@@ -1,7 +1,7 @@
 # WeCoza Core Plugin Merge - Final Implementation Plan
 
 **Created:** 2026-01-29
-**Status:** Phase 1 COMPLETE - Ready for Phase 2
+**Status:** Phase 3 COMPLETE - Ready for Phase 4 (Consolidation & Switchover)
 **Plugin Name:** `wecoza-core`
 **Scope:** Learners + Classes (extensible for future modules)
 
@@ -110,48 +110,67 @@ wecoza-core/
 
 ### Phase 2: Migrate Learners Module
 
-- [ ] Create `src/Learners/` directory structure
-- [ ] Migrate `LearnerModel.php` → extend `BaseModel`
+#### Backend (✅ Complete)
+- [x] Create `src/Learners/` directory structure
+- [x] Migrate `LearnerModel.php` → extend `BaseModel`
   - Source: `wecoza-learners-plugin/models/LearnerModel.php`
   - Update namespace: `WeCoza\Learners\Models`
-- [ ] Migrate `LearnerProgressionModel.php` → extend `BaseModel`
+- [x] Migrate `LearnerProgressionModel.php` → extend `BaseModel`
   - Source: `wecoza-learners-plugin/models/LearnerProgressionModel.php`
-- [ ] Migrate `LearnerController.php`
+- [x] Migrate `LearnerController.php`
   - Source: `wecoza-learners-plugin/controllers/LearnerController.php`
-- [ ] Migrate `LearnerProgressionRepository.php`
+- [x] Migrate `LearnerProgressionRepository.php`
   - Source: `wecoza-learners-plugin/repositories/LearnerProgressionRepository.php`
-- [ ] Migrate `ProgressionService.php`
+- [x] Migrate `ProgressionService.php`
   - Source: `wecoza-learners-plugin/services/ProgressionService.php`
-- [ ] Migrate `PortfolioUploadService.php`
+- [x] Migrate `PortfolioUploadService.php`
   - Source: `wecoza-learners-plugin/services/PortfolioUploadService.php`
-- [ ] Migrate shortcodes from `learners-plugin.php`
-- [ ] Migrate AJAX handlers from `ajax/learners-ajax-handlers.php`
-- [ ] Copy views to `views/learners/`
+- [x] Register basic AJAX handlers (in LearnerController)
+- [x] Register basic shortcodes (simplified versions in LearnerController)
+
+#### Frontend (✅ Complete)
+- [x] Migrate full shortcodes from `shortcodes/` folder
+  - `learners-display-shortcode.php` → `src/Learners/Shortcodes/`
+  - `learners-capture-shortcode.php` → `src/Learners/Shortcodes/`
+  - `learner-single-display-shortcode.php` → `src/Learners/Shortcodes/`
+  - `learners-update-shortcode.php` → `src/Learners/Shortcodes/`
+- [x] Migrate view components to `views/learners/`
+  - 8 component files + 1 view file
+- [x] Migrate JS assets to `assets/js/learners/`
+  - `learners-app.js`, `learners-display-shortcode.js`, `learner-progressions.js`, `learner-single-display.js`
+- [x] Migrate CSS to `assets/css/`
+  - `learners-style.css`
+- [x] Register shortcodes in `wecoza-core.php`
+- [x] Enqueue global JS/CSS assets
 - [ ] **VERIFY:** Learner CRUD operations work
 
-### Phase 3: Migrate Classes Module
+### Phase 3: Migrate Classes Module ✅ COMPLETE
 
-- [ ] Create `src/Classes/` directory structure
-- [ ] Migrate `ClassModel.php` → extend `BaseModel`
+- [x] Create `src/Classes/` directory structure
+- [x] Migrate `ClassModel.php` → extend `BaseModel`
   - Source: `wecoza-classes-plugin/app/Models/ClassModel.php`
   - Update namespace: `WeCoza\Classes\Models`
   - **Keep JSONB `learner_ids`** - do not refactor yet
-- [ ] Migrate `QAModel.php`, `QAVisitModel.php`
-- [ ] Migrate `ClassController.php`
+- [x] Migrate `QAModel.php` (analytics service - no BaseModel needed), `QAVisitModel.php`
+- [x] Migrate `ClassController.php`
   - Source: `wecoza-classes-plugin/app/Controllers/ClassController.php`
-- [ ] Migrate `ClassAjaxController.php`
+- [x] Migrate `ClassAjaxController.php`
   - Source: `wecoza-classes-plugin/app/Controllers/ClassAjaxController.php`
-- [ ] Migrate `QAController.php`
+- [x] Migrate `QAController.php`
   - Source: `wecoza-classes-plugin/app/Controllers/QAController.php`
-- [ ] Migrate `ClassRepository.php`
+- [x] Migrate `ClassRepository.php`
   - Source: `wecoza-classes-plugin/app/Repositories/ClassRepository.php`
-- [ ] Migrate `ScheduleService.php`
+- [x] Migrate `ScheduleService.php`
   - Source: `wecoza-classes-plugin/app/Services/ScheduleService.php`
-- [ ] Migrate `FormDataProcessor.php`
+- [x] Migrate `FormDataProcessor.php`
   - Source: `wecoza-classes-plugin/app/Services/FormDataProcessor.php`
-- [ ] Migrate `UploadService.php`
-- [ ] Copy views to `views/classes/`
+- [x] Create `UploadService.php` (extracted from ClassAjaxController + QAController)
+- [x] Copy views to `views/classes/`
 - [ ] **VERIFY:** Class CRUD + learner assignment works
+
+**Additional controllers created:**
+- `ClassTypesController.php` - class type management
+- `PublicHolidaysController.php` - public holidays lookup
 
 ### Phase 4: Consolidation & Switchover
 

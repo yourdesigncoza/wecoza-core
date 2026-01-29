@@ -395,16 +395,8 @@ class ClassModel extends BaseModel
         return array_column($this->stopRestartDates, 'stop_date');
     }
 
-    public function setStopDates(mixed $stopDates): self {
-        return $this;
-    }
-
     public function getRestartDates(): array {
         return array_column($this->stopRestartDates, 'restart_date');
-    }
-
-    public function setRestartDates(mixed $restartDates): self {
-        return $this;
     }
 
     public function getClassNotesData(): array { return $this->classNotesData; }
@@ -476,16 +468,6 @@ class ClassModel extends BaseModel
         } else {
             return array_map('intval', $this->learnerIds);
         }
-    }
-
-    public static function getValidationRules(): array
-    {
-        return [];
-    }
-
-    public static function validate($data): bool
-    {
-        return true;
     }
 
     public static function getAll($limit = null, $offset = 0): array

@@ -16,6 +16,7 @@ use WeCoza\Classes\Models\ClassModel;
 use WeCoza\Classes\Repositories\ClassRepository;
 use WeCoza\Classes\Services\FormDataProcessor;
 use WeCoza\Classes\Services\ScheduleService;
+use WeCoza\Classes\Services\UploadService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -488,96 +489,21 @@ class ClassAjaxController extends BaseController
             return;
         }
 
-        if (!current_user_can('upload_files')) {
-            wp_send_json_error('You do not have permission to upload files');
-            return;
-        }
-
         if (empty($_FILES['file'])) {
             wp_send_json_error('No file uploaded');
             return;
         }
 
-        $file = $_FILES['file'];
         $context = isset($_POST['context']) ? sanitize_text_field($_POST['context']) : 'general';
 
-        $allowed_types = [
-            'application/pdf', 'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'image/jpeg', 'image/png'
-        ];
+        $uploadService = new UploadService();
+        $result = $uploadService->uploadClassAttachment($_FILES['file'], $context);
 
-        $file_type = wp_check_filetype($file['name']);
-        if (!in_array($file['type'], $allowed_types) && !in_array($file_type['type'], $allowed_types)) {
-            wp_send_json_error('Invalid file type');
-            return;
-        }
-
-        if ($file['size'] > 10 * 1024 * 1024) {
-            wp_send_json_error('File size must be less than 10MB');
-            return;
-        }
-
-        require_once(ABSPATH . 'wp-admin/includes/image.php');
-        require_once(ABSPATH . 'wp-admin/includes/file.php');
-        require_once(ABSPATH . 'wp-admin/includes/media.php');
-
-        add_filter('upload_dir', [__CLASS__, 'customUploadDir']);
-
-        $upload_overrides = ['test_form' => false];
-        $movefile = wp_handle_upload($file, $upload_overrides);
-
-        remove_filter('upload_dir', [__CLASS__, 'customUploadDir']);
-
-        if ($movefile && !isset($movefile['error'])) {
-            $filename = $movefile['file'];
-            $filetype = wp_check_filetype(basename($filename), null);
-            $wp_upload_dir = wp_upload_dir();
-
-            $attachment = [
-                'guid' => $wp_upload_dir['url'] . '/' . basename($filename),
-                'post_mime_type' => $filetype['type'],
-                'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-                'post_content' => '',
-                'post_status' => 'inherit'
-            ];
-
-            $attach_id = wp_insert_attachment($attachment, $filename);
-
-            if (!is_wp_error($attach_id)) {
-                $attach_data = wp_generate_attachment_metadata($attach_id, $filename);
-                wp_update_attachment_metadata($attach_id, $attach_data);
-
-                update_post_meta($attach_id, '_wecoza_context', $context);
-
-                wp_send_json_success([
-                    'id' => $attach_id,
-                    'url' => wp_get_attachment_url($attach_id),
-                    'title' => get_the_title($attach_id),
-                    'filename' => basename($filename),
-                    'filesize' => filesize($filename),
-                    'filetype' => $filetype['type']
-                ]);
-            } else {
-                wp_send_json_error('Failed to create attachment');
-            }
+        if ($result['success']) {
+            unset($result['success']);
+            wp_send_json_success($result);
         } else {
-            $error = $movefile['error'] ?? 'File upload failed';
-            wp_send_json_error($error);
+            wp_send_json_error($result['message']);
         }
-    }
-
-    /**
-     * Custom upload directory for class-related files
-     */
-    public static function customUploadDir(array $upload): array
-    {
-        $upload['subdir'] = '/wecoza-classes' . $upload['subdir'];
-        $upload['path'] = $upload['basedir'] . $upload['subdir'];
-        $upload['url'] = $upload['baseurl'] . $upload['subdir'];
-
-        return $upload;
     }
 }

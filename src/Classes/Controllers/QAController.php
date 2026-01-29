@@ -15,6 +15,7 @@ use WeCoza\Core\Abstract\BaseController;
 use WeCoza\Classes\Models\QAModel;
 use WeCoza\Classes\Models\QAVisitModel;
 use WeCoza\Classes\Repositories\ClassRepository;
+use WeCoza\Classes\Services\UploadService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -30,25 +31,25 @@ class QAController extends BaseController
         add_action('init', [$this, 'registerShortcodes']);
         add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
 
-        // QA Analytics AJAX handlers
-        add_action('wp_ajax_get_qa_analytics', [__CLASS__, 'getQAAnalytics']);
-        add_action('wp_ajax_nopriv_get_qa_analytics', [__CLASS__, 'getQAAnalytics']);
-        add_action('wp_ajax_get_qa_summary', [__CLASS__, 'getQASummary']);
-        add_action('wp_ajax_nopriv_get_qa_summary', [__CLASS__, 'getQASummary']);
-        add_action('wp_ajax_get_qa_visits', [__CLASS__, 'getQAVisits']);
-        add_action('wp_ajax_nopriv_get_qa_visits', [__CLASS__, 'getQAVisits']);
-        add_action('wp_ajax_create_qa_visit', [__CLASS__, 'createQAVisit']);
-        add_action('wp_ajax_nopriv_create_qa_visit', [__CLASS__, 'createQAVisit']);
-        add_action('wp_ajax_export_qa_reports', [__CLASS__, 'exportQAReports']);
-        add_action('wp_ajax_nopriv_export_qa_reports', [__CLASS__, 'exportQAReports']);
+        // QA Analytics AJAX handlers - using instance methods
+        add_action('wp_ajax_get_qa_analytics', [$this, 'getQAAnalytics']);
+        add_action('wp_ajax_nopriv_get_qa_analytics', [$this, 'getQAAnalytics']);
+        add_action('wp_ajax_get_qa_summary', [$this, 'getQASummary']);
+        add_action('wp_ajax_nopriv_get_qa_summary', [$this, 'getQASummary']);
+        add_action('wp_ajax_get_qa_visits', [$this, 'getQAVisits']);
+        add_action('wp_ajax_nopriv_get_qa_visits', [$this, 'getQAVisits']);
+        add_action('wp_ajax_create_qa_visit', [$this, 'createQAVisit']);
+        add_action('wp_ajax_nopriv_create_qa_visit', [$this, 'createQAVisit']);
+        add_action('wp_ajax_export_qa_reports', [$this, 'exportQAReports']);
+        add_action('wp_ajax_nopriv_export_qa_reports', [$this, 'exportQAReports']);
 
         // QA Operations AJAX handlers
         add_action('wp_ajax_delete_qa_report', [$this, 'deleteQAReport']);
         add_action('wp_ajax_nopriv_delete_qa_report', [$this, 'deleteQAReport']);
-        add_action('wp_ajax_get_class_qa_data', [__CLASS__, 'getClassQAData']);
-        add_action('wp_ajax_nopriv_get_class_qa_data', [__CLASS__, 'getClassQAData']);
-        add_action('wp_ajax_submit_qa_question', [__CLASS__, 'submitQAQuestion']);
-        add_action('wp_ajax_nopriv_submit_qa_question', [__CLASS__, 'submitQAQuestion']);
+        add_action('wp_ajax_get_class_qa_data', [$this, 'getClassQAData']);
+        add_action('wp_ajax_nopriv_get_class_qa_data', [$this, 'getClassQAData']);
+        add_action('wp_ajax_submit_qa_question', [$this, 'submitQAQuestion']);
+        add_action('wp_ajax_nopriv_submit_qa_question', [$this, 'submitQAQuestion']);
 
         add_action('admin_menu', [$this, 'addQADashboardMenu']);
     }
@@ -140,87 +141,79 @@ class QAController extends BaseController
     /**
      * AJAX handler for getting QA analytics data
      */
-    public static function getQAAnalytics(): void
+    public function getQAAnalytics(): void
     {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'qa_dashboard_nonce')) {
-            wp_die('Security check failed');
-        }
+        $this->requireNonce('qa_dashboard_nonce');
 
-        $start_date = sanitize_text_field($_POST['start_date'] ?? '');
-        $end_date = sanitize_text_field($_POST['end_date'] ?? '');
-        $department = sanitize_text_field($_POST['department'] ?? '');
+        $start_date = $this->input('start_date', 'string', '');
+        $end_date = $this->input('end_date', 'string', '');
+        $department = $this->input('department', 'string', '');
 
         $qa_model = new QAModel();
         $analytics_data = $qa_model->getAnalyticsData($start_date, $end_date, $department);
 
-        wp_send_json_success($analytics_data);
+        $this->sendSuccess($analytics_data);
     }
 
     /**
      * AJAX handler for getting QA summary data
      */
-    public static function getQASummary(): void
+    public function getQASummary(): void
     {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'qa_dashboard_nonce')) {
-            wp_die('Security check failed');
-        }
+        $this->requireNonce('qa_dashboard_nonce');
 
         $qa_model = new QAModel();
         $summary_data = $qa_model->getSummaryData();
 
-        wp_send_json_success($summary_data);
+        $this->sendSuccess($summary_data);
     }
 
     /**
      * AJAX handler for getting QA visits for a specific class
      */
-    public static function getQAVisits(): void
+    public function getQAVisits(): void
     {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'qa_dashboard_nonce')) {
-            wp_die('Security check failed');
-        }
+        $this->requireNonce('qa_dashboard_nonce');
 
-        $class_id = intval($_POST['class_id'] ?? 0);
+        $class_id = $this->input('class_id', 'int', 0);
 
         if (!$class_id) {
-            wp_send_json_error('Invalid class ID');
+            $this->sendError('Invalid class ID');
             return;
         }
 
         $qa_model = new QAModel();
         $visits = $qa_model->getVisitsByClass($class_id);
 
-        wp_send_json_success($visits);
+        $this->sendSuccess($visits);
     }
 
     /**
      * AJAX handler for creating a new QA visit
      */
-    public static function createQAVisit(): void
+    public function createQAVisit(): void
     {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'qa_dashboard_nonce')) {
-            wp_die('Security check failed');
-        }
+        $this->requireNonce('qa_dashboard_nonce');
 
         $visit_data = [
-            'class_id' => intval($_POST['class_id'] ?? 0),
-            'visit_date' => sanitize_text_field($_POST['visit_date'] ?? ''),
-            'visit_time' => sanitize_text_field($_POST['visit_time'] ?? ''),
-            'visit_type' => sanitize_text_field($_POST['visit_type'] ?? 'routine'),
-            'qa_officer_id' => intval($_POST['qa_officer_id'] ?? 0),
-            'visit_duration' => intval($_POST['visit_duration'] ?? 0),
-            'overall_rating' => intval($_POST['overall_rating'] ?? 0),
-            'attendance_count' => intval($_POST['attendance_count'] ?? 0),
-            'instructor_present' => filter_var($_POST['instructor_present'] ?? true, FILTER_VALIDATE_BOOLEAN),
-            'equipment_status' => sanitize_text_field($_POST['equipment_status'] ?? ''),
-            'venue_condition' => sanitize_text_field($_POST['venue_condition'] ?? ''),
-            'safety_compliance' => filter_var($_POST['safety_compliance'] ?? true, FILTER_VALIDATE_BOOLEAN),
-            'findings' => json_decode(stripslashes($_POST['findings'] ?? '[]'), true),
-            'recommendations' => json_decode(stripslashes($_POST['recommendations'] ?? '[]'), true),
-            'action_items' => json_decode(stripslashes($_POST['action_items'] ?? '[]'), true),
-            'visit_notes' => sanitize_textarea_field($_POST['visit_notes'] ?? ''),
-            'follow_up_required' => filter_var($_POST['follow_up_required'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            'follow_up_date' => sanitize_text_field($_POST['follow_up_date'] ?? ''),
+            'class_id' => $this->input('class_id', 'int', 0),
+            'visit_date' => $this->input('visit_date', 'string', ''),
+            'visit_time' => $this->input('visit_time', 'string', ''),
+            'visit_type' => $this->input('visit_type', 'string', 'routine'),
+            'qa_officer_id' => $this->input('qa_officer_id', 'int', 0),
+            'visit_duration' => $this->input('visit_duration', 'int', 0),
+            'overall_rating' => $this->input('overall_rating', 'int', 0),
+            'attendance_count' => $this->input('attendance_count', 'int', 0),
+            'instructor_present' => $this->input('instructor_present', 'bool', true),
+            'equipment_status' => $this->input('equipment_status', 'string', ''),
+            'venue_condition' => $this->input('venue_condition', 'string', ''),
+            'safety_compliance' => $this->input('safety_compliance', 'bool', true),
+            'findings' => $this->input('findings', 'json', []),
+            'recommendations' => $this->input('recommendations', 'json', []),
+            'action_items' => $this->input('action_items', 'json', []),
+            'visit_notes' => $this->input('visit_notes', 'textarea', ''),
+            'follow_up_required' => $this->input('follow_up_required', 'bool', false),
+            'follow_up_date' => $this->input('follow_up_date', 'string', ''),
             'created_by' => get_current_user_id()
         ];
 
@@ -228,31 +221,30 @@ class QAController extends BaseController
         $result = $qa_model->createVisit($visit_data);
 
         if ($result) {
-            wp_send_json_success(['message' => 'QA visit created successfully', 'visit_id' => $result]);
+            $this->sendSuccess(['visit_id' => $result], 'QA visit created successfully');
         } else {
-            wp_send_json_error('Failed to create QA visit');
+            $this->sendError('Failed to create QA visit');
         }
     }
 
     /**
      * AJAX handler for exporting QA reports
      */
-    public static function exportQAReports(): void
+    public function exportQAReports(): void
     {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'qa_dashboard_nonce')) {
-            wp_die('Security check failed');
-        }
+        $this->requireNonce('qa_dashboard_nonce');
 
-        $format = sanitize_text_field($_POST['format'] ?? 'csv');
-        $start_date = sanitize_text_field($_POST['start_date'] ?? '');
-        $end_date = sanitize_text_field($_POST['end_date'] ?? '');
+        $format = $this->input('format', 'string', 'csv');
+        $start_date = $this->input('start_date', 'string', '');
+        $end_date = $this->input('end_date', 'string', '');
 
         $qa_model = new QAModel();
         $export_data = $qa_model->getExportData($start_date, $end_date);
 
         if ($format === 'csv') {
+            $filename = sanitize_file_name('qa-reports-' . date('Y-m-d') . '.csv');
             header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="qa-reports-' . date('Y-m-d') . '.csv"');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
 
             $output = fopen('php://output', 'w');
 
@@ -264,7 +256,7 @@ class QAController extends BaseController
 
             fclose($output);
         } elseif ($format === 'pdf') {
-            wp_send_json_error('PDF export not implemented yet');
+            $this->sendError('PDF export not implemented yet');
         }
 
         exit;
@@ -279,61 +271,8 @@ class QAController extends BaseController
      */
     private static function handleQAReportUploads(array $files, array $visitData): array
     {
-        $uploadedReports = [];
-
-        if (empty($files['name']) || !is_array($files['name'])) {
-            return $uploadedReports;
-        }
-
-        $upload_dir = wp_upload_dir();
-        $qa_reports_dir = $upload_dir['basedir'] . '/qa-reports';
-        $qa_reports_url = $upload_dir['baseurl'] . '/qa-reports';
-
-        if (!file_exists($qa_reports_dir)) {
-            wp_mkdir_p($qa_reports_dir);
-        }
-
-        for ($i = 0; $i < count($files['name']); $i++) {
-            if (empty($files['name'][$i]) || $files['error'][$i] !== UPLOAD_ERR_OK) {
-                continue;
-            }
-
-            $visit_date = $visitData[$i]['date'] ?? date('Y-m-d');
-            $visit_type = $visitData[$i]['type'] ?? 'Initial QA Visit';
-            $qa_officer = $visitData[$i]['officer'] ?? '';
-
-            $file = [
-                'name' => $files['name'][$i],
-                'type' => $files['type'][$i],
-                'tmp_name' => $files['tmp_name'][$i],
-                'error' => $files['error'][$i],
-                'size' => $files['size'][$i]
-            ];
-
-            $allowed_types = ['application/pdf'];
-            if (!in_array($file['type'], $allowed_types)) {
-                continue;
-            }
-
-            $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $base_name = 'qa_report_' . date('Ymd_His') . '_' . uniqid();
-            $new_filename = $base_name . '.' . $file_extension;
-            $file_path = $qa_reports_dir . '/' . $new_filename;
-
-            if (move_uploaded_file($file['tmp_name'], $file_path)) {
-                $uploadedReports[] = [
-                    'filename' => $new_filename,
-                    'original_name' => $file['name'],
-                    'file_path' => 'qa-reports/' . $new_filename,
-                    'file_url' => $qa_reports_url . '/' . $new_filename,
-                    'file_size' => $file['size'],
-                    'uploaded_by' => wp_get_current_user()->display_name,
-                    'upload_date' => current_time('mysql')
-                ];
-            }
-        }
-
-        return $uploadedReports;
+        $uploadService = new UploadService();
+        return $uploadService->uploadQAReports($files, $visitData);
     }
 
     /**
@@ -341,18 +280,8 @@ class QAController extends BaseController
      */
     private static function deleteQAReportFile(string $filePath): bool
     {
-        if (empty($filePath)) {
-            return false;
-        }
-
-        $upload_dir = wp_upload_dir();
-        $full_path = $upload_dir['basedir'] . '/' . $filePath;
-
-        if (file_exists($full_path)) {
-            return unlink($full_path);
-        }
-
-        return false;
+        $uploadService = new UploadService();
+        return $uploadService->deleteQAReportFile($filePath);
     }
 
     /**
@@ -485,24 +414,21 @@ class QAController extends BaseController
     /**
      * AJAX: Get class QA data for a specific class
      */
-    public static function getClassQAData(): void
+    public function getClassQAData(): void
     {
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wecoza_class_nonce')) {
-            wp_send_json_error('Invalid security token');
-            return;
-        }
+        $this->requireNonce('wecoza_class_nonce');
 
-        $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
+        $class_id = $this->input('class_id', 'int', 0);
 
         if ($class_id <= 0) {
-            wp_send_json_error('Invalid class ID');
+            $this->sendError('Invalid class ID');
             return;
         }
 
         $class = ClassRepository::getSingleClass($class_id);
 
         if (!$class) {
-            wp_send_json_error('Class not found');
+            $this->sendError('Class not found');
             return;
         }
 
@@ -522,7 +448,7 @@ class QAController extends BaseController
 
         $qa_reports = $class['qa_reports'] ?? [];
 
-        wp_send_json_success([
+        $this->sendSuccess([
             'qa_visit_dates' => $qa_visit_dates,
             'qa_reports' => $qa_reports
         ]);
@@ -531,59 +457,35 @@ class QAController extends BaseController
     /**
      * AJAX: Submit a QA question
      */
-    public static function submitQAQuestion(): void
+    public function submitQAQuestion(): void
     {
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wecoza_class_nonce')) {
-            wp_send_json_error('Invalid security token');
-            return;
-        }
+        $this->requireNonce('wecoza_class_nonce');
 
-        $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
-        $question = isset($_POST['question']) ? sanitize_textarea_field($_POST['question']) : '';
-        $context = isset($_POST['context']) ? sanitize_textarea_field($_POST['context']) : '';
+        $class_id = $this->input('class_id', 'int', 0);
+        $question = $this->input('question', 'textarea', '');
+        $context = $this->input('context', 'textarea', '');
 
         if ($class_id <= 0 || empty($question)) {
-            wp_send_json_error('Invalid input data');
+            $this->sendError('Invalid input data');
             return;
         }
 
         $attachment_url = '';
         $attachment_path = '';
+        $filename = '';
 
         if (!empty($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-            $file = $_FILES['attachment'];
+            $uploadService = new UploadService();
+            $result = $uploadService->uploadQAQuestionAttachment($class_id, $_FILES['attachment']);
 
-            $allowed_types = [
-                'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'image/jpeg',
-                'image/png'
-            ];
-            if (!in_array($file['type'], $allowed_types)) {
-                wp_send_json_error('Invalid file type');
+            if (!$result['success']) {
+                $this->sendError($result['message']);
                 return;
             }
 
-            if ($file['size'] > 5 * 1024 * 1024) {
-                wp_send_json_error('File size must be less than 5MB');
-                return;
-            }
-
-            $upload_dir = wp_upload_dir();
-            $qa_dir = $upload_dir['basedir'] . '/qa-questions/' . $class_id;
-
-            if (!file_exists($qa_dir)) {
-                wp_mkdir_p($qa_dir);
-            }
-
-            $filename = 'question_' . uniqid() . '_' . sanitize_file_name($file['name']);
-            $filepath = $qa_dir . '/' . $filename;
-
-            if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                $attachment_path = 'qa-questions/' . $class_id . '/' . $filename;
-                $attachment_url = $upload_dir['baseurl'] . '/' . $attachment_path;
-            }
+            $attachment_url = $result['url'];
+            $attachment_path = $result['path'];
+            $filename = $result['name'];
         }
 
         $question_data = [
@@ -608,7 +510,7 @@ class QAController extends BaseController
         $class = ClassRepository::getSingleClass($class_id);
 
         if (!$class) {
-            wp_send_json_error('Class not found');
+            $this->sendError('Class not found');
             return;
         }
 
@@ -618,10 +520,9 @@ class QAController extends BaseController
 
         $qa_data[] = $question_data;
 
-        wp_send_json_success([
-            'message' => 'Question submitted successfully',
+        $this->sendSuccess([
             'question' => $question_data
-        ]);
+        ], 'Question submitted successfully');
     }
 
     /**
@@ -629,23 +530,20 @@ class QAController extends BaseController
      */
     public function deleteQAReport(): void
     {
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wecoza_class_nonce')) {
-            wp_send_json_error('Invalid security token');
-            return;
-        }
+        $this->requireNonce('wecoza_class_nonce');
 
-        $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
-        $report_index = isset($_POST['report_index']) ? intval($_POST['report_index']) : -1;
+        $class_id = $this->input('class_id', 'int', 0);
+        $report_index = $this->input('report_index', 'int', -1);
 
         if ($class_id <= 0 || $report_index < 0) {
-            wp_send_json_error('Invalid input data');
+            $this->sendError('Invalid input data');
             return;
         }
 
         $class = ClassRepository::getSingleClass($class_id);
 
         if (!$class) {
-            wp_send_json_error('Class not found');
+            $this->sendError('Class not found');
             return;
         }
 
@@ -654,7 +552,7 @@ class QAController extends BaseController
             : [];
 
         if (!isset($reports[$report_index])) {
-            wp_send_json_error('Report not found');
+            $this->sendError('Report not found');
             return;
         }
 
@@ -668,34 +566,19 @@ class QAController extends BaseController
 
         array_splice($reports, $report_index, 1);
 
-        $db = wecoza_db();
-
         try {
             $sql = "UPDATE public.classes SET qa_reports = $1, updated_at = NOW() WHERE class_id = $2";
-            $db->query($sql, [json_encode($reports), $class_id]);
+            $this->db()->query($sql, [json_encode($reports), $class_id]);
 
             if ($file_path && file_exists($file_path)) {
                 unlink($file_path);
             }
 
-            wp_send_json_success([
-                'message' => 'Report deleted successfully',
+            $this->sendSuccess([
                 'remaining_reports' => count($reports)
-            ]);
+            ], 'Report deleted successfully');
         } catch (\Exception $e) {
-            wp_send_json_error('Failed to delete report');
+            $this->sendError('Failed to delete report');
         }
-    }
-
-    /**
-     * Custom upload directory for QA-related files
-     */
-    public static function customUploadDir(array $upload): array
-    {
-        $upload['subdir'] = '/wecoza-classes' . $upload['subdir'];
-        $upload['path'] = $upload['basedir'] . $upload['subdir'];
-        $upload['url'] = $upload['baseurl'] . $upload['subdir'];
-
-        return $upload;
     }
 }

@@ -28,6 +28,7 @@ if (!defined('ABSPATH')) {
 
 define('WECOZA_CORE_VERSION', '1.0.0');
 define('WECOZA_CORE_PATH', plugin_dir_path(__FILE__));
+define('WECOZA_CORE_DIR', plugin_dir_path(__FILE__)); // Alias for WECOZA_CORE_PATH
 define('WECOZA_CORE_URL', plugin_dir_url(__FILE__));
 define('WECOZA_CORE_BASENAME', plugin_basename(__FILE__));
 define('WECOZA_CORE_FILE', __FILE__);
@@ -82,6 +83,43 @@ spl_autoload_register(function (string $class) {
 */
 
 require_once WECOZA_CORE_PATH . 'core/Helpers/functions.php';
+
+/*
+|--------------------------------------------------------------------------
+| Frontend Asset Enqueue
+|--------------------------------------------------------------------------
+*/
+
+add_action('wp_enqueue_scripts', function () {
+    // Enqueue Learners CSS
+    wp_enqueue_style(
+        'wecoza-learners-style',
+        WECOZA_CORE_URL . 'assets/css/learners-style.css',
+        [],
+        WECOZA_CORE_VERSION
+    );
+
+    // Enqueue global Learners JavaScript (handles initials generation, delete confirmations, etc.)
+    wp_enqueue_script(
+        'wecoza-learners-app',
+        WECOZA_CORE_URL . 'assets/js/learners/learners-app.js',
+        ['jquery'],
+        WECOZA_CORE_VERSION,
+        true
+    );
+
+    // Localize script
+    wp_localize_script('wecoza-learners-app', 'WeCozaLearners', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('learners_nonce'),
+        'plugin_url' => WECOZA_CORE_URL,
+        'uploads_url' => wp_upload_dir()['baseurl'],
+        'home_url' => home_url(),
+        'display_learners_url' => home_url('app/all-learners'),
+        'view_learner_url' => home_url('app/view-learner'),
+        'update_learner_url' => home_url('app/update-learners')
+    ]);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -146,6 +184,40 @@ add_action('plugins_loaded', function () {
         $publicHolidaysController = \WeCoza\Classes\Controllers\PublicHolidaysController::getInstance();
         $publicHolidaysController->initialize();
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load Learners Shortcodes
+    |--------------------------------------------------------------------------
+    |
+    | Full-featured shortcodes for learner management forms and displays.
+    | These extend the basic MVC shortcodes in LearnerController.
+    |
+    */
+
+    // Learners display shortcode [wecoza_display_learners]
+    require_once WECOZA_CORE_PATH . 'src/Learners/Shortcodes/learners-display-shortcode.php';
+
+    // Learners capture form shortcode [wecoza_learners_form]
+    require_once WECOZA_CORE_PATH . 'src/Learners/Shortcodes/learners-capture-shortcode.php';
+
+    // Single learner display shortcode [wecoza_single_learner_display]
+    require_once WECOZA_CORE_PATH . 'src/Learners/Shortcodes/learner-single-display-shortcode.php';
+
+    // Learners update form shortcode [wecoza_learners_update_form]
+    require_once WECOZA_CORE_PATH . 'src/Learners/Shortcodes/learners-update-shortcode.php';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load Learners AJAX Handlers
+    |--------------------------------------------------------------------------
+    |
+    | AJAX handlers using legacy action names for backward compatibility
+    | with existing JavaScript files.
+    |
+    */
+
+    require_once WECOZA_CORE_PATH . 'src/Learners/Ajax/LearnerAjaxHandlers.php';
 
     // Debug logging
     if (defined('WP_DEBUG') && WP_DEBUG) {
