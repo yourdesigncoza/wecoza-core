@@ -1,0 +1,542 @@
+<?php
+/**
+ * WeCoza Core - Learner Progression Repository
+ *
+ * Data access layer for learner LP progression tracking.
+ * Handles all database operations for the learner_lp_tracking table.
+ *
+ * @package WeCoza\Learners\Repositories
+ * @since 1.0.0
+ */
+
+namespace WeCoza\Learners\Repositories;
+
+use WeCoza\Core\Abstract\BaseRepository;
+use PDO;
+use Exception;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class LearnerProgressionRepository extends BaseRepository
+{
+    /**
+     * Table name
+     */
+    protected static string $table = 'learner_lp_tracking';
+
+    /**
+     * Primary key column
+     */
+    protected static string $primaryKey = 'tracking_id';
+
+    /**
+     * Base query with common joins
+     */
+    private function baseQuery(): string
+    {
+        return "
+            SELECT
+                lpt.*,
+                p.product_name,
+                p.product_duration,
+                CONCAT(l.first_name, ' ', l.surname) AS learner_name,
+                c.class_code
+            FROM learner_lp_tracking lpt
+            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN learners l ON lpt.learner_id = l.id
+            LEFT JOIN classes c ON lpt.class_id = c.class_id
+        ";
+    }
+
+    /**
+     * Find progression by ID
+     */
+    public function findById(int $trackingId): ?array
+    {
+        $sql = $this->baseQuery() . " WHERE lpt.tracking_id = :tracking_id";
+
+        try {
+            $stmt = $this->db->query($sql, ['tracking_id' => $trackingId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findById error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Find current (in_progress) LP for a learner
+     */
+    public function findCurrentForLearner(int $learnerId): ?array
+    {
+        $sql = $this->baseQuery() . "
+            WHERE lpt.learner_id = :learner_id
+            AND lpt.status = 'in_progress'
+            LIMIT 1
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, ['learner_id' => $learnerId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findCurrentForLearner error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Find all progressions for a learner
+     */
+    public function findAllForLearner(int $learnerId): array
+    {
+        $sql = $this->baseQuery() . "
+            WHERE lpt.learner_id = :learner_id
+            ORDER BY lpt.start_date DESC
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, ['learner_id' => $learnerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findAllForLearner error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Find completed progressions for a learner (history)
+     */
+    public function findHistoryForLearner(int $learnerId): array
+    {
+        $sql = $this->baseQuery() . "
+            WHERE lpt.learner_id = :learner_id
+            AND lpt.status = 'completed'
+            ORDER BY lpt.completion_date DESC
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, ['learner_id' => $learnerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findHistoryForLearner error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Find progressions by class
+     */
+    public function findByClass(int $classId, ?string $status = null): array
+    {
+        $sql = $this->baseQuery() . " WHERE lpt.class_id = :class_id";
+        $params = ['class_id' => $classId];
+
+        if ($status) {
+            $sql .= " AND lpt.status = :status";
+            $params['status'] = $status;
+        }
+
+        $sql .= " ORDER BY l.surname, l.first_name";
+
+        try {
+            $stmt = $this->db->query($sql, $params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findByClass error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Find progressions by product
+     */
+    public function findByProduct(int $productId, ?string $status = null): array
+    {
+        $sql = $this->baseQuery() . " WHERE lpt.product_id = :product_id";
+        $params = ['product_id' => $productId];
+
+        if ($status) {
+            $sql .= " AND lpt.status = :status";
+            $params['status'] = $status;
+        }
+
+        $sql .= " ORDER BY lpt.start_date DESC";
+
+        try {
+            $stmt = $this->db->query($sql, $params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findByProduct error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Insert new progression
+     */
+    public function insert(array $data): ?int
+    {
+        $columns = [
+            'learner_id', 'product_id', 'class_id',
+            'hours_trained', 'hours_present', 'hours_absent',
+            'status', 'start_date', 'notes',
+            'created_at', 'updated_at'
+        ];
+
+        $filteredData = array_intersect_key($data, array_flip($columns));
+
+        if (!isset($filteredData['start_date'])) {
+            $filteredData['start_date'] = date('Y-m-d');
+        }
+        if (!isset($filteredData['status'])) {
+            $filteredData['status'] = 'in_progress';
+        }
+
+        $columnList = implode(', ', array_keys($filteredData));
+        $placeholders = ':' . implode(', :', array_keys($filteredData));
+
+        $sql = "INSERT INTO learner_lp_tracking ($columnList) VALUES ($placeholders) RETURNING tracking_id";
+
+        try {
+            $pdo = $this->db->getPdo();
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($filteredData);
+            $trackingId = $stmt->fetchColumn();
+
+            $pdo->commit();
+            delete_transient('learner_progressions_cache');
+
+            return (int) $trackingId;
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            error_log("WeCoza Core: LearnerProgressionRepository insert error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Update existing progression
+     */
+    public function update(int $trackingId, array $data): bool
+    {
+        $columns = [
+            'hours_trained', 'hours_present', 'hours_absent',
+            'status', 'completion_date',
+            'portfolio_file_path', 'portfolio_uploaded_at',
+            'marked_complete_by', 'marked_complete_date',
+            'notes', 'updated_at'
+        ];
+
+        $filteredData = array_intersect_key($data, array_flip($columns));
+        $filteredData['updated_at'] = date('Y-m-d H:i:s');
+
+        $setParts = [];
+        foreach (array_keys($filteredData) as $column) {
+            $setParts[] = "$column = :$column";
+        }
+        $setClause = implode(', ', $setParts);
+
+        $sql = "UPDATE learner_lp_tracking SET $setClause WHERE tracking_id = :tracking_id";
+        $filteredData['tracking_id'] = $trackingId;
+
+        try {
+            $stmt = $this->db->query($sql, $filteredData);
+            delete_transient('learner_progressions_cache');
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository update error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete progression
+     */
+    public function delete(int $trackingId): bool
+    {
+        $sql = "DELETE FROM learner_lp_tracking WHERE tracking_id = :tracking_id";
+
+        try {
+            $stmt = $this->db->query($sql, ['tracking_id' => $trackingId]);
+            delete_transient('learner_progressions_cache');
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository delete error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Log hours to the hours log table
+     */
+    public function logHours(array $data): bool
+    {
+        $columns = [
+            'learner_id', 'product_id', 'class_id', 'tracking_id',
+            'log_date', 'hours_trained', 'hours_present',
+            'source', 'session_id', 'created_by', 'notes'
+        ];
+
+        $filteredData = array_intersect_key($data, array_flip($columns));
+        $filteredData['created_at'] = date('Y-m-d H:i:s');
+
+        $columnList = implode(', ', array_keys($filteredData));
+        $placeholders = ':' . implode(', :', array_keys($filteredData));
+
+        $sql = "INSERT INTO learner_hours_log ($columnList) VALUES ($placeholders)";
+
+        try {
+            $this->db->query($sql, $filteredData);
+            return true;
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository logHours error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get hours log for a tracking ID
+     */
+    public function getHoursLog(int $trackingId): array
+    {
+        $sql = "
+            SELECT * FROM learner_hours_log
+            WHERE tracking_id = :tracking_id
+            ORDER BY log_date DESC, created_at DESC
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, ['tracking_id' => $trackingId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository getHoursLog error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get hours log for a learner
+     */
+    public function getHoursLogForLearner(int $learnerId, ?string $startDate = null, ?string $endDate = null): array
+    {
+        $sql = "
+            SELECT lhl.*, p.product_name
+            FROM learner_hours_log lhl
+            LEFT JOIN products p ON lhl.product_id = p.product_id
+            WHERE lhl.learner_id = :learner_id
+        ";
+        $params = ['learner_id' => $learnerId];
+
+        if ($startDate) {
+            $sql .= " AND lhl.log_date >= :start_date";
+            $params['start_date'] = $startDate;
+        }
+        if ($endDate) {
+            $sql .= " AND lhl.log_date <= :end_date";
+            $params['end_date'] = $endDate;
+        }
+
+        $sql .= " ORDER BY lhl.log_date DESC, lhl.created_at DESC";
+
+        try {
+            $stmt = $this->db->query($sql, $params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository getHoursLogForLearner error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get monthly progressions report
+     */
+    public function getMonthlyProgressions(int $year, int $month): array
+    {
+        $startDate = sprintf('%04d-%02d-01', $year, $month);
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        $sql = "
+            SELECT
+                lpt.*,
+                p.product_name,
+                CONCAT(l.first_name, ' ', l.surname) AS learner_name,
+                c.class_code,
+                cl.client_name
+            FROM learner_lp_tracking lpt
+            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN learners l ON lpt.learner_id = l.id
+            LEFT JOIN classes c ON lpt.class_id = c.class_id
+            LEFT JOIN clients cl ON c.client_id = cl.client_id
+            WHERE lpt.completion_date BETWEEN :start_date AND :end_date
+            AND lpt.status = 'completed'
+            ORDER BY lpt.completion_date DESC
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, [
+                'start_date' => $startDate,
+                'end_date' => $endDate
+            ]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository getMonthlyProgressions error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Find progressions with filters (for admin panel)
+     */
+    public function findWithFilters(array $filters = [], int $limit = 50, int $offset = 0): array
+    {
+        $sql = $this->baseQuery();
+        $conditions = [];
+        $params = [];
+
+        if (!empty($filters['client_id'])) {
+            $sql = str_replace('LEFT JOIN classes c', 'LEFT JOIN classes c LEFT JOIN clients cl ON c.client_id = cl.client_id', $sql);
+            $conditions[] = "cl.client_id = :client_id";
+            $params['client_id'] = $filters['client_id'];
+        }
+
+        if (!empty($filters['class_id'])) {
+            $conditions[] = "lpt.class_id = :class_id";
+            $params['class_id'] = $filters['class_id'];
+        }
+
+        if (!empty($filters['product_id'])) {
+            $conditions[] = "lpt.product_id = :product_id";
+            $params['product_id'] = $filters['product_id'];
+        }
+
+        if (!empty($filters['status'])) {
+            $conditions[] = "lpt.status = :status";
+            $params['status'] = $filters['status'];
+        }
+
+        if (!empty($filters['learner_id'])) {
+            $conditions[] = "lpt.learner_id = :learner_id";
+            $params['learner_id'] = $filters['learner_id'];
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $sql .= " ORDER BY lpt.updated_at DESC LIMIT :limit OFFSET :offset";
+
+        try {
+            $pdo = $this->db->getPdo();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $key => $value) {
+                $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+                $stmt->bindValue(":$key", $value, $type);
+            }
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findWithFilters error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Count progressions with filters
+     */
+    public function countWithFilters(array $filters = []): int
+    {
+        $sql = "SELECT COUNT(*) FROM learner_lp_tracking lpt";
+        $conditions = [];
+        $params = [];
+
+        if (!empty($filters['client_id'])) {
+            $sql .= " LEFT JOIN classes c ON lpt.class_id = c.class_id";
+            $conditions[] = "c.client_id = :client_id";
+            $params['client_id'] = $filters['client_id'];
+        }
+
+        if (!empty($filters['class_id'])) {
+            $conditions[] = "lpt.class_id = :class_id";
+            $params['class_id'] = $filters['class_id'];
+        }
+
+        if (!empty($filters['product_id'])) {
+            $conditions[] = "lpt.product_id = :product_id";
+            $params['product_id'] = $filters['product_id'];
+        }
+
+        if (!empty($filters['status'])) {
+            $conditions[] = "lpt.status = :status";
+            $params['status'] = $filters['status'];
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        try {
+            $stmt = $this->db->query($sql, $params);
+            return (int) $stmt->fetchColumn();
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository countWithFilters error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Save portfolio file record
+     */
+    public function savePortfolioFile(int $trackingId, array $fileData): ?int
+    {
+        $sql = "
+            INSERT INTO learner_progression_portfolios
+            (tracking_id, file_name, file_path, file_type, file_size, uploaded_by, uploaded_at)
+            VALUES (:tracking_id, :file_name, :file_path, :file_type, :file_size, :uploaded_by, :uploaded_at)
+            RETURNING file_id
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, [
+                'tracking_id' => $trackingId,
+                'file_name' => $fileData['file_name'],
+                'file_path' => $fileData['file_path'],
+                'file_type' => $fileData['file_type'] ?? null,
+                'file_size' => $fileData['file_size'] ?? null,
+                'uploaded_by' => $fileData['uploaded_by'] ?? null,
+                'uploaded_at' => date('Y-m-d H:i:s'),
+            ]);
+            return (int) $stmt->fetchColumn();
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository savePortfolioFile error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get portfolio files for a tracking ID
+     */
+    public function getPortfolioFiles(int $trackingId): array
+    {
+        $sql = "SELECT * FROM learner_progression_portfolios WHERE tracking_id = :tracking_id ORDER BY uploaded_at DESC";
+
+        try {
+            $stmt = $this->db->query($sql, ['tracking_id' => $trackingId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository getPortfolioFiles error: " . $e->getMessage());
+            return [];
+        }
+    }
+}
