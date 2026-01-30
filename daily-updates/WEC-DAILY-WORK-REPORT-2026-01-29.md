@@ -11,6 +11,8 @@
 
 Major foundational day establishing the WeCoza Core plugin infrastructure. Created the complete plugin architecture with PostgreSQL database integration, MVC framework, Classes module, and Learners module. This consolidates previously separate plugins into a unified core system.
 
+**Key highlight:** The LP Progression Tracking System was fully implemented, including three-way hours tracking (trained/present/absent), portfolio upload for completion, one-LP-at-a-time constraint, and complete audit trail. This foundation supports WEC-168 (Progression Clarity) requirements.
+
 ---
 
 ## 1. Git Commits (2026-01-29)
@@ -66,6 +68,29 @@ Major foundational day establishing the WeCoza Core plugin infrastructure. Creat
 * `LearnerController.php`, `LearnerModel.php`, `LearnerRepository.php`
 * `LearnerProgressionModel.php`, `LearnerProgressionRepository.php`
 * `ProgressionService.php`, `PortfolioUploadService.php`
+
+#### **LP Progression Tracking System (WEC-168 Foundation)**
+
+*Complete Learning Programme tracking already implemented:*
+
+| Feature | Implementation | Location |
+|---------|----------------|----------|
+| One LP at a time constraint | Enforces single active LP per learner | `ProgressionService.php:39` |
+| Three-way hours tracking | `hours_trained`, `hours_present`, `hours_absent` | `LearnerProgressionModel.php` |
+| Progress % calculation | Based on hours present vs product duration | `getProgressPercentage()` |
+| Portfolio upload for completion | Required file upload to mark LP complete | `markComplete()` method |
+| Mark complete workflow | UI for completing LPs with portfolio | `learner-progressions.php` view |
+| Historical progression table | Tracks all LP completions | `learner_progressions` table |
+| Hours audit trail | Logs all hours changes with source | `learner_hours_log` table |
+| Class-to-progression link | Links LP records to classes | `class_id` FK in `learner_lp_tracking` |
+
+*Key methods in ProgressionService:*
+* `startLearnerProgression()` - Create new LP for learner
+* `markLPComplete()` - Complete LP with portfolio upload
+* `logHours()` - Record training hours
+* `getLearnerOverallProgress()` - Get cumulative progress stats
+* `getProgressionHistory()` - Get completed LP history
+* `getClassProgressionStats()` - Get class-level aggregates
 
 #### **Database & Configuration**
 
@@ -144,4 +169,19 @@ Major foundational day establishing the WeCoza Core plugin infrastructure. Creat
 * **PostgreSQL:** Requires `pdo_pgsql` PHP extension
 * **Password Storage:** WordPress option `wecoza_postgres_password` holds DB credentials
 * **Load Priority:** Plugin loads at priority 5 on `plugins_loaded`
+
+---
+
+## 6. WEC-168 Gap Identified
+
+**Critical Gap:** When learners are assigned to classes in Create/Edit Class, NO automatic LP record is created.
+
+* Current flow: `Class saved → learner_ids stored → STOP`
+* Required flow: `Class saved → learner_ids stored → create learner_lp_tracking records`
+
+**Pending for WEC-168 completion:**
+- [ ] Auto-create LP on learner assignment
+- [ ] Collision warning modal for learners with active LPs
+- [ ] "Last Course" column in Available Learners table
+- [ ] Progression display in class learner modal
 
