@@ -379,6 +379,162 @@ class LearnerRepository extends BaseRepository
 
     /*
     |--------------------------------------------------------------------------
+    | Progression Context (for Class Learner Selection)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get learners with their progression context for class assignment
+     *
+     * Optimized query that fetches:
+     * - Last completed course (product name, completion date)
+     * - Current active LP (product_id, product_name, progress %, class_id)
+     *
+     * Uses window functions to avoid N+1 queries.
+     *
+     * @param array $filters Optional filters ['client_id', 'exclude_class_id']
+     * @return array Learners with progression context
+     */
+    public function getLearnersWithProgressionContext(array $filters = []): array
+    {
+        $sql = "
+            WITH last_completed AS (
+                SELECT DISTINCT ON (lpt.learner_id)
+                    lpt.learner_id,
+                    lpt.product_id AS last_product_id,
+                    p.product_name AS last_course_name,
+                    lpt.completion_date AS last_completion_date
+                FROM learner_lp_tracking lpt
+                LEFT JOIN products p ON lpt.product_id = p.product_id
+                WHERE lpt.status = 'completed'
+                ORDER BY lpt.learner_id, lpt.completion_date DESC
+            ),
+            active_lp AS (
+                SELECT
+                    lpt.learner_id,
+                    lpt.tracking_id AS active_tracking_id,
+                    lpt.product_id AS active_product_id,
+                    p.product_name AS active_course_name,
+                    p.product_duration AS active_product_duration,
+                    lpt.class_id AS active_class_id,
+                    c.class_code AS active_class_code,
+                    lpt.hours_present AS active_hours_present,
+                    lpt.start_date AS active_start_date,
+                    CASE
+                        WHEN p.product_duration > 0 THEN
+                            LEAST(100, ROUND((lpt.hours_present / p.product_duration) * 100, 1))
+                        ELSE 0
+                    END AS active_progress_pct
+                FROM learner_lp_tracking lpt
+                LEFT JOIN products p ON lpt.product_id = p.product_id
+                LEFT JOIN classes c ON lpt.class_id = c.class_id
+                WHERE lpt.status = 'in_progress'
+            )
+            SELECT
+                l.id,
+                l.first_name,
+                l.surname,
+                CONCAT(l.first_name, ' ', l.surname) AS full_name,
+                l.sa_id_number,
+                l.cell_phone,
+                l.email_address,
+                lc.last_course_name,
+                lc.last_completion_date,
+                alp.active_tracking_id,
+                alp.active_product_id,
+                alp.active_course_name,
+                alp.active_class_id,
+                alp.active_class_code,
+                alp.active_hours_present,
+                alp.active_product_duration,
+                alp.active_progress_pct,
+                alp.active_start_date,
+                CASE WHEN alp.active_tracking_id IS NOT NULL THEN true ELSE false END AS has_active_lp
+            FROM learners l
+            LEFT JOIN last_completed lc ON l.id = lc.learner_id
+            LEFT JOIN active_lp alp ON l.id = alp.learner_id
+        ";
+
+        $conditions = [];
+        $params = [];
+
+        // Filter by client if provided
+        if (!empty($filters['client_id'])) {
+            // Join to classes to filter by client
+            $sql .= " LEFT JOIN classes cl ON l.id = ANY(
+                SELECT jsonb_array_elements(cl2.learner_ids::jsonb)->>'id'::int
+                FROM classes cl2 WHERE cl2.client_id = :client_id
+            )";
+            $params['client_id'] = $filters['client_id'];
+        }
+
+        // Exclude learners already in a specific class
+        if (!empty($filters['exclude_class_id'])) {
+            $conditions[] = "(alp.active_class_id IS NULL OR alp.active_class_id != :exclude_class_id)";
+            $params['exclude_class_id'] = $filters['exclude_class_id'];
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $sql .= " ORDER BY l.surname, l.first_name";
+
+        try {
+            $stmt = $this->db->query($sql, $params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerRepository getLearnersWithProgressionContext error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get active LP for a specific learner
+     *
+     * Used for collision detection when adding learner to class.
+     *
+     * @param int $learnerId
+     * @return array|null Active LP data or null if none
+     */
+    public function getActiveLPForLearner(int $learnerId): ?array
+    {
+        $sql = "
+            SELECT
+                lpt.tracking_id,
+                lpt.product_id,
+                p.product_name,
+                lpt.class_id,
+                c.class_code,
+                lpt.hours_present,
+                lpt.hours_trained,
+                p.product_duration,
+                lpt.start_date,
+                CASE
+                    WHEN p.product_duration > 0 THEN
+                        LEAST(100, ROUND((lpt.hours_present / p.product_duration) * 100, 1))
+                    ELSE 0
+                END AS progress_pct
+            FROM learner_lp_tracking lpt
+            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN classes c ON lpt.class_id = c.class_id
+            WHERE lpt.learner_id = :learner_id
+            AND lpt.status = 'in_progress'
+            LIMIT 1
+        ";
+
+        try {
+            $stmt = $this->db->query($sql, ['learner_id' => $learnerId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerRepository getActiveLPForLearner error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Portfolio Management
     |--------------------------------------------------------------------------
     */

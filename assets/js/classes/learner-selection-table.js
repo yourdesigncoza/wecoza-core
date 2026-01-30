@@ -129,7 +129,9 @@ class LearnerSelectionTable {
                 learner.id_number,
                 learner.city_town_name,
                 learner.province_region_name,
-                learner.postal_code
+                learner.postal_code,
+                learner.last_course_name,
+                learner.active_course_name
             ].filter(Boolean).join(' ').toLowerCase();
 
             return searchableFields.includes(this.searchTerm);
@@ -413,14 +415,127 @@ class LearnerSelectionTable {
             return;
         }
 
-        // Get selected learner data
+        // Get selected learner data and check for active LP collisions
         const selectedLearnerData = [];
+        const learnersWithActiveLPs = [];
+
         this.selectedLearners.forEach(learnerId => {
             const learner = this.allLearners.find(l => l.id === learnerId);
             if (learner && !this.assignedLearners.has(learnerId)) {
                 selectedLearnerData.push(learner);
-                this.assignedLearners.add(learnerId);
+
+                // Check for active LP collision
+                if (learner.has_active_lp) {
+                    learnersWithActiveLPs.push(learner);
+                }
             }
+        });
+
+        // If there are learners with active LPs, show warning modal
+        if (learnersWithActiveLPs.length > 0) {
+            this.showCollisionWarningModal(selectedLearnerData, learnersWithActiveLPs);
+            return;
+        }
+
+        // No collisions, proceed with adding
+        this.proceedWithAddingLearners(selectedLearnerData);
+    }
+
+    /**
+     * Show warning modal for learners with active LPs
+     */
+    showCollisionWarningModal(allSelectedLearners, learnersWithActiveLPs) {
+        const esc = window.WeCozaUtils ? window.WeCozaUtils.escapeHtml : this._fallbackEscape;
+
+        // Build the list of learners with active LPs
+        let learnerListHtml = '<ul class="list-unstyled mb-0">';
+        learnersWithActiveLPs.forEach(learner => {
+            const name = learner.name || `${learner.first_name} ${learner.surname}`;
+            const courseName = learner.active_course_name || 'Unknown Course';
+            const progress = learner.active_progress_pct || 0;
+            const classCode = learner.active_class_code || 'No class';
+
+            learnerListHtml += `
+                <li class="mb-2 p-2 bg-light rounded">
+                    <strong>${esc(name)}</strong><br>
+                    <small class="text-muted">
+                        Active LP: <span class="badge badge-phoenix badge-phoenix-warning">${esc(courseName)}</span>
+                        (${progress}% complete)<br>
+                        Class: ${esc(classCode)}
+                    </small>
+                </li>
+            `;
+        });
+        learnerListHtml += '</ul>';
+
+        // Create modal HTML
+        const modalHtml = `
+            <div class="modal fade" id="lpCollisionWarningModal" tabindex="-1" aria-labelledby="lpCollisionWarningModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning-subtle">
+                            <h5 class="modal-title" id="lpCollisionWarningModalLabel">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Active Learning Programme Detected
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-3">The following ${learnersWithActiveLPs.length === 1 ? 'learner has' : 'learners have'} an active Learning Programme (LP) in progress:</p>
+                            ${learnerListHtml}
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <small>Adding ${learnersWithActiveLPs.length === 1 ? 'this learner' : 'these learners'} to this class will put their current LP on hold and start a new progression.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-warning" id="confirmAddWithCollision">
+                                <i class="bi bi-check-circle me-1"></i> Add Anyway
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal if any
+        const existingModal = document.getElementById('lpCollisionWarningModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Get modal element and show it
+        const modalElement = document.getElementById('lpCollisionWarningModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+
+        // Handle confirm button click
+        const confirmBtn = document.getElementById('confirmAddWithCollision');
+        confirmBtn.addEventListener('click', () => {
+            modal.hide();
+            // Mark that we're forcing the override
+            this.forceOverride = true;
+            this.proceedWithAddingLearners(allSelectedLearners);
+            this.forceOverride = false;
+        });
+
+        // Clean up modal when hidden
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            modalElement.remove();
+        });
+    }
+
+    /**
+     * Proceed with adding learners to the class
+     */
+    proceedWithAddingLearners(selectedLearnerData) {
+        // Add learners to assigned set
+        selectedLearnerData.forEach(learner => {
+            this.assignedLearners.add(learner.id);
         });
 
         // Add to existing learners container

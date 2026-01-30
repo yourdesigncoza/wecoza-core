@@ -17,6 +17,7 @@ use WeCoza\Classes\Repositories\ClassRepository;
 use WeCoza\Classes\Services\FormDataProcessor;
 use WeCoza\Classes\Services\ScheduleService;
 use WeCoza\Classes\Services\UploadService;
+use WeCoza\Learners\Services\ProgressionService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -113,6 +114,9 @@ class ClassAjaxController extends BaseController
                         QAController::saveQAVisits($class->getId(), $_POST, $_FILES);
                     }
 
+                    // Auto-create LP records for newly assigned learners
+                    $lpCreationResults = self::createLPsForNewLearners($class, $formData, $isUpdate);
+
                     $redirect_url = '';
                     $display_page = get_page_by_path('app/display-single-class');
                     if ($display_page) {
@@ -126,10 +130,21 @@ class ClassAjaxController extends BaseController
                     ob_clean();
                     restore_error_handler();
 
+                    $message = $isUpdate ? 'Class updated successfully.' : 'Draft class created successfully.';
+
+                    // Append LP creation summary to message
+                    if (!empty($lpCreationResults['created'])) {
+                        $message .= " Created {$lpCreationResults['created']} LP record(s).";
+                    }
+                    if (!empty($lpCreationResults['warnings'])) {
+                        $message .= " {$lpCreationResults['warnings']} learner(s) had existing LPs put on hold.";
+                    }
+
                     wp_send_json_success([
-                        'message' => $isUpdate ? 'Class updated successfully.' : 'Draft class created successfully.',
+                        'message' => $message,
                         'class_id' => $class->getId(),
-                        'redirect_url' => $redirect_url
+                        'redirect_url' => $redirect_url,
+                        'lp_creation_results' => $lpCreationResults
                     ]);
                 } else {
                     ob_clean();
@@ -477,6 +492,123 @@ class ClassAjaxController extends BaseController
         } catch (\PDOException $e) {
             wp_send_json_error('Database error: Failed to delete note');
         }
+    }
+
+    /**
+     * Create LP records for newly assigned learners
+     *
+     * Compares current learner_ids with previous (for updates) and creates
+     * LP records for new learners.
+     *
+     * @param ClassModel $class The class model
+     * @param array $formData The form data
+     * @param bool $isUpdate Whether this is an update operation
+     * @return array Results with 'created', 'warnings', 'errors', 'details'
+     */
+    private static function createLPsForNewLearners(ClassModel $class, array $formData, bool $isUpdate): array
+    {
+        $results = [
+            'created' => 0,
+            'warnings' => 0,
+            'errors' => 0,
+            'details' => [],
+        ];
+
+        // Get the product_id (class subject) from the class
+        $productId = $class->getClassSubject(); // This should return the product_id
+        if (!$productId) {
+            $results['details'][] = 'No product/course assigned to class - LP creation skipped';
+            return $results;
+        }
+
+        // Get current learner IDs from the class
+        $currentLearnerIds = $class->getLearnerIdsOnly();
+        if (empty($currentLearnerIds)) {
+            return $results;
+        }
+
+        // For updates, get previous learner IDs to determine new ones
+        $previousLearnerIds = [];
+        if ($isUpdate) {
+            // Fetch the previous state from database
+            try {
+                $db = wecoza_db();
+                $stmt = $db->query(
+                    "SELECT learner_ids FROM classes WHERE class_id = :class_id",
+                    ['class_id' => $class->getId()]
+                );
+                $row = $stmt->fetch();
+                if ($row && !empty($row['learner_ids'])) {
+                    $previousData = is_string($row['learner_ids'])
+                        ? json_decode($row['learner_ids'], true)
+                        : $row['learner_ids'];
+
+                    if (is_array($previousData)) {
+                        foreach ($previousData as $learner) {
+                            if (isset($learner['id'])) {
+                                $previousLearnerIds[] = (int) $learner['id'];
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                error_log("WeCoza Core: Error fetching previous learner IDs: " . $e->getMessage());
+            }
+        }
+
+        // Calculate newly added learners
+        $newLearnerIds = $isUpdate
+            ? array_diff($currentLearnerIds, $previousLearnerIds)
+            : $currentLearnerIds;
+
+        if (empty($newLearnerIds)) {
+            return $results;
+        }
+
+        // Check if force override is enabled (from form data or always true for class assignment)
+        $forceOverride = !empty($formData['force_lp_override']) || true; // Always force for now
+
+        // Create LP records for each new learner
+        $progressionService = new ProgressionService();
+
+        foreach ($newLearnerIds as $learnerId) {
+            try {
+                $lpResult = $progressionService->createLPForClassAssignment(
+                    (int) $learnerId,
+                    (int) $productId,
+                    $class->getId(),
+                    $forceOverride
+                );
+
+                if ($lpResult['success']) {
+                    $results['created']++;
+
+                    if ($lpResult['collision_data']) {
+                        $results['warnings']++;
+                        $results['details'][] = "Learner {$learnerId}: Created LP (previous LP put on hold)";
+                    } else {
+                        $results['details'][] = "Learner {$learnerId}: Created LP successfully";
+                    }
+                } else {
+                    if ($lpResult['warning']) {
+                        $results['warnings']++;
+                        $results['details'][] = "Learner {$learnerId}: {$lpResult['message']}";
+                    } else {
+                        $results['errors']++;
+                        $results['details'][] = "Learner {$learnerId}: Failed - {$lpResult['message']}";
+                    }
+                }
+            } catch (\Exception $e) {
+                $results['errors']++;
+                $results['details'][] = "Learner {$learnerId}: Exception - " . $e->getMessage();
+                error_log("WeCoza Core: LP creation error for learner {$learnerId}: " . $e->getMessage());
+            }
+        }
+
+        // Clear the learners cache since progression data has changed
+        delete_transient('wecoza_class_learners_with_progression');
+
+        return $results;
     }
 
     /**
