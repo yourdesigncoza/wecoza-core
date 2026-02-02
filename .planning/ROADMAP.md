@@ -13,7 +13,7 @@ This roadmap migrates the wecoza-events-plugin (~7,700 lines) into wecoza-core, 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Code Foundation** - Namespace conversion, file structure, PSR-4 autoloading
-- [ ] **Phase 2: Database Migration** - PostgreSQL triggers, functions, and schema fixes
+- [x] **Phase 2: Database Migration** - PostgreSQL triggers, functions, and schema fixes
 - [ ] **Phase 3: Bootstrap Integration** - Module initialization and activation hooks
 - [ ] **Phase 4: Task Management** - Class change monitoring and task dashboard
 - [ ] **Phase 5: Material Tracking** - Delivery status tracking and alerts
@@ -50,8 +50,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Remove delivery_date column references from PHP code
-- [ ] 02-02-PLAN.md — Verify and document PostgreSQL trigger infrastructure
+- [x] 02-01-PLAN.md — Remove delivery_date column references from PHP code
+- [x] 02-02-PLAN.md — Verify and document PostgreSQL trigger infrastructure
 
 ### Phase 3: Bootstrap Integration
 **Goal**: Events module initializes correctly within wecoza-core lifecycle
@@ -140,7 +140,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Code Foundation | 3/3 | ✓ Complete | 2026-02-02 |
-| 2. Database Migration | 0/2 | In Progress | - |
+| 2. Database Migration | 2/2 | ✓ Complete | 2026-02-02 |
 | 3. Bootstrap Integration | 0/2 | Not started | - |
 | 4. Task Management | 0/3 | Not started | - |
 | 5. Material Tracking | 0/3 | Not started | - |
