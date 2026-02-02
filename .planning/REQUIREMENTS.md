@@ -28,12 +28,12 @@ Requirements for events plugin migration into wecoza-core.
 
 ### Material Tracking
 
-- [ ] **MATL-01**: Material delivery status tracking per class
-- [ ] **MATL-02**: 7-day pre-start alert notifications for material delivery
-- [ ] **MATL-03**: 5-day pre-start alert notifications for material delivery
-- [ ] **MATL-04**: Material tracking shortcode `[wecoza_material_tracking]` renders dashboard
-- [ ] **MATL-05**: Mark materials delivered via AJAX handler
-- [ ] **MATL-06**: Material tracking capability checks (`view_material_tracking`, `manage_material_tracking`)
+- [x] **MATL-01**: Material delivery status tracking per class
+- [x] **MATL-02**: 7-day pre-start alert notifications for material delivery
+- [x] **MATL-03**: 5-day pre-start alert notifications for material delivery
+- [x] **MATL-04**: Material tracking shortcode `[wecoza_material_tracking]` renders dashboard
+- [x] **MATL-05**: Mark materials delivered via AJAX handler
+- [x] **MATL-06**: Material tracking capability checks (`view_material_tracking`, `manage_material_tracking`)
 
 ### AI Summarization
 
@@ -90,12 +90,12 @@ Deferred to future release.
 | TASK-03 | Phase 4: Task Management | Complete |
 | TASK-04 | Phase 4: Task Management | Complete |
 | TASK-05 | Phase 4: Task Management | Complete |
-| MATL-01 | Phase 5: Material Tracking | Pending |
-| MATL-02 | Phase 5: Material Tracking | Pending |
-| MATL-03 | Phase 5: Material Tracking | Pending |
-| MATL-04 | Phase 5: Material Tracking | Pending |
-| MATL-05 | Phase 5: Material Tracking | Pending |
-| MATL-06 | Phase 5: Material Tracking | Pending |
+| MATL-01 | Phase 5: Material Tracking | Complete |
+| MATL-02 | Phase 5: Material Tracking | Complete |
+| MATL-03 | Phase 5: Material Tracking | Complete |
+| MATL-04 | Phase 5: Material Tracking | Complete |
+| MATL-05 | Phase 5: Material Tracking | Complete |
+| MATL-06 | Phase 5: Material Tracking | Complete |
 | AI-01 | Phase 6: AI Summarization | Pending |
 | AI-02 | Phase 6: AI Summarization | Pending |
 | AI-03 | Phase 6: AI Summarization | Pending |
@@ -112,4 +112,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 4 completion*
+*Last updated: 2026-02-02 after Phase 5 completion*
