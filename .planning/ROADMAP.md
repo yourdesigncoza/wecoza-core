@@ -26,8 +26,8 @@ See: `.planning/milestones/v1-ROADMAP.md` for full details.
 
 **Goal**: Critical bugs fixed and core security vulnerabilities addressed
 **Depends on**: Phase 7 (v1 complete)
-**Requirements**: BUG-01, BUG-02, BUG-03, BUG-04, SEC-01, SEC-04, SEC-05
-**Plans**: TBD
+**Requirements**: BUG-01, BUG-02, BUG-04, SEC-01, SEC-04, SEC-05
+**Plans**: 3 plans (Wave 1 parallel)
 
 **Success Criteria** (what must be TRUE):
 1. Portfolio save operations append to existing portfolios instead of overwriting them
@@ -37,8 +37,9 @@ See: `.planning/milestones/v1-ROADMAP.md` for full details.
 5. Exception logs contain sanitized messages without exposing schema details
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md — Fix learner query bugs (BUG-01, BUG-04)
+- [ ] 08-02-PLAN.md — Fix portfolio save and add MIME validation (BUG-02, SEC-04)
+- [ ] 08-03-PLAN.md — Add security helpers and sanitize logging (SEC-01, SEC-05)
 
 ### Phase 9: Data Privacy Hardening
 
@@ -111,7 +112,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-7 | v1.0 | 13/13 | Complete | 2026-02-02 |
-| 8. Bug Fixes & Core Security | v1.1 | 0/? | Not started | - |
+| 8. Bug Fixes & Core Security | v1.1 | 0/3 | Planned | - |
 | 9. Data Privacy Hardening | v1.1 | 0/? | Not started | - |
 | 10. Architecture & Type Safety | v1.1 | 0/? | Not started | - |
 | 11. AI Service Quality | v1.1 | 0/? | Not started | - |
@@ -125,7 +126,7 @@ All 21 v1.1 requirements mapped to exactly one phase:
 |-------------|-------|-------------|
 | BUG-01 | 8 | Fix column name mismatch |
 | BUG-02 | 8 | Fix savePortfolios() overwrite bug |
-| BUG-03 | 8 | Implement missing processPortfolioDetails() |
+| BUG-03 | N/A | Already implemented (processPortfolioDetails exists) |
 | BUG-04 | 8 | Fix unsafe $pdo access in catch block |
 | SEC-01 | 8 | Add quoteIdentifier() helper |
 | SEC-04 | 8 | Add MIME type validation on PDF uploads |
