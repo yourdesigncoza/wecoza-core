@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 1 of 7 (Code Foundation)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-02 — Completed 01-01-PLAN.md
+Last activity: 2026-02-02 — Completed 01-02-PLAN.md
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 6min
+- Total execution time: 0.20 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-code-foundation | 1 | 4min | 4min |
+| 01-code-foundation | 2 | 12min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 4min
-- Trend: First plan completed
+- Last 5 plans: 4min, 8min
+- Trend: Averaging 6 min/plan
 
 *Updated after each plan completion*
 
@@ -45,9 +45,12 @@ Recent decisions affecting current work:
 - Use src/Events/ structure (consistent with existing modules)
 - Namespace: WeCoza\Events\* (consistent with existing modules)
 - Fix delivery_date during migration (cleaner than pre-fixing)
-- Deferred Container.php migration to Plan 02 (depends on Services layer)
+- ~~Deferred Container.php migration to Plan 02~~ ✓ Completed in 01-02
 - Removed schema qualification from all SQL queries (use public schema default)
 - Repositories extend BaseRepository instead of custom constructor pattern
+- Services use PostgresConnection singleton instead of constructor PDO injection
+- Container no longer manages PDO/schema (services get connection directly)
+- DataObfuscator trait placed in Services/Traits/ subdirectory
 
 ### Pending Todos
 
@@ -60,6 +63,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T10:54:54Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-02-02T11:05:54Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
