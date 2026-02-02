@@ -47,7 +47,7 @@ Plans:
 **Goal**: PII protection strengthened with no sensitive data leakage
 **Depends on**: Phase 8
 **Requirements**: SEC-02, SEC-03, SEC-06, PERF-05
-**Plans**: TBD
+**Plans**: 3 plans (Wave 1: 01, 03 parallel; Wave 2: 02)
 
 **Success Criteria** (what must be TRUE):
 1. DataObfuscator return values contain obfuscated data only (no PII mappings exposed)
@@ -56,7 +56,9 @@ Plans:
 4. Long-running obfuscation operations release memory periodically (no memory leaks on large datasets)
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — Remove PII mappings from return values, strengthen email masking (SEC-02, SEC-03)
+- [ ] 09-02-PLAN.md — Add PIIDetector trait for heuristic PII detection (SEC-06)
+- [ ] 09-03-PLAN.md — Add memory cleanup to NotificationProcessor (PERF-05)
 
 ### Phase 10: Architecture & Type Safety
 
@@ -114,7 +116,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-7 | v1.0 | 13/13 | Complete | 2026-02-02 |
 | 8. Bug Fixes & Core Security | v1.1 | 4/4 | Complete | 2026-02-02 |
-| 9. Data Privacy Hardening | v1.1 | 0/? | Not started | - |
+| 9. Data Privacy Hardening | v1.1 | 0/3 | Planned | - |
 | 10. Architecture & Type Safety | v1.1 | 0/? | Not started | - |
 | 11. AI Service Quality | v1.1 | 0/? | Not started | - |
 | 12. Performance & Async Processing | v1.1 | 0/? | Not started | - |
@@ -152,4 +154,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02 — Phase 8 complete*
+*Last updated: 2026-02-02 — Phase 9 planned*
