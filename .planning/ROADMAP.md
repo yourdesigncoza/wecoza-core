@@ -99,7 +99,7 @@ Plans:
 **Goal**: Notification processing handles high volume without blocking
 **Depends on**: Phase 8 (bug fixes needed for stable processing)
 **Requirements**: PERF-01, PERF-02, PERF-03, PERF-04
-**Plans**: TBD
+**Plans**: 2 plans (Wave 1: 01, Wave 2: 02)
 
 **Success Criteria** (what must be TRUE):
 1. NotificationProcessor processes 50+ notifications per batch without timeout
@@ -108,8 +108,8 @@ Plans:
 4. Notification lock TTL prevents race conditions during high-volume processing
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 12-01-PLAN.md — Install Action Scheduler and update constants (PERF-01, PERF-04)
+- [ ] 12-02-PLAN.md — Implement async jobs for AI enrichment and email sending (PERF-02, PERF-03)
 
 ## Progress
 
@@ -122,7 +122,7 @@ Plans:
 | 9. Data Privacy Hardening | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 10. Architecture & Type Safety | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 11. AI Service Quality | v1.1 | 1/1 | Complete | 2026-02-02 |
-| 12. Performance & Async Processing | v1.1 | 0/? | Not started | - |
+| 12. Performance & Async Processing | v1.1 | 0/2 | Planned | - |
 
 ## Requirement Coverage
 
@@ -157,4 +157,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02 — Phase 11 complete*
+*Last updated: 2026-02-02 — Phase 12 planned*
