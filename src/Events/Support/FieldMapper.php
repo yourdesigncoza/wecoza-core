@@ -27,7 +27,6 @@ final class FieldMapper
         'schedule_start_date' => 'Schedule Start Date',
         'schedule_end_date' => 'Estimated End Date',
         'initial_agent_start_date' => 'Start Date',
-        'delivery_date' => 'Delivery Date',
         'schedule_pattern' => 'Schedule Pattern',
         'schedule_days' => 'Days of Week',
         'schedule_day_monday' => 'Monday',
