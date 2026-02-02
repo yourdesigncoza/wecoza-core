@@ -33,6 +33,7 @@ use function wp_mail;
 use function absint;
 use function do_action;
 use function gmdate;
+use function gc_collect_cycles;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -44,6 +45,7 @@ final class NotificationProcessor
     private const MAX_RUNTIME_SECONDS = 20;
     private const MIN_REMAINING_SECONDS = 5;
     private const BATCH_LIMIT = 1;
+    private const MEMORY_CLEANUP_INTERVAL = 50;  // Every 50 records
     private const SKIP_MESSAGES = [
         'config_missing' => 'OpenAI configuration missing or invalid.',
         'feature_disabled' => 'AI summaries disabled via admin settings.',
@@ -321,5 +323,27 @@ SQL;
     private function releaseLock(): void
     {
         delete_transient(self::LOCK_KEY);
+    }
+
+    /**
+     * Perform periodic memory cleanup during batch processing.
+     *
+     * Uses unset() for immediate release and gc_collect_cycles() for
+     * cyclic references in obfuscation state.
+     *
+     * @param mixed $data Data to release (passed by reference)
+     */
+    private function performMemoryCleanup(mixed &$data): void
+    {
+        unset($data);
+        gc_collect_cycles();
+    }
+
+    /**
+     * Check if memory cleanup should run based on iteration count.
+     */
+    private function shouldCleanupMemory(int $iteration): bool
+    {
+        return $iteration > 0 && ($iteration % self::MEMORY_CLEANUP_INTERVAL === 0);
     }
 }
