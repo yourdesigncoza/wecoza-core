@@ -1,0 +1,126 @@
+<?php
+declare(strict_types=1);
+
+namespace WeCoza\Events\Support;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use WeCoza\Events\Controllers\JsonResponder;
+use WeCoza\Events\Repositories\ClassTaskRepository;
+use WeCoza\Events\Services\AISummaryService;
+use WeCoza\Events\Services\ClassTaskService;
+use WeCoza\Events\Services\TaskManager;
+use WeCoza\Events\Services\TaskTemplateRegistry;
+use WeCoza\Events\Support\OpenAIConfig;
+use WeCoza\Events\Views\Presenters\ClassTaskPresenter;
+use WeCoza\Events\Views\TemplateRenderer;
+
+final class Container
+{
+    private static ?TaskTemplateRegistry $taskTemplateRegistry = null;
+    private static ?ClassTaskRepository $classTaskRepository = null;
+    private static ?TaskManager $taskManager = null;
+    private static ?ClassTaskService $classTaskService = null;
+    private static ?ClassTaskPresenter $classTaskPresenter = null;
+    private static ?TemplateRenderer $templateRenderer = null;
+    private static ?WordPressRequest $wordpressRequest = null;
+    private static ?JsonResponder $jsonResponder = null;
+    private static ?OpenAIConfig $openAIConfig = null;
+    private static ?AISummaryService $aiSummaryService = null;
+
+    public static function taskTemplateRegistry(): TaskTemplateRegistry
+    {
+        if (self::$taskTemplateRegistry === null) {
+            self::$taskTemplateRegistry = new TaskTemplateRegistry();
+        }
+
+        return self::$taskTemplateRegistry;
+    }
+
+    public static function classTaskRepository(): ClassTaskRepository
+    {
+        if (self::$classTaskRepository === null) {
+            self::$classTaskRepository = new ClassTaskRepository();
+        }
+
+        return self::$classTaskRepository;
+    }
+
+    public static function taskManager(): TaskManager
+    {
+        if (self::$taskManager === null) {
+            self::$taskManager = new TaskManager(self::taskTemplateRegistry());
+        }
+
+        return self::$taskManager;
+    }
+
+    public static function classTaskService(): ClassTaskService
+    {
+        if (self::$classTaskService === null) {
+            self::$classTaskService = new ClassTaskService(
+                self::classTaskRepository(),
+                self::taskManager(),
+                self::taskTemplateRegistry()
+            );
+        }
+
+        return self::$classTaskService;
+    }
+
+    public static function classTaskPresenter(): ClassTaskPresenter
+    {
+        if (self::$classTaskPresenter === null) {
+            self::$classTaskPresenter = new ClassTaskPresenter();
+        }
+
+        return self::$classTaskPresenter;
+    }
+
+    public static function templateRenderer(): TemplateRenderer
+    {
+        if (self::$templateRenderer === null) {
+            self::$templateRenderer = new TemplateRenderer();
+        }
+
+        return self::$templateRenderer;
+    }
+
+    public static function wordpressRequest(): WordPressRequest
+    {
+        if (self::$wordpressRequest === null) {
+            self::$wordpressRequest = new WordPressRequest();
+        }
+
+        return self::$wordpressRequest;
+    }
+
+    public static function jsonResponder(): JsonResponder
+    {
+        if (self::$jsonResponder === null) {
+            self::$jsonResponder = new JsonResponder();
+        }
+
+        return self::$jsonResponder;
+    }
+
+    public static function openAIConfig(): OpenAIConfig
+    {
+        if (self::$openAIConfig === null) {
+            self::$openAIConfig = new OpenAIConfig();
+        }
+
+        return self::$openAIConfig;
+    }
+
+    public static function aiSummaryService(): AISummaryService
+    {
+        if (self::$aiSummaryService === null) {
+            self::$aiSummaryService = new AISummaryService(self::openAIConfig());
+        }
+
+        return self::$aiSummaryService;
+    }
+}
