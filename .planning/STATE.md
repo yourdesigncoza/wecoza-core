@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 9 of 12 (Data Privacy Hardening)
-Plan: 1 of 4 completed
+Plan: 2 of 4 completed
 Status: In progress
-Last activity: 2026-02-02 — Completed 09-01-PLAN.md (Secure PII Obfuscation)
+Last activity: 2026-02-02 — Completed 09-02-PLAN.md (Heuristic PII Detection)
 
 Progress: [==============............] 65% (8/13 phases, continuing from v1)
 
@@ -54,7 +54,7 @@ See: .planning/milestones/v1-* for archived artifacts
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 08-bug-fixes-core-security | 4 | 7min | 1.75min |
-| 09-data-privacy-hardening | 1/4 | 2.3min | 2.3min |
+| 09-data-privacy-hardening | 2/4 | 5.5min | 2.75min |
 
 ## Accumulated Context
 
@@ -79,6 +79,10 @@ Key decisions are archived in:
 | 09 | 01 | Remove 'mappings' from obfuscation return values | Prevents reverse-engineering PII from public API responses (SEC-02) |
 | 09 | 01 | Hide entire email local part (****@domain.com) | Stronger privacy than showing first/last characters (SEC-03) |
 | 09 | 01 | Access aliases via $state['aliases'] | Maintains functionality while preventing mapping exposure |
+| 09 | 02 | Value-based PII detection via pattern matching | Catches PII in non-standard fields (notes, custom_field, reference_number) |
+| 09 | 02 | SA ID pattern is exactly 13 digits | Specific pattern takes priority over generic phone detection |
+| 09 | 02 | Passport detection requires field name hint | Reduces false positives for 6-12 alphanumeric values |
+| 09 | 02 | Allow CLI execution for PIIDetector tests | ABSPATH check includes php_sapi_name() !== 'cli' for direct test runs |
 
 ### Pending Todos
 
@@ -90,8 +94,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T16:11:17Z
-Stopped at: Completed 09-01-PLAN.md (Secure PII Obfuscation)
+Last session: 2026-02-02T18:17:19Z
+Stopped at: Completed 09-02-PLAN.md (Heuristic PII Detection)
 Resume file: None
 
-**Next action:** Continue Phase 9 with plan 02
+**Next action:** Continue Phase 9 with plan 09-03 or 09-04
