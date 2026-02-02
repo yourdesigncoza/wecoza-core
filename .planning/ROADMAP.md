@@ -122,11 +122,11 @@ Plans:
   2. Updating a class triggers email notification to configured recipients
   3. Admin can configure notification recipients via WordPress options
   4. Email sending is handled via WordPress cron (not blocking request)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md — Cron registration + template path fix for email notifications
+- [ ] 07-02-PLAN.md — Verification test suite for EMAIL requirements
 
 ## Progress
 
@@ -135,14 +135,14 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Code Foundation | 3/3 | ✓ Complete | 2026-02-02 |
-| 2. Database Migration | 2/2 | ✓ Complete | 2026-02-02 |
-| 3. Bootstrap Integration | 1/1 | ✓ Complete | 2026-02-02 |
-| 4. Task Management | 1/1 | ✓ Complete | 2026-02-02 |
-| 5. Material Tracking | 2/2 | ✓ Complete | 2026-02-02 |
+| 1. Code Foundation | 3/3 | Complete | 2026-02-02 |
+| 2. Database Migration | 2/2 | Complete | 2026-02-02 |
+| 3. Bootstrap Integration | 1/1 | Complete | 2026-02-02 |
+| 4. Task Management | 1/1 | Complete | 2026-02-02 |
+| 5. Material Tracking | 2/2 | Complete | 2026-02-02 |
 | 6. AI Summarization | 0/2 | Not started | - |
-| 7. Email Notifications | 0/2 | Not started | - |
+| 7. Email Notifications | 0/2 | Planned | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 5 completion*
+*Last updated: 2026-02-02 after Phase 7 planning*
