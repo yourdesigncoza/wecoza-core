@@ -74,9 +74,9 @@ Plans:
 4. Status strings (`in_progress`, `completed`, etc.) use PHP 8.1 Enums with validation
 
 Plans:
-- [ ] 10-01-PLAN.md — Create typed DTOs for AI summary arrays (QUAL-02)
-- [ ] 10-02-PLAN.md — Create PHP 8.1 Enums for status strings (QUAL-03)
-- [ ] 10-03-PLAN.md — Refactor generateSummary() for Single Responsibility (ARCH-01)
+- [x] 10-01-PLAN.md — Create typed DTOs for AI summary arrays (QUAL-02)
+- [x] 10-02-PLAN.md — Create PHP 8.1 Enums for status strings (QUAL-03)
+- [x] 10-03-PLAN.md — Refactor generateSummary() for Single Responsibility (ARCH-01)
 
 **Note:** ARCH-02 (BaseRepository count()) already implemented - verified in research phase.
 
@@ -120,7 +120,7 @@ Plans:
 | 1-7 | v1.0 | 13/13 | Complete | 2026-02-02 |
 | 8. Bug Fixes & Core Security | v1.1 | 4/4 | Complete | 2026-02-02 |
 | 9. Data Privacy Hardening | v1.1 | 3/3 | Complete | 2026-02-02 |
-| 10. Architecture & Type Safety | v1.1 | 0/3 | Planned | - |
+| 10. Architecture & Type Safety | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 11. AI Service Quality | v1.1 | 0/? | Not started | - |
 | 12. Performance & Async Processing | v1.1 | 0/? | Not started | - |
 
