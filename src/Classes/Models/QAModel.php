@@ -77,7 +77,7 @@ class QAModel
                 c.class_subject
             FROM qa_reports qr
             JOIN classes c ON qr.class_id = c.class_id
-            WHERE qr.class_id = $1
+            WHERE qr.class_id = ?
             ORDER BY qr.report_date DESC
         ";
 
@@ -91,7 +91,7 @@ class QAModel
     {
         $query = "
             INSERT INTO qa_reports (class_id, report_date, notes, created_at, updated_at)
-            VALUES ($1, $2, $3, NOW(), NOW())
+            VALUES (?, ?, ?, NOW(), NOW())
             RETURNING qa_report_id
         ";
 
@@ -113,7 +113,7 @@ class QAModel
                 COUNT(*) as total_visits,
                 COUNT(DISTINCT class_id) as classes_visited
             FROM qa_reports
-            WHERE report_date BETWEEN $1 AND $2
+            WHERE report_date BETWEEN ? AND ?
             GROUP BY DATE_TRUNC('month', report_date)
             ORDER BY month ASC
         ";
@@ -131,13 +131,13 @@ class QAModel
                 4.2 as avg_rating
             FROM classes c
             LEFT JOIN qa_reports qr ON c.class_id = qr.class_id
-            WHERE qr.report_date BETWEEN $1 AND $2
+            WHERE qr.report_date BETWEEN ? AND ?
         ";
 
         $params = [$start_date, $end_date];
 
         if (!empty($department)) {
-            $query .= " AND c.class_subject = $3";
+            $query .= " AND c.class_subject = ?";
             $params[] = $department;
         }
 
@@ -156,7 +156,7 @@ class QAModel
                     COUNT(DISTINCT aqv.class_id) as unique_classes,
                     4.3 as avg_performance_score
                 FROM agent_qa_visits aqv
-                WHERE aqv.visit_date BETWEEN $1 AND $2
+                WHERE aqv.visit_date BETWEEN ? AND ?
                 GROUP BY aqv.agent_id
                 ORDER BY total_visits DESC
             ";
@@ -188,7 +188,7 @@ class QAModel
                     4.1 as overall_rating
                 FROM qa_reports qr
                 LEFT JOIN agent_qa_visits aqv ON qr.qa_report_id = aqv.qa_report_id
-                WHERE qr.report_date BETWEEN $1 AND $2
+                WHERE qr.report_date BETWEEN ? AND ?
             ";
 
             $result = $this->db->query($query, [$start_date, $end_date]);
@@ -211,7 +211,7 @@ class QAModel
             FROM qa_reports qr
             JOIN classes c ON qr.class_id = c.class_id
             ORDER BY qr.report_date DESC
-            LIMIT $1
+            LIMIT ?
         ";
 
         return $this->db->query($query, [$limit])->fetchAll();
@@ -256,7 +256,7 @@ class QAModel
                 'N/A' as duration,
                 qr.notes
             FROM qa_reports qr
-            WHERE qr.report_date BETWEEN $1 AND $2
+            WHERE qr.report_date BETWEEN ? AND ?
             ORDER BY qr.report_date DESC
         ";
 

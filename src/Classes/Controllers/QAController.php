@@ -567,7 +567,7 @@ class QAController extends BaseController
         array_splice($reports, $report_index, 1);
 
         try {
-            $sql = "UPDATE public.classes SET qa_reports = $1, updated_at = NOW() WHERE class_id = $2";
+            $sql = "UPDATE public.classes SET qa_reports = ?, updated_at = NOW() WHERE class_id = ?";
             $this->db()->query($sql, [json_encode($reports), $class_id]);
 
             if ($file_path && file_exists($file_path)) {

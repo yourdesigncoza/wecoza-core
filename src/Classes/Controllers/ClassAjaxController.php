@@ -196,7 +196,7 @@ class ClassAjaxController extends BaseController
 
             try {
                 $stmt = $db->query(
-                    "DELETE FROM public.classes WHERE class_id = $1 RETURNING class_id",
+                    "DELETE FROM public.classes WHERE class_id = ? RETURNING class_id",
                     [$class_id]
                 );
                 $deletedClass = $stmt->fetch();
@@ -373,7 +373,7 @@ class ClassAjaxController extends BaseController
             $db = wecoza_db();
 
             $stmt = $db->query(
-                "SELECT class_notes_data FROM public.classes WHERE class_id = $1 LIMIT 1",
+                "SELECT class_notes_data FROM public.classes WHERE class_id = ? LIMIT 1",
                 [$class_id]
             );
 
@@ -406,7 +406,7 @@ class ClassAjaxController extends BaseController
 
             $notes_json = json_encode($notes);
             $db->query(
-                "UPDATE public.classes SET class_notes_data = $1, updated_at = NOW() WHERE class_id = $2",
+                "UPDATE public.classes SET class_notes_data = ?, updated_at = NOW() WHERE class_id = ?",
                 [$notes_json, $class_id]
             );
 
@@ -446,7 +446,7 @@ class ClassAjaxController extends BaseController
             $db = wecoza_db();
 
             $stmt = $db->query(
-                "SELECT class_notes_data FROM public.classes WHERE class_id = $1 LIMIT 1",
+                "SELECT class_notes_data FROM public.classes WHERE class_id = ? LIMIT 1",
                 [$class_id]
             );
 
@@ -481,7 +481,7 @@ class ClassAjaxController extends BaseController
 
             $notes_json = json_encode($notes);
             $db->query(
-                "UPDATE public.classes SET class_notes_data = $1, updated_at = NOW() WHERE class_id = $2",
+                "UPDATE public.classes SET class_notes_data = ?, updated_at = NOW() WHERE class_id = ?",
                 [$notes_json, $class_id]
             );
 
