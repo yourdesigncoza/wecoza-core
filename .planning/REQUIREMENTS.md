@@ -34,14 +34,14 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 ### Quality
 
 - [ ] **QUAL-01**: Fix invalid model name (`gpt-5-mini` → `gpt-4o-mini`)
-- [ ] **QUAL-02**: Extract DTOs for `$record`, `$context`, `$summary` arrays
-- [ ] **QUAL-03**: Implement PHP 8.1 Enums for status strings
+- [x] **QUAL-02**: Extract DTOs for `$record`, `$context`, `$summary` arrays
+- [x] **QUAL-03**: Implement PHP 8.1 Enums for status strings
 - [ ] **QUAL-04**: Make API URL configurable (support Azure/proxy)
 
 ### Architecture
 
-- [ ] **ARCH-01**: Refactor `generateSummary()` for Single Responsibility
-- [ ] **ARCH-02**: Add BaseRepository `count()` method for pagination
+- [x] **ARCH-01**: Refactor `generateSummary()` for Single Responsibility
+- [x] **ARCH-02**: Add BaseRepository `count()` method for pagination (already existed)
 
 ## Future Requirements
 
@@ -87,10 +87,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-03 | Phase 9 | Complete |
 | SEC-06 | Phase 9 | Complete |
 | PERF-05 | Phase 9 | Complete |
-| ARCH-01 | Phase 10 | Pending |
-| ARCH-02 | Phase 10 | Pending |
-| QUAL-02 | Phase 10 | Pending |
-| QUAL-03 | Phase 10 | Pending |
+| ARCH-01 | Phase 10 | Complete |
+| ARCH-02 | Phase 10 | Complete |
+| QUAL-02 | Phase 10 | Complete |
+| QUAL-03 | Phase 10 | Complete |
 | QUAL-01 | Phase 11 | Pending |
 | QUAL-04 | Phase 11 | Pending |
 | PERF-01 | Phase 12 | Pending |
@@ -105,4 +105,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 — Phase 9 complete (11 requirements satisfied)*
+*Last updated: 2026-02-02 — Phase 10 complete (15 requirements satisfied)*
