@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 12 of 12 (Performance & Async Processing)
-Plan: 1 of 3 completed
+Plan: 2 of 3 completed
 Status: In progress
-Last activity: 2026-02-02 — Completed 12-01-PLAN.md (Action Scheduler Setup)
+Last activity: 2026-02-02 — Completed 12-02-PLAN.md (Async Action Scheduler Integration)
 
-Progress: [=======================...] 96% (13/13 phases, continuing from v1)
+Progress: [========================..] 97% (13/13 phases, continuing from v1)
 
-v1.1 Progress: [====================....] 83% (5/6 phases, started Phase 12)
+v1.1 Progress: [=====================...] 88% (5/6 phases, Phase 12 in progress)
 
 ## Milestone History
 
@@ -57,7 +57,7 @@ See: .planning/milestones/v1-* for archived artifacts
 | 09-data-privacy-hardening | 3 | 6min | 2min |
 | 10-architecture-type-safety | 3/3 | 13min | 4.3min |
 | 11-ai-service-quality | 1/1 | 3min | 3min |
-| 12-performance-async-processing | 1/3 | 2min | 2min |
+| 12-performance-async-processing | 2/3 | 5min | 2.5min |
 
 ## Accumulated Context
 
@@ -105,6 +105,9 @@ Key decisions are archived in:
 | 12 | 01 | LOCK_TTL increased to 120s (from 30s) | Prevents race conditions for 50-item batches |
 | 12 | 01 | MAX_RUNTIME increased to 90s (from 20s) | Allows ~1.8s per notification for AI + email |
 | 12 | 01 | vendor/ directory gitignored per Composer standard | Developers run composer install after clone |
+| 12 | 02 | AI enrichment as separate job | Enables independent failure and retry without blocking other notifications |
+| 12 | 02 | Job chaining pattern | Enricher schedules email job on success, maintains processing order |
+| 12 | 02 | Direct email scheduling for non-AI | Skips enrichment job when AI disabled, reduces latency |
 
 ### Pending Todos
 
@@ -116,8 +119,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T17:52:31Z
-Stopped at: Completed 12-01-PLAN.md (Action Scheduler Setup & Batch Optimization)
+Last session: 2026-02-02T18:05:44Z
+Stopped at: Completed 12-02-PLAN.md (Async Action Scheduler Integration)
 Resume file: None
 
-**Next action:** Ready for 12-02-PLAN.md (Async Action Scheduler Integration)
+**Next action:** Ready for 12-03-PLAN.md (WP-Cron Monitoring)
