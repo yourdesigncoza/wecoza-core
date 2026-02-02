@@ -68,7 +68,6 @@ final class MaterialNotificationService
                 c.class_code,
                 c.class_subject,
                 c.original_start_date,
-                c.delivery_date,
                 cl.client_name,
                 s.site_name,
                 (c.original_start_date - CURRENT_DATE) as days_until_start
@@ -186,9 +185,6 @@ final class MaterialNotificationService
         $clientName = esc_html((string) ($class['client_name'] ?? 'N/A'));
         $siteName = esc_html((string) ($class['site_name'] ?? 'N/A'));
         $startDate = esc_html((string) ($class['original_start_date'] ?? 'N/A'));
-        $deliveryDate = isset($class['delivery_date']) && $class['delivery_date'] !== null
-            ? esc_html((string) $class['delivery_date'])
-            : '<em>Not specified</em>';
 
         return sprintf(
             '<!DOCTYPE html>
@@ -239,10 +235,6 @@ final class MaterialNotificationService
                                     <td style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">Class Start Date</td>
                                     <td style="padding: 12px; border: 1px solid #dee2e6;">%s</td>
                                 </tr>
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">Expected Delivery Date</td>
-                                    <td style="padding: 12px; border: 1px solid #dee2e6;">%s</td>
-                                </tr>
                                 <tr style="background-color: #fff3cd;">
                                     <td style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">⏰ Days Until Start</td>
                                     <td style="padding: 12px; border: 1px solid #dee2e6; color: #%s; font-weight: bold; font-size: 18px;">%d days</td>
@@ -280,7 +272,6 @@ final class MaterialNotificationService
             $clientName,
             $siteName,
             $startDate,
-            $deliveryDate,
             $textColor,
             $daysRemaining,
             $notificationType,
