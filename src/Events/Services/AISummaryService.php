@@ -324,6 +324,91 @@ final class AISummaryService
     }
 
     /**
+     * Obfuscate PII from context data
+     *
+     * @param array<string,mixed> $context Raw context with potential PII
+     * @return ObfuscatedDataDTO Obfuscated payloads with alias mappings
+     */
+    private function obfuscateContext(array $context): ObfuscatedDataDTO
+    {
+        $state = null;
+
+        $newRowResult = $this->obfuscatePayloadWithLabels(
+            (array) ($context['new_row'] ?? []),
+            $state
+        );
+        $state = $newRowResult['state'];
+
+        $diffResult = $this->obfuscatePayloadWithLabels(
+            (array) ($context['diff'] ?? []),
+            $state
+        );
+        $state = $diffResult['state'];
+
+        $oldRowResult = $this->obfuscatePayloadWithLabels(
+            (array) ($context['old_row'] ?? []),
+            $state
+        );
+
+        return ObfuscatedDataDTO::fromResults($newRowResult, $diffResult, $oldRowResult);
+    }
+
+    /**
+     * Process OpenAI API response and build result DTO
+     *
+     * @param array{success:bool,content:string,error_code:?string,error_message:?string,model:?string,tokens:int} $response
+     * @param RecordDTO $record Current record state
+     * @param ObfuscatedDataDTO $obfuscatedData Obfuscation results
+     * @param int $elapsed Processing time in milliseconds
+     * @return SummaryResultDTO
+     */
+    private function processApiResponse(
+        array $response,
+        RecordDTO $record,
+        ObfuscatedDataDTO $obfuscatedData,
+        int $elapsed
+    ): SummaryResultDTO {
+        $emailContext = $obfuscatedData->toEmailContext();
+
+        if ($response['success'] === true) {
+            $summaryText = $this->normaliseSummaryText($response['content']);
+
+            $record = $record
+                ->withStatus(SummaryStatus::SUCCESS->value)
+                ->withSummary($summaryText)
+                ->withError(null, null)
+                ->withGeneratedAt(gmdate('c'))
+                ->withModel($response['model'])
+                ->withTokensUsed($response['tokens'])
+                ->withProcessingTimeMs($elapsed);
+
+            $this->metrics['success']++;
+            $this->metrics['total_tokens'] += $response['tokens'];
+
+            return SummaryResultDTO::success($record, $emailContext);
+        }
+
+        // Handle failure
+        $record = $record
+            ->withError($response['error_code'], $response['error_message'])
+            ->withModel($record->model ?? $response['model'])
+            ->withProcessingTimeMs($elapsed);
+
+        $newStatus = $record->attempts >= $this->maxAttempts
+            ? SummaryStatus::FAILED->value
+            : SummaryStatus::PENDING->value;
+
+        $record = $record->withStatus($newStatus);
+
+        if ($newStatus === SummaryStatus::FAILED->value) {
+            $this->metrics['failed']++;
+            return SummaryResultDTO::failed($record, $emailContext);
+        }
+
+        return SummaryResultDTO::pending($record, $emailContext);
+    }
+
+    /**
      * @param array<string,mixed> $context
      * @param array<string|int,mixed> $newRow
      * @param array<string|int,mixed> $diff

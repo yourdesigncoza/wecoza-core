@@ -215,4 +215,84 @@ final class RecordDTO
             processingTimeMs: $this->processingTimeMs,
         );
     }
+
+    /**
+     * Create a copy with updated generatedAt timestamp.
+     */
+    public function withGeneratedAt(?string $generatedAt): self
+    {
+        return new self(
+            summary: $this->summary,
+            status: $this->status,
+            errorCode: $this->errorCode,
+            errorMessage: $this->errorMessage,
+            attempts: $this->attempts,
+            viewed: $this->viewed,
+            viewedAt: $this->viewedAt,
+            generatedAt: $generatedAt,
+            model: $this->model,
+            tokensUsed: $this->tokensUsed,
+            processingTimeMs: $this->processingTimeMs,
+        );
+    }
+
+    /**
+     * Create a copy with updated model.
+     */
+    public function withModel(?string $model): self
+    {
+        return new self(
+            summary: $this->summary,
+            status: $this->status,
+            errorCode: $this->errorCode,
+            errorMessage: $this->errorMessage,
+            attempts: $this->attempts,
+            viewed: $this->viewed,
+            viewedAt: $this->viewedAt,
+            generatedAt: $this->generatedAt,
+            model: $model,
+            tokensUsed: $this->tokensUsed,
+            processingTimeMs: $this->processingTimeMs,
+        );
+    }
+
+    /**
+     * Create a copy with updated tokens used.
+     */
+    public function withTokensUsed(int $tokensUsed): self
+    {
+        return new self(
+            summary: $this->summary,
+            status: $this->status,
+            errorCode: $this->errorCode,
+            errorMessage: $this->errorMessage,
+            attempts: $this->attempts,
+            viewed: $this->viewed,
+            viewedAt: $this->viewedAt,
+            generatedAt: $this->generatedAt,
+            model: $this->model,
+            tokensUsed: $tokensUsed,
+            processingTimeMs: $this->processingTimeMs,
+        );
+    }
+
+    /**
+     * Create a copy with updated processing time.
+     */
+    public function withProcessingTimeMs(int $processingTimeMs): self
+    {
+        return new self(
+            summary: $this->summary,
+            status: $this->status,
+            errorCode: $this->errorCode,
+            errorMessage: $this->errorMessage,
+            attempts: $this->attempts,
+            viewed: $this->viewed,
+            viewedAt: $this->viewedAt,
+            generatedAt: $this->generatedAt,
+            model: $this->model,
+            tokensUsed: $this->tokensUsed,
+            processingTimeMs: $processingTimeMs,
+        );
+    }
 }
