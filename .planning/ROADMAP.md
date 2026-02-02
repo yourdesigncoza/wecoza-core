@@ -85,14 +85,14 @@ Plans:
 **Goal**: AI service uses correct model and supports flexible deployment
 **Depends on**: Phase 10 (uses refactored generateSummary)
 **Requirements**: QUAL-01, QUAL-04
-**Plans**: TBD
+**Plans**: 1 plan (Wave 1)
 
 **Success Criteria** (what must be TRUE):
 1. AI summaries generated using valid model name (`gpt-4o-mini` not `gpt-5-mini`)
 2. OpenAI API endpoint configurable via WordPress options (supports Azure/proxy deployments)
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md — Add configurable model and API URL to OpenAIConfig (QUAL-01, QUAL-04)
 
 ### Phase 12: Performance & Async Processing
 
@@ -121,7 +121,7 @@ Plans:
 | 8. Bug Fixes & Core Security | v1.1 | 4/4 | Complete | 2026-02-02 |
 | 9. Data Privacy Hardening | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 10. Architecture & Type Safety | v1.1 | 3/3 | Complete | 2026-02-02 |
-| 11. AI Service Quality | v1.1 | 0/? | Not started | - |
+| 11. AI Service Quality | v1.1 | 0/1 | Planned | - |
 | 12. Performance & Async Processing | v1.1 | 0/? | Not started | - |
 
 ## Requirement Coverage
@@ -157,4 +157,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02 — Phase 10 planned*
+*Last updated: 2026-02-02 — Phase 11 planned*
