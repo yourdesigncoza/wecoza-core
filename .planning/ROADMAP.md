@@ -31,12 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All classes use `WeCoza\Events\*` namespace and can be instantiated without require_once
   3. Events module classes use `wecoza_db()` for database queries instead of separate connection class
   4. Running `wp wecoza test-db` succeeds with events module loaded
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — Directory setup, PSR-4 config, Models/Repositories/Support migration
+- [ ] 01-02-PLAN.md — Services migration (TaskManager, AISummary, Notifications, Materials)
+- [ ] 01-03-PLAN.md — Interface layer migration (Controllers, Shortcodes, Views, Admin, CLI)
 
 ### Phase 2: Database Migration
 **Goal**: PostgreSQL triggers and functions operate correctly with wecoza-core
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Code Foundation | 0/3 | Not started | - |
+| 1. Code Foundation | 0/3 | Planned | - |
 | 2. Database Migration | 0/2 | Not started | - |
 | 3. Bootstrap Integration | 0/2 | Not started | - |
 | 4. Task Management | 0/3 | Not started | - |
