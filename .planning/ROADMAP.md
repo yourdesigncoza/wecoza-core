@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Code Foundation** - Namespace conversion, file structure, PSR-4 autoloading
 - [x] **Phase 2: Database Migration** - PostgreSQL triggers, functions, and schema fixes
-- [ ] **Phase 3: Bootstrap Integration** - Module initialization and activation hooks
+- [x] **Phase 3: Bootstrap Integration** - Module initialization and activation hooks
 - [ ] **Phase 4: Task Management** - Class change monitoring and task dashboard
 - [ ] **Phase 5: Material Tracking** - Delivery status tracking and alerts
 - [ ] **Phase 6: AI Summarization** - OpenAI integration for class change summaries
@@ -62,11 +62,10 @@ Plans:
   2. Events shortcodes are registered and callable after wecoza-core loads
   3. Events AJAX handlers respond to requests
   4. Deactivating wecoza-core properly cleans up events resources
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [x] 03-01-PLAN.md — Events module bootstrap (autoloader + hooks + CLI)
 
 ### Phase 4: Task Management
 **Goal**: Users can view and manage tasks generated from class changes
@@ -78,12 +77,10 @@ Plans:
   3. User can mark tasks complete and reopen them via AJAX
   4. User can filter tasks by status, date range, and class
   5. Task list updates in real-time after status changes
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md — Verify migrated task management functionality
 
 ### Phase 5: Material Tracking
 **Goal**: Users can track material delivery status with automated alerts
@@ -141,8 +138,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Code Foundation | 3/3 | ✓ Complete | 2026-02-02 |
 | 2. Database Migration | 2/2 | ✓ Complete | 2026-02-02 |
-| 3. Bootstrap Integration | 0/2 | Not started | - |
-| 4. Task Management | 0/3 | Not started | - |
+| 3. Bootstrap Integration | 1/1 | ✓ Complete | 2026-02-02 |
+| 4. Task Management | 0/1 | Not started | - |
 | 5. Material Tracking | 0/3 | Not started | - |
 | 6. AI Summarization | 0/2 | Not started | - |
 | 7. Email Notifications | 0/2 | Not started | - |
