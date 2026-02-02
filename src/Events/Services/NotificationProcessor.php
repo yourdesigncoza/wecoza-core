@@ -127,8 +127,8 @@ final class NotificationProcessor
                     'diff' => $diff,
                 ], $summaryRecord);
 
-                $summaryRecord = $result['record'];
-                $emailContext = $result['email_context'];
+                $summaryRecord = $result->record->toArray();
+                $emailContext = $result->emailContext->toArray();
                 $this->persistSummary($logId, $summaryRecord);
                 $this->emitSummaryMetrics($logId, $summaryRecord);
             }

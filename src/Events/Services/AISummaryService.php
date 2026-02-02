@@ -66,121 +66,65 @@ final class AISummaryService
     }
 
     /**
-     * @param array<string,mixed> $context
-     * @param array<string,mixed>|null $existing
-     * @return array{record:array<string,mixed>, email_context:array<string,mixed>, status:string}
+     * Generate AI summary for class change notification
+     *
+     * @param array<string,mixed> $context Change context (new_row, diff, old_row, operation, etc.)
+     * @param array<string,mixed>|null $existing Existing record if retrying
+     * @return SummaryResultDTO
      */
-    public function generateSummary(array $context, ?array $existing = null): array
+    public function generateSummary(array $context, ?array $existing = null): SummaryResultDTO
     {
         $record = $this->normaliseRecord($existing);
 
-        if ($record['status'] === 'success') {
-            return [
-                'record' => $record,
-                'email_context' => ['alias_map' => [], 'obfuscated' => []],
-                'status' => 'success',
-            ];
+        // Early exit for already-complete or max-attempts records
+        if ($this->shouldSkipGeneration($record)) {
+            return $this->buildSkippedResult($record);
         }
 
-        if ($record['attempts'] >= $this->maxAttempts) {
-            $record['status'] = 'failed';
-            return [
-                'record' => $record,
-                'email_context' => ['alias_map' => [], 'obfuscated' => []],
-                'status' => 'failed',
-            ];
-        }
+        // Obfuscate PII from context
+        $obfuscatedData = $this->obfuscateContext($context);
 
-        $state = null;
-        $newRowResult = $this->obfuscatePayloadWithLabels((array) ($context['new_row'] ?? []), $state);
-        $state = $newRowResult['state'];
-        $diffResult = $this->obfuscatePayloadWithLabels((array) ($context['diff'] ?? []), $state);
-        $state = $diffResult['state'];
-        $oldRowResult = $this->obfuscatePayloadWithLabels((array) ($context['old_row'] ?? []), $state);
-
-        $aliasMap = $oldRowResult['state']['aliases'];
-        $fieldLabels = array_merge(
-            $newRowResult['field_labels'],
-            $diffResult['field_labels'],
-            $oldRowResult['field_labels']
-        );
-
-        $attemptNumber = $record['attempts'] + 1;
-        $delaySeconds = $this->backoffDelaySeconds($record['attempts']);
+        // Prepare for API call with backoff delay
+        $delaySeconds = $this->backoffDelaySeconds($record->attempts);
         if ($delaySeconds > 0) {
             usleep($delaySeconds * 1_000_000);
         }
 
+        // Build prompt messages
         $messages = $this->buildMessages(
             (string) ($context['operation'] ?? ''),
             $context,
-            $newRowResult['payload'],
-            $diffResult['payload'],
-            $oldRowResult['payload']
+            $obfuscatedData->newRow,
+            $obfuscatedData->diff,
+            $obfuscatedData->oldRow
         );
 
+        // Call OpenAI API
         $start = microtime(true);
         $response = $this->callOpenAI($messages, self::MODEL);
-
         $elapsed = (int) round((microtime(true) - $start) * 1000);
 
-        $record['attempts'] = $attemptNumber;
-        $record['processing_time_ms'] = $elapsed;
+        // Update record with attempt info
+        $record = $record->incrementAttempts();
 
         $this->metrics['attempts']++;
         $this->metrics['processing_time_ms'] += $elapsed;
 
-        if ($response['success'] === true) {
-            $summaryText = $this->normaliseSummaryText($response['content']);
+        // Process response and return result
+        return $this->processApiResponse($response, $record, $obfuscatedData, $elapsed);
+    }
 
-            $record['status'] = 'success';
-            $record['summary'] = $summaryText;
-            $record['error_code'] = null;
-            $record['error_message'] = null;
-            $record['generated_at'] = gmdate('c');
-            $record['model'] = $response['model'];
-            $record['tokens_used'] = $response['tokens'];
-
-            $this->metrics['success']++;
-            $this->metrics['total_tokens'] += $response['tokens'];
-
-            return [
-                'record' => $record,
-                'email_context' => [
-                    'alias_map' => $aliasMap,
-                    'field_labels' => $fieldLabels,
-                    'obfuscated' => [
-                        'new_row' => $newRowResult['payload'],
-                        'diff' => $diffResult['payload'],
-                        'old_row' => $oldRowResult['payload'],
-                    ],
-                ],
-                'status' => 'success',
-            ];
-        }
-
-        $record['error_code'] = $response['error_code'];
-        $record['error_message'] = $response['error_message'];
-        $record['model'] = $record['model'] ?? $response['model'];
-        $record['status'] = $record['attempts'] >= $this->maxAttempts ? 'failed' : 'pending';
-
-        if ($record['status'] === 'failed') {
-            $this->metrics['failed']++;
-        }
-
-        return [
-            'record' => $record,
-            'email_context' => [
-                'alias_map' => $aliasMap,
-                'field_labels' => $fieldLabels,
-                'obfuscated' => [
-                    'new_row' => $newRowResult['payload'],
-                    'diff' => $diffResult['payload'],
-                    'old_row' => $oldRowResult['payload'],
-                ],
-            ],
-            'status' => $record['status'],
-        ];
+    /**
+     * Generate summary returning array format (backward compatibility)
+     *
+     * @deprecated Use generateSummary() which returns SummaryResultDTO
+     * @param array<string,mixed> $context
+     * @param array<string,mixed>|null $existing
+     * @return array{record:array<string,mixed>, email_context:array<string,mixed>, status:string}
+     */
+    public function generateSummaryArray(array $context, ?array $existing = null): array
+    {
+        return $this->generateSummary($context, $existing)->toArray();
     }
 
     /**

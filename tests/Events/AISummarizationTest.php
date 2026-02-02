@@ -647,10 +647,10 @@ if ($hasGenerateSummaryMethod) {
     $hasContextParam = count($params) >= 1;
     $runner->test('generateSummary() accepts context parameter', $hasContextParam);
 
-    // Test 13.2: Verify generateSummary() return structure via docblock
-    $docComment = $generateMethod->getDocComment();
-    $hasReturnStructure = $docComment !== false && strpos($docComment, 'record') !== false && strpos($docComment, 'email_context') !== false && strpos($docComment, 'status') !== false;
-    $runner->test('generateSummary() return type includes record, email_context, status', $hasReturnStructure);
+    // Test 13.2: Verify generateSummary() returns SummaryResultDTO
+    $returnType = $generateMethod->getReturnType();
+    $hasReturnStructure = $returnType !== null && $returnType->getName() === 'WeCoza\\Events\\DTOs\\SummaryResultDTO';
+    $runner->test('generateSummary() returns SummaryResultDTO', $hasReturnStructure);
 }
 
 // Test 13.3: Summary record structure verification
@@ -857,21 +857,22 @@ try {
 
     $result = $service->generateSummary($testContext, null);
 
-    $hasRecord = isset($result['record']);
-    $runner->test('generateSummary() returns result structure without API key', $hasRecord);
+    // generateSummary now returns SummaryResultDTO
+    $hasRecord = $result instanceof \WeCoza\Events\DTOs\SummaryResultDTO;
+    $runner->test('generateSummary() returns SummaryResultDTO without API key', $hasRecord);
 
     if ($hasRecord) {
-        $errorCode = $result['record']['error_code'] ?? null;
+        $errorCode = $result->record->errorCode;
         $isConfigMissing = $errorCode === 'config_missing';
         $runner->test('generateSummary() returns error_code=config_missing when no API key', $isConfigMissing);
 
-        $errorMessage = $result['record']['error_message'] ?? '';
+        $errorMessage = $result->record->errorMessage ?? '';
         $hasErrorMessage = strpos($errorMessage, 'API key') !== false;
         $runner->test('generateSummary() includes descriptive error message about API key', $hasErrorMessage);
     }
 
 } catch (Throwable $e) {
-    $runner->test('generateSummary() returns result structure without API key', false, $e->getMessage());
+    $runner->test('generateSummary() returns SummaryResultDTO without API key', false, $e->getMessage());
 }
 
 // Test 17.2: Test disabled feature handling (via assessEligibility)
@@ -1036,21 +1037,23 @@ try {
 
     $result = $service->generateSummary($testContext, null);
 
-    $hasEmailContext = isset($result['email_context']);
-    $runner->test('generateSummary() returns email_context for obfuscation', $hasEmailContext);
+    // generateSummary now returns SummaryResultDTO with emailContext property
+    $hasEmailContext = $result instanceof \WeCoza\Events\DTOs\SummaryResultDTO && $result->emailContext !== null;
+    $runner->test('generateSummary() returns SummaryResultDTO with emailContext', $hasEmailContext);
 
     if ($hasEmailContext) {
-        $hasAliasMap = isset($result['email_context']['alias_map']);
-        $hasObfuscated = isset($result['email_context']['obfuscated']);
-        $hasFieldLabels = isset($result['email_context']['field_labels']);
+        $emailContextArray = $result->emailContext->toArray();
+        $hasAliasMap = isset($emailContextArray['alias_map']);
+        $hasObfuscated = isset($emailContextArray['obfuscated']);
+        $hasFieldLabels = isset($emailContextArray['field_labels']);
 
-        $runner->test('email_context includes alias_map', $hasAliasMap);
-        $runner->test('email_context includes obfuscated data', $hasObfuscated);
-        $runner->test('email_context includes field_labels', $hasFieldLabels);
+        $runner->test('emailContext includes alias_map', $hasAliasMap);
+        $runner->test('emailContext includes obfuscated data', $hasObfuscated);
+        $runner->test('emailContext includes field_labels', $hasFieldLabels);
     }
 
 } catch (Throwable $e) {
-    $runner->test('generateSummary() returns email_context for obfuscation', false, $e->getMessage());
+    $runner->test('generateSummary() returns SummaryResultDTO with emailContext', false, $e->getMessage());
 }
 
 echo "\n";
