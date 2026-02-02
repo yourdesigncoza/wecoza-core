@@ -29,6 +29,185 @@ class ClassRepository extends BaseRepository
 
     private const CACHE_DURATION = 12 * HOUR_IN_SECONDS;
 
+    /*
+    |--------------------------------------------------------------------------
+    | Column Whitelisting (Security)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Columns allowed for ORDER BY
+     */
+    protected function getAllowedOrderColumns(): array
+    {
+        return [
+            'class_id', 'client_id', 'class_type', 'class_subject',
+            'original_start_date', 'created_at', 'updated_at', 'class_code'
+        ];
+    }
+
+    /**
+     * Columns allowed for WHERE filtering
+     */
+    protected function getAllowedFilterColumns(): array
+    {
+        return [
+            'class_id', 'client_id', 'site_id', 'class_type', 'class_subject',
+            'class_code', 'seta_funded', 'seta', 'exam_class', 'class_agent',
+            'project_supervisor_id', 'created_at', 'updated_at'
+        ];
+    }
+
+    /**
+     * Columns allowed for INSERT
+     */
+    protected function getAllowedInsertColumns(): array
+    {
+        return [
+            'client_id', 'site_id', 'class_address_line', 'class_type',
+            'class_subject', 'class_code', 'class_duration', 'original_start_date',
+            'seta_funded', 'seta', 'exam_class', 'exam_type', 'class_agent',
+            'initial_class_agent', 'initial_agent_start_date', 'project_supervisor_id',
+            'learner_ids', 'exam_learners', 'backup_agent_ids', 'agent_replacements',
+            'schedule_data', 'stop_restart_dates', 'event_dates', 'class_notes_data',
+            'order_nr', 'created_at', 'updated_at'
+        ];
+    }
+
+    /**
+     * Columns allowed for UPDATE
+     */
+    protected function getAllowedUpdateColumns(): array
+    {
+        // Same as insert, minus created_at
+        $columns = $this->getAllowedInsertColumns();
+        return array_values(array_diff($columns, ['created_at']));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD Operations (Delegated from ClassModel)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Insert a new class record
+     *
+     * @param array $data Class data
+     * @return int|null The new class ID or null on failure
+     */
+    public function insertClass(array $data): ?int
+    {
+        // Filter to only allowed columns
+        $filteredData = $this->filterAllowedColumns($data, $this->getAllowedInsertColumns());
+
+        if (empty($filteredData)) {
+            error_log('WeCoza Core: Insert rejected - no valid columns in data');
+            return null;
+        }
+
+        $columns = array_keys($filteredData);
+        $placeholders = array_map(fn($c) => ":{$c}", $columns);
+
+        $sql = sprintf(
+            "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
+            static::$table,
+            implode(', ', $columns),
+            implode(', ', $placeholders),
+            static::$primaryKey
+        );
+
+        try {
+            $stmt = $this->db->query($sql, $filteredData);
+            $result = $stmt->fetch();
+            return $result ? (int)$result[static::$primaryKey] : null;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error inserting class: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Update a class record
+     *
+     * @param int $id Class ID
+     * @param array $data Class data
+     * @return bool Success status
+     */
+    public function updateClass(int $id, array $data): bool
+    {
+        // Filter to only allowed columns
+        $filteredData = $this->filterAllowedColumns($data, $this->getAllowedUpdateColumns());
+
+        if (empty($filteredData)) {
+            error_log('WeCoza Core: Update rejected - no valid columns in data');
+            return false;
+        }
+
+        $setClauses = array_map(fn($c) => "{$c} = :{$c}", array_keys($filteredData));
+        $filteredData['id'] = $id;
+
+        $sql = sprintf(
+            "UPDATE %s SET %s WHERE %s = :id",
+            static::$table,
+            implode(', ', $setClauses),
+            static::$primaryKey
+        );
+
+        try {
+            $this->db->query($sql, $filteredData);
+            return true;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error updating class: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete a class record
+     *
+     * @param int $id Class ID
+     * @return bool Success status
+     */
+    public function deleteClass(int $id): bool
+    {
+        $sql = sprintf(
+            "DELETE FROM %s WHERE %s = ?",
+            static::$table,
+            static::$primaryKey
+        );
+
+        try {
+            $this->db->query($sql, [$id]);
+            return true;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error deleting class: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Filter data to only include allowed columns
+     *
+     * @param array $data Input data
+     * @param array $allowedColumns Allowed column names
+     * @return array Filtered data
+     */
+    protected function filterAllowedColumns(array $data, array $allowedColumns): array
+    {
+        return array_filter(
+            $data,
+            fn($key) => in_array($key, $allowedColumns, true),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reference Data Methods
+    |--------------------------------------------------------------------------
+    */
+
     /**
      * Get all clients ordered by name
      */
@@ -90,35 +269,89 @@ class ClassRepository extends BaseRepository
     }
 
     /**
-     * Get all learners with location information (cached)
+     * Get all learners with location and progression context (cached)
+     *
+     * Includes:
+     * - Last completed course (product name, completion date)
+     * - Current active LP (product_id, product_name, progress %, class_id)
      */
     public static function getLearners(): array
     {
         try {
-            $cache_key = 'wecoza_class_learners_with_locations';
+            $cache_key = 'wecoza_class_learners_with_progression';
             $cached_learners = get_transient($cache_key);
             if ($cached_learners !== false) {
                 return $cached_learners;
             }
 
             $db = wecoza_db();
-            $sql = "SELECT
-                        l.id,
-                        l.first_name,
-                        l.second_name,
-                        l.initials,
-                        l.surname,
-                        l.sa_id_no,
-                        l.passport_number,
-                        l.city_town_id,
-                        l.province_region_id,
-                        l.postal_code,
-                        loc.town AS city_town_name,
-                        loc.province AS province_region_name
-                    FROM public.learners l
-                    LEFT JOIN public.locations loc ON l.city_town_id = loc.location_id
-                    WHERE l.first_name IS NOT NULL AND l.surname IS NOT NULL
-                    ORDER BY l.surname ASC, l.first_name ASC";
+
+            // Optimized query with progression context using CTEs
+            $sql = "
+                WITH last_completed AS (
+                    SELECT DISTINCT ON (lpt.learner_id)
+                        lpt.learner_id,
+                        lpt.product_id AS last_product_id,
+                        p.product_name AS last_course_name,
+                        lpt.completion_date AS last_completion_date
+                    FROM learner_lp_tracking lpt
+                    LEFT JOIN products p ON lpt.product_id = p.product_id
+                    WHERE lpt.status = 'completed'
+                    ORDER BY lpt.learner_id, lpt.completion_date DESC
+                ),
+                active_lp AS (
+                    SELECT
+                        lpt.learner_id,
+                        lpt.tracking_id AS active_tracking_id,
+                        lpt.product_id AS active_product_id,
+                        p.product_name AS active_course_name,
+                        p.product_duration AS active_product_duration,
+                        lpt.class_id AS active_class_id,
+                        c.class_code AS active_class_code,
+                        lpt.hours_present AS active_hours_present,
+                        lpt.start_date AS active_start_date,
+                        CASE
+                            WHEN p.product_duration > 0 THEN
+                                LEAST(100, ROUND((lpt.hours_present / p.product_duration) * 100, 1))
+                            ELSE 0
+                        END AS active_progress_pct
+                    FROM learner_lp_tracking lpt
+                    LEFT JOIN products p ON lpt.product_id = p.product_id
+                    LEFT JOIN classes c ON lpt.class_id = c.class_id
+                    WHERE lpt.status = 'in_progress'
+                )
+                SELECT
+                    l.id,
+                    l.first_name,
+                    l.second_name,
+                    l.initials,
+                    l.surname,
+                    l.sa_id_no,
+                    l.passport_number,
+                    l.city_town_id,
+                    l.province_region_id,
+                    l.postal_code,
+                    loc.town AS city_town_name,
+                    loc.province AS province_region_name,
+                    lc.last_course_name,
+                    lc.last_completion_date,
+                    alp.active_tracking_id,
+                    alp.active_product_id,
+                    alp.active_course_name,
+                    alp.active_class_id,
+                    alp.active_class_code,
+                    alp.active_hours_present,
+                    alp.active_product_duration,
+                    alp.active_progress_pct,
+                    alp.active_start_date,
+                    CASE WHEN alp.active_tracking_id IS NOT NULL THEN true ELSE false END AS has_active_lp
+                FROM public.learners l
+                LEFT JOIN public.locations loc ON l.city_town_id = loc.location_id
+                LEFT JOIN last_completed lc ON l.id = lc.learner_id
+                LEFT JOIN active_lp alp ON l.id = alp.learner_id
+                WHERE l.first_name IS NOT NULL AND l.surname IS NOT NULL
+                ORDER BY l.surname ASC, l.first_name ASC
+            ";
             $stmt = $db->query($sql);
 
             $learners = [];
@@ -154,7 +387,20 @@ class ClassRepository extends BaseRepository
                     'province_region_id' => (int)($row['province_region_id'] ?? 0),
                     'postal_code' => sanitize_text_field($row['postal_code'] ?? ''),
                     'city_town_name' => sanitize_text_field($row['city_town_name'] ?? ''),
-                    'province_region_name' => sanitize_text_field($row['province_region_name'] ?? '')
+                    'province_region_name' => sanitize_text_field($row['province_region_name'] ?? ''),
+                    // Progression context
+                    'last_course_name' => sanitize_text_field($row['last_course_name'] ?? ''),
+                    'last_completion_date' => sanitize_text_field($row['last_completion_date'] ?? ''),
+                    'has_active_lp' => (bool)($row['has_active_lp'] ?? false),
+                    'active_tracking_id' => $row['active_tracking_id'] ? (int)$row['active_tracking_id'] : null,
+                    'active_product_id' => $row['active_product_id'] ? (int)$row['active_product_id'] : null,
+                    'active_course_name' => sanitize_text_field($row['active_course_name'] ?? ''),
+                    'active_class_id' => $row['active_class_id'] ? (int)$row['active_class_id'] : null,
+                    'active_class_code' => sanitize_text_field($row['active_class_code'] ?? ''),
+                    'active_hours_present' => $row['active_hours_present'] ? (float)$row['active_hours_present'] : 0,
+                    'active_product_duration' => $row['active_product_duration'] ? (float)$row['active_product_duration'] : 0,
+                    'active_progress_pct' => $row['active_progress_pct'] ? (float)$row['active_progress_pct'] : 0,
+                    'active_start_date' => sanitize_text_field($row['active_start_date'] ?? '')
                 ];
             }
 
@@ -162,7 +408,7 @@ class ClassRepository extends BaseRepository
 
             return $learners;
         } catch (Exception $e) {
-            error_log('WeCoza Core: Error fetching learners: ' . $e->getMessage());
+            error_log('WeCoza Core: Error fetching learners with progression: ' . $e->getMessage());
             return [];
         }
     }

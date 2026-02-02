@@ -31,13 +31,26 @@ class ProgressionService
     /**
      * Start a new LP for a learner
      *
-     * @throws Exception if learner already has an in-progress LP
+     * @param int $learnerId
+     * @param int $productId
+     * @param int|null $classId
+     * @param string|null $notes
+     * @param bool $forceOverride If true, puts existing LP on hold instead of throwing
+     * @return LearnerProgressionModel
+     * @throws Exception if learner already has an in-progress LP and $forceOverride is false
      */
-    public function startLearnerProgression(int $learnerId, int $productId, ?int $classId = null, ?string $notes = null): LearnerProgressionModel
+    public function startLearnerProgression(int $learnerId, int $productId, ?int $classId = null, ?string $notes = null, bool $forceOverride = false): LearnerProgressionModel
     {
         $current = LearnerProgressionModel::getCurrentForLearner($learnerId);
+
         if ($current) {
-            throw new Exception("Learner already has an in-progress LP: " . $current->getProductName());
+            if (!$forceOverride) {
+                throw new Exception("Learner already has an in-progress LP: " . $current->getProductName());
+            }
+
+            // Put current LP on hold
+            $holdNotes = "Put on hold - learner assigned to new class. " . date('Y-m-d H:i:s');
+            $current->putOnHold($holdNotes);
         }
 
         $progression = new LearnerProgressionModel([
@@ -54,6 +67,88 @@ class ProgressionService
         }
 
         return $progression;
+    }
+
+    /**
+     * Check if learner has an active LP and return details
+     *
+     * Used for collision detection before assignment.
+     *
+     * @param int $learnerId
+     * @return array|null Returns active LP info or null if none
+     */
+    public function checkForActiveLPCollision(int $learnerId): ?array
+    {
+        $current = LearnerProgressionModel::getCurrentForLearner($learnerId);
+
+        if (!$current) {
+            return null;
+        }
+
+        return [
+            'has_collision' => true,
+            'tracking_id' => $current->getTrackingId(),
+            'product_id' => $current->getProductId(),
+            'product_name' => $current->getProductName(),
+            'class_id' => $current->getClassId(),
+            'class_code' => $current->getClassCode(),
+            'progress_percentage' => $current->getProgressPercentage(),
+            'hours_present' => $current->getHoursPresent(),
+            'hours_trained' => $current->getHoursTrained(),
+            'start_date' => $current->getStartDate(),
+        ];
+    }
+
+    /**
+     * Create LP for class assignment (handles collision gracefully)
+     *
+     * Returns a result array instead of throwing exceptions.
+     *
+     * @param int $learnerId
+     * @param int $productId
+     * @param int $classId
+     * @param bool $forceOverride
+     * @return array Result with 'success', 'progression', 'warning', 'collision_data'
+     */
+    public function createLPForClassAssignment(int $learnerId, int $productId, int $classId, bool $forceOverride = false): array
+    {
+        $collision = $this->checkForActiveLPCollision($learnerId);
+
+        // If collision exists and no override, return warning
+        if ($collision && !$forceOverride) {
+            return [
+                'success' => false,
+                'warning' => true,
+                'message' => "Learner has an active LP: " . $collision['product_name'],
+                'collision_data' => $collision,
+                'progression' => null,
+            ];
+        }
+
+        try {
+            $notes = "Auto-created on class assignment. Class ID: {$classId}";
+            if ($collision && $forceOverride) {
+                $notes .= " (Previous LP put on hold: " . $collision['product_name'] . ")";
+            }
+
+            $progression = $this->startLearnerProgression($learnerId, $productId, $classId, $notes, $forceOverride);
+
+            return [
+                'success' => true,
+                'warning' => false,
+                'message' => 'LP created successfully',
+                'collision_data' => $collision,
+                'progression' => $progression,
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'warning' => false,
+                'message' => 'Failed to create LP: ' . $e->getMessage(),
+                'collision_data' => $collision,
+                'progression' => null,
+            ];
+        }
     }
 
     /**

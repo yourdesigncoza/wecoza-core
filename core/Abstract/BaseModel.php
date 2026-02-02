@@ -55,12 +55,14 @@ abstract class BaseModel
     /**
      * Constructor
      *
-     * @param array $data Optional data to hydrate the model
+     * @param array|object $data Optional data to hydrate the model (accepts array or stdClass from PDO)
      */
-    public function __construct(array $data = [])
+    public function __construct(array|object $data = [])
     {
         if (!empty($data)) {
-            $this->hydrate($data);
+            // Convert stdClass to array if needed
+            $dataArray = is_object($data) ? (array) $data : $data;
+            $this->hydrate($dataArray);
         }
     }
 
@@ -219,6 +221,8 @@ abstract class BaseModel
     /**
      * Cast a value to its defined type
      *
+     * Uses centralized wecoza_sanitize_value() helper.
+     *
      * @param string $property Property name
      * @param mixed $value Value to cast
      * @return mixed Cast value
@@ -235,16 +239,12 @@ abstract class BaseModel
             return $value;
         }
 
-        return match ($cast) {
-            'int', 'integer' => (int) $value,
-            'float', 'double' => (float) $value,
-            'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
-            'string' => (string) $value,
-            'array', 'json' => is_string($value) ? json_decode($value, true) : (array) $value,
-            'date' => $value, // Keep as string, let child handle
-            'datetime' => $value,
-            default => $value,
-        };
+        // Use 'raw' type for date/datetime to preserve as-is
+        if (in_array($cast, ['date', 'datetime'], true)) {
+            return $value;
+        }
+
+        return wecoza_sanitize_value($value, $cast);
     }
 
     /**

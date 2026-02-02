@@ -1,0 +1,28 @@
+/**
+ * WeCoza Learners Management Styles
+ * 
+ * This file will contain all learner-specific styles when the plugin is activated.
+ * Currently, styles are located in: /includes/css/ydcoza-styles.css
+ * 
+ * @package WeCoza_Learners
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Note Categories (from ydcoza-styles.css)
+   ========================================================================== */
+
+.note-category-learners-unhappy {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+}
+
+.note-category-learners-behind-schedule {
+    background-color: #fff3e0;
+    border-left: 4px solid #ff9800;
+}
+
+.note-category-learners-too-fast {
+    background-color: #e8f5e9;
+    border-left: 4px solid #4caf50;
+}

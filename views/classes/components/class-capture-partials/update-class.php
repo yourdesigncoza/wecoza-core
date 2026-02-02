@@ -1129,6 +1129,13 @@ if (isset($data['class_data']) && $data['class_data']):
                                     Postal Code
                                     <i class="bi bi-arrow-down-up ms-1"></i>
                                  </th>
+                                 <th scope="col" class="border-0 sortable-column" data-field="last_course_name" style="cursor: pointer;">
+                                    Last Course
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                 </th>
+                                 <th scope="col" class="border-0" style="width: 60px;">
+                                    Active LP
+                                 </th>
                               </tr>
                            </thead>
                            <tbody id="learner-selection-tbody">
@@ -1161,6 +1168,29 @@ if (isset($data['class_data']) && $data['class_data']):
                                  <td class="py-2 align-middle"><?php echo esc_html($learner['city_town_name'] ?? '-'); ?></td>
                                  <td class="py-2 align-middle"><?php echo esc_html($learner['province_region_name'] ?? '-'); ?></td>
                                  <td class="py-2 align-middle"><?php echo esc_html($learner['postal_code'] ?? '-'); ?></td>
+                                 <td class="py-2 align-middle">
+                                    <?php if (!empty($learner['last_course_name'])): ?>
+                                    <span class="badge fs-10 badge-phoenix badge-phoenix-success" title="Completed: <?php echo esc_attr($learner['last_completion_date'] ?? ''); ?>">
+                                       <?php echo esc_html($learner['last_course_name']); ?>
+                                    </span>
+                                    <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                 </td>
+                                 <td class="py-2 align-middle text-center">
+                                    <?php if (!empty($learner['has_active_lp'])): ?>
+                                    <span class="badge fs-10 badge-phoenix badge-phoenix-warning"
+                                          title="<?php echo esc_attr($learner['active_course_name'] . ' (' . $learner['active_progress_pct'] . '% complete)'); ?>"
+                                          data-active-lp="true"
+                                          data-active-course="<?php echo esc_attr($learner['active_course_name']); ?>"
+                                          data-active-progress="<?php echo esc_attr($learner['active_progress_pct']); ?>"
+                                          data-active-class-code="<?php echo esc_attr($learner['active_class_code'] ?? ''); ?>">
+                                       <i class="bi bi-exclamation-triangle"></i>
+                                    </span>
+                                    <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                 </td>
                               </tr>
                               <?php endforeach; ?>
                            </tbody>

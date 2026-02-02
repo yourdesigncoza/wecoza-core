@@ -57,8 +57,13 @@ if (!function_exists('wecoza_view')) {
      * Supports both .view.php (Classes style) and .php (Learners style) extensions.
      * Data is extracted to local scope using EXTR_SKIP for security.
      *
+     * WARNING: Data array keys become local variables via extract().
+     * Avoid using these reserved keys in $data as they may conflict:
+     * - 'file', 'basePath', 'return', 'data', 'view'
+     * - Any PHP superglobals ($_GET, $_POST, etc.)
+     *
      * @param string $view View path relative to views directory (without extension)
-     * @param array $data Data to pass to the view
+     * @param array $data Data to pass to the view.
      * @param bool $return Whether to return output (true) or echo it (false)
      * @return string|void HTML output if $return is true
      */
@@ -317,5 +322,69 @@ if (!function_exists('wecoza_camel_to_snake')) {
      */
     function wecoza_camel_to_snake(string $value): string {
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $value));
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Input Sanitization Functions
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('wecoza_sanitize_value')) {
+    /**
+     * Sanitize a value based on type
+     *
+     * Centralized sanitization used by BaseController, BaseModel, and AjaxSecurity.
+     * Supports WordPress sanitization functions when available.
+     *
+     * @param mixed $value Value to sanitize
+     * @param string $type Type to sanitize as (string, int, email, url, bool, array, json, raw)
+     * @return mixed Sanitized value
+     */
+    function wecoza_sanitize_value(mixed $value, string $type): mixed {
+        if ($value === null) {
+            return match ($type) {
+                'string', 'text', 'textarea', 'email', 'url' => '',
+                'int', 'integer' => 0,
+                'float', 'double' => 0.0,
+                'bool', 'boolean' => false,
+                'array', 'json' => [],
+                default => null,
+            };
+        }
+
+        return match ($type) {
+            'string', 'text' => function_exists('sanitize_text_field')
+                ? sanitize_text_field((string) $value)
+                : htmlspecialchars(strip_tags((string) $value), ENT_QUOTES, 'UTF-8'),
+            'textarea' => function_exists('sanitize_textarea_field')
+                ? sanitize_textarea_field((string) $value)
+                : htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'),
+            'int', 'integer' => (int) $value,
+            'float', 'double' => (float) $value,
+            'email' => function_exists('sanitize_email')
+                ? sanitize_email((string) $value)
+                : filter_var($value, FILTER_SANITIZE_EMAIL),
+            'url' => function_exists('esc_url_raw')
+                ? esc_url_raw((string) $value)
+                : filter_var($value, FILTER_SANITIZE_URL),
+            'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            'array' => is_array($value) ? $value : [],
+            'json' => is_string($value) ? (json_decode($value, true) ?? []) : (is_array($value) ? $value : []),
+            'filename' => function_exists('sanitize_file_name')
+                ? sanitize_file_name((string) $value)
+                : preg_replace('/[^a-zA-Z0-9._-]/', '', (string) $value),
+            'date' => is_string($value) ? (function_exists('sanitize_text_field')
+                ? sanitize_text_field($value)
+                : htmlspecialchars($value, ENT_QUOTES, 'UTF-8')) : '',
+            'datetime' => is_string($value) ? (function_exists('sanitize_text_field')
+                ? sanitize_text_field($value)
+                : htmlspecialchars($value, ENT_QUOTES, 'UTF-8')) : '',
+            'raw' => $value,
+            default => function_exists('sanitize_text_field')
+                ? sanitize_text_field((string) $value)
+                : htmlspecialchars(strip_tags((string) $value), ENT_QUOTES, 'UTF-8'),
+        };
     }
 }

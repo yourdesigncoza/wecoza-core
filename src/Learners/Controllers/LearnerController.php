@@ -33,13 +33,10 @@ class LearnerController extends BaseController
     {
         add_action('init', [$this, 'registerShortcodes']);
 
-        // Register AJAX handlers
+        // Register AJAX handlers (authenticated users only)
+        // Note: nopriv hooks removed - learner data is private
         add_action('wp_ajax_wecoza_get_learner', [$this, 'ajaxGetLearner']);
-        add_action('wp_ajax_nopriv_wecoza_get_learner', [$this, 'ajaxGetLearner']);
-
         add_action('wp_ajax_wecoza_get_learners', [$this, 'ajaxGetLearners']);
-        add_action('wp_ajax_nopriv_wecoza_get_learners', [$this, 'ajaxGetLearners']);
-
         add_action('wp_ajax_wecoza_update_learner', [$this, 'ajaxUpdateLearner']);
         add_action('wp_ajax_wecoza_delete_learner', [$this, 'ajaxDeleteLearner']);
     }
@@ -214,6 +211,15 @@ class LearnerController extends BaseController
      */
     public function ajaxGetLearner(): void
     {
+        // Capability check - only administrators can access learner PII
+        if (!current_user_can('manage_learners')) {
+            $this->sendError('Insufficient permissions.', 403);
+            return;
+        }
+
+        // Verify CSRF token for read operations (defense in depth)
+        $this->requireNonce('learners_nonce_action');
+
         $id = $this->input('id', 'int') ?? $this->query('id', 'int');
 
         if (!$id) {
@@ -235,6 +241,15 @@ class LearnerController extends BaseController
      */
     public function ajaxGetLearners(): void
     {
+        // Capability check - only administrators can access learner PII
+        if (!current_user_can('manage_learners')) {
+            $this->sendError('Insufficient permissions.', 403);
+            return;
+        }
+
+        // Verify CSRF token for read operations (defense in depth)
+        $this->requireNonce('learners_nonce_action');
+
         $limit = $this->query('limit', 'int') ?? 50;
         $offset = $this->query('offset', 'int') ?? 0;
         $withMappings = $this->query('mappings', 'bool') ?? false;
@@ -260,6 +275,12 @@ class LearnerController extends BaseController
      */
     public function ajaxUpdateLearner(): void
     {
+        // Capability check - only administrators can modify learner data
+        if (!current_user_can('manage_learners')) {
+            $this->sendError('Insufficient permissions.', 403);
+            return;
+        }
+
         $this->requireNonce('learners_nonce_action');
 
         $id = $this->input('id', 'int');
@@ -283,6 +304,12 @@ class LearnerController extends BaseController
      */
     public function ajaxDeleteLearner(): void
     {
+        // Capability check - only administrators can delete learner data
+        if (!current_user_can('manage_learners')) {
+            $this->sendError('Insufficient permissions.', 403);
+            return;
+        }
+
         $this->requireNonce('learners_nonce_action');
 
         $id = $this->input('id', 'int');

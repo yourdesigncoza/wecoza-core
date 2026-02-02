@@ -48,6 +48,87 @@ abstract class BaseRepository
         $this->db = PostgresConnection::getInstance();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Column Whitelisting (Security)
+    |--------------------------------------------------------------------------
+    | Override these methods in child classes to define allowed columns.
+    | This prevents SQL injection via column name manipulation.
+    */
+
+    /**
+     * Get columns allowed for ORDER BY clauses
+     * Override in child classes to expand the list
+     *
+     * @return array List of allowed column names
+     */
+    protected function getAllowedOrderColumns(): array
+    {
+        return ['id', 'created_at', 'updated_at'];
+    }
+
+    /**
+     * Get columns allowed for WHERE clause filtering
+     * Override in child classes to expand the list
+     *
+     * @return array List of allowed column names
+     */
+    protected function getAllowedFilterColumns(): array
+    {
+        return ['id', 'created_at', 'updated_at'];
+    }
+
+    /**
+     * Get columns allowed for INSERT operations
+     * Override in child classes with actual table columns
+     *
+     * @return array List of allowed column names
+     */
+    protected function getAllowedInsertColumns(): array
+    {
+        return ['created_at', 'updated_at'];
+    }
+
+    /**
+     * Get columns allowed for UPDATE operations
+     * Override in child classes with actual table columns
+     *
+     * @return array List of allowed column names
+     */
+    protected function getAllowedUpdateColumns(): array
+    {
+        return ['updated_at'];
+    }
+
+    /**
+     * Validate and sanitize orderBy column
+     *
+     * @param string $orderBy Column name to validate
+     * @param string $default Default column if invalid
+     * @return string Validated column name
+     */
+    protected function validateOrderColumn(string $orderBy, string $default = 'created_at'): string
+    {
+        $allowed = $this->getAllowedOrderColumns();
+        return in_array($orderBy, $allowed, true) ? $orderBy : $default;
+    }
+
+    /**
+     * Filter data array to only include allowed columns
+     *
+     * @param array $data Input data
+     * @param array $allowedColumns List of allowed column names
+     * @return array Filtered data
+     */
+    protected function filterAllowedColumns(array $data, array $allowedColumns): array
+    {
+        return array_filter(
+            $data,
+            fn($key) => in_array($key, $allowedColumns, true),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
     /**
      * Get database connection
      *
@@ -99,6 +180,9 @@ abstract class BaseRepository
      */
     public function findAll(int $limit = 50, int $offset = 0, string $orderBy = 'created_at', string $order = 'DESC'): array
     {
+        // Validate orderBy against whitelist (SQL injection prevention)
+        $orderBy = $this->validateOrderColumn($orderBy);
+
         // Sanitize order direction
         $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
 
@@ -138,16 +222,32 @@ abstract class BaseRepository
             return $this->findAll($limit, $offset, $orderBy, $order);
         }
 
+        // Validate orderBy against whitelist (SQL injection prevention)
+        $orderBy = $this->validateOrderColumn($orderBy);
+
+        // Get allowed filter columns
+        $allowedFilterColumns = $this->getAllowedFilterColumns();
+
         $conditions = [];
         $params = [];
 
         foreach ($criteria as $field => $value) {
+            // Skip non-whitelisted columns (SQL injection prevention)
+            if (!in_array($field, $allowedFilterColumns, true)) {
+                continue;
+            }
+
             if ($value === null) {
                 $conditions[] = "{$field} IS NULL";
             } else {
                 $conditions[] = "{$field} = :{$field}";
                 $params[$field] = $value;
             }
+        }
+
+        // If no valid conditions after filtering, return empty
+        if (empty($conditions)) {
+            return [];
         }
 
         $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
@@ -202,8 +302,16 @@ abstract class BaseRepository
         $params = [];
 
         if (!empty($criteria)) {
+            // Get allowed filter columns
+            $allowedFilterColumns = $this->getAllowedFilterColumns();
+
             $conditions = [];
             foreach ($criteria as $field => $value) {
+                // Skip non-whitelisted columns (SQL injection prevention)
+                if (!in_array($field, $allowedFilterColumns, true)) {
+                    continue;
+                }
+
                 if ($value === null) {
                     $conditions[] = "{$field} IS NULL";
                 } else {
@@ -211,7 +319,10 @@ abstract class BaseRepository
                     $params[$field] = $value;
                 }
             }
-            $sql .= " WHERE " . implode(' AND ', $conditions);
+
+            if (!empty($conditions)) {
+                $sql .= " WHERE " . implode(' AND ', $conditions);
+            }
         }
 
         try {
@@ -263,7 +374,16 @@ abstract class BaseRepository
             return null;
         }
 
-        $columns = array_keys($data);
+        // Filter data to only allowed columns (SQL injection prevention)
+        $allowedColumns = $this->getAllowedInsertColumns();
+        $filteredData = $this->filterAllowedColumns($data, $allowedColumns);
+
+        if (empty($filteredData)) {
+            error_log("WeCoza Core: Insert rejected - no valid columns in data");
+            return null;
+        }
+
+        $columns = array_keys($filteredData);
         $placeholders = array_map(fn($c) => ":{$c}", $columns);
 
         $sql = sprintf(
@@ -275,7 +395,7 @@ abstract class BaseRepository
         );
 
         try {
-            $stmt = $this->db->query($sql, $data);
+            $stmt = $this->db->query($sql, $filteredData);
             return (int) $stmt->fetchColumn();
         } catch (Exception $e) {
             error_log("WeCoza Core: Repository insert error: " . $e->getMessage());
@@ -296,8 +416,17 @@ abstract class BaseRepository
             return false;
         }
 
+        // Filter data to only allowed columns (SQL injection prevention)
+        $allowedColumns = $this->getAllowedUpdateColumns();
+        $filteredData = $this->filterAllowedColumns($data, $allowedColumns);
+
+        if (empty($filteredData)) {
+            error_log("WeCoza Core: Update rejected - no valid columns in data");
+            return false;
+        }
+
         $setParts = [];
-        foreach (array_keys($data) as $column) {
+        foreach (array_keys($filteredData) as $column) {
             $setParts[] = "{$column} = :{$column}";
         }
 
@@ -308,10 +437,10 @@ abstract class BaseRepository
             static::$primaryKey
         );
 
-        $data['_id'] = $id;
+        $filteredData['_id'] = $id;
 
         try {
-            $stmt = $this->db->query($sql, $data);
+            $stmt = $this->db->query($sql, $filteredData);
             return $stmt->rowCount() > 0;
         } catch (Exception $e) {
             error_log("WeCoza Core: Repository update error: " . $e->getMessage());
@@ -354,12 +483,25 @@ abstract class BaseRepository
             return 0; // Safety: don't delete all
         }
 
+        // Get allowed filter columns
+        $allowedFilterColumns = $this->getAllowedFilterColumns();
+
         $conditions = [];
         $params = [];
 
         foreach ($criteria as $field => $value) {
+            // Skip non-whitelisted columns (SQL injection prevention)
+            if (!in_array($field, $allowedFilterColumns, true)) {
+                continue;
+            }
+
             $conditions[] = "{$field} = :{$field}";
             $params[$field] = $value;
+        }
+
+        // If no valid conditions after filtering, don't delete anything
+        if (empty($conditions)) {
+            return 0;
         }
 
         $sql = sprintf(

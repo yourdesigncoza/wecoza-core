@@ -321,22 +321,7 @@ class AjaxSecurity
                 continue;
             }
 
-            $value = $input[$field];
-
-            $sanitized[$field] = match ($type) {
-                'string', 'text' => self::sanitizeString($value),
-                'textarea' => self::sanitizeTextarea($value),
-                'int', 'integer' => self::sanitizeInt($value),
-                'float', 'double' => self::sanitizeFloat($value),
-                'email' => self::sanitizeEmail($value),
-                'url' => self::sanitizeUrl($value),
-                'bool', 'boolean' => self::sanitizeBool($value),
-                'filename' => self::sanitizeFilename($value),
-                'array' => is_array($value) ? $value : [],
-                'json' => is_string($value) ? json_decode($value, true) : $value,
-                'raw' => $value,
-                default => self::sanitizeString($value),
-            };
+            $sanitized[$field] = wecoza_sanitize_value($input[$field], $type);
         }
 
         return $sanitized;
@@ -356,18 +341,7 @@ class AjaxSecurity
             return $default;
         }
 
-        return match ($type) {
-            'string', 'text' => self::sanitizeString($_POST[$key]),
-            'textarea' => self::sanitizeTextarea($_POST[$key]),
-            'int', 'integer' => self::sanitizeInt($_POST[$key]),
-            'float', 'double' => self::sanitizeFloat($_POST[$key]),
-            'email' => self::sanitizeEmail($_POST[$key]),
-            'url' => self::sanitizeUrl($_POST[$key]),
-            'bool', 'boolean' => self::sanitizeBool($_POST[$key]),
-            'array' => is_array($_POST[$key]) ? $_POST[$key] : [],
-            'raw' => $_POST[$key],
-            default => self::sanitizeString($_POST[$key]),
-        };
+        return wecoza_sanitize_value($_POST[$key], $type);
     }
 
     /**
@@ -384,13 +358,7 @@ class AjaxSecurity
             return $default;
         }
 
-        return match ($type) {
-            'string', 'text' => self::sanitizeString($_GET[$key]),
-            'int', 'integer' => self::sanitizeInt($_GET[$key]),
-            'float', 'double' => self::sanitizeFloat($_GET[$key]),
-            'bool', 'boolean' => self::sanitizeBool($_GET[$key]),
-            default => self::sanitizeString($_GET[$key]),
-        };
+        return wecoza_sanitize_value($_GET[$key], $type);
     }
 
     /*

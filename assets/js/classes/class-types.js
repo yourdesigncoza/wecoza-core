@@ -214,9 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         classSubjectSelect.innerHTML = '<option value="">No subjects available</option>';
                     }
                 } else {
-                    // Handle error
+                    // Handle error (WordPress puts error message in data.data, not data.message)
                     classSubjectSelect.innerHTML = '<option value="">Error loading subjects</option>';
-                    console.error('Error loading class subjects:', data.message || 'Unknown error');
+                    console.error('Error loading class subjects:', data.data || 'Unknown error');
                 }
             })
             .catch(error => {

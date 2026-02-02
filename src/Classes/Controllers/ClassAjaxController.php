@@ -16,6 +16,8 @@ use WeCoza\Classes\Models\ClassModel;
 use WeCoza\Classes\Repositories\ClassRepository;
 use WeCoza\Classes\Services\FormDataProcessor;
 use WeCoza\Classes\Services\ScheduleService;
+use WeCoza\Classes\Services\UploadService;
+use WeCoza\Learners\Services\ProgressionService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -112,6 +114,9 @@ class ClassAjaxController extends BaseController
                         QAController::saveQAVisits($class->getId(), $_POST, $_FILES);
                     }
 
+                    // Auto-create LP records for newly assigned learners
+                    $lpCreationResults = self::createLPsForNewLearners($class, $formData, $isUpdate);
+
                     $redirect_url = '';
                     $display_page = get_page_by_path('app/display-single-class');
                     if ($display_page) {
@@ -125,10 +130,21 @@ class ClassAjaxController extends BaseController
                     ob_clean();
                     restore_error_handler();
 
+                    $message = $isUpdate ? 'Class updated successfully.' : 'Draft class created successfully.';
+
+                    // Append LP creation summary to message
+                    if (!empty($lpCreationResults['created'])) {
+                        $message .= " Created {$lpCreationResults['created']} LP record(s).";
+                    }
+                    if (!empty($lpCreationResults['warnings'])) {
+                        $message .= " {$lpCreationResults['warnings']} learner(s) had existing LPs put on hold.";
+                    }
+
                     wp_send_json_success([
-                        'message' => $isUpdate ? 'Class updated successfully.' : 'Draft class created successfully.',
+                        'message' => $message,
                         'class_id' => $class->getId(),
-                        'redirect_url' => $redirect_url
+                        'redirect_url' => $redirect_url,
+                        'lp_creation_results' => $lpCreationResults
                     ]);
                 } else {
                     ob_clean();
@@ -180,7 +196,7 @@ class ClassAjaxController extends BaseController
 
             try {
                 $stmt = $db->query(
-                    "DELETE FROM public.classes WHERE class_id = $1 RETURNING class_id",
+                    "DELETE FROM public.classes WHERE class_id = ? RETURNING class_id",
                     [$class_id]
                 );
                 $deletedClass = $stmt->fetch();
@@ -357,7 +373,7 @@ class ClassAjaxController extends BaseController
             $db = wecoza_db();
 
             $stmt = $db->query(
-                "SELECT class_notes_data FROM public.classes WHERE class_id = $1 LIMIT 1",
+                "SELECT class_notes_data FROM public.classes WHERE class_id = ? LIMIT 1",
                 [$class_id]
             );
 
@@ -390,7 +406,7 @@ class ClassAjaxController extends BaseController
 
             $notes_json = json_encode($notes);
             $db->query(
-                "UPDATE public.classes SET class_notes_data = $1, updated_at = NOW() WHERE class_id = $2",
+                "UPDATE public.classes SET class_notes_data = ?, updated_at = NOW() WHERE class_id = ?",
                 [$notes_json, $class_id]
             );
 
@@ -430,7 +446,7 @@ class ClassAjaxController extends BaseController
             $db = wecoza_db();
 
             $stmt = $db->query(
-                "SELECT class_notes_data FROM public.classes WHERE class_id = $1 LIMIT 1",
+                "SELECT class_notes_data FROM public.classes WHERE class_id = ? LIMIT 1",
                 [$class_id]
             );
 
@@ -465,7 +481,7 @@ class ClassAjaxController extends BaseController
 
             $notes_json = json_encode($notes);
             $db->query(
-                "UPDATE public.classes SET class_notes_data = $1, updated_at = NOW() WHERE class_id = $2",
+                "UPDATE public.classes SET class_notes_data = ?, updated_at = NOW() WHERE class_id = ?",
                 [$notes_json, $class_id]
             );
 
@@ -479,6 +495,123 @@ class ClassAjaxController extends BaseController
     }
 
     /**
+     * Create LP records for newly assigned learners
+     *
+     * Compares current learner_ids with previous (for updates) and creates
+     * LP records for new learners.
+     *
+     * @param ClassModel $class The class model
+     * @param array $formData The form data
+     * @param bool $isUpdate Whether this is an update operation
+     * @return array Results with 'created', 'warnings', 'errors', 'details'
+     */
+    private static function createLPsForNewLearners(ClassModel $class, array $formData, bool $isUpdate): array
+    {
+        $results = [
+            'created' => 0,
+            'warnings' => 0,
+            'errors' => 0,
+            'details' => [],
+        ];
+
+        // Get the product_id (class subject) from the class
+        $productId = $class->getClassSubject(); // This should return the product_id
+        if (!$productId) {
+            $results['details'][] = 'No product/course assigned to class - LP creation skipped';
+            return $results;
+        }
+
+        // Get current learner IDs from the class
+        $currentLearnerIds = $class->getLearnerIdsOnly();
+        if (empty($currentLearnerIds)) {
+            return $results;
+        }
+
+        // For updates, get previous learner IDs to determine new ones
+        $previousLearnerIds = [];
+        if ($isUpdate) {
+            // Fetch the previous state from database
+            try {
+                $db = wecoza_db();
+                $stmt = $db->query(
+                    "SELECT learner_ids FROM classes WHERE class_id = :class_id",
+                    ['class_id' => $class->getId()]
+                );
+                $row = $stmt->fetch();
+                if ($row && !empty($row['learner_ids'])) {
+                    $previousData = is_string($row['learner_ids'])
+                        ? json_decode($row['learner_ids'], true)
+                        : $row['learner_ids'];
+
+                    if (is_array($previousData)) {
+                        foreach ($previousData as $learner) {
+                            if (isset($learner['id'])) {
+                                $previousLearnerIds[] = (int) $learner['id'];
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                error_log("WeCoza Core: Error fetching previous learner IDs: " . $e->getMessage());
+            }
+        }
+
+        // Calculate newly added learners
+        $newLearnerIds = $isUpdate
+            ? array_diff($currentLearnerIds, $previousLearnerIds)
+            : $currentLearnerIds;
+
+        if (empty($newLearnerIds)) {
+            return $results;
+        }
+
+        // Check if force override is enabled (from form data or always true for class assignment)
+        $forceOverride = !empty($formData['force_lp_override']) || true; // Always force for now
+
+        // Create LP records for each new learner
+        $progressionService = new ProgressionService();
+
+        foreach ($newLearnerIds as $learnerId) {
+            try {
+                $lpResult = $progressionService->createLPForClassAssignment(
+                    (int) $learnerId,
+                    (int) $productId,
+                    $class->getId(),
+                    $forceOverride
+                );
+
+                if ($lpResult['success']) {
+                    $results['created']++;
+
+                    if ($lpResult['collision_data']) {
+                        $results['warnings']++;
+                        $results['details'][] = "Learner {$learnerId}: Created LP (previous LP put on hold)";
+                    } else {
+                        $results['details'][] = "Learner {$learnerId}: Created LP successfully";
+                    }
+                } else {
+                    if ($lpResult['warning']) {
+                        $results['warnings']++;
+                        $results['details'][] = "Learner {$learnerId}: {$lpResult['message']}";
+                    } else {
+                        $results['errors']++;
+                        $results['details'][] = "Learner {$learnerId}: Failed - {$lpResult['message']}";
+                    }
+                }
+            } catch (\Exception $e) {
+                $results['errors']++;
+                $results['details'][] = "Learner {$learnerId}: Exception - " . $e->getMessage();
+                error_log("WeCoza Core: LP creation error for learner {$learnerId}: " . $e->getMessage());
+            }
+        }
+
+        // Clear the learners cache since progression data has changed
+        delete_transient('wecoza_class_learners_with_progression');
+
+        return $results;
+    }
+
+    /**
      * AJAX: Upload attachment to WordPress media library
      */
     public static function uploadAttachment(): void
@@ -488,96 +621,21 @@ class ClassAjaxController extends BaseController
             return;
         }
 
-        if (!current_user_can('upload_files')) {
-            wp_send_json_error('You do not have permission to upload files');
-            return;
-        }
-
         if (empty($_FILES['file'])) {
             wp_send_json_error('No file uploaded');
             return;
         }
 
-        $file = $_FILES['file'];
         $context = isset($_POST['context']) ? sanitize_text_field($_POST['context']) : 'general';
 
-        $allowed_types = [
-            'application/pdf', 'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'image/jpeg', 'image/png'
-        ];
+        $uploadService = new UploadService();
+        $result = $uploadService->uploadClassAttachment($_FILES['file'], $context);
 
-        $file_type = wp_check_filetype($file['name']);
-        if (!in_array($file['type'], $allowed_types) && !in_array($file_type['type'], $allowed_types)) {
-            wp_send_json_error('Invalid file type');
-            return;
-        }
-
-        if ($file['size'] > 10 * 1024 * 1024) {
-            wp_send_json_error('File size must be less than 10MB');
-            return;
-        }
-
-        require_once(ABSPATH . 'wp-admin/includes/image.php');
-        require_once(ABSPATH . 'wp-admin/includes/file.php');
-        require_once(ABSPATH . 'wp-admin/includes/media.php');
-
-        add_filter('upload_dir', [__CLASS__, 'customUploadDir']);
-
-        $upload_overrides = ['test_form' => false];
-        $movefile = wp_handle_upload($file, $upload_overrides);
-
-        remove_filter('upload_dir', [__CLASS__, 'customUploadDir']);
-
-        if ($movefile && !isset($movefile['error'])) {
-            $filename = $movefile['file'];
-            $filetype = wp_check_filetype(basename($filename), null);
-            $wp_upload_dir = wp_upload_dir();
-
-            $attachment = [
-                'guid' => $wp_upload_dir['url'] . '/' . basename($filename),
-                'post_mime_type' => $filetype['type'],
-                'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-                'post_content' => '',
-                'post_status' => 'inherit'
-            ];
-
-            $attach_id = wp_insert_attachment($attachment, $filename);
-
-            if (!is_wp_error($attach_id)) {
-                $attach_data = wp_generate_attachment_metadata($attach_id, $filename);
-                wp_update_attachment_metadata($attach_id, $attach_data);
-
-                update_post_meta($attach_id, '_wecoza_context', $context);
-
-                wp_send_json_success([
-                    'id' => $attach_id,
-                    'url' => wp_get_attachment_url($attach_id),
-                    'title' => get_the_title($attach_id),
-                    'filename' => basename($filename),
-                    'filesize' => filesize($filename),
-                    'filetype' => $filetype['type']
-                ]);
-            } else {
-                wp_send_json_error('Failed to create attachment');
-            }
+        if ($result['success']) {
+            unset($result['success']);
+            wp_send_json_success($result);
         } else {
-            $error = $movefile['error'] ?? 'File upload failed';
-            wp_send_json_error($error);
+            wp_send_json_error($result['message']);
         }
-    }
-
-    /**
-     * Custom upload directory for class-related files
-     */
-    public static function customUploadDir(array $upload): array
-    {
-        $upload['subdir'] = '/wecoza-classes' . $upload['subdir'];
-        $upload['path'] = $upload['basedir'] . $upload['subdir'];
-        $upload['url'] = $upload['baseurl'] . $upload['subdir'];
-
-        return $upload;
     }
 }

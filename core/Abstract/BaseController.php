@@ -237,7 +237,7 @@ abstract class BaseController
      * Get sanitized POST value
      *
      * @param string $key POST key
-     * @param string $type Type to sanitize as (string, int, email, url, bool)
+     * @param string $type Type to sanitize as (string, int, email, url, bool, array, json, raw)
      * @param mixed $default Default value if not set
      * @return mixed
      */
@@ -247,27 +247,14 @@ abstract class BaseController
             return $default;
         }
 
-        $value = $_POST[$key];
-
-        return match ($type) {
-            'string', 'text' => sanitize_text_field($value),
-            'textarea' => sanitize_textarea_field($value),
-            'int', 'integer' => (int) $value,
-            'float', 'double' => (float) $value,
-            'email' => sanitize_email($value),
-            'url' => esc_url_raw($value),
-            'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
-            'array' => is_array($value) ? $value : [],
-            'raw' => $value,
-            default => sanitize_text_field($value),
-        };
+        return wecoza_sanitize_value($_POST[$key], $type);
     }
 
     /**
      * Get sanitized GET value
      *
      * @param string $key GET key
-     * @param string $type Type to sanitize as
+     * @param string $type Type to sanitize as (string, int, email, url, bool, array, json, raw)
      * @param mixed $default Default value
      * @return mixed
      */
@@ -277,15 +264,7 @@ abstract class BaseController
             return $default;
         }
 
-        $value = $_GET[$key];
-
-        return match ($type) {
-            'string', 'text' => sanitize_text_field($value),
-            'int', 'integer' => (int) $value,
-            'float', 'double' => (float) $value,
-            'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
-            default => sanitize_text_field($value),
-        };
+        return wecoza_sanitize_value($_GET[$key], $type);
     }
 
     /**
@@ -344,23 +323,11 @@ abstract class BaseController
         $sanitized = [];
 
         foreach ($schema as $field => $type) {
-            if (!isset($input[$field])) {
+            if (!array_key_exists($field, $input)) {
                 continue;
             }
 
-            $sanitized[$field] = match ($type) {
-                'string', 'text' => $this->sanitizeString($input[$field]),
-                'textarea' => sanitize_textarea_field($input[$field]),
-                'int', 'integer' => $this->sanitizeInt($input[$field]),
-                'float', 'double' => (float) $input[$field],
-                'email' => $this->sanitizeEmail($input[$field]),
-                'url' => $this->sanitizeUrl($input[$field]),
-                'bool', 'boolean' => filter_var($input[$field], FILTER_VALIDATE_BOOLEAN),
-                'date' => $this->sanitizeString($input[$field]),
-                'array' => is_array($input[$field]) ? $input[$field] : [],
-                'json' => is_string($input[$field]) ? json_decode($input[$field], true) : $input[$field],
-                default => $input[$field],
-            };
+            $sanitized[$field] = wecoza_sanitize_value($input[$field], $type);
         }
 
         return $sanitized;
