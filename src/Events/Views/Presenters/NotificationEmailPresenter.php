@@ -12,6 +12,7 @@ use function sprintf;
 use function strtolower;
 use function strtoupper;
 use function trim;
+use function wecoza_plugin_path;
 use function wp_json_encode;
 use function wp_strip_all_tags;
 use const JSON_PRETTY_PRINT;
@@ -52,7 +53,7 @@ final class NotificationEmailPresenter
      */
     private function renderHtml(array $context): string
     {
-        $template = WECOZA_EVENTS_PLUGIN_DIR . 'includes/Views/event-tasks/email-summary.php';
+        $template = wecoza_plugin_path('views/events/event-tasks/email-summary.php');
         if (!file_exists($template)) {
             return wp_json_encode($context, JSON_PRETTY_PRINT);
         }
