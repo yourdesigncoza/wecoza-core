@@ -9,10 +9,10 @@ Requirements for events plugin migration into wecoza-core.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Namespace conversion from `WeCozaEvents\*` to `WeCoza\Events\*`
-- [ ] **INFRA-02**: File structure reorganization from `includes/` to `src/Events/`
-- [ ] **INFRA-03**: Replace events plugin database connection with wecoza-core's `PostgresConnection`
-- [ ] **INFRA-04**: Add PSR-4 autoloading for `WeCoza\Events\*` namespace
+- [x] **INFRA-01**: Namespace conversion from `WeCozaEvents\*` to `WeCoza\Events\*`
+- [x] **INFRA-02**: File structure reorganization from `includes/` to `src/Events/`
+- [x] **INFRA-03**: Replace events plugin database connection with wecoza-core's `PostgresConnection`
+- [x] **INFRA-04**: Add PSR-4 autoloading for `WeCoza\Events\*` namespace
 - [ ] **INFRA-05**: Migrate PostgreSQL schema (triggers, functions) to wecoza-core
 - [ ] **INFRA-06**: Fix `delivery_date` column references (removed column)
 - [ ] **INFRA-07**: Integrate events module initialization into wecoza-core bootstrap
@@ -77,10 +77,10 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1: Code Foundation | Pending |
-| INFRA-02 | Phase 1: Code Foundation | Pending |
-| INFRA-03 | Phase 1: Code Foundation | Pending |
-| INFRA-04 | Phase 1: Code Foundation | Pending |
+| INFRA-01 | Phase 1: Code Foundation | Complete |
+| INFRA-02 | Phase 1: Code Foundation | Complete |
+| INFRA-03 | Phase 1: Code Foundation | Complete |
+| INFRA-04 | Phase 1: Code Foundation | Complete |
 | INFRA-05 | Phase 2: Database Migration | Pending |
 | INFRA-06 | Phase 2: Database Migration | Pending |
 | INFRA-07 | Phase 3: Bootstrap Integration | Pending |
