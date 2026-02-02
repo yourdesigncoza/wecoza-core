@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 10 of 12 (Architecture & Type Safety)
-Plan: 1 of 3 completed
+Plan: 2 of 3 completed
 Status: In progress
-Last activity: 2026-02-02 — Completed 10-01-PLAN.md (DTO Foundation)
+Last activity: 2026-02-02 — Completed 10-02-PLAN.md (Enum Extraction)
 
-Progress: [=================.........] 73% (10.3/13 phases, continuing from v1)
+Progress: [==================........] 77% (10.6/13 phases, continuing from v1)
 
-v1.1 Progress: [===============...........] 66% (3.3/5 phases complete)
+v1.1 Progress: [================..........] 70% (3.6/5 phases complete)
 
 ## Milestone History
 
@@ -55,7 +55,7 @@ See: .planning/milestones/v1-* for archived artifacts
 |-------|-------|-------|----------|
 | 08-bug-fixes-core-security | 4 | 7min | 1.75min |
 | 09-data-privacy-hardening | 3 | 6min | 2min |
-| 10-architecture-type-safety | 1/3 | 4min | 4min |
+| 10-architecture-type-safety | 2/3 | 9min | 4.5min |
 
 ## Accumulated Context
 
@@ -87,6 +87,9 @@ Key decisions are archived in:
 | 10 | 01 | Use with*() methods for immutable updates | PHP 8.1 readonly properties require creating new instances for modifications |
 | 10 | 01 | Include CLI exemption in ABSPATH check | All DTO files allow direct test execution without WordPress bootstrap |
 | 10 | 01 | ObfuscatedDataDTO::toEmailContext() conversion | Convenience method simplifies obfuscation-to-email-context transformation |
+| 10 | 02 | Allow CLI execution in functions.php for testing | Extended php_sapi_name() pattern to helpers file |
+| 10 | 02 | Use tryFrom() not from() for safe validation | Prevents ValueError on invalid input, returns null for fallback |
+| 10 | 02 | Domain helpers on enums (isActive, canLogHours) | Encapsulates business logic in type-safe manner |
 
 ### Pending Todos
 
@@ -98,8 +101,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T16:47:55Z
-Stopped at: Completed 10-01-PLAN.md (DTO Foundation)
+Last session: 2026-02-02T16:49:33Z
+Stopped at: Completed 10-02-PLAN.md (Enum Extraction)
 Resume file: None
 
-**Next action:** Continue Phase 10 — execute 10-02-PLAN.md (Enum Extraction)
+**Next action:** Continue Phase 10 — execute 10-03-PLAN.md (Repository Pattern Enhancements)
