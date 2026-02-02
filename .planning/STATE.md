@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-Phase: 11 of 12 (AI Service Quality)
-Plan: 1 of 1 completed
-Status: Phase complete
-Last activity: 2026-02-02 — Completed 11-01-PLAN.md (Configurable API & Model)
+Phase: 12 of 12 (Performance & Async Processing)
+Plan: 1 of 3 completed
+Status: In progress
+Last activity: 2026-02-02 — Completed 12-01-PLAN.md (Action Scheduler Setup)
 
-Progress: [======================....] 92% (12/13 phases, continuing from v1)
+Progress: [=======================...] 96% (13/13 phases, continuing from v1)
 
-v1.1 Progress: [========================] 100% (5/5 phases complete)
+v1.1 Progress: [====================....] 83% (5/6 phases, started Phase 12)
 
 ## Milestone History
 
@@ -57,6 +57,7 @@ See: .planning/milestones/v1-* for archived artifacts
 | 09-data-privacy-hardening | 3 | 6min | 2min |
 | 10-architecture-type-safety | 3/3 | 13min | 4.3min |
 | 11-ai-service-quality | 1/1 | 3min | 3min |
+| 12-performance-async-processing | 1/3 | 2min | 2min |
 
 ## Accumulated Context
 
@@ -99,6 +100,11 @@ Key decisions are archived in:
 | 11 | 01 | Validate API URLs with filter_var() + protocol check | Prevents invalid URLs, enforces https/http protocols |
 | 11 | 01 | Default to gpt-4o-mini not gpt-5-mini | gpt-5-mini doesn't exist; gpt-4o-mini is valid and cost-effective |
 | 11 | 01 | Store config in WordPress options table | Leverages existing WP admin UI capability, no new infrastructure |
+| 12 | 01 | Action Scheduler loaded before plugins_loaded | Required for proper data store initialization |
+| 12 | 01 | BATCH_LIMIT increased to 50 (from 1) | 50x throughput increase for high-volume notifications |
+| 12 | 01 | LOCK_TTL increased to 120s (from 30s) | Prevents race conditions for 50-item batches |
+| 12 | 01 | MAX_RUNTIME increased to 90s (from 20s) | Allows ~1.8s per notification for AI + email |
+| 12 | 01 | vendor/ directory gitignored per Composer standard | Developers run composer install after clone |
 
 ### Pending Todos
 
@@ -110,8 +116,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T19:30:00Z
-Stopped at: Phase 11 (AI Service Quality) complete
+Last session: 2026-02-02T17:52:31Z
+Stopped at: Completed 12-01-PLAN.md (Action Scheduler Setup & Batch Optimization)
 Resume file: None
 
-**Next action:** Ready for Phase 12 (Performance & Async Processing) — requires planning first
+**Next action:** Ready for 12-02-PLAN.md (Async Action Scheduler Integration)
