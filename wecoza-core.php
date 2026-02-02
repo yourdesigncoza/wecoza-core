@@ -233,6 +233,16 @@ add_action('plugins_loaded', function () {
         }
     });
 
+    // Email Notification Cron Handler
+    add_action('wecoza_email_notifications_process', function () {
+        if (!class_exists(\WeCoza\Events\Services\NotificationProcessor::class)) {
+            return;
+        }
+
+        $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
+        $processor->process();
+    });
+
     /*
     |--------------------------------------------------------------------------
     | Load Learners Shortcodes
@@ -330,6 +340,11 @@ register_activation_hook(__FILE__, function () {
         wp_schedule_event(time(), 'daily', 'wecoza_material_notifications_check');
     }
 
+    // Schedule email notification cron if not already scheduled
+    if (!wp_next_scheduled('wecoza_email_notifications_process')) {
+        wp_schedule_event(time(), 'hourly', 'wecoza_email_notifications_process');
+    }
+
     /**
      * Fires when WeCoza Core is activated.
      *
@@ -354,6 +369,12 @@ register_deactivation_hook(__FILE__, function () {
     $timestamp = wp_next_scheduled('wecoza_material_notifications_check');
     if ($timestamp) {
         wp_unschedule_event($timestamp, 'wecoza_material_notifications_check');
+    }
+
+    // Unschedule email notification cron
+    $emailTimestamp = wp_next_scheduled('wecoza_email_notifications_process');
+    if ($emailTimestamp) {
+        wp_unschedule_event($emailTimestamp, 'wecoza_email_notifications_process');
     }
 
     /**
