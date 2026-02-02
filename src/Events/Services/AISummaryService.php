@@ -9,6 +9,11 @@ if (!defined('ABSPATH')) {
 
 use WeCoza\Events\Services\Traits\DataObfuscator;
 use WeCoza\Events\Support\OpenAIConfig;
+use WeCoza\Events\DTOs\RecordDTO;
+use WeCoza\Events\DTOs\EmailContextDTO;
+use WeCoza\Events\DTOs\SummaryResultDTO;
+use WeCoza\Events\DTOs\ObfuscatedDataDTO;
+use WeCoza\Events\Enums\SummaryStatus;
 
 use function array_merge;
 use function gmdate;
@@ -284,42 +289,38 @@ final class AISummaryService
     }
 
     /**
+     * Normalise existing record into RecordDTO
+     *
      * @param array<string,mixed>|null $existing
-     * @return array<string,mixed>
      */
-    private function normaliseRecord(?array $existing): array
+    private function normaliseRecord(?array $existing): RecordDTO
     {
-        $base = [
-            'summary' => null,
-            'status' => 'pending',
-            'error_code' => null,
-            'error_message' => null,
-            'attempts' => 0,
-            'viewed' => false,
-            'viewed_at' => null,
-            'generated_at' => null,
-            'model' => null,
-            'tokens_used' => 0,
-            'processing_time_ms' => 0,
-        ];
+        return RecordDTO::fromArray($existing);
+    }
 
-        if ($existing === null) {
-            return $base;
+    /**
+     * Check if summary generation should be skipped
+     */
+    private function shouldSkipGeneration(RecordDTO $record): bool
+    {
+        return $record->status === SummaryStatus::SUCCESS->value
+            || $record->attempts >= $this->maxAttempts;
+    }
+
+    /**
+     * Build result for skipped generation (already success or max attempts)
+     */
+    private function buildSkippedResult(RecordDTO $record): SummaryResultDTO
+    {
+        $emailContext = EmailContextDTO::empty();
+
+        if ($record->status === SummaryStatus::SUCCESS->value) {
+            return SummaryResultDTO::success($record, $emailContext);
         }
 
-        return array_merge($base, [
-            'summary' => $existing['summary'] ?? null,
-            'status' => (string) ($existing['status'] ?? 'pending'),
-            'error_code' => $existing['error_code'] ?? null,
-            'error_message' => $existing['error_message'] ?? null,
-            'attempts' => max(0, (int) ($existing['attempts'] ?? 0)),
-            'viewed' => (bool) ($existing['viewed'] ?? false),
-            'viewed_at' => $existing['viewed_at'] ?? null,
-            'generated_at' => $existing['generated_at'] ?? null,
-            'model' => $existing['model'] ?? null,
-            'tokens_used' => isset($existing['tokens_used']) ? (int) $existing['tokens_used'] : 0,
-            'processing_time_ms' => isset($existing['processing_time_ms']) ? (int) $existing['processing_time_ms'] : 0,
-        ]);
+        // Max attempts reached
+        $record = $record->withStatus(SummaryStatus::FAILED->value);
+        return SummaryResultDTO::failed($record, $emailContext);
     }
 
     /**
