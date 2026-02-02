@@ -42,10 +42,10 @@ final class NotificationProcessor
 {
     private const OPTION_LAST_ID = 'wecoza_last_notified_log_id';
     private const LOCK_KEY = 'wecoza_ai_summary_lock';
-    private const LOCK_TTL = 30;
-    private const MAX_RUNTIME_SECONDS = 20;
+    private const LOCK_TTL = 120;  // 2 minutes for 50+ item batches
+    private const MAX_RUNTIME_SECONDS = 90;  // Room for 50 items
     private const MIN_REMAINING_SECONDS = 5;
-    private const BATCH_LIMIT = 1;
+    private const BATCH_LIMIT = 50;
     private const MEMORY_CLEANUP_INTERVAL = 50;  // Every 50 records
     private const SKIP_MESSAGES = [
         'config_missing' => 'OpenAI configuration missing or invalid.',
@@ -343,6 +343,12 @@ SQL;
         }
 
         return set_transient(self::LOCK_KEY, '1', self::LOCK_TTL);
+    }
+
+    private function refreshLock(): void
+    {
+        // Extend lock during long processing
+        set_transient(self::LOCK_KEY, '1', self::LOCK_TTL);
     }
 
     private function releaseLock(): void
