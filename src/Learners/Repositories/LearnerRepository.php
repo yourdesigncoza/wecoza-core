@@ -631,6 +631,7 @@ class LearnerRepository extends BaseRepository
      */
     public function savePortfolios(int $learnerId, array $files): array
     {
+        $pdo = null;  // Initialize to prevent catch block crash
         try {
             $pdo = $this->db->getPdo();
             $uploadDir = wp_upload_dir();
@@ -688,7 +689,7 @@ class LearnerRepository extends BaseRepository
                 'paths' => $portfolioPaths,
             ];
         } catch (Exception $e) {
-            if ($pdo->inTransaction()) {
+            if ($pdo !== null && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
             error_log("WeCoza Core: LearnerRepository savePortfolios error: " . $e->getMessage());
@@ -704,6 +705,7 @@ class LearnerRepository extends BaseRepository
      */
     public function deletePortfolio(int $portfolioId): bool
     {
+        $pdo = null;  // Initialize to prevent catch block crash
         try {
             $pdo = $this->db->getPdo();
             $pdo->beginTransaction();
@@ -751,7 +753,7 @@ class LearnerRepository extends BaseRepository
 
             return true;
         } catch (Exception $e) {
-            if ($pdo->inTransaction()) {
+            if ($pdo !== null && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
             error_log("WeCoza Core: LearnerRepository deletePortfolio error: " . $e->getMessage());
