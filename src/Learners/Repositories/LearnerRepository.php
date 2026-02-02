@@ -654,12 +654,25 @@ class LearnerRepository extends BaseRepository
                 throw new Exception('No files were uploaded.');
             }
 
+            $skippedCount = 0;
+
             for ($i = 0; $i < count($files['name']); $i++) {
                 if ($files['error'][$i] === UPLOAD_ERR_OK) {
                     $filename = $files['name'][$i];
                     $fileExt = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
                     if ($fileExt === 'pdf') {
+                        // Validate actual MIME type (SEC-04: prevent malicious files)
+                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                        $mimeType = finfo_file($finfo, $files['tmp_name'][$i]);
+                        finfo_close($finfo);
+
+                        if ($mimeType !== 'application/pdf') {
+                            // Generic error per CONTEXT.md decision - do NOT reveal detected MIME
+                            $skippedCount++;
+                            continue; // Skip invalid file, process others
+                        }
+
                         $newFilename = uniqid('portfolio_', true) . '.pdf';
                         $filePath = $portfolioDir . $newFilename;
                         $relativePath = 'portfolios/' . $newFilename;
@@ -676,6 +689,8 @@ class LearnerRepository extends BaseRepository
                                 'file_path' => $relativePath,
                             ]);
                         }
+                    } else {
+                        $skippedCount++;
                     }
                 }
             }
@@ -694,8 +709,11 @@ class LearnerRepository extends BaseRepository
 
             return [
                 'success' => true,
-                'message' => 'Files uploaded successfully',
+                'message' => $skippedCount > 0
+                    ? 'Some files were skipped due to invalid type. Please upload PDF documents only.'
+                    : 'Files uploaded successfully',
                 'paths' => $portfolioPaths,
+                'skipped' => $skippedCount,
             ];
         } catch (Exception $e) {
             if ($pdo !== null && $pdo->inTransaction()) {
