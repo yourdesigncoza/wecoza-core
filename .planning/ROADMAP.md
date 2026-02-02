@@ -92,12 +92,11 @@ Plans:
   3. System generates 7-day pre-start alerts for classes needing materials
   4. System generates 5-day pre-start alerts for classes needing materials
   5. Only users with `view_material_tracking` capability can view dashboard; only `manage_material_tracking` can mark delivered
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
-- [ ] 05-03: TBD
+- [ ] 05-01-PLAN.md — Capability registration + WP Cron scheduling for notifications
+- [ ] 05-02-PLAN.md — Verification test suite for all MATL requirements
 
 ### Phase 6: AI Summarization
 **Goal**: Users can view AI-generated summaries of class changes
@@ -140,10 +139,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Database Migration | 2/2 | ✓ Complete | 2026-02-02 |
 | 3. Bootstrap Integration | 1/1 | ✓ Complete | 2026-02-02 |
 | 4. Task Management | 1/1 | ✓ Complete | 2026-02-02 |
-| 5. Material Tracking | 0/3 | Not started | - |
+| 5. Material Tracking | 0/2 | Planned | - |
 | 6. AI Summarization | 0/2 | Not started | - |
 | 7. Email Notifications | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 4 completion*
+*Last updated: 2026-02-02 after Phase 5 planning*
