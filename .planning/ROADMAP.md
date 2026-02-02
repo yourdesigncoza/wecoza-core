@@ -12,7 +12,7 @@ This roadmap migrates the wecoza-events-plugin (~7,700 lines) into wecoza-core, 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Code Foundation** - Namespace conversion, file structure, PSR-4 autoloading
+- [x] **Phase 1: Code Foundation** - Namespace conversion, file structure, PSR-4 autoloading
 - [ ] **Phase 2: Database Migration** - PostgreSQL triggers, functions, and schema fixes
 - [ ] **Phase 3: Bootstrap Integration** - Module initialization and activation hooks
 - [ ] **Phase 4: Task Management** - Class change monitoring and task dashboard
@@ -34,9 +34,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Directory setup, PSR-4 config, Models/Repositories/Support migration
-- [ ] 01-02-PLAN.md — Services migration (TaskManager, AISummary, Notifications, Materials)
-- [ ] 01-03-PLAN.md — Interface layer migration (Controllers, Shortcodes, Views, Admin, CLI)
+- [x] 01-01-PLAN.md — Directory setup, PSR-4 config, Models/Repositories/Support migration
+- [x] 01-02-PLAN.md — Services migration (TaskManager, AISummary, Notifications, Materials)
+- [x] 01-03-PLAN.md — Interface layer migration (Controllers, Shortcodes, Views, Admin, CLI)
 
 ### Phase 2: Database Migration
 **Goal**: PostgreSQL triggers and functions operate correctly with wecoza-core
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Code Foundation | 0/3 | Planned | - |
+| 1. Code Foundation | 3/3 | ✓ Complete | 2026-02-02 |
 | 2. Database Migration | 0/2 | Not started | - |
 | 3. Bootstrap Integration | 0/2 | Not started | - |
 | 4. Task Management | 0/3 | Not started | - |
