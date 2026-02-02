@@ -87,6 +87,21 @@ require_once WECOZA_CORE_PATH . 'core/Helpers/functions.php';
 
 /*
 |--------------------------------------------------------------------------
+| Load Action Scheduler
+|--------------------------------------------------------------------------
+|
+| Action Scheduler must be loaded before plugins_loaded hook for proper
+| initialization. Used for async email/AI processing in notifications.
+|
+*/
+
+$action_scheduler_path = WECOZA_CORE_PATH . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
+if (file_exists($action_scheduler_path)) {
+    require_once $action_scheduler_path;
+}
+
+/*
+|--------------------------------------------------------------------------
 | Frontend Asset Enqueue
 |--------------------------------------------------------------------------
 */
@@ -205,6 +220,15 @@ add_action('plugins_loaded', function () {
     if (class_exists(\WeCoza\Events\Admin\SettingsPage::class)) {
         \WeCoza\Events\Admin\SettingsPage::register();
     }
+
+    // Action Scheduler Performance Tuning
+    add_filter('action_scheduler_queue_runner_time_limit', function () {
+        return 60;  // 60 seconds (default is 30)
+    });
+
+    add_filter('action_scheduler_queue_runner_batch_size', function () {
+        return 50;  // Match NotificationProcessor BATCH_LIMIT
+    });
 
     // Material Notification Cron Handler
     add_action('wecoza_material_notifications_check', function () {
