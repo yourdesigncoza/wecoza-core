@@ -97,7 +97,7 @@ final class ClassTaskPresenter
         $subject = trim((string) ($row['class_subject'] ?? ''));
         $code = trim((string) ($row['class_code'] ?? ''));
         $startDate = $this->formatDatePair((string) ($row['original_start_date'] ?? ''));
-        $dueDate = $this->formatDueDate((string) ($row['delivery_date'] ?? ''), $startDate);
+        $dueDate = $startDate;
         $agentDisplay = $this->formatAgentDisplay($row);
         $exam = $this->formatExamLabel((bool) ($row['exam_class'] ?? false), (string) ($row['exam_type'] ?? ''));
         $seta = $this->formatSetaLabel((bool) ($row['seta_funded'] ?? false), (string) ($row['seta_name'] ?? ''));
