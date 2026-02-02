@@ -33,10 +33,10 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 
 ### Quality
 
-- [ ] **QUAL-01**: Fix invalid model name (`gpt-5-mini` → `gpt-4o-mini`)
+- [x] **QUAL-01**: Fix invalid model name (`gpt-5-mini` → `gpt-4o-mini`)
 - [x] **QUAL-02**: Extract DTOs for `$record`, `$context`, `$summary` arrays
 - [x] **QUAL-03**: Implement PHP 8.1 Enums for status strings
-- [ ] **QUAL-04**: Make API URL configurable (support Azure/proxy)
+- [x] **QUAL-04**: Make API URL configurable (support Azure/proxy)
 
 ### Architecture
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-02 | Phase 10 | Complete |
 | QUAL-02 | Phase 10 | Complete |
 | QUAL-03 | Phase 10 | Complete |
-| QUAL-01 | Phase 11 | Pending |
-| QUAL-04 | Phase 11 | Pending |
+| QUAL-01 | Phase 11 | Complete |
+| QUAL-04 | Phase 11 | Complete |
 | PERF-01 | Phase 12 | Pending |
 | PERF-02 | Phase 12 | Pending |
 | PERF-03 | Phase 12 | Pending |
@@ -105,4 +105,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 — Phase 10 complete (15 requirements satisfied)*
+*Last updated: 2026-02-02 — Phase 11 complete (17 requirements satisfied)*
