@@ -130,6 +130,22 @@ abstract class BaseRepository
     }
 
     /**
+     * Quote a PostgreSQL identifier to handle reserved words
+     *
+     * Sanitizes the identifier by removing non-alphanumeric characters (except underscore),
+     * then wraps in double quotes for PostgreSQL compatibility.
+     *
+     * @param string $identifier Column or table name
+     * @return string Safely quoted identifier
+     */
+    protected function quoteIdentifier(string $identifier): string
+    {
+        // Remove any characters that aren't alphanumeric or underscore
+        $clean = preg_replace('/[^a-zA-Z0-9_]/', '', $identifier);
+        return '"' . $clean . '"';
+    }
+
+    /**
      * Get database connection
      *
      * @return PostgresConnection
