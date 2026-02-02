@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v1.1 Quality & Performance — Phase 8 (Bug Fixes & Core Security)
+**Current focus:** v1.1 Quality & Performance — Phase 9 (Data Privacy Hardening)
 
 ## Current Position
 
 Phase: 9 of 12 (Data Privacy Hardening)
-Plan: 3 of 4 completed
+Plan: 1 of 4 completed
 Status: In progress
-Last activity: 2026-02-02 — Completed 09-03-PLAN.md (NotificationProcessor Memory Cleanup)
+Last activity: 2026-02-02 — Completed 09-01-PLAN.md (Secure PII Obfuscation)
 
-Progress: [==============............] 62% (8/13 phases, continuing from v1)
+Progress: [==============............] 65% (8/13 phases, continuing from v1)
 
-v1.1 Progress: [==========................] 40% (2/5 phases complete)
+v1.1 Progress: [============..............] 45% (2/5 phases complete)
 
 ## Milestone History
 
@@ -54,7 +54,7 @@ See: .planning/milestones/v1-* for archived artifacts
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 08-bug-fixes-core-security | 4 | 7min | 1.75min |
-| 09-data-privacy-hardening | 3/4 | 6min | 2min |
+| 09-data-privacy-hardening | 1/4 | 2.3min | 2.3min |
 
 ## Accumulated Context
 
@@ -76,9 +76,9 @@ Key decisions are archived in:
 | 08 | 03 | Regex patterns to redact schema details | Prevents table/column/SQL exposure in logs (SEC-05) |
 | 08 | 03 | Truncate sanitized messages at 200 chars | Prevents log flooding from verbose exceptions |
 | 08 | 03 | Separate admin exception details function | Admins get more detail via wecoza_admin_exception_details() |
-| 09 | 03 | Cleanup interval set to 50 records | Conservative for current BATCH_LIMIT=1, prepares for Phase 12 increases |
-| 09 | 03 | Two-stage cleanup (unset + gc_collect_cycles) | Handles both immediate and cyclic references |
-| 09 | 03 | Memory logging only when WP_DEBUG enabled | Avoids production performance impact |
+| 09 | 01 | Remove 'mappings' from obfuscation return values | Prevents reverse-engineering PII from public API responses (SEC-02) |
+| 09 | 01 | Hide entire email local part (****@domain.com) | Stronger privacy than showing first/last characters (SEC-03) |
+| 09 | 01 | Access aliases via $state['aliases'] | Maintains functionality while preventing mapping exposure |
 
 ### Pending Todos
 
@@ -90,8 +90,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T16:11:26Z
-Stopped at: Completed 09-03-PLAN.md (NotificationProcessor Memory Cleanup)
+Last session: 2026-02-02T16:11:17Z
+Stopped at: Completed 09-01-PLAN.md (Secure PII Obfuscation)
 Resume file: None
 
-**Next action:** Continue Phase 9 with plan 04 (Secure Serialization Review)
+**Next action:** Continue Phase 9 with plan 02
