@@ -153,7 +153,7 @@ class LearnerRepository extends BaseRepository
 
             return $result ?: null;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository findByIdWithMappings error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::findByIdWithMappings'));
             return null;
         }
     }
@@ -186,7 +186,7 @@ class LearnerRepository extends BaseRepository
 
             return $results;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository findAllWithMappings error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::findAllWithMappings'));
             return [];
         }
     }
@@ -278,7 +278,7 @@ class LearnerRepository extends BaseRepository
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            error_log("WeCoza Core: LearnerRepository insert error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::insert'));
             return null;
         }
     }
@@ -363,7 +363,7 @@ class LearnerRepository extends BaseRepository
 
             return $result;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getLocations error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getLocations'));
             return ['cities' => [], 'provinces' => []];
         }
     }
@@ -388,7 +388,7 @@ class LearnerRepository extends BaseRepository
 
             return $result;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getQualifications error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getQualifications'));
             return [];
         }
     }
@@ -413,7 +413,7 @@ class LearnerRepository extends BaseRepository
 
             return $result;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getPlacementLevels error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getPlacementLevels'));
             return [];
         }
     }
@@ -438,7 +438,7 @@ class LearnerRepository extends BaseRepository
 
             return $result;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getEmployers error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getEmployers'));
             return [];
         }
     }
@@ -550,7 +550,7 @@ class LearnerRepository extends BaseRepository
             $stmt = $this->db->query($sql, $params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getLearnersWithProgressionContext error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getLearnersWithProgressionContext'));
             return [];
         }
     }
@@ -594,7 +594,7 @@ class LearnerRepository extends BaseRepository
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result ?: null;
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getActiveLPForLearner error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getActiveLPForLearner'));
             return null;
         }
     }
@@ -621,7 +621,7 @@ class LearnerRepository extends BaseRepository
             $stmt = $this->db->query($sql, ['learner_id' => $learnerId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerRepository getPortfolios error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getPortfolios'));
             return [];
         }
     }
@@ -719,7 +719,7 @@ class LearnerRepository extends BaseRepository
             if ($pdo !== null && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            error_log("WeCoza Core: LearnerRepository savePortfolios error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::savePortfolios'));
             return [
                 'success' => false,
                 'message' => 'Error processing files: ' . $e->getMessage(),
@@ -783,7 +783,7 @@ class LearnerRepository extends BaseRepository
             if ($pdo !== null && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            error_log("WeCoza Core: LearnerRepository deletePortfolio error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::deletePortfolio'));
             return false;
         }
     }
