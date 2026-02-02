@@ -644,6 +644,12 @@ class LearnerRepository extends BaseRepository
 
             $pdo->beginTransaction();
 
+            // Fetch existing portfolios to append, not overwrite
+            $existingStmt = $pdo->prepare("SELECT scanned_portfolio FROM learners WHERE id = :id");
+            $existingStmt->execute(['id' => $learnerId]);
+            $existingPortfolios = $existingStmt->fetchColumn();
+            $currentPaths = $existingPortfolios ? array_map('trim', explode(',', $existingPortfolios)) : [];
+
             if (!is_array($files['name']) || empty($files['name'][0])) {
                 throw new Exception('No files were uploaded.');
             }
@@ -675,7 +681,10 @@ class LearnerRepository extends BaseRepository
             }
 
             if (!empty($portfolioPaths)) {
-                $portfolioList = implode(', ', $portfolioPaths);
+                // Merge existing and new paths, remove duplicates
+                $allPaths = array_merge($currentPaths, $portfolioPaths);
+                $uniquePaths = array_unique(array_filter($allPaths));
+                $portfolioList = implode(', ', $uniquePaths);
                 $stmt = $pdo->prepare("UPDATE learners SET scanned_portfolio = :paths WHERE id = :id");
                 $stmt->execute(['paths' => $portfolioList, 'id' => $learnerId]);
             }
