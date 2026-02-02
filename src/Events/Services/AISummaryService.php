@@ -93,7 +93,7 @@ final class AISummaryService
         $state = $diffResult['state'];
         $oldRowResult = $this->obfuscatePayloadWithLabels((array) ($context['old_row'] ?? []), $state);
 
-        $aliasMap = $oldRowResult['mappings'];
+        $aliasMap = $oldRowResult['state']['aliases'];
         $fieldLabels = array_merge(
             $newRowResult['field_labels'],
             $diffResult['field_labels'],
