@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace WeCoza\Events\Services\Traits;
 
-if (!defined('ABSPATH')) {
+if (!defined('ABSPATH') && php_sapi_name() !== 'cli') {
     exit;
 }
 
+use function max;
 use function preg_match;
 use function preg_replace;
 use function strlen;
