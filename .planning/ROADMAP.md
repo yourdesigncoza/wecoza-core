@@ -107,11 +107,11 @@ Plans:
   2. Class change events trigger AI summary generation
   3. User can view AI summaries via `[wecoza_ai_summary]` shortcode
   4. Summary generation handles API errors gracefully (no crashes)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md — Verify API key configuration, shortcode registration, and display infrastructure
+- [ ] 06-02-PLAN.md — Verify event-triggered summary generation and error handling
 
 ### Phase 7: Email Notifications
 **Goal**: Users receive automated email notifications on class changes
@@ -122,11 +122,11 @@ Plans:
   2. Updating a class triggers email notification to configured recipients
   3. Admin can configure notification recipients via WordPress options
   4. Email sending is handled via WordPress cron (not blocking request)
-**Plans**: 2 plans
+**Plans**: TBD
 
 Plans:
-- [ ] 07-01-PLAN.md — Cron registration + template path fix for email notifications
-- [ ] 07-02-PLAN.md — Verification test suite for EMAIL requirements
+- [ ] 07-01: TBD
+- [ ] 07-02: TBD
 
 ## Progress
 
@@ -140,9 +140,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Bootstrap Integration | 1/1 | Complete | 2026-02-02 |
 | 4. Task Management | 1/1 | Complete | 2026-02-02 |
 | 5. Material Tracking | 2/2 | Complete | 2026-02-02 |
-| 6. AI Summarization | 0/2 | Not started | - |
-| 7. Email Notifications | 0/2 | Planned | - |
+| 6. AI Summarization | 0/2 | Planned | - |
+| 7. Email Notifications | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 7 planning*
+*Last updated: 2026-02-02 after Phase 6 planning*
