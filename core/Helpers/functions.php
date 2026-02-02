@@ -327,6 +327,84 @@ if (!function_exists('wecoza_camel_to_snake')) {
 
 /*
 |--------------------------------------------------------------------------
+| Exception/Error Sanitization Functions
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('wecoza_sanitize_exception')) {
+    /**
+     * Sanitize exception message for logging
+     *
+     * Removes sensitive information from exception messages before logging:
+     * - Database schema/table names patterns
+     * - Column names in error messages
+     * - Connection strings
+     * - SQL query fragments
+     *
+     * @param string $message Original exception message
+     * @param string $context Optional context prefix (e.g., "LearnerRepository")
+     * @return string Sanitized message safe for logging
+     */
+    function wecoza_sanitize_exception(string $message, string $context = ''): string
+    {
+        // Patterns that might expose schema details
+        $patterns = [
+            // Remove table.column references
+            '/\b[a-z_]+\.[a-z_]+/i' => '[table.column]',
+            // Remove "column X" patterns
+            '/column\s+["\']?[a-z_]+["\']?/i' => 'column [redacted]',
+            // Remove "table X" patterns
+            '/table\s+["\']?[a-z_]+["\']?/i' => 'table [redacted]',
+            // Remove SQL fragments
+            '/\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN)\b.*$/i' => '[SQL redacted]',
+            // Remove constraint names
+            '/constraint\s+["\']?[a-z_]+["\']?/i' => 'constraint [redacted]',
+            // Remove index names
+            '/index\s+["\']?[a-z_]+["\']?/i' => 'index [redacted]',
+        ];
+
+        $sanitized = $message;
+        foreach ($patterns as $pattern => $replacement) {
+            $sanitized = preg_replace($pattern, $replacement, $sanitized);
+        }
+
+        // Truncate if too long (prevent log flooding)
+        if (strlen($sanitized) > 200) {
+            $sanitized = substr($sanitized, 0, 200) . '...';
+        }
+
+        // Add context prefix if provided
+        $prefix = $context ? "WeCoza Core [{$context}]: " : "WeCoza Core: ";
+
+        return $prefix . $sanitized;
+    }
+}
+
+if (!function_exists('wecoza_admin_exception_details')) {
+    /**
+     * Get admin-safe exception details
+     *
+     * For administrators only - provides more detail than logs but still sanitized.
+     * Use current_user_can('manage_options') before showing this to users.
+     *
+     * @param Exception $e The exception
+     * @param string $context Context identifier
+     * @return array Admin-safe error details
+     */
+    function wecoza_admin_exception_details(\Exception $e, string $context = ''): array
+    {
+        return [
+            'context' => $context,
+            'type' => get_class($e),
+            'code' => $e->getCode(),
+            'file' => basename($e->getFile()) . ':' . $e->getLine(),
+            'message' => wecoza_sanitize_exception($e->getMessage()),
+        ];
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Input Sanitization Functions
 |--------------------------------------------------------------------------
 */
