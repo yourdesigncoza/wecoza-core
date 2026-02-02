@@ -30,7 +30,40 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(None — use `/gsd:new-milestone` to define next milestone requirements)
+**Current Milestone: v1.1 Quality & Performance**
+
+Goal: Address 21 issues from code analysis + architectural improvements for production readiness.
+
+**Security (6):**
+- [ ] SEC-01: Add `quoteIdentifier()` helper for PostgreSQL reserved words
+- [ ] SEC-02: Remove PII mappings from DataObfuscator return value
+- [ ] SEC-03: Strengthen email masking (show domain only)
+- [ ] SEC-04: Add MIME type validation on PDF uploads
+- [ ] SEC-05: Reduce verbose exception logging (schema leak risk)
+- [ ] SEC-06: Add heuristic field detection for custom PII fields
+
+**Performance (5):**
+- [ ] PERF-01: Increase NotificationProcessor BATCH_LIMIT to 50+
+- [ ] PERF-02: Implement async email via Action Scheduler
+- [ ] PERF-03: Separate AI enrichment job from email sending job
+- [ ] PERF-04: Increase lock TTL to prevent race conditions
+- [ ] PERF-05: Add memory cleanup for long-running DataObfuscator
+
+**Bugs (4):**
+- [ ] BUG-01: Fix column name mismatch (`sa_id_no` vs `sa_id_number`)
+- [ ] BUG-02: Fix savePortfolios() overwrite bug (append, don't replace)
+- [ ] BUG-03: Implement missing `processPortfolioDetails()` method
+- [ ] BUG-04: Fix unsafe `$pdo` access in catch block
+
+**Quality (4):**
+- [ ] QUAL-01: Fix invalid model name (`gpt-5-mini` → `gpt-4o-mini`)
+- [ ] QUAL-02: Extract DTOs for `$record`, `$context`, `$summary` arrays
+- [ ] QUAL-03: Implement PHP 8.1 Enums for status strings
+- [ ] QUAL-04: Make API URL configurable (support Azure/proxy)
+
+**Architecture (2):**
+- [ ] ARCH-01: Refactor `generateSummary()` for Single Responsibility
+- [ ] ARCH-02: Add BaseRepository `count()` method for pagination
 
 ### Out of Scope
 
@@ -96,4 +129,4 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Hourly email cron | Non-blocking notifications without real-time complexity | ✓ wp_schedule_event configured |
 
 ---
-*Last updated: 2026-02-02 after v1 milestone completion*
+*Last updated: 2026-02-02 after v1.1 milestone started*
