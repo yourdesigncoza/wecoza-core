@@ -267,6 +267,38 @@ add_action('plugins_loaded', function () {
         $processor->process();
     });
 
+    // Action Scheduler Job Handlers for Async Notifications
+    add_action('wecoza_enrich_notification', function (int $logId) {
+        if (!class_exists(\WeCoza\Events\Services\NotificationEnricher::class)) {
+            return;
+        }
+
+        $enricher = \WeCoza\Events\Services\NotificationEnricher::boot();
+        $result = $enricher->enrich($logId);
+
+        if ($result['success'] && $result['should_email'] && $result['recipient'] !== null) {
+            // Chain to email job
+            as_enqueue_async_action(
+                'wecoza_send_notification_email',
+                [
+                    'log_id' => $logId,
+                    'recipient' => $result['recipient'],
+                    'email_context' => $result['email_context'],
+                ],
+                'wecoza-notifications'
+            );
+        }
+    }, 10, 1);
+
+    add_action('wecoza_send_notification_email', function (int $logId, string $recipient, array $emailContext = []) {
+        if (!class_exists(\WeCoza\Events\Services\NotificationEmailer::class)) {
+            return;
+        }
+
+        $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
+        $emailer->send($logId, $recipient, $emailContext);
+    }, 10, 3);
+
     /*
     |--------------------------------------------------------------------------
     | Load Learners Shortcodes
