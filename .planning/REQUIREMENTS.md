@@ -77,39 +77,39 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 | Pending |
-| INFRA-02 | Phase 1 | Pending |
-| INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
-| INFRA-05 | Phase 2 | Pending |
-| INFRA-06 | Phase 2 | Pending |
-| INFRA-07 | Phase 3 | Pending |
-| INFRA-08 | Phase 3 | Pending |
-| TASK-01 | Phase 2 | Pending |
-| TASK-02 | Phase 2 | Pending |
-| TASK-03 | Phase 4 | Pending |
-| TASK-04 | Phase 4 | Pending |
-| TASK-05 | Phase 4 | Pending |
-| MATL-01 | Phase 5 | Pending |
-| MATL-02 | Phase 5 | Pending |
-| MATL-03 | Phase 5 | Pending |
-| MATL-04 | Phase 5 | Pending |
-| MATL-05 | Phase 5 | Pending |
-| MATL-06 | Phase 5 | Pending |
-| AI-01 | Phase 6 | Pending |
-| AI-02 | Phase 6 | Pending |
-| AI-03 | Phase 6 | Pending |
-| AI-04 | Phase 6 | Pending |
-| EMAIL-01 | Phase 7 | Pending |
-| EMAIL-02 | Phase 7 | Pending |
-| EMAIL-03 | Phase 7 | Pending |
-| EMAIL-04 | Phase 7 | Pending |
+| INFRA-01 | Phase 1: Code Foundation | Pending |
+| INFRA-02 | Phase 1: Code Foundation | Pending |
+| INFRA-03 | Phase 1: Code Foundation | Pending |
+| INFRA-04 | Phase 1: Code Foundation | Pending |
+| INFRA-05 | Phase 2: Database Migration | Pending |
+| INFRA-06 | Phase 2: Database Migration | Pending |
+| INFRA-07 | Phase 3: Bootstrap Integration | Pending |
+| INFRA-08 | Phase 3: Bootstrap Integration | Pending |
+| TASK-01 | Phase 4: Task Management | Pending |
+| TASK-02 | Phase 4: Task Management | Pending |
+| TASK-03 | Phase 4: Task Management | Pending |
+| TASK-04 | Phase 4: Task Management | Pending |
+| TASK-05 | Phase 4: Task Management | Pending |
+| MATL-01 | Phase 5: Material Tracking | Pending |
+| MATL-02 | Phase 5: Material Tracking | Pending |
+| MATL-03 | Phase 5: Material Tracking | Pending |
+| MATL-04 | Phase 5: Material Tracking | Pending |
+| MATL-05 | Phase 5: Material Tracking | Pending |
+| MATL-06 | Phase 5: Material Tracking | Pending |
+| AI-01 | Phase 6: AI Summarization | Pending |
+| AI-02 | Phase 6: AI Summarization | Pending |
+| AI-03 | Phase 6: AI Summarization | Pending |
+| AI-04 | Phase 6: AI Summarization | Pending |
+| EMAIL-01 | Phase 7: Email Notifications | Pending |
+| EMAIL-02 | Phase 7: Email Notifications | Pending |
+| EMAIL-03 | Phase 7: Email Notifications | Pending |
+| EMAIL-04 | Phase 7: Email Notifications | Pending |
 
 **Coverage:**
 - v1 requirements: 24 total
 - Mapped to phases: 24
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after initial definition*
+*Last updated: 2026-02-02 after roadmap creation*
