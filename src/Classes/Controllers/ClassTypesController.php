@@ -95,7 +95,7 @@ class ClassTypesController
             $typeStmt = $db->query(
                 "SELECT class_type_id, subject_selection_mode, progression_total_hours
                  FROM public.class_types
-                 WHERE class_type_code = $1 AND is_active = TRUE",
+                 WHERE class_type_code = ? AND is_active = TRUE",
                 [$classTypeId]
             );
             $type = $typeStmt->fetch();
@@ -121,7 +121,7 @@ class ClassTypesController
                     $subStmt = $db->query(
                         "SELECT subject_code, subject_name, subject_duration
                          FROM public.class_type_subjects
-                         WHERE class_type_id = $1 AND is_active = TRUE
+                         WHERE class_type_id = ? AND is_active = TRUE
                          ORDER BY display_order",
                         [$type['class_type_id']]
                     );
@@ -163,7 +163,7 @@ class ClassTypesController
             $stmt = $db->query(
                 "SELECT subject_duration
                  FROM public.class_type_subjects
-                 WHERE subject_code = $1 AND is_active = TRUE
+                 WHERE subject_code = ? AND is_active = TRUE
                  LIMIT 1",
                 [$subjectId]
             );
