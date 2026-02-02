@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 8 of 12 (Bug Fixes & Core Security)
-Plan: 1 of 1 completed
-Status: Phase in progress
-Last activity: 2026-02-02 — Completed 08-01-PLAN.md (Learner Query Bug Fixes)
+Plan: 3 of 3 completed
+Status: Phase complete
+Last activity: 2026-02-02 — Completed 08-03-PLAN.md (Security Helpers)
 
-Progress: [=============.............] 54% (7/13 phases, continuing from v1)
+Progress: [==============............] 62% (8/13 phases, continuing from v1)
 
-v1.1 Progress: [=====.....................] 20% (1/5 phases in progress)
+v1.1 Progress: [==========................] 40% (2/5 phases complete)
 
 ## Milestone History
 
@@ -53,7 +53,7 @@ See: .planning/milestones/v1-* for archived artifacts
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 08-bug-fixes-core-security | 1 | 1min | 1min |
+| 08-bug-fixes-core-security | 3 | 5min | 1.7min |
 
 ## Accumulated Context
 
@@ -68,6 +68,13 @@ Key decisions are archived in:
 | Phase | Plan | Decision | Impact |
 |-------|------|----------|--------|
 | 08 | 01 | Initialize PDO to null before try blocks | All catch blocks with PDO operations require null checks |
+| 08 | 02 | Use finfo_file() for MIME validation | Prevents malicious files disguised as PDFs |
+| 08 | 02 | Generic error messages (no MIME reveal) | Security through obscurity - don't reveal validation details |
+| 08 | 02 | Inline error display for file validation | Immediate UX feedback, user can retry instantly |
+| 08 | 03 | Sanitize all exception messages before logging | All repositories should use wecoza_sanitize_exception() pattern |
+| 08 | 03 | Regex patterns to redact schema details | Prevents table/column/SQL exposure in logs (SEC-05) |
+| 08 | 03 | Truncate sanitized messages at 200 chars | Prevents log flooding from verbose exceptions |
+| 08 | 03 | Separate admin exception details function | Admins get more detail via wecoza_admin_exception_details() |
 
 ### Pending Todos
 
@@ -79,8 +86,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T15:11:19Z
-Stopped at: Completed 08-01-PLAN.md (Learner Query Bug Fixes)
+Last session: 2026-02-02T15:15:01Z
+Stopped at: Completed 08-03-PLAN.md (Security Helpers)
 Resume file: None
 
-**Next action:** Continue with remaining Phase 8 bug fixes or move to Phase 9
+**Next action:** Phase 8 complete - ready for Phase 9 (Performance Optimization)
