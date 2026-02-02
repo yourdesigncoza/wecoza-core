@@ -250,10 +250,10 @@ if ($service !== null) {
     $maxAttempts = $service->getMaxAttempts();
     $runner->test('getMaxAttempts() returns default value of 3', $maxAttempts === 3);
 
-    // Test 3.5: Service uses gpt-5-mini model constant
-    $constants = $reflection->getConstants();
-    $hasModelConstant = isset($constants['MODEL']) && $constants['MODEL'] === 'gpt-5-mini';
-    $runner->test('AISummaryService uses gpt-5-mini model constant', $hasModelConstant);
+    // Test 3.5: OpenAIConfig provides correct default model
+    $testConfig = new OpenAIConfig();
+    $defaultModel = $testConfig->getModel();
+    $runner->test('OpenAIConfig::getModel() returns gpt-4o-mini by default', $defaultModel === 'gpt-4o-mini');
 
     // Test 3.6: Service uses DataObfuscator trait
     $traits = $reflection->getTraitNames();
@@ -712,7 +712,7 @@ try {
         'viewed' => false,
         'viewed_at' => null,
         'generated_at' => gmdate('c'),
-        'model' => 'gpt-5-mini',
+        'model' => 'gpt-4o-mini',
         'tokens_used' => 150,
         'processing_time_ms' => 1200,
     ];
@@ -1107,23 +1107,31 @@ if ($hasTimeoutConstant) {
     $runner->test('Timeout is configured to 60 seconds', $timeoutIs60);
 }
 
-// Test 21.2: API URL is correct
-$hasApiUrl = isset($constants['API_URL']);
-$runner->test('AISummaryService has API_URL constant', $hasApiUrl);
+// Test 21.2: Default API URL is correct
+$testConfigUrl = new OpenAIConfig();
+$defaultUrl = $testConfigUrl->getApiUrl();
+$urlIsCorrect = $defaultUrl === 'https://api.openai.com/v1/chat/completions';
+$runner->test('OpenAIConfig::getApiUrl() returns OpenAI endpoint by default', $urlIsCorrect);
 
-if ($hasApiUrl) {
-    $urlIsCorrect = $constants['API_URL'] === 'https://api.openai.com/v1/chat/completions';
-    $runner->test('API URL is https://api.openai.com/v1/chat/completions', $urlIsCorrect);
-}
+// Test 21.3: Default model is gpt-4o-mini
+$testConfigModel = new OpenAIConfig();
+$defaultModelValue = $testConfigModel->getModel();
+$modelIsGpt4oMini = $defaultModelValue === 'gpt-4o-mini';
+$runner->test('OpenAIConfig::getModel() returns gpt-4o-mini (QUAL-01 verified)', $modelIsGpt4oMini);
 
-// Test 21.3: Model constant is 'gpt-5-mini'
-$hasModel = isset($constants['MODEL']);
-$runner->test('AISummaryService has MODEL constant (verified)', $hasModel);
+// Test 21.3b: Custom model can be set via WordPress option
+update_option(OpenAIConfig::OPTION_MODEL, 'gpt-4o');
+$customConfig = new OpenAIConfig();
+$customModel = $customConfig->getModel();
+$runner->test('OpenAIConfig::getModel() returns custom model from options', $customModel === 'gpt-4o');
+delete_option(OpenAIConfig::OPTION_MODEL);
 
-if ($hasModel) {
-    $modelIsGpt5Mini = $constants['MODEL'] === 'gpt-5-mini';
-    $runner->test('Model constant is gpt-5-mini (verified)', $modelIsGpt5Mini);
-}
+// Test 21.3c: Custom API URL can be set via WordPress option
+update_option(OpenAIConfig::OPTION_API_URL, 'https://custom.openai.azure.com/v1/chat');
+$customUrlConfig = new OpenAIConfig();
+$customUrl = $customUrlConfig->getApiUrl();
+$runner->test('OpenAIConfig::getApiUrl() returns custom URL from options (QUAL-04 verified)', $customUrl === 'https://custom.openai.azure.com/v1/chat');
+delete_option(OpenAIConfig::OPTION_API_URL);
 
 // Test 21.4: Test Authorization header format (Bearer token)
 // This is implemented in callOpenAI method which uses defaultHttpClient

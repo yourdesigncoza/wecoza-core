@@ -37,8 +37,6 @@ final class AISummaryService
 {
     use DataObfuscator;
 
-    private const MODEL = 'gpt-5-mini';
-    private const API_URL = 'https://api.openai.com/v1/chat/completions';
     private const TIMEOUT_SECONDS = 60;
 
     /**
@@ -101,7 +99,7 @@ final class AISummaryService
 
         // Call OpenAI API
         $start = microtime(true);
-        $response = $this->callOpenAI($messages, self::MODEL);
+        $response = $this->callOpenAI($messages);
         $elapsed = (int) round((microtime(true) - $start) * 1000);
 
         // Update record with attempt info
@@ -144,7 +142,7 @@ final class AISummaryService
      * @param array<int,array<string,string>> $messages
      * @return array{success:bool,content:string,error_code:?string,error_message:?string,retryable:bool,model:?string,tokens:int}
      */
-    private function callOpenAI(array $messages, string $model): array
+    private function callOpenAI(array $messages): array
     {
         $apiKey = $this->config->getApiKey();
         if ($apiKey === null) {
@@ -159,6 +157,9 @@ final class AISummaryService
             ];
         }
 
+        $apiUrl = $this->config->getApiUrl();
+        $model = $this->config->getModel();
+
         $payload = [
             'model' => $model,
             'messages' => $messages
@@ -167,7 +168,7 @@ final class AISummaryService
         ];
 
         $response = ($this->httpClient)([
-            'url' => self::API_URL,
+            'url' => $apiUrl,
             'timeout' => self::TIMEOUT_SECONDS,
             'headers' => [
                 'Content-Type' => 'application/json',
