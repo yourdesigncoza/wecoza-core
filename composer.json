@@ -13,7 +13,8 @@
         "psr-4": {
             "WeCoza\\Core\\": "core/",
             "WeCoza\\Learners\\": "src/Learners/",
-            "WeCoza\\Classes\\": "src/Classes/"
+            "WeCoza\\Classes\\": "src/Classes/",
+            "WeCoza\\Events\\": "src/Events/"
         },
         "files": [
             "core/Helpers/functions.php"
