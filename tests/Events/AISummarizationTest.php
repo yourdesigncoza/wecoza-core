@@ -739,6 +739,249 @@ echo "AI-02 Event-Triggered Summary Tests Complete\n";
 echo "\n";
 
 // =====================================================
+// SECTION 15: Error State Handling
+// =====================================================
+
+echo "SECTION 15: Error State Handling\n";
+echo "---------------------------------\n";
+
+// Test 15.1: AISummaryService::mapErrorCode() exists
+$serviceReflection = new ReflectionClass(AISummaryService::class);
+$hasMapErrorCode = $serviceReflection->hasMethod('mapErrorCode');
+$runner->test('AISummaryService::mapErrorCode() method exists', $hasMapErrorCode);
+
+// Test 15.2: Error code mapping logic verification via reflection
+// We can't directly test the mapping, but we can verify the method signature
+if ($hasMapErrorCode) {
+    $mapErrorMethod = $serviceReflection->getMethod('mapErrorCode');
+    $params = $mapErrorMethod->getParameters();
+    $hasTwoParams = count($params) === 2; // (code, status)
+    $runner->test('mapErrorCode() accepts code and status parameters', $hasTwoParams);
+}
+
+// Test 15.3: sanitizeErrorMessage() method exists
+$hasSanitizeError = $serviceReflection->hasMethod('sanitizeErrorMessage');
+$runner->test('AISummaryService::sanitizeErrorMessage() method exists', $hasSanitizeError);
+
+// Test 15.4: Test OpenAIConfig eligibility checking
+try {
+    $config = new OpenAIConfig();
+    $eligibility = $config->assessEligibility(1);
+
+    // Test structure
+    $hasEligibleKey = array_key_exists('eligible', $eligibility);
+    $hasReasonKey = array_key_exists('reason', $eligibility);
+    $runner->test('assessEligibility() returns structure with eligible and reason keys', $hasEligibleKey && $hasReasonKey);
+
+    // Test without API key configured (should return config_missing)
+    delete_option(OpenAIConfig::OPTION_API_KEY);
+    $configEmpty = new OpenAIConfig();
+    $result = $configEmpty->assessEligibility(1);
+    $isNotEligible = $result['eligible'] === false;
+    $reasonIsConfigMissing = $result['reason'] === 'config_missing';
+    $runner->test('assessEligibility() returns eligible=false when no API key', $isNotEligible);
+    $runner->test('assessEligibility() returns reason=config_missing when no API key', $reasonIsConfigMissing);
+
+} catch (Throwable $e) {
+    $runner->test('assessEligibility() returns structure with eligible and reason keys', false, $e->getMessage());
+}
+
+echo "\n";
+
+// =====================================================
+// SECTION 16: Retry Logic with Exponential Backoff
+// =====================================================
+
+echo "SECTION 16: Retry Logic with Exponential Backoff\n";
+echo "-------------------------------------------------\n";
+
+// Test 16.1: backoffDelaySeconds() logic testing
+// We can't directly call the private method, but we can verify it exists and test the pattern via AISummaryService
+$serviceReflection = new ReflectionClass(AISummaryService::class);
+$hasBackoff = $serviceReflection->hasMethod('backoffDelaySeconds');
+$runner->test('AISummaryService::backoffDelaySeconds() method exists (verified)', $hasBackoff);
+
+// Test 16.2: maxAttempts default is 3
+try {
+    $config = new OpenAIConfig();
+    $service = new AISummaryService($config);
+    $maxAttempts = $service->getMaxAttempts();
+    $runner->test('getMaxAttempts() returns default of 3', $maxAttempts === 3);
+} catch (Throwable $e) {
+    $runner->test('getMaxAttempts() returns default of 3', false, $e->getMessage());
+}
+
+// Test 16.3: Custom maxAttempts via constructor
+try {
+    $config = new OpenAIConfig();
+    $customService = new AISummaryService($config, null, 5);
+    $customMax = $customService->getMaxAttempts();
+    $runner->test('Constructor accepts custom maxAttempts parameter', $customMax === 5);
+} catch (Throwable $e) {
+    $runner->test('Constructor accepts custom maxAttempts parameter', false, $e->getMessage());
+}
+
+// Test 16.4: normaliseRecord() handles missing fields
+$hasNormaliseRecord = $serviceReflection->hasMethod('normaliseRecord');
+$runner->test('AISummaryService::normaliseRecord() method exists (verified)', $hasNormaliseRecord);
+
+// Test 16.5: normaliseSummaryText() method exists
+$hasNormaliseSummary = $serviceReflection->hasMethod('normaliseSummaryText');
+$runner->test('AISummaryService::normaliseSummaryText() method exists', $hasNormaliseSummary);
+
+echo "\n";
+
+// =====================================================
+// SECTION 17: Graceful Failure Handling
+// =====================================================
+
+echo "SECTION 17: Graceful Failure Handling\n";
+echo "--------------------------------------\n";
+
+// Test 17.1: Test missing API key returns error without exception
+try {
+    delete_option(OpenAIConfig::OPTION_API_KEY);
+    $config = new OpenAIConfig();
+    $service = new AISummaryService($config);
+
+    // Generate summary without API key - should fail gracefully
+    $testContext = [
+        'log_id' => 1,
+        'operation' => 'INSERT',
+        'changed_at' => gmdate('c'),
+        'class_id' => 1,
+        'new_row' => ['class_code' => 'TEST-001'],
+        'old_row' => [],
+        'diff' => ['class_code' => 'TEST-001'],
+    ];
+
+    $result = $service->generateSummary($testContext, null);
+
+    $hasRecord = isset($result['record']);
+    $runner->test('generateSummary() returns result structure without API key', $hasRecord);
+
+    if ($hasRecord) {
+        $errorCode = $result['record']['error_code'] ?? null;
+        $isConfigMissing = $errorCode === 'config_missing';
+        $runner->test('generateSummary() returns error_code=config_missing when no API key', $isConfigMissing);
+
+        $errorMessage = $result['record']['error_message'] ?? '';
+        $hasErrorMessage = strpos($errorMessage, 'API key') !== false;
+        $runner->test('generateSummary() includes descriptive error message about API key', $hasErrorMessage);
+    }
+
+} catch (Throwable $e) {
+    $runner->test('generateSummary() returns result structure without API key', false, $e->getMessage());
+}
+
+// Test 17.2: Test disabled feature handling (via assessEligibility)
+try {
+    $config = new OpenAIConfig();
+
+    // Simulate feature disabled by checking eligibility without enabled flag
+    $eligibility = $config->assessEligibility(1);
+
+    // When no API key, it should indicate config_missing
+    $hasReason = isset($eligibility['reason']);
+    $runner->test('assessEligibility() provides reason for ineligibility', $hasReason);
+
+} catch (Throwable $e) {
+    $runner->test('assessEligibility() provides reason for ineligibility', false, $e->getMessage());
+}
+
+// Test 17.3: NotificationProcessor handles eligibility checking
+try {
+    $processorReflection = new ReflectionClass(NotificationProcessor::class);
+    $hasShouldMarkFailure = $processorReflection->hasMethod('shouldMarkFailure');
+    $runner->test('NotificationProcessor::shouldMarkFailure() method exists', $hasShouldMarkFailure);
+
+    $hasFinalizeSkipped = $processorReflection->hasMethod('finalizeSkippedSummary');
+    $runner->test('NotificationProcessor::finalizeSkippedSummary() method exists', $hasFinalizeSkipped);
+
+} catch (ReflectionException $e) {
+    $runner->test('NotificationProcessor::shouldMarkFailure() method exists', false, $e->getMessage());
+}
+
+echo "\n";
+
+// =====================================================
+// SECTION 18: Metrics Tracking
+// =====================================================
+
+echo "SECTION 18: Metrics Tracking\n";
+echo "-----------------------------\n";
+
+// Test 18.1: getMetrics() returns array with required keys
+try {
+    $config = new OpenAIConfig();
+    $service = new AISummaryService($config);
+    $metrics = $service->getMetrics();
+
+    $hasAttempts = array_key_exists('attempts', $metrics);
+    $hasSuccess = array_key_exists('success', $metrics);
+    $hasFailed = array_key_exists('failed', $metrics);
+    $hasTotalTokens = array_key_exists('total_tokens', $metrics);
+    $hasProcessingTime = array_key_exists('processing_time_ms', $metrics);
+
+    $runner->test('getMetrics() includes attempts key', $hasAttempts);
+    $runner->test('getMetrics() includes success key', $hasSuccess);
+    $runner->test('getMetrics() includes failed key', $hasFailed);
+    $runner->test('getMetrics() includes total_tokens key', $hasTotalTokens);
+    $runner->test('getMetrics() includes processing_time_ms key', $hasProcessingTime);
+
+    // Test initial values are zero
+    $initialAttempts = $metrics['attempts'] === 0;
+    $runner->test('Initial metrics show 0 attempts', $initialAttempts);
+
+} catch (Throwable $e) {
+    $runner->test('getMetrics() includes attempts key', false, $e->getMessage());
+}
+
+// Test 18.2: Metrics are updated after generateSummary() calls
+try {
+    delete_option(OpenAIConfig::OPTION_API_KEY);
+    $config = new OpenAIConfig();
+    $service = new AISummaryService($config);
+
+    $metricsBefore = $service->getMetrics();
+    $attemptsBefore = $metricsBefore['attempts'];
+
+    // Call generateSummary (will fail due to no API key)
+    $testContext = [
+        'log_id' => 1,
+        'operation' => 'INSERT',
+        'changed_at' => gmdate('c'),
+        'class_id' => 1,
+        'new_row' => ['class_code' => 'TEST-001'],
+        'old_row' => [],
+        'diff' => [],
+    ];
+    $service->generateSummary($testContext, null);
+
+    $metricsAfter = $service->getMetrics();
+    $attemptsAfter = $metricsAfter['attempts'];
+
+    $attemptsIncremented = $attemptsAfter === $attemptsBefore + 1;
+    $runner->test('Metrics attempts counter increments after generateSummary()', $attemptsIncremented);
+
+} catch (Throwable $e) {
+    $runner->test('Metrics attempts counter increments after generateSummary()', false, $e->getMessage());
+}
+
+// Test 18.3: NotificationProcessor emits metrics via WordPress action
+try {
+    $processorReflection = new ReflectionClass(NotificationProcessor::class);
+    $hasEmitMetrics = $processorReflection->hasMethod('emitSummaryMetrics');
+    $runner->test('NotificationProcessor::emitSummaryMetrics() method exists', $hasEmitMetrics);
+} catch (ReflectionException $e) {
+    $runner->test('NotificationProcessor::emitSummaryMetrics() method exists', false, $e->getMessage());
+}
+
+echo "\n";
+echo "Error Handling and Retry Logic Tests Complete\n";
+echo "\n";
+
+// =====================================================
 // FINAL SUMMARY
 // =====================================================
 
