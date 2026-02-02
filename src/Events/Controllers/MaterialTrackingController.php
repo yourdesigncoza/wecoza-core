@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace WeCoza\Events\Controllers;
 
 use WeCoza\Events\Services\MaterialTrackingDashboardService;
-use WeCoza\Events\Models\MaterialTrackingRepository;
+use WeCoza\Events\Repositories\MaterialTrackingRepository;
 use WeCoza\Core\Database\PostgresConnection;
 
 use function __;

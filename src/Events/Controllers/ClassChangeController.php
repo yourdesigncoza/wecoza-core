@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace WeCoza\Events\Controllers;
 
 use PDO;
-use WeCoza\Events\Models\ClassChangeLogRepository;
+use WeCoza\Events\Repositories\ClassChangeLogRepository;
 use WeCoza\Events\Models\ClassChangeSchema;
 use WeCoza\Events\Services\ClassChangeListener;
 use WeCoza\Events\Services\PayloadFormatter;
