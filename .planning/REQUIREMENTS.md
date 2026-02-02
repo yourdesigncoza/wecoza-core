@@ -10,11 +10,11 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 ### Security
 
 - [x] **SEC-01**: Add `quoteIdentifier()` helper for PostgreSQL reserved words
-- [ ] **SEC-02**: Remove PII mappings from DataObfuscator return value
-- [ ] **SEC-03**: Strengthen email masking (show domain only)
+- [x] **SEC-02**: Remove PII mappings from DataObfuscator return value
+- [x] **SEC-03**: Strengthen email masking (show domain only)
 - [x] **SEC-04**: Add MIME type validation on PDF uploads
 - [x] **SEC-05**: Reduce verbose exception logging (schema leak risk)
-- [ ] **SEC-06**: Add heuristic field detection for custom PII fields
+- [x] **SEC-06**: Add heuristic field detection for custom PII fields
 
 ### Performance
 
@@ -22,7 +22,7 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 - [ ] **PERF-02**: Implement async email via Action Scheduler
 - [ ] **PERF-03**: Separate AI enrichment job from email sending job
 - [ ] **PERF-04**: Increase lock TTL to prevent race conditions
-- [ ] **PERF-05**: Add memory cleanup for long-running DataObfuscator
+- [x] **PERF-05**: Add memory cleanup for long-running DataObfuscator
 
 ### Bugs
 
@@ -83,10 +83,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-01 | Phase 8 | Complete |
 | SEC-04 | Phase 8 | Complete |
 | SEC-05 | Phase 8 | Complete |
-| SEC-02 | Phase 9 | Pending |
-| SEC-03 | Phase 9 | Pending |
-| SEC-06 | Phase 9 | Pending |
-| PERF-05 | Phase 9 | Pending |
+| SEC-02 | Phase 9 | Complete |
+| SEC-03 | Phase 9 | Complete |
+| SEC-06 | Phase 9 | Complete |
+| PERF-05 | Phase 9 | Complete |
 | ARCH-01 | Phase 10 | Pending |
 | ARCH-02 | Phase 10 | Pending |
 | QUAL-02 | Phase 10 | Pending |
@@ -105,4 +105,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 — Phase 8 complete (7 requirements satisfied)*
+*Last updated: 2026-02-02 — Phase 9 complete (11 requirements satisfied)*

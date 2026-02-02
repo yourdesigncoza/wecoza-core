@@ -56,9 +56,9 @@ Plans:
 4. Long-running obfuscation operations release memory periodically (no memory leaks on large datasets)
 
 Plans:
-- [ ] 09-01-PLAN.md — Remove PII mappings from return values, strengthen email masking (SEC-02, SEC-03)
-- [ ] 09-02-PLAN.md — Add PIIDetector trait for heuristic PII detection (SEC-06)
-- [ ] 09-03-PLAN.md — Add memory cleanup to NotificationProcessor (PERF-05)
+- [x] 09-01-PLAN.md — Remove PII mappings from return values, strengthen email masking (SEC-02, SEC-03)
+- [x] 09-02-PLAN.md — Add PIIDetector trait for heuristic PII detection (SEC-06)
+- [x] 09-03-PLAN.md — Add memory cleanup to NotificationProcessor (PERF-05)
 
 ### Phase 10: Architecture & Type Safety
 
@@ -116,7 +116,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-7 | v1.0 | 13/13 | Complete | 2026-02-02 |
 | 8. Bug Fixes & Core Security | v1.1 | 4/4 | Complete | 2026-02-02 |
-| 9. Data Privacy Hardening | v1.1 | 0/3 | Planned | - |
+| 9. Data Privacy Hardening | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 10. Architecture & Type Safety | v1.1 | 0/? | Not started | - |
 | 11. AI Service Quality | v1.1 | 0/? | Not started | - |
 | 12. Performance & Async Processing | v1.1 | 0/? | Not started | - |
@@ -154,4 +154,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02 — Phase 9 planned*
+*Last updated: 2026-02-02 — Phase 9 complete*
