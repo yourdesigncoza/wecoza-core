@@ -18,10 +18,10 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 
 ### Performance
 
-- [ ] **PERF-01**: Increase NotificationProcessor BATCH_LIMIT to 50+
-- [ ] **PERF-02**: Implement async email via Action Scheduler
-- [ ] **PERF-03**: Separate AI enrichment job from email sending job
-- [ ] **PERF-04**: Increase lock TTL to prevent race conditions
+- [x] **PERF-01**: Increase NotificationProcessor BATCH_LIMIT to 50+
+- [x] **PERF-02**: Implement async email via Action Scheduler
+- [x] **PERF-03**: Separate AI enrichment job from email sending job
+- [x] **PERF-04**: Increase lock TTL to prevent race conditions
 - [x] **PERF-05**: Add memory cleanup for long-running DataObfuscator
 
 ### Bugs
@@ -93,10 +93,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-03 | Phase 10 | Complete |
 | QUAL-01 | Phase 11 | Complete |
 | QUAL-04 | Phase 11 | Complete |
-| PERF-01 | Phase 12 | Pending |
-| PERF-02 | Phase 12 | Pending |
-| PERF-03 | Phase 12 | Pending |
-| PERF-04 | Phase 12 | Pending |
+| PERF-01 | Phase 12 | Complete |
+| PERF-02 | Phase 12 | Complete |
+| PERF-03 | Phase 12 | Complete |
+| PERF-04 | Phase 12 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 21 total
@@ -105,4 +105,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 — Phase 11 complete (17 requirements satisfied)*
+*Last updated: 2026-02-02 — v1.1 milestone complete (21/21 requirements satisfied)*

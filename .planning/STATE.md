@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v1.1 Quality & Performance — Phase 12 (Performance & Async Processing)
+**Current focus:** v1.1 Quality & Performance — COMPLETE
 
 ## Current Position
 
 Phase: 12 of 12 (Performance & Async Processing)
-Plan: 2 of 3 completed
-Status: In progress
+Plan: 2 of 2 completed
+Status: Phase complete, milestone complete
 Last activity: 2026-02-02 — Completed 12-02-PLAN.md (Async Action Scheduler Integration)
 
-Progress: [========================..] 97% (13/13 phases, continuing from v1)
+Progress: [============================] 100% (12/12 phases)
 
-v1.1 Progress: [=====================...] 88% (5/6 phases, Phase 12 in progress)
+v1.1 Progress: [============================] 100% (5/5 phases, 21/21 requirements)
 
 ## Milestone History
 
@@ -25,6 +25,11 @@ v1.1 Progress: [=====================...] 88% (5/6 phases, Phase 12 in progress)
 - 50 files (37 PHP + 9 templates + 4 tests)
 - 6,288 LOC in Events module
 - 4 days from start to ship
+
+**v1.1 Quality & Performance (Shipped: 2026-02-02)**
+- 5 phases, 14 plans, 21 requirements
+- Bug fixes, security hardening, data privacy, architecture, performance
+- Key additions: Action Scheduler, typed DTOs, PHP 8.1 Enums, async processing
 
 See: .planning/MILESTONES.md for full details
 See: .planning/milestones/v1-* for archived artifacts
@@ -55,9 +60,9 @@ See: .planning/milestones/v1-* for archived artifacts
 |-------|-------|-------|----------|
 | 08-bug-fixes-core-security | 4 | 7min | 1.75min |
 | 09-data-privacy-hardening | 3 | 6min | 2min |
-| 10-architecture-type-safety | 3/3 | 13min | 4.3min |
-| 11-ai-service-quality | 1/1 | 3min | 3min |
-| 12-performance-async-processing | 2/3 | 5min | 2.5min |
+| 10-architecture-type-safety | 3 | 13min | 4.3min |
+| 11-ai-service-quality | 1 | 3min | 3min |
+| 12-performance-async-processing | 2 | 5min | 2.5min |
 
 ## Accumulated Context
 
@@ -101,26 +106,24 @@ Key decisions are archived in:
 | 11 | 01 | Default to gpt-4o-mini not gpt-5-mini | gpt-5-mini doesn't exist; gpt-4o-mini is valid and cost-effective |
 | 11 | 01 | Store config in WordPress options table | Leverages existing WP admin UI capability, no new infrastructure |
 | 12 | 01 | Action Scheduler loaded before plugins_loaded | Required for proper data store initialization |
-| 12 | 01 | BATCH_LIMIT increased to 50 (from 1) | 50x throughput increase for high-volume notifications |
-| 12 | 01 | LOCK_TTL increased to 120s (from 30s) | Prevents race conditions for 50-item batches |
-| 12 | 01 | MAX_RUNTIME increased to 90s (from 20s) | Allows ~1.8s per notification for AI + email |
-| 12 | 01 | vendor/ directory gitignored per Composer standard | Developers run composer install after clone |
-| 12 | 02 | AI enrichment as separate job | Enables independent failure and retry without blocking other notifications |
-| 12 | 02 | Job chaining pattern | Enricher schedules email job on success, maintains processing order |
-| 12 | 02 | Direct email scheduling for non-AI | Skips enrichment job when AI disabled, reduces latency |
+| 12 | 01 | BATCH_LIMIT = 50, LOCK_TTL = 120s, MAX_RUNTIME = 90s | High-volume batch processing with race condition prevention |
+| 12 | 01 | vendor/ directory gitignored | Standard Composer practice, developers run composer install |
+| 12 | 02 | Separate NotificationEnricher and NotificationEmailer services | Single Responsibility, independent failure handling |
+| 12 | 02 | Job chaining: AI success schedules email | Ensures email only sent after successful enrichment |
+| 12 | 02 | Direct email path when AI disabled | Reduces latency, skip unnecessary job |
 
 ### Pending Todos
 
-None — v1.1 roadmap just created.
+None — v1.1 milestone complete.
 
 ### Blockers/Concerns
 
-None identified yet.
+None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-02T18:05:44Z
-Stopped at: Completed 12-02-PLAN.md (Async Action Scheduler Integration)
+Last session: 2026-02-02T20:00:00Z
+Stopped at: Phase 12 complete, v1.1 milestone complete
 Resume file: None
 
-**Next action:** Ready for 12-03-PLAN.md (WP-Cron Monitoring)
+**Next action:** Ready for /gsd:audit-milestone or /gsd:new-milestone

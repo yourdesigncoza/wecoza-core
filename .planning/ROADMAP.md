@@ -3,7 +3,7 @@
 ## Milestones
 
 - v1.0 Events Integration - Phases 1-7 (shipped 2026-02-02)
-- **v1.1 Quality & Performance** - Phases 8-12 (in progress)
+- **v1.1 Quality & Performance** - Phases 8-12 (shipped 2026-02-02)
 
 ## Phases
 
@@ -16,9 +16,11 @@ See: `.planning/milestones/v1-ROADMAP.md` for full details.
 
 </details>
 
-### v1.1 Quality & Performance (In Progress)
+### v1.1 Quality & Performance (Complete)
 
 **Milestone Goal:** Production-ready polish addressing 21 issues from code analysis: bug fixes, security hardening, data privacy improvements, architecture refactoring, and performance optimization.
+
+**Shipped:** 2026-02-02 — All 5 phases complete, all 21 requirements satisfied.
 
 ## Phase Details
 
@@ -108,8 +110,8 @@ Plans:
 4. Notification lock TTL prevents race conditions during high-volume processing
 
 Plans:
-- [ ] 12-01-PLAN.md — Install Action Scheduler and update constants (PERF-01, PERF-04)
-- [ ] 12-02-PLAN.md — Implement async jobs for AI enrichment and email sending (PERF-02, PERF-03)
+- [x] 12-01-PLAN.md — Install Action Scheduler and update constants (PERF-01, PERF-04)
+- [x] 12-02-PLAN.md — Implement async jobs for AI enrichment and email sending (PERF-02, PERF-03)
 
 ## Progress
 
@@ -122,7 +124,7 @@ Plans:
 | 9. Data Privacy Hardening | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 10. Architecture & Type Safety | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 11. AI Service Quality | v1.1 | 1/1 | Complete | 2026-02-02 |
-| 12. Performance & Async Processing | v1.1 | 0/2 | Planned | - |
+| 12. Performance & Async Processing | v1.1 | 2/2 | Complete | 2026-02-02 |
 
 ## Requirement Coverage
 
@@ -157,4 +159,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02 — Phase 12 planned*
+*Last updated: 2026-02-02 — v1.1 milestone complete*
