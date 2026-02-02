@@ -37,17 +37,17 @@ Requirements for events plugin migration into wecoza-core.
 
 ### AI Summarization
 
-- [ ] **AI-01**: OpenAI GPT integration for class change summarization
-- [ ] **AI-02**: AI summary generation on class change events
-- [ ] **AI-03**: AI summary shortcode `[wecoza_ai_summary]` displays summaries
-- [ ] **AI-04**: API key configuration via WordPress options
+- [x] **AI-01**: OpenAI GPT integration for class change summarization
+- [x] **AI-02**: AI summary generation on class change events
+- [x] **AI-03**: AI summary shortcode `[wecoza_insert_update_ai_summary]` displays summaries
+- [x] **AI-04**: API key configuration via WordPress options
 
 ### Email Notifications
 
-- [ ] **EMAIL-01**: Automated email notifications on class INSERT events
-- [ ] **EMAIL-02**: Automated email notifications on class UPDATE events
-- [ ] **EMAIL-03**: WordPress cron integration for scheduled notifications
-- [ ] **EMAIL-04**: Configurable notification recipients
+- [x] **EMAIL-01**: Automated email notifications on class INSERT events
+- [x] **EMAIL-02**: Automated email notifications on class UPDATE events
+- [x] **EMAIL-03**: WordPress cron integration for scheduled notifications
+- [x] **EMAIL-04**: Configurable notification recipients
 
 ## v2 Requirements
 
@@ -96,14 +96,14 @@ Deferred to future release.
 | MATL-04 | Phase 5: Material Tracking | Complete |
 | MATL-05 | Phase 5: Material Tracking | Complete |
 | MATL-06 | Phase 5: Material Tracking | Complete |
-| AI-01 | Phase 6: AI Summarization | Pending |
-| AI-02 | Phase 6: AI Summarization | Pending |
-| AI-03 | Phase 6: AI Summarization | Pending |
-| AI-04 | Phase 6: AI Summarization | Pending |
-| EMAIL-01 | Phase 7: Email Notifications | Pending |
-| EMAIL-02 | Phase 7: Email Notifications | Pending |
-| EMAIL-03 | Phase 7: Email Notifications | Pending |
-| EMAIL-04 | Phase 7: Email Notifications | Pending |
+| AI-01 | Phase 6: AI Summarization | Complete |
+| AI-02 | Phase 6: AI Summarization | Complete |
+| AI-03 | Phase 6: AI Summarization | Complete |
+| AI-04 | Phase 6: AI Summarization | Complete |
+| EMAIL-01 | Phase 7: Email Notifications | Complete |
+| EMAIL-02 | Phase 7: Email Notifications | Complete |
+| EMAIL-03 | Phase 7: Email Notifications | Complete |
+| EMAIL-04 | Phase 7: Email Notifications | Complete |
 
 **Coverage:**
 - v1 requirements: 24 total
@@ -112,4 +112,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 5 completion*
+*Last updated: 2026-02-02 after Phase 7 completion*
