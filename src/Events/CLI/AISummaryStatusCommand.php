@@ -6,7 +6,7 @@ namespace WeCoza\Events\CLI;
 use PDO;
 use WP_CLI;
 use WP_CLI_Command;
-use WeCoza\Events\Database\Connection;
+use WeCoza\Core\Database\PostgresConnection;
 
 use function apply_filters;
 use function array_column;
@@ -42,11 +42,10 @@ final class AISummaryStatusCommand extends WP_CLI_Command
     {
         $hours = isset($assocArgs['hours']) ? max(1, (int) $assocArgs['hours']) : self::DEFAULT_HOURS;
 
-        $pdo = Connection::getPdo();
-        $schema = Connection::getSchema();
+        $pdo = PostgresConnection::getInstance()->getPdo();
 
-        $statusRows = $this->fetchStatusCounts($pdo, $schema, $hours);
-        $modelRows = $this->fetchModelBreakdown($pdo, $schema, $hours);
+        $statusRows = $this->fetchStatusCounts($pdo, $hours);
+        $modelRows = $this->fetchModelBreakdown($pdo, $hours);
 
         $totalProcessed = array_sum(array_column($statusRows, 'count'));
 
@@ -72,17 +71,14 @@ final class AISummaryStatusCommand extends WP_CLI_Command
     /**
      * @return array<int,array{status:string,count:int}>
      */
-    private function fetchStatusCounts(PDO $pdo, string $schema, int $hours): array
+    private function fetchStatusCounts(PDO $pdo, int $hours): array
     {
-        $sql = sprintf(
-            'SELECT COALESCE(ai_summary->>\'status\', \'pending\') AS status, COUNT(*)::int AS total
-             FROM "%s".class_change_logs
+        $sql = 'SELECT COALESCE(ai_summary->>\'status\', \'pending\') AS status, COUNT(*)::int AS total
+             FROM class_change_logs
              WHERE changed_at >= (NOW() AT TIME ZONE \'UTC\' - (:hours || \' hours\')::interval)
              AND ai_summary IS NOT NULL
              GROUP BY status
-             ORDER BY status ASC',
-            $schema
-        );
+             ORDER BY status ASC';
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':hours', $hours, PDO::PARAM_INT);
@@ -101,20 +97,17 @@ final class AISummaryStatusCommand extends WP_CLI_Command
     /**
      * @return array<int,array{model:string,tokens:int,processing_ms:int,estimated_cost_usd:float}>
      */
-    private function fetchModelBreakdown(PDO $pdo, string $schema, int $hours): array
+    private function fetchModelBreakdown(PDO $pdo, int $hours): array
     {
-        $sql = sprintf(
-            'SELECT
+        $sql = 'SELECT
                 COALESCE(ai_summary->>\'model\', \'unknown\') AS model,
                 SUM(COALESCE((ai_summary->>\'tokens_used\')::int, 0))::int AS tokens,
                 SUM(COALESCE((ai_summary->>\'processing_time_ms\')::int, 0))::int AS processing_ms
-             FROM "%s".class_change_logs
+             FROM class_change_logs
              WHERE changed_at >= (NOW() AT TIME ZONE \'UTC\' - (:hours || \' hours\')::interval)
              AND ai_summary IS NOT NULL
              GROUP BY model
-             ORDER BY model ASC',
-            $schema
-        );
+             ORDER BY model ASC';
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':hours', $hours, PDO::PARAM_INT);
