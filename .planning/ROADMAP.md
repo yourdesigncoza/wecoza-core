@@ -65,7 +65,7 @@ Plans:
 **Goal**: Codebase uses proper abstractions with type-safe data structures
 **Depends on**: Phase 8
 **Requirements**: ARCH-01, ARCH-02, QUAL-02, QUAL-03
-**Plans**: TBD
+**Plans**: 3 plans (Wave 1: 01-02 parallel, Wave 2: 03)
 
 **Success Criteria** (what must be TRUE):
 1. `generateSummary()` delegates to focused single-purpose methods (prompt building, API calling, response parsing)
@@ -74,8 +74,11 @@ Plans:
 4. Status strings (`in_progress`, `completed`, etc.) use PHP 8.1 Enums with validation
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md — Create typed DTOs for AI summary arrays (QUAL-02)
+- [ ] 10-02-PLAN.md — Create PHP 8.1 Enums for status strings (QUAL-03)
+- [ ] 10-03-PLAN.md — Refactor generateSummary() for Single Responsibility (ARCH-01)
+
+**Note:** ARCH-02 (BaseRepository count()) already implemented - verified in research phase.
 
 ### Phase 11: AI Service Quality
 
@@ -117,7 +120,7 @@ Plans:
 | 1-7 | v1.0 | 13/13 | Complete | 2026-02-02 |
 | 8. Bug Fixes & Core Security | v1.1 | 4/4 | Complete | 2026-02-02 |
 | 9. Data Privacy Hardening | v1.1 | 3/3 | Complete | 2026-02-02 |
-| 10. Architecture & Type Safety | v1.1 | 0/? | Not started | - |
+| 10. Architecture & Type Safety | v1.1 | 0/3 | Planned | - |
 | 11. AI Service Quality | v1.1 | 0/? | Not started | - |
 | 12. Performance & Async Processing | v1.1 | 0/? | Not started | - |
 
@@ -139,7 +142,7 @@ All 21 v1.1 requirements mapped to exactly one phase:
 | SEC-06 | 9 | Add heuristic field detection for PII |
 | PERF-05 | 9 | Add memory cleanup for DataObfuscator |
 | ARCH-01 | 10 | Refactor generateSummary() for SRP |
-| ARCH-02 | 10 | Add BaseRepository count() method |
+| ARCH-02 | 10 | Add BaseRepository count() method (already implemented) |
 | QUAL-02 | 10 | Extract DTOs for arrays |
 | QUAL-03 | 10 | Implement PHP 8.1 Enums for status strings |
 | QUAL-01 | 11 | Fix invalid model name |
@@ -154,4 +157,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02 — Phase 9 complete*
+*Last updated: 2026-02-02 — Phase 10 planned*
