@@ -47,11 +47,11 @@ Plans:
   2. class_change_logs table captures INSERT/UPDATE events on public.classes
   3. All SQL queries execute without errors (no `delivery_date` column references)
   4. Trigger functions execute and populate logging tables correctly
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Remove delivery_date column references from PHP code
+- [ ] 02-02-PLAN.md — Verify and document PostgreSQL trigger infrastructure
 
 ### Phase 3: Bootstrap Integration
 **Goal**: Events module initializes correctly within wecoza-core lifecycle
@@ -140,7 +140,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Code Foundation | 3/3 | ✓ Complete | 2026-02-02 |
-| 2. Database Migration | 0/2 | Not started | - |
+| 2. Database Migration | 0/2 | In Progress | - |
 | 3. Bootstrap Integration | 0/2 | Not started | - |
 | 4. Task Management | 0/3 | Not started | - |
 | 5. Material Tracking | 0/3 | Not started | - |
