@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-Phase: 10 of 12 (Architecture & Type Safety)
-Plan: 3 of 3 completed
-Status: Phase complete
-Last activity: 2026-02-02 — Completed 10-03-PLAN.md (SRP Refactoring)
+Phase: 11 of 12 (AI Service Quality)
+Plan: 1 of 2 completed
+Status: In progress
+Last activity: 2026-02-02 — Completed 11-01-PLAN.md (Configurable API & Model)
 
-Progress: [===================.......] 80% (11/13 phases, continuing from v1)
+Progress: [===================.......] 81% (11.5/13 phases, continuing from v1)
 
-v1.1 Progress: [==================........] 80% (4/5 phases complete)
+v1.1 Progress: [==================........] 90% (4.5/5 phases, plan 11-01 complete)
 
 ## Milestone History
 
@@ -56,6 +56,7 @@ See: .planning/milestones/v1-* for archived artifacts
 | 08-bug-fixes-core-security | 4 | 7min | 1.75min |
 | 09-data-privacy-hardening | 3 | 6min | 2min |
 | 10-architecture-type-safety | 3/3 | 13min | 4.3min |
+| 11-ai-service-quality | 1/2 | 3min | 3min |
 
 ## Accumulated Context
 
@@ -94,6 +95,10 @@ Key decisions are archived in:
 | 10 | 03 | Add generateSummaryArray() for backward compatibility | Deprecated wrapper returns ->toArray() on DTO |
 | 10 | 03 | Add individual with*() methods to RecordDTO | More granular than withGenerationMeta() for chainable updates |
 | 10 | 03 | Update NotificationProcessor to use DTO properties | Cleaner code than backward compat method |
+| 11 | 01 | Use OpenAIConfig getter methods not service constants | Centralized config, supports Azure/proxy, runtime flexibility |
+| 11 | 01 | Validate API URLs with filter_var() + protocol check | Prevents invalid URLs, enforces https/http protocols |
+| 11 | 01 | Default to gpt-4o-mini not gpt-5-mini | gpt-5-mini doesn't exist; gpt-4o-mini is valid and cost-effective |
+| 11 | 01 | Store config in WordPress options table | Leverages existing WP admin UI capability, no new infrastructure |
 
 ### Pending Todos
 
@@ -105,8 +110,8 @@ None identified yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T19:00:00Z
-Stopped at: Phase 10 (Architecture & Type Safety) verified - all 3 plans complete
+Last session: 2026-02-02T17:27:00Z
+Stopped at: Completed 11-01-PLAN.md (Configurable API & Model)
 Resume file: None
 
-**Next action:** Ready for Phase 11 (AI Service Quality) — fix model name, make API URL configurable
+**Next action:** Ready for plan 11-02 (Response Validation & Error Handling)
