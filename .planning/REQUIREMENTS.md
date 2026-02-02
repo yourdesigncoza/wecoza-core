@@ -13,8 +13,8 @@ Requirements for events plugin migration into wecoza-core.
 - [x] **INFRA-02**: File structure reorganization from `includes/` to `src/Events/`
 - [x] **INFRA-03**: Replace events plugin database connection with wecoza-core's `PostgresConnection`
 - [x] **INFRA-04**: Add PSR-4 autoloading for `WeCoza\Events\*` namespace
-- [ ] **INFRA-05**: Migrate PostgreSQL schema (triggers, functions) to wecoza-core
-- [ ] **INFRA-06**: Fix `delivery_date` column references (removed column)
+- [x] **INFRA-05**: Migrate PostgreSQL schema (triggers, functions) to wecoza-core
+- [x] **INFRA-06**: Fix `delivery_date` column references (removed column)
 - [ ] **INFRA-07**: Integrate events module initialization into wecoza-core bootstrap
 - [ ] **INFRA-08**: Migrate events plugin activation/deactivation hooks
 
@@ -81,8 +81,8 @@ Deferred to future release.
 | INFRA-02 | Phase 1: Code Foundation | Complete |
 | INFRA-03 | Phase 1: Code Foundation | Complete |
 | INFRA-04 | Phase 1: Code Foundation | Complete |
-| INFRA-05 | Phase 2: Database Migration | Pending |
-| INFRA-06 | Phase 2: Database Migration | Pending |
+| INFRA-05 | Phase 2: Database Migration | Complete |
+| INFRA-06 | Phase 2: Database Migration | Complete |
 | INFRA-07 | Phase 3: Bootstrap Integration | Pending |
 | INFRA-08 | Phase 3: Bootstrap Integration | Pending |
 | TASK-01 | Phase 4: Task Management | Pending |
