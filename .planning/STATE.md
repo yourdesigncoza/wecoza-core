@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 2 of 7 (Database Migration)
-Plan: 1 of 2 in current phase
+Plan: 2 of 2 in current phase
 Status: In progress
-Last activity: 2026-02-02 — Completed 02-01-PLAN.md
+Last activity: 2026-02-02 — Completed 02-02-PLAN.md
 
 Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 5min
-- Total execution time: 0.35 hours
+- Total plans completed: 5
+- Average duration: 4min
+- Total execution time: 0.38 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-code-foundation | 3 | 19min | 6min |
-| 02-database-migration | 1 | 2min | 2min |
+| 02-database-migration | 2 | 4min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 8min, 7min, 2min
-- Trend: Improving efficiency
+- Last 5 plans: 7min, 2min, 2min
+- Trend: Consistently fast (2min average)
 
 *Updated after each plan completion*
 
@@ -56,6 +56,8 @@ Recent decisions affecting current work:
 - Remove ABSPATH exit check from autoloaded classes (conflicts with declare(strict_types=1))
 - TemplateRenderer base path uses wecoza_plugin_path('views/events/')
 - Exclude backup files (*-bu.php) from migration
+- Use idempotent SQL migrations with CREATE OR REPLACE for functions
+- Use DROP TRIGGER IF EXISTS + CREATE for trigger idempotency
 
 ### Pending Todos
 
@@ -68,9 +70,11 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02T11:47:11Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-02-02T11:49:00Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
 
 **Phase 2 Progress:**
-Plan 02-01 complete (delivery_date PHP cleanup). Ready for 02-02 (trigger migration).
+- Plan 02-01 complete (delivery_date PHP cleanup) ✓
+- Plan 02-02 complete (trigger migration infrastructure) ✓
+- Ready for Phase 2 remaining plans
