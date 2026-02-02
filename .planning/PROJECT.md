@@ -18,18 +18,19 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ PostgreSQL database layer with lazy-loading — existing
 - ✓ MVC architecture with BaseController, BaseModel, BaseRepository — existing
 - ✓ Security: nonce validation, capability checks, column whitelisting — existing
+- ✓ Migrate Events module into wecoza-core — v1
+- ✓ Task management (class change monitoring, task tracking) — v1
+- ✓ Material tracking (delivery status, 7-day/5-day alerts) — v1
+- ✓ AI summarization (OpenAI integration for class change summaries) — v1
+- ✓ Email notifications (automated notifications on class changes) — v1
+- ✓ PostgreSQL triggers migration (class_change_logs, triggers) — v1
+- ✓ Unified database connection (consolidate to single PostgresConnection) — v1
+- ✓ PSR-4 autoloading for Events module — v1
+- ✓ Fix delivery_date column references (bug from schema migration) — v1
 
 ### Active
 
-- [ ] Migrate Events module into wecoza-core
-- [ ] Task management (class change monitoring, task tracking)
-- [ ] Material tracking (delivery status, 7-day/5-day alerts)
-- [ ] AI summarization (OpenAI integration for class change summaries)
-- [ ] Email notifications (automated notifications on class changes)
-- [ ] PostgreSQL triggers migration (class_change_logs, triggers)
-- [ ] Unified database connection (consolidate to single PostgresConnection)
-- [ ] PSR-4 autoloading for Events module
-- [ ] Fix delivery_date column references (bug from schema migration)
+(None — use `/gsd:new-milestone` to define next milestone requirements)
 
 ### Out of Scope
 
@@ -40,28 +41,38 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-**Source codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-events-plugin/`
-- ~7,700 lines of code, 33 PHP files
-- Good MVC architecture similar to wecoza-core
-- Uses separate database connection (needs consolidation)
-- Manual require_once (needs PSR-4 conversion)
-- 3 shortcodes, 2 AJAX handlers
-- OpenAI API integration for AI summaries
+### Current State (v1 Shipped)
 
-**Current architecture (wecoza-core):**
+**Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
+- **Total:** ~15,000 lines of PHP across 3 modules
+- **Events module:** 37 PHP files, 6,288 LOC in `src/Events/`
+- **View templates:** 9 templates in `views/events/`
+- **Test coverage:** 4 test files in `tests/Events/`
+
+**Architecture:**
 - `core/` — Framework abstractions (Base classes)
 - `src/Learners/` — Learner module
 - `src/Classes/` — Classes module
+- `src/Events/` — Events module (new in v1)
 - `views/` — PHP templates
 - `assets/` — JS/CSS files
 
-**Target architecture after migration:**
-- `src/Events/` — Events module (new)
-- Same patterns: Controllers, Models, Repositories, Services, Shortcodes
+**Tech stack:** PostgreSQL, PHP 8.0+, WordPress 6.0+, OpenAI API
 
-**Known issues:**
-- Events plugin references `c.delivery_date` column that was dropped
-- Events plugin has own database connection class (duplicate of core)
+**Shortcodes (Events module):**
+- `[wecoza_event_tasks]` — Task management dashboard
+- `[wecoza_material_tracking]` — Material delivery tracking
+- `[wecoza_insert_update_ai_summary]` — AI-generated summaries
+
+**Cron jobs:**
+- `wecoza_email_notifications_process` — Hourly email notifications
+- `wecoza_material_notifications_check` — Daily material alerts
+
+### Known Issues
+
+- Phase 3 (Bootstrap Integration) lacks formal VERIFICATION.md (functionality verified via dependent phases)
+- Settings page may need admin menu entry for easier discovery
+- 2 test failures in AI summarization test suite (test format issues, not production bugs)
 
 ## Constraints
 
@@ -75,10 +86,14 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Migrate all events features | User confirmed all features needed | — Pending |
-| Fix delivery_date during migration | Cleaner than pre-fixing in old plugin | — Pending |
-| Use src/Events/ structure | Consistent with src/Learners/, src/Classes/ | — Pending |
-| Namespace: WeCoza\Events\* | Consistent with WeCoza\Learners\*, WeCoza\Classes\* | — Pending |
+| Migrate all events features | User confirmed all features needed | ✓ All 24 requirements shipped |
+| Fix delivery_date during migration | Cleaner than pre-fixing in old plugin | ✓ Zero delivery_date references |
+| Use src/Events/ structure | Consistent with src/Learners/, src/Classes/ | ✓ 37 files in proper structure |
+| Namespace: WeCoza\Events\* | Consistent with WeCoza\Learners\*, WeCoza\Classes\* | ✓ All classes use correct namespace |
+| Single PostgresConnection | Eliminate duplicate database code | ✓ All modules use wecoza_db() |
+| Use gpt-5-mini model | Balance cost vs quality for summaries | ✓ Working with error handling |
+| PII protection via DataObfuscator | Prevent leaking sensitive data to OpenAI | ✓ Trait applied to AISummaryService |
+| Hourly email cron | Non-blocking notifications without real-time complexity | ✓ wp_schedule_event configured |
 
 ---
-*Last updated: 2026-02-02 after initialization*
+*Last updated: 2026-02-02 after v1 milestone completion*

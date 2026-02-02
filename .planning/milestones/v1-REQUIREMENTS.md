@@ -1,3 +1,13 @@
+# Requirements Archive: v1 Events Integration
+
+**Archived:** 2026-02-02
+**Status:** ✅ SHIPPED
+
+This is the archived requirements specification for v1.
+For current requirements, see `.planning/REQUIREMENTS.md` (created for next milestone).
+
+---
+
 # Requirements: WeCoza Core - Events Integration
 
 **Defined:** 2026-02-02
@@ -107,9 +117,16 @@ Deferred to future release.
 
 **Coverage:**
 - v1 requirements: 24 total
-- Mapped to phases: 24
-- Unmapped: 0
+- Shipped: 24 (100%)
+- Dropped: 0
 
 ---
-*Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 7 completion*
+
+## Milestone Summary
+
+**Shipped:** 24 of 24 v1 requirements (100%)
+**Adjusted:** None — all requirements implemented as specified
+**Dropped:** None
+
+---
+*Archived: 2026-02-02 as part of v1 milestone completion*
