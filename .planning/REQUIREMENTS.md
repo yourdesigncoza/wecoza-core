@@ -9,11 +9,11 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 
 ### Security
 
-- [ ] **SEC-01**: Add `quoteIdentifier()` helper for PostgreSQL reserved words
+- [x] **SEC-01**: Add `quoteIdentifier()` helper for PostgreSQL reserved words
 - [ ] **SEC-02**: Remove PII mappings from DataObfuscator return value
 - [ ] **SEC-03**: Strengthen email masking (show domain only)
-- [ ] **SEC-04**: Add MIME type validation on PDF uploads
-- [ ] **SEC-05**: Reduce verbose exception logging (schema leak risk)
+- [x] **SEC-04**: Add MIME type validation on PDF uploads
+- [x] **SEC-05**: Reduce verbose exception logging (schema leak risk)
 - [ ] **SEC-06**: Add heuristic field detection for custom PII fields
 
 ### Performance
@@ -26,10 +26,10 @@ Requirements for quality/performance polish milestone. Derived from code analysi
 
 ### Bugs
 
-- [ ] **BUG-01**: Fix column name mismatch (`sa_id_no` vs `sa_id_number`)
-- [ ] **BUG-02**: Fix savePortfolios() overwrite bug (append, don't replace)
-- [ ] **BUG-03**: Implement missing `processPortfolioDetails()` method
-- [ ] **BUG-04**: Fix unsafe `$pdo` access in catch block
+- [x] **BUG-01**: Fix column name mismatch (`sa_id_no` vs `sa_id_number`)
+- [x] **BUG-02**: Fix savePortfolios() overwrite bug (append, don't replace)
+- [x] **BUG-03**: Implement missing `processPortfolioDetails()` method (already existed)
+- [x] **BUG-04**: Fix unsafe `$pdo` access in catch block
 
 ### Quality
 
@@ -76,13 +76,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 8 | Pending |
-| BUG-02 | Phase 8 | Pending |
-| BUG-03 | Phase 8 | Pending |
-| BUG-04 | Phase 8 | Pending |
-| SEC-01 | Phase 8 | Pending |
-| SEC-04 | Phase 8 | Pending |
-| SEC-05 | Phase 8 | Pending |
+| BUG-01 | Phase 8 | Complete |
+| BUG-02 | Phase 8 | Complete |
+| BUG-03 | Phase 8 | Complete |
+| BUG-04 | Phase 8 | Complete |
+| SEC-01 | Phase 8 | Complete |
+| SEC-04 | Phase 8 | Complete |
+| SEC-05 | Phase 8 | Complete |
 | SEC-02 | Phase 9 | Pending |
 | SEC-03 | Phase 9 | Pending |
 | SEC-06 | Phase 9 | Pending |
@@ -105,4 +105,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after roadmap creation*
+*Last updated: 2026-02-02 — Phase 8 complete (7 requirements satisfied)*

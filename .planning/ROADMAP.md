@@ -27,7 +27,7 @@ See: `.planning/milestones/v1-ROADMAP.md` for full details.
 **Goal**: Critical bugs fixed and core security vulnerabilities addressed
 **Depends on**: Phase 7 (v1 complete)
 **Requirements**: BUG-01, BUG-02, BUG-04, SEC-01, SEC-04, SEC-05
-**Plans**: 3 plans (Wave 1 parallel)
+**Plans**: 4 plans (Wave 1: 01-03 parallel, Wave 2: 04 gap closure)
 
 **Success Criteria** (what must be TRUE):
 1. Portfolio save operations append to existing portfolios instead of overwriting them
@@ -37,9 +37,10 @@ See: `.planning/milestones/v1-ROADMAP.md` for full details.
 5. Exception logs contain sanitized messages without exposing schema details
 
 Plans:
-- [ ] 08-01-PLAN.md — Fix learner query bugs (BUG-01, BUG-04)
-- [ ] 08-02-PLAN.md — Fix portfolio save and add MIME validation (BUG-02, SEC-04)
-- [ ] 08-03-PLAN.md — Add security helpers and sanitize logging (SEC-01, SEC-05)
+- [x] 08-01-PLAN.md — Fix learner query bugs (BUG-01, BUG-04)
+- [x] 08-02-PLAN.md — Fix portfolio save and add MIME validation (BUG-02, SEC-04)
+- [x] 08-03-PLAN.md — Add security helpers and sanitize logging (SEC-01, SEC-05)
+- [x] 08-04-PLAN.md — LearnerRepository exception sanitization (gap closure)
 
 ### Phase 9: Data Privacy Hardening
 
@@ -112,7 +113,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-7 | v1.0 | 13/13 | Complete | 2026-02-02 |
-| 8. Bug Fixes & Core Security | v1.1 | 0/3 | Planned | - |
+| 8. Bug Fixes & Core Security | v1.1 | 4/4 | Complete | 2026-02-02 |
 | 9. Data Privacy Hardening | v1.1 | 0/? | Not started | - |
 | 10. Architecture & Type Safety | v1.1 | 0/? | Not started | - |
 | 11. AI Service Quality | v1.1 | 0/? | Not started | - |
@@ -151,4 +152,4 @@ All 21 v1.1 requirements mapped to exactly one phase:
 ---
 
 *Created: 2026-02-02 for v1.1 milestone*
-*Last updated: 2026-02-02*
+*Last updated: 2026-02-02 — Phase 8 complete*
