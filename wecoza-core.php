@@ -49,6 +49,7 @@ spl_autoload_register(function (string $class) {
         'WeCoza\\Core\\' => WECOZA_CORE_PATH . 'core/',
         'WeCoza\\Learners\\' => WECOZA_CORE_PATH . 'src/Learners/',
         'WeCoza\\Classes\\' => WECOZA_CORE_PATH . 'src/Classes/',
+        'WeCoza\\Events\\' => WECOZA_CORE_PATH . 'src/Events/',
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
@@ -111,7 +112,7 @@ add_action('wp_enqueue_scripts', function () {
     // Localize script
     wp_localize_script('wecoza-learners-app', 'WeCozaLearners', [
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('learners_nonce'),
+        'nonce' => wp_create_nonce('learners_nonce_action'),
         'plugin_url' => WECOZA_CORE_URL,
         'uploads_url' => wp_upload_dir()['baseurl'],
         'home_url' => home_url(),
@@ -184,6 +185,53 @@ add_action('plugins_loaded', function () {
         $publicHolidaysController = \WeCoza\Classes\Controllers\PublicHolidaysController::getInstance();
         $publicHolidaysController->initialize();
     }
+
+    // Initialize Events Module
+    if (class_exists(\WeCoza\Events\Shortcodes\EventTasksShortcode::class)) {
+        \WeCoza\Events\Shortcodes\EventTasksShortcode::register();
+    }
+    if (class_exists(\WeCoza\Events\Shortcodes\MaterialTrackingShortcode::class)) {
+        \WeCoza\Events\Shortcodes\MaterialTrackingShortcode::register();
+    }
+    if (class_exists(\WeCoza\Events\Shortcodes\AISummaryShortcode::class)) {
+        \WeCoza\Events\Shortcodes\AISummaryShortcode::register();
+    }
+    if (class_exists(\WeCoza\Events\Controllers\TaskController::class)) {
+        \WeCoza\Events\Controllers\TaskController::register();
+    }
+    if (class_exists(\WeCoza\Events\Controllers\MaterialTrackingController::class)) {
+        \WeCoza\Events\Controllers\MaterialTrackingController::register();
+    }
+    if (class_exists(\WeCoza\Events\Admin\SettingsPage::class)) {
+        \WeCoza\Events\Admin\SettingsPage::register();
+    }
+
+    // Material Notification Cron Handler
+    add_action('wecoza_material_notifications_check', function () {
+        if (!class_exists(\WeCoza\Events\Services\MaterialNotificationService::class)) {
+            return;
+        }
+
+        $service = new \WeCoza\Events\Services\MaterialNotificationService();
+
+        // Check and send 7-day (orange) notifications
+        $orangeClasses = $service->findOrangeStatusClasses();
+        if (!empty($orangeClasses)) {
+            $sentOrange = $service->sendMaterialNotifications($orangeClasses, 'orange');
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("WeCoza Material Cron: Sent {$sentOrange} orange (7-day) notifications");
+            }
+        }
+
+        // Check and send 5-day (red) notifications
+        $redClasses = $service->findRedStatusClasses();
+        if (!empty($redClasses)) {
+            $sentRed = $service->sendMaterialNotifications($redClasses, 'red');
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("WeCoza Material Cron: Sent {$sentRed} red (5-day) notifications");
+            }
+        }
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -268,6 +316,20 @@ register_activation_hook(__FILE__, function () {
     // Flush rewrite rules
     flush_rewrite_rules();
 
+    // Register custom capabilities for learner management
+    // Only Administrators should have access to PII data
+    $admin = get_role('administrator');
+    if ($admin) {
+        $admin->add_cap('manage_learners');
+        $admin->add_cap('view_material_tracking');
+        $admin->add_cap('manage_material_tracking');
+    }
+
+    // Schedule material notification cron if not already scheduled
+    if (!wp_next_scheduled('wecoza_material_notifications_check')) {
+        wp_schedule_event(time(), 'daily', 'wecoza_material_notifications_check');
+    }
+
     /**
      * Fires when WeCoza Core is activated.
      *
@@ -279,6 +341,20 @@ register_activation_hook(__FILE__, function () {
 register_deactivation_hook(__FILE__, function () {
     // Flush rewrite rules
     flush_rewrite_rules();
+
+    // Remove custom capabilities
+    $admin = get_role('administrator');
+    if ($admin) {
+        $admin->remove_cap('manage_learners');
+        $admin->remove_cap('view_material_tracking');
+        $admin->remove_cap('manage_material_tracking');
+    }
+
+    // Unschedule material notification cron
+    $timestamp = wp_next_scheduled('wecoza_material_notifications_check');
+    if ($timestamp) {
+        wp_unschedule_event($timestamp, 'wecoza_material_notifications_check');
+    }
 
     /**
      * Fires when WeCoza Core is deactivated.
@@ -340,4 +416,9 @@ if (defined('WP_CLI') && WP_CLI) {
         WP_CLI::log('  wp wecoza test-db    - Test PostgreSQL connection');
         WP_CLI::log('  wp wecoza version    - Show plugin version');
     });
+
+    // Events CLI commands
+    if (class_exists(\WeCoza\Events\CLI\AISummaryStatusCommand::class)) {
+        \WeCoza\Events\CLI\AISummaryStatusCommand::register();
+    }
 }
