@@ -34,7 +34,7 @@ trait DataObfuscator
 {
     /**
      * @param array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}|null $state
-     * @return array{payload:array<string|int,mixed>, mappings:array<string,string>, state:array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}}
+     * @return array{payload:array<string|int,mixed>, state:array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}}
      */
     private function obfuscatePayload(array $payload, ?array &$state = null): array
     {
@@ -46,14 +46,13 @@ trait DataObfuscator
 
         return [
             'payload' => $obfuscated,
-            'mappings' => $state['aliases'],
             'state' => $state,
         ];
     }
 
     /**
      * @param array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}|null $state
-     * @return array{payload:array<string|int,mixed>, mappings:array<string,string>, field_labels:array<string,string>, state:array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}}
+     * @return array{payload:array<string|int,mixed>, field_labels:array<string,string>, state:array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}}
      */
     private function obfuscatePayloadWithLabels(array $payload, ?array &$state = null): array
     {
@@ -64,7 +63,6 @@ trait DataObfuscator
 
         return [
             'payload' => $labeledPayload,
-            'mappings' => $result['mappings'],
             'field_labels' => $fieldLabels,
             'state' => $result['state'],
         ];
@@ -284,15 +282,10 @@ trait DataObfuscator
     {
         $parts = explode('@', $value, 2);
         if (count($parts) !== 2) {
-            return 'hidden@example.com';
+            return '****@example.com';
         }
 
-        $local = $parts[0];
-        $domain = $parts[1];
-
-        $localMasked = strlen($local) <= 2 ? str_repeat('*', strlen($local)) : substr($local, 0, 1) . str_repeat('*', max(strlen($local) - 2, 1)) . substr($local, -1);
-
-        return $localMasked . '@' . $domain;
+        return '****@' . $parts[1];
     }
 
     private function maskPhone(string $value): string
