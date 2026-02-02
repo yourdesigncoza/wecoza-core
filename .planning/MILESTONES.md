@@ -1,5 +1,33 @@
 # Project Milestones: WeCoza Core
 
+## v1.1 Quality & Performance (Shipped: 2026-02-02)
+
+**Delivered:** Production-ready polish addressing 21 issues from code analysis — bug fixes, security hardening, data privacy improvements, architecture refactoring, and async processing for high-volume notifications.
+
+**Phases completed:** 8-12 (13 plans total)
+
+**Key accomplishments:**
+
+- Fixed critical bugs: column name mismatch, unsafe PDO catch blocks, portfolio save overwrite
+- Security hardening: exception sanitization, MIME validation, quoteIdentifier helper
+- Data privacy: removed PII mapping exposure, strengthened email masking, heuristic PII detection
+- Architecture: typed DTOs with PHP 8.1 readonly properties, Enums for status strings, SRP refactoring
+- AI service quality: fixed invalid model name (gpt-4o-mini), configurable API endpoint for Azure
+- Performance: Action Scheduler integration, 50x batch throughput, async AI enrichment and email sending
+
+**Stats:**
+
+- 20+ files modified
+- 19,200 lines of PHP total
+- 5 phases, 13 plans, 21 requirements
+- 3 hours from start to ship (same day as milestone definition)
+
+**Git range:** `feat(08-01)` → `docs(12)`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+
 ## v1 Events Integration (Shipped: 2026-02-02)
 
 **Delivered:** Migrated wecoza-events-plugin into wecoza-core as unified Events module with task management, material tracking, AI summarization, and email notifications.
