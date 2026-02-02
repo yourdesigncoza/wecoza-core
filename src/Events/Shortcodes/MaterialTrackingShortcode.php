@@ -6,7 +6,7 @@ namespace WeCoza\Events\Shortcodes;
 use WeCoza\Events\Services\MaterialTrackingDashboardService;
 use WeCoza\Events\Views\Presenters\MaterialTrackingPresenter;
 use WeCoza\Events\Views\TemplateRenderer;
-use WeCoza\Events\Models\MaterialTrackingRepository;
+use WeCoza\Events\Repositories\MaterialTrackingRepository;
 use WeCoza\Core\Database\PostgresConnection;
 
 use function absint;
