@@ -501,7 +501,7 @@ class LearnerRepository extends BaseRepository
                 l.first_name,
                 l.surname,
                 CONCAT(l.first_name, ' ', l.surname) AS full_name,
-                l.sa_id_number,
+                l.sa_id_no,
                 l.cell_phone,
                 l.email_address,
                 lc.last_course_name,
