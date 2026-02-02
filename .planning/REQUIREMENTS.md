@@ -15,16 +15,16 @@ Requirements for events plugin migration into wecoza-core.
 - [x] **INFRA-04**: Add PSR-4 autoloading for `WeCoza\Events\*` namespace
 - [x] **INFRA-05**: Migrate PostgreSQL schema (triggers, functions) to wecoza-core
 - [x] **INFRA-06**: Fix `delivery_date` column references (removed column)
-- [ ] **INFRA-07**: Integrate events module initialization into wecoza-core bootstrap
-- [ ] **INFRA-08**: Migrate events plugin activation/deactivation hooks
+- [x] **INFRA-07**: Integrate events module initialization into wecoza-core bootstrap
+- [x] **INFRA-08**: Migrate events plugin activation/deactivation hooks
 
 ### Task Management
 
-- [ ] **TASK-01**: Class change monitoring via PostgreSQL triggers on `public.classes`
-- [ ] **TASK-02**: Task generation from class INSERT/UPDATE events
-- [ ] **TASK-03**: Task completion/reopening via AJAX handler
-- [ ] **TASK-04**: Task list shortcode `[wecoza_event_tasks]` renders task dashboard
-- [ ] **TASK-05**: Task filtering by status, date, class
+- [x] **TASK-01**: Class change monitoring via PostgreSQL triggers on `public.classes`
+- [x] **TASK-02**: Task generation from class INSERT/UPDATE events
+- [x] **TASK-03**: Task completion/reopening via AJAX handler
+- [x] **TASK-04**: Task list shortcode `[wecoza_event_tasks]` renders task dashboard
+- [x] **TASK-05**: Task filtering by status, date, class
 
 ### Material Tracking
 
@@ -83,13 +83,13 @@ Deferred to future release.
 | INFRA-04 | Phase 1: Code Foundation | Complete |
 | INFRA-05 | Phase 2: Database Migration | Complete |
 | INFRA-06 | Phase 2: Database Migration | Complete |
-| INFRA-07 | Phase 3: Bootstrap Integration | Pending |
-| INFRA-08 | Phase 3: Bootstrap Integration | Pending |
-| TASK-01 | Phase 4: Task Management | Pending |
-| TASK-02 | Phase 4: Task Management | Pending |
-| TASK-03 | Phase 4: Task Management | Pending |
-| TASK-04 | Phase 4: Task Management | Pending |
-| TASK-05 | Phase 4: Task Management | Pending |
+| INFRA-07 | Phase 3: Bootstrap Integration | Complete |
+| INFRA-08 | Phase 3: Bootstrap Integration | Complete |
+| TASK-01 | Phase 4: Task Management | Complete |
+| TASK-02 | Phase 4: Task Management | Complete |
+| TASK-03 | Phase 4: Task Management | Complete |
+| TASK-04 | Phase 4: Task Management | Complete |
+| TASK-05 | Phase 4: Task Management | Complete |
 | MATL-01 | Phase 5: Material Tracking | Pending |
 | MATL-02 | Phase 5: Material Tracking | Pending |
 | MATL-03 | Phase 5: Material Tracking | Pending |
@@ -112,4 +112,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after roadmap creation*
+*Last updated: 2026-02-02 after Phase 4 completion*
