@@ -34,6 +34,7 @@ use function absint;
 use function do_action;
 use function gmdate;
 use function gc_collect_cycles;
+use function wecoza_log;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -83,8 +84,10 @@ final class NotificationProcessor
 
         try {
             $rows = $this->fetchRows($lastProcessed, self::BATCH_LIMIT);
+            $iteration = 0;
 
             foreach ($rows as $row) {
+                $iteration++;
                 if ($this->shouldStop($start)) {
                     break;
                 }
@@ -151,7 +154,29 @@ final class NotificationProcessor
             } else {
                 // error_log(sprintf('WeCoza notification sent for row %d to %s', (int) $row['log_id'], $recipient));
             }
+
+                // Periodic memory cleanup for large batches
+                if ($this->shouldCleanupMemory($iteration)) {
+                    // Release email-related data
+                    unset($mailData, $body, $subject, $headers);
+                    unset($newRow, $oldRow, $diff, $summaryRecord, $emailContext);
+
+                    // Trigger garbage collection
+                    gc_collect_cycles();
+
+                    // Optional: Log memory usage for monitoring
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        wecoza_log(sprintf(
+                            'NotificationProcessor: Memory cleanup at iteration %d, usage: %s MB',
+                            $iteration,
+                            round(memory_get_usage(true) / 1048576, 2)
+                        ), 'debug');
+                    }
+                }
             }
+
+            // Final memory cleanup after batch
+            gc_collect_cycles();
 
             if ($latestId !== $lastProcessed) {
                 update_option(self::OPTION_LAST_ID, $latestId, false);
