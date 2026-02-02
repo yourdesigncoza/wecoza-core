@@ -180,7 +180,7 @@ abstract class BaseRepository
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result ?: null;
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository findById error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::findById'));
             return null;
         }
     }
@@ -217,7 +217,7 @@ abstract class BaseRepository
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository findAll error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::findAll'));
             return [];
         }
     }
@@ -289,7 +289,7 @@ abstract class BaseRepository
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository findBy error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::findBy'));
             return [];
         }
     }
@@ -345,7 +345,7 @@ abstract class BaseRepository
             $stmt = $this->db->query($sql, $params);
             return (int) $stmt->fetchColumn();
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository count error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::count'));
             return 0;
         }
     }
@@ -395,7 +395,7 @@ abstract class BaseRepository
         $filteredData = $this->filterAllowedColumns($data, $allowedColumns);
 
         if (empty($filteredData)) {
-            error_log("WeCoza Core: Insert rejected - no valid columns in data");
+            error_log(wecoza_sanitize_exception("Insert rejected - no valid columns in data", 'Repository::insert'));
             return null;
         }
 
@@ -414,7 +414,7 @@ abstract class BaseRepository
             $stmt = $this->db->query($sql, $filteredData);
             return (int) $stmt->fetchColumn();
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository insert error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::insert'));
             return null;
         }
     }
@@ -437,7 +437,7 @@ abstract class BaseRepository
         $filteredData = $this->filterAllowedColumns($data, $allowedColumns);
 
         if (empty($filteredData)) {
-            error_log("WeCoza Core: Update rejected - no valid columns in data");
+            error_log(wecoza_sanitize_exception("Update rejected - no valid columns in data", 'Repository::update'));
             return false;
         }
 
@@ -459,7 +459,7 @@ abstract class BaseRepository
             $stmt = $this->db->query($sql, $filteredData);
             return $stmt->rowCount() > 0;
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository update error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::update'));
             return false;
         }
     }
@@ -482,7 +482,7 @@ abstract class BaseRepository
             $stmt = $this->db->query($sql, ['id' => $id]);
             return $stmt->rowCount() > 0;
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository delete error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::delete'));
             return false;
         }
     }
@@ -530,7 +530,7 @@ abstract class BaseRepository
             $stmt = $this->db->query($sql, $params);
             return $stmt->rowCount();
         } catch (Exception $e) {
-            error_log("WeCoza Core: Repository deleteBy error: " . $e->getMessage());
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'Repository::deleteBy'));
             return 0;
         }
     }
