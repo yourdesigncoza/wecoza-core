@@ -87,6 +87,21 @@ require_once WECOZA_CORE_PATH . 'core/Helpers/functions.php';
 
 /*
 |--------------------------------------------------------------------------
+| Load Action Scheduler
+|--------------------------------------------------------------------------
+|
+| Action Scheduler must be loaded before plugins_loaded hook for proper
+| initialization. Used for async email/AI processing in notifications.
+|
+*/
+
+$action_scheduler_path = WECOZA_CORE_PATH . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
+if (file_exists($action_scheduler_path)) {
+    require_once $action_scheduler_path;
+}
+
+/*
+|--------------------------------------------------------------------------
 | Frontend Asset Enqueue
 |--------------------------------------------------------------------------
 */
@@ -206,6 +221,15 @@ add_action('plugins_loaded', function () {
         \WeCoza\Events\Admin\SettingsPage::register();
     }
 
+    // Action Scheduler Performance Tuning
+    add_filter('action_scheduler_queue_runner_time_limit', function () {
+        return 60;  // 60 seconds (default is 30)
+    });
+
+    add_filter('action_scheduler_queue_runner_batch_size', function () {
+        return 50;  // Match NotificationProcessor BATCH_LIMIT
+    });
+
     // Material Notification Cron Handler
     add_action('wecoza_material_notifications_check', function () {
         if (!class_exists(\WeCoza\Events\Services\MaterialNotificationService::class)) {
@@ -242,6 +266,38 @@ add_action('plugins_loaded', function () {
         $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
         $processor->process();
     });
+
+    // Action Scheduler Job Handlers for Async Notifications
+    add_action('wecoza_enrich_notification', function (int $logId) {
+        if (!class_exists(\WeCoza\Events\Services\NotificationEnricher::class)) {
+            return;
+        }
+
+        $enricher = \WeCoza\Events\Services\NotificationEnricher::boot();
+        $result = $enricher->enrich($logId);
+
+        if ($result['success'] && $result['should_email'] && $result['recipient'] !== null) {
+            // Chain to email job
+            as_enqueue_async_action(
+                'wecoza_send_notification_email',
+                [
+                    'log_id' => $logId,
+                    'recipient' => $result['recipient'],
+                    'email_context' => $result['email_context'],
+                ],
+                'wecoza-notifications'
+            );
+        }
+    }, 10, 1);
+
+    add_action('wecoza_send_notification_email', function (int $logId, string $recipient, array $emailContext = []) {
+        if (!class_exists(\WeCoza\Events\Services\NotificationEmailer::class)) {
+            return;
+        }
+
+        $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
+        $emailer->send($logId, $recipient, $emailContext);
+    }, 10, 3);
 
     /*
     |--------------------------------------------------------------------------

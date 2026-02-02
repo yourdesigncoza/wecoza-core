@@ -10,52 +10,37 @@ if (!defined('ABSPATH')) {
 use PDO;
 use RuntimeException;
 use WeCoza\Core\Database\PostgresConnection;
-use WeCoza\Events\Services\AISummaryService;
 use WeCoza\Events\Support\OpenAIConfig;
-use WeCoza\Events\Views\Presenters\NotificationEmailPresenter;
 
-use function error_log;
+use function as_enqueue_async_action;
 use function get_option;
 use function get_transient;
-use function is_array;
 use function is_string;
-use function json_decode;
-use function json_encode;
 use function microtime;
 use function set_transient;
 use function delete_transient;
 use function max;
 use function sprintf;
 use function strtoupper;
-use function strtolower;
 use function update_option;
-use function wp_mail;
-use function absint;
-use function do_action;
-use function gmdate;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
+use function gc_collect_cycles;
+use function wecoza_log;
 
 final class NotificationProcessor
 {
     private const OPTION_LAST_ID = 'wecoza_last_notified_log_id';
     private const LOCK_KEY = 'wecoza_ai_summary_lock';
-    private const LOCK_TTL = 30;
-    private const MAX_RUNTIME_SECONDS = 20;
+    private const LOCK_TTL = 120;  // 2 minutes for 50+ item batches
+    private const MAX_RUNTIME_SECONDS = 90;  // Room for 50 items
     private const MIN_REMAINING_SECONDS = 5;
-    private const BATCH_LIMIT = 1;
-    private const SKIP_MESSAGES = [
-        'config_missing' => 'OpenAI configuration missing or invalid.',
-        'feature_disabled' => 'AI summaries disabled via admin settings.',
-    ];
+    private const BATCH_LIMIT = 50;
+    private const MEMORY_CLEANUP_INTERVAL = 50;  // Every 50 records
 
     private PostgresConnection $db;
 
     public function __construct(
         private readonly NotificationSettings $settings,
-        private readonly AISummaryService $aiSummaryService,
-        private readonly OpenAIConfig $openAIConfig,
-        private readonly NotificationEmailPresenter $presenter
+        private readonly OpenAIConfig $openAIConfig
     ) {
         $this->db = PostgresConnection::getInstance();
     }
@@ -63,10 +48,7 @@ final class NotificationProcessor
     public static function boot(): self
     {
         $openAIConfig = new OpenAIConfig();
-        $aiSummaryService = new AISummaryService($openAIConfig);
-        $presenter = new NotificationEmailPresenter();
-
-        return new self(new NotificationSettings(), $aiSummaryService, $openAIConfig, $presenter);
+        return new self(new NotificationSettings(), $openAIConfig);
     }
 
     public function process(): void
@@ -81,75 +63,60 @@ final class NotificationProcessor
 
         try {
             $rows = $this->fetchRows($lastProcessed, self::BATCH_LIMIT);
+            $iteration = 0;
 
             foreach ($rows as $row) {
+                $iteration++;
                 if ($this->shouldStop($start)) {
                     break;
                 }
 
                 $latestId = max($latestId, (int) $row['log_id']);
-            $operation = strtoupper((string) ($row['operation'] ?? ''));
-            $recipient = $this->settings->getRecipientForOperation($operation);
-            if ($recipient === null) {
-                continue;
-            }
+                $logId = (int) $row['log_id'];
+                $operation = strtoupper((string) ($row['operation'] ?? ''));
 
-            $logId = (int) $row['log_id'];
-            $newRow = $this->decodeJson($row['new_row'] ?? null);
-            $oldRow = $this->decodeJson($row['old_row'] ?? null);
-            $diff = $this->decodeJson($row['diff'] ?? null);
-            $summaryRecord = $this->decodeJson($row['ai_summary'] ?? null);
-
-            $emailContext = ['alias_map' => [], 'obfuscated' => []];
-
-            $eligibility = $this->openAIConfig->assessEligibility($logId);
-
-            if ($eligibility['eligible'] === false) {
-                if ($this->shouldMarkFailure($summaryRecord)) {
-                    $reason = is_string($eligibility['reason']) ? $eligibility['reason'] : 'feature_disabled';
-                    $summaryRecord = $this->finalizeSkippedSummary($summaryRecord, $reason);
-                    $this->persistSummary($logId, $summaryRecord);
-                    $this->emitSummaryMetrics($logId, $summaryRecord);
+                // Check if this operation has a recipient configured
+                $recipient = $this->settings->getRecipientForOperation($operation);
+                if ($recipient === null) {
+                    continue;
                 }
-            } elseif ($this->shouldGenerateSummary($summaryRecord)) {
-                $result = $this->aiSummaryService->generateSummary([
-                    'log_id' => $logId,
-                    'operation' => $operation,
-                    'changed_at' => $row['changed_at'] ?? null,
-                    'class_id' => $row['class_id'] ?? null,
-                    'new_row' => $newRow,
-                    'old_row' => $oldRow,
-                    'diff' => $diff,
-                ], $summaryRecord);
 
-                $summaryRecord = $result['record'];
-                $emailContext = $result['email_context'];
-                $this->persistSummary($logId, $summaryRecord);
-                $this->emitSummaryMetrics($logId, $summaryRecord);
+                // Check AI eligibility to decide which job to schedule
+                $eligibility = $this->openAIConfig->assessEligibility($logId);
+                $needsAI = $eligibility['eligible'] !== false;
+
+                if ($needsAI) {
+                    // Schedule AI enrichment first (will chain to email on success)
+                    as_enqueue_async_action(
+                        'wecoza_enrich_notification',
+                        ['log_id' => $logId],
+                        'wecoza-notifications'
+                    );
+                } else {
+                    // Skip AI, schedule email directly
+                    as_enqueue_async_action(
+                        'wecoza_send_notification_email',
+                        ['log_id' => $logId, 'recipient' => $recipient, 'email_context' => []],
+                        'wecoza-notifications'
+                    );
+                }
+
+                // Periodic memory cleanup
+                if ($this->shouldCleanupMemory($iteration)) {
+                    gc_collect_cycles();
+
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        wecoza_log(sprintf(
+                            'NotificationProcessor: Memory cleanup at iteration %d, usage: %s MB',
+                            $iteration,
+                            round(memory_get_usage(true) / 1048576, 2)
+                        ), 'debug');
+                    }
+                }
             }
 
-            $mailData = $this->presenter->present([
-                'operation' => $operation,
-                'row' => $row,
-                'recipient' => $recipient,
-                'new_row' => $newRow,
-                'old_row' => $oldRow,
-                'diff' => $diff,
-                'summary' => $summaryRecord,
-                'email_context' => $emailContext,
-            ]);
-
-            $subject = $mailData['subject'];
-            $body = $mailData['body'];
-            $headers = $mailData['headers'];
-
-            $sent = wp_mail($recipient, $subject, $body, $headers);
-            if (!$sent) {
-                error_log(sprintf('WeCoza notification failed for row %d to %s', (int) $row['log_id'], $recipient));
-            } else {
-                // error_log(sprintf('WeCoza notification sent for row %d to %s', (int) $row['log_id'], $recipient));
-            }
-            }
+            // Final memory cleanup after batch
+            gc_collect_cycles();
 
             if ($latestId !== $lastProcessed) {
                 update_option(self::OPTION_LAST_ID, $latestId, false);
@@ -197,107 +164,6 @@ SQL;
         return $results;
     }
 
-    /**
-     * @param array<string, mixed> $row
-     * @return array{subject:string, body:string}
-     */
-    private function decodeJson(mixed $value): array
-    {
-        if ($value === null) {
-            return [];
-        }
-
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if (!is_string($value) || $value === '') {
-            return [];
-        }
-
-        $decoded = json_decode($value, true);
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    /**
-     * @param array<string, mixed> $value
-     */
-    private function shouldGenerateSummary(array $summary): bool
-    {
-        $status = is_string($summary['status'] ?? null) ? strtolower((string) $summary['status']) : 'pending';
-        if ($status === 'success' || $status === 'failed') {
-            return false;
-        }
-
-        $attempts = absint($summary['attempts'] ?? 0);
-        return $attempts < $this->aiSummaryService->getMaxAttempts();
-    }
-
-    private function shouldMarkFailure(array $summary): bool
-    {
-        $status = is_string($summary['status'] ?? null) ? strtolower((string) $summary['status']) : 'pending';
-        return $status !== 'failed' && $status !== 'success';
-    }
-
-    private function finalizeSkippedSummary(array $summary, string $reason): array
-    {
-        $normalised = $this->normaliseSummaryPayload($summary);
-        $normalised['status'] = 'failed';
-        $normalised['error_code'] = $reason;
-        $normalised['error_message'] = self::SKIP_MESSAGES[$reason] ?? 'AI summary skipped.';
-        if (!is_string($normalised['generated_at']) || $normalised['generated_at'] === '') {
-            $normalised['generated_at'] = gmdate('c');
-        }
-
-        return $normalised;
-    }
-
-    private function normaliseSummaryPayload(array $summary): array
-    {
-        return [
-            'summary' => $summary['summary'] ?? null,
-            'status' => (string) ($summary['status'] ?? 'pending'),
-            'error_code' => $summary['error_code'] ?? null,
-            'error_message' => $summary['error_message'] ?? null,
-            'attempts' => absint($summary['attempts'] ?? 0),
-            'viewed' => (bool) ($summary['viewed'] ?? false),
-            'viewed_at' => $summary['viewed_at'] ?? null,
-            'generated_at' => $summary['generated_at'] ?? null,
-            'model' => $summary['model'] ?? null,
-            'tokens_used' => isset($summary['tokens_used']) ? (int) $summary['tokens_used'] : 0,
-            'processing_time_ms' => isset($summary['processing_time_ms']) ? (int) $summary['processing_time_ms'] : 0,
-        ];
-    }
-
-    private function persistSummary(int $logId, array $summary): void
-    {
-        $stmt = $this->db->getPdo()->prepare('UPDATE class_change_logs SET ai_summary = :summary WHERE log_id = :log_id');
-        if (!$stmt) {
-            throw new RuntimeException('Failed to prepare AI summary update.');
-        }
-
-        $payload = json_encode($summary, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        if ($payload === false) {
-            $payload = '{}';
-        }
-        $stmt->bindValue(':summary', $payload, PDO::PARAM_STR);
-        $stmt->bindValue(':log_id', $logId, PDO::PARAM_INT);
-
-        $stmt->execute();
-    }
-
-    private function emitSummaryMetrics(int $logId, array $summary): void
-    {
-        do_action('wecoza_ai_summary_generated', [
-            'log_id' => $logId,
-            'status' => $summary['status'] ?? 'pending',
-            'model' => $summary['model'] ?? null,
-            'tokens_used' => $summary['tokens_used'] ?? 0,
-            'processing_time_ms' => $summary['processing_time_ms'] ?? 0,
-            'attempts' => $summary['attempts'] ?? 0,
-        ]);
-    }
-
     private function shouldStop(float $start): bool
     {
         $elapsed = microtime(true) - $start;
@@ -318,8 +184,22 @@ SQL;
         return set_transient(self::LOCK_KEY, '1', self::LOCK_TTL);
     }
 
+    private function refreshLock(): void
+    {
+        // Extend lock during long processing
+        set_transient(self::LOCK_KEY, '1', self::LOCK_TTL);
+    }
+
     private function releaseLock(): void
     {
         delete_transient(self::LOCK_KEY);
+    }
+
+    /**
+     * Check if memory cleanup should run based on iteration count.
+     */
+    private function shouldCleanupMemory(int $iteration): bool
+    {
+        return $iteration > 0 && ($iteration % self::MEMORY_CLEANUP_INTERVAL === 0);
     }
 }

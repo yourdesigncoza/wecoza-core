@@ -250,10 +250,10 @@ if ($service !== null) {
     $maxAttempts = $service->getMaxAttempts();
     $runner->test('getMaxAttempts() returns default value of 3', $maxAttempts === 3);
 
-    // Test 3.5: Service uses gpt-5-mini model constant
-    $constants = $reflection->getConstants();
-    $hasModelConstant = isset($constants['MODEL']) && $constants['MODEL'] === 'gpt-5-mini';
-    $runner->test('AISummaryService uses gpt-5-mini model constant', $hasModelConstant);
+    // Test 3.5: OpenAIConfig provides correct default model
+    $testConfig = new OpenAIConfig();
+    $defaultModel = $testConfig->getModel();
+    $runner->test('OpenAIConfig::getModel() returns gpt-4o-mini by default', $defaultModel === 'gpt-4o-mini');
 
     // Test 3.6: Service uses DataObfuscator trait
     $traits = $reflection->getTraitNames();
@@ -647,10 +647,10 @@ if ($hasGenerateSummaryMethod) {
     $hasContextParam = count($params) >= 1;
     $runner->test('generateSummary() accepts context parameter', $hasContextParam);
 
-    // Test 13.2: Verify generateSummary() return structure via docblock
-    $docComment = $generateMethod->getDocComment();
-    $hasReturnStructure = $docComment !== false && strpos($docComment, 'record') !== false && strpos($docComment, 'email_context') !== false && strpos($docComment, 'status') !== false;
-    $runner->test('generateSummary() return type includes record, email_context, status', $hasReturnStructure);
+    // Test 13.2: Verify generateSummary() returns SummaryResultDTO
+    $returnType = $generateMethod->getReturnType();
+    $hasReturnStructure = $returnType !== null && $returnType->getName() === 'WeCoza\\Events\\DTOs\\SummaryResultDTO';
+    $runner->test('generateSummary() returns SummaryResultDTO', $hasReturnStructure);
 }
 
 // Test 13.3: Summary record structure verification
@@ -712,7 +712,7 @@ try {
         'viewed' => false,
         'viewed_at' => null,
         'generated_at' => gmdate('c'),
-        'model' => 'gpt-5-mini',
+        'model' => 'gpt-4o-mini',
         'tokens_used' => 150,
         'processing_time_ms' => 1200,
     ];
@@ -857,21 +857,22 @@ try {
 
     $result = $service->generateSummary($testContext, null);
 
-    $hasRecord = isset($result['record']);
-    $runner->test('generateSummary() returns result structure without API key', $hasRecord);
+    // generateSummary now returns SummaryResultDTO
+    $hasRecord = $result instanceof \WeCoza\Events\DTOs\SummaryResultDTO;
+    $runner->test('generateSummary() returns SummaryResultDTO without API key', $hasRecord);
 
     if ($hasRecord) {
-        $errorCode = $result['record']['error_code'] ?? null;
+        $errorCode = $result->record->errorCode;
         $isConfigMissing = $errorCode === 'config_missing';
         $runner->test('generateSummary() returns error_code=config_missing when no API key', $isConfigMissing);
 
-        $errorMessage = $result['record']['error_message'] ?? '';
+        $errorMessage = $result->record->errorMessage ?? '';
         $hasErrorMessage = strpos($errorMessage, 'API key') !== false;
         $runner->test('generateSummary() includes descriptive error message about API key', $hasErrorMessage);
     }
 
 } catch (Throwable $e) {
-    $runner->test('generateSummary() returns result structure without API key', false, $e->getMessage());
+    $runner->test('generateSummary() returns SummaryResultDTO without API key', false, $e->getMessage());
 }
 
 // Test 17.2: Test disabled feature handling (via assessEligibility)
@@ -1036,21 +1037,23 @@ try {
 
     $result = $service->generateSummary($testContext, null);
 
-    $hasEmailContext = isset($result['email_context']);
-    $runner->test('generateSummary() returns email_context for obfuscation', $hasEmailContext);
+    // generateSummary now returns SummaryResultDTO with emailContext property
+    $hasEmailContext = $result instanceof \WeCoza\Events\DTOs\SummaryResultDTO && $result->emailContext !== null;
+    $runner->test('generateSummary() returns SummaryResultDTO with emailContext', $hasEmailContext);
 
     if ($hasEmailContext) {
-        $hasAliasMap = isset($result['email_context']['alias_map']);
-        $hasObfuscated = isset($result['email_context']['obfuscated']);
-        $hasFieldLabels = isset($result['email_context']['field_labels']);
+        $emailContextArray = $result->emailContext->toArray();
+        $hasAliasMap = isset($emailContextArray['alias_map']);
+        $hasObfuscated = isset($emailContextArray['obfuscated']);
+        $hasFieldLabels = isset($emailContextArray['field_labels']);
 
-        $runner->test('email_context includes alias_map', $hasAliasMap);
-        $runner->test('email_context includes obfuscated data', $hasObfuscated);
-        $runner->test('email_context includes field_labels', $hasFieldLabels);
+        $runner->test('emailContext includes alias_map', $hasAliasMap);
+        $runner->test('emailContext includes obfuscated data', $hasObfuscated);
+        $runner->test('emailContext includes field_labels', $hasFieldLabels);
     }
 
 } catch (Throwable $e) {
-    $runner->test('generateSummary() returns email_context for obfuscation', false, $e->getMessage());
+    $runner->test('generateSummary() returns SummaryResultDTO with emailContext', false, $e->getMessage());
 }
 
 echo "\n";
@@ -1104,23 +1107,31 @@ if ($hasTimeoutConstant) {
     $runner->test('Timeout is configured to 60 seconds', $timeoutIs60);
 }
 
-// Test 21.2: API URL is correct
-$hasApiUrl = isset($constants['API_URL']);
-$runner->test('AISummaryService has API_URL constant', $hasApiUrl);
+// Test 21.2: Default API URL is correct
+$testConfigUrl = new OpenAIConfig();
+$defaultUrl = $testConfigUrl->getApiUrl();
+$urlIsCorrect = $defaultUrl === 'https://api.openai.com/v1/chat/completions';
+$runner->test('OpenAIConfig::getApiUrl() returns OpenAI endpoint by default', $urlIsCorrect);
 
-if ($hasApiUrl) {
-    $urlIsCorrect = $constants['API_URL'] === 'https://api.openai.com/v1/chat/completions';
-    $runner->test('API URL is https://api.openai.com/v1/chat/completions', $urlIsCorrect);
-}
+// Test 21.3: Default model is gpt-4o-mini
+$testConfigModel = new OpenAIConfig();
+$defaultModelValue = $testConfigModel->getModel();
+$modelIsGpt4oMini = $defaultModelValue === 'gpt-4o-mini';
+$runner->test('OpenAIConfig::getModel() returns gpt-4o-mini (QUAL-01 verified)', $modelIsGpt4oMini);
 
-// Test 21.3: Model constant is 'gpt-5-mini'
-$hasModel = isset($constants['MODEL']);
-$runner->test('AISummaryService has MODEL constant (verified)', $hasModel);
+// Test 21.3b: Custom model can be set via WordPress option
+update_option(OpenAIConfig::OPTION_MODEL, 'gpt-4o');
+$customConfig = new OpenAIConfig();
+$customModel = $customConfig->getModel();
+$runner->test('OpenAIConfig::getModel() returns custom model from options', $customModel === 'gpt-4o');
+delete_option(OpenAIConfig::OPTION_MODEL);
 
-if ($hasModel) {
-    $modelIsGpt5Mini = $constants['MODEL'] === 'gpt-5-mini';
-    $runner->test('Model constant is gpt-5-mini (verified)', $modelIsGpt5Mini);
-}
+// Test 21.3c: Custom API URL can be set via WordPress option
+update_option(OpenAIConfig::OPTION_API_URL, 'https://custom.openai.azure.com/v1/chat');
+$customUrlConfig = new OpenAIConfig();
+$customUrl = $customUrlConfig->getApiUrl();
+$runner->test('OpenAIConfig::getApiUrl() returns custom URL from options (QUAL-04 verified)', $customUrl === 'https://custom.openai.azure.com/v1/chat');
+delete_option(OpenAIConfig::OPTION_API_URL);
 
 // Test 21.4: Test Authorization header format (Bearer token)
 // This is implemented in callOpenAI method which uses defaultHttpClient

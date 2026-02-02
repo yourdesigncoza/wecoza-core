@@ -18,8 +18,13 @@ if (!defined('ABSPATH')) {
 final class OpenAIConfig
 {
     public const OPTION_API_KEY = 'wecoza_openai_api_key';
+    public const OPTION_API_URL = 'wecoza_openai_api_url';
+    public const OPTION_MODEL = 'wecoza_openai_model';
     public const OPTION_ENABLED = true;
     // public const OPTION_ENABLED = 'wecoza_ai_summaries_enabled';
+
+    private const DEFAULT_API_URL = 'https://api.openai.com/v1/chat/completions';
+    private const DEFAULT_MODEL = 'gpt-4o-mini';
 
     public function getApiKey(): ?string
     {
@@ -39,6 +44,32 @@ final class OpenAIConfig
     public function hasValidApiKey(): bool
     {
         return $this->getApiKey() !== null;
+    }
+
+    public function getApiUrl(): string
+    {
+        $stored = get_option(self::OPTION_API_URL, '');
+        if (!is_string($stored)) {
+            return self::DEFAULT_API_URL;
+        }
+
+        $stored = trim($stored);
+        if ($stored === '') {
+            return self::DEFAULT_API_URL;
+        }
+
+        return $this->isValidUrl($stored) ? $stored : self::DEFAULT_API_URL;
+    }
+
+    public function getModel(): string
+    {
+        $stored = get_option(self::OPTION_MODEL, '');
+        if (!is_string($stored)) {
+            return self::DEFAULT_MODEL;
+        }
+
+        $stored = trim($stored);
+        return $stored !== '' ? $stored : self::DEFAULT_MODEL;
     }
 
     public function isEnabled(): bool
@@ -101,5 +132,11 @@ final class OpenAIConfig
     public function sanitizeApiKey(string $value): string
     {
         return $this->isValidApiKey($value) ? trim($value) : '';
+    }
+
+    private function isValidUrl(string $url): bool
+    {
+        return filter_var($url, FILTER_VALIDATE_URL) !== false
+            && (str_starts_with($url, 'https://') || str_starts_with($url, 'http://'));
     }
 }

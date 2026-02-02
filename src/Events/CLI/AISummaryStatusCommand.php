@@ -22,7 +22,7 @@ final class AISummaryStatusCommand extends WP_CLI_Command
 {
     private const DEFAULT_HOURS = 24;
     private const DEFAULT_MODEL_RATES = [
-        'gpt-5-mini' => 0.0020,
+        'gpt-4o-mini' => 0.0020,
     ];
 
     public static function register(): void

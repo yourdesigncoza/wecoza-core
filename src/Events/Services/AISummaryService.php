@@ -9,6 +9,11 @@ if (!defined('ABSPATH')) {
 
 use WeCoza\Events\Services\Traits\DataObfuscator;
 use WeCoza\Events\Support\OpenAIConfig;
+use WeCoza\Events\DTOs\RecordDTO;
+use WeCoza\Events\DTOs\EmailContextDTO;
+use WeCoza\Events\DTOs\SummaryResultDTO;
+use WeCoza\Events\DTOs\ObfuscatedDataDTO;
+use WeCoza\Events\Enums\SummaryStatus;
 
 use function array_merge;
 use function gmdate;
@@ -32,8 +37,6 @@ final class AISummaryService
 {
     use DataObfuscator;
 
-    private const MODEL = 'gpt-5-mini';
-    private const API_URL = 'https://api.openai.com/v1/chat/completions';
     private const TIMEOUT_SECONDS = 60;
 
     /**
@@ -61,121 +64,65 @@ final class AISummaryService
     }
 
     /**
-     * @param array<string,mixed> $context
-     * @param array<string,mixed>|null $existing
-     * @return array{record:array<string,mixed>, email_context:array<string,mixed>, status:string}
+     * Generate AI summary for class change notification
+     *
+     * @param array<string,mixed> $context Change context (new_row, diff, old_row, operation, etc.)
+     * @param array<string,mixed>|null $existing Existing record if retrying
+     * @return SummaryResultDTO
      */
-    public function generateSummary(array $context, ?array $existing = null): array
+    public function generateSummary(array $context, ?array $existing = null): SummaryResultDTO
     {
         $record = $this->normaliseRecord($existing);
 
-        if ($record['status'] === 'success') {
-            return [
-                'record' => $record,
-                'email_context' => ['alias_map' => [], 'obfuscated' => []],
-                'status' => 'success',
-            ];
+        // Early exit for already-complete or max-attempts records
+        if ($this->shouldSkipGeneration($record)) {
+            return $this->buildSkippedResult($record);
         }
 
-        if ($record['attempts'] >= $this->maxAttempts) {
-            $record['status'] = 'failed';
-            return [
-                'record' => $record,
-                'email_context' => ['alias_map' => [], 'obfuscated' => []],
-                'status' => 'failed',
-            ];
-        }
+        // Obfuscate PII from context
+        $obfuscatedData = $this->obfuscateContext($context);
 
-        $state = null;
-        $newRowResult = $this->obfuscatePayloadWithLabels((array) ($context['new_row'] ?? []), $state);
-        $state = $newRowResult['state'];
-        $diffResult = $this->obfuscatePayloadWithLabels((array) ($context['diff'] ?? []), $state);
-        $state = $diffResult['state'];
-        $oldRowResult = $this->obfuscatePayloadWithLabels((array) ($context['old_row'] ?? []), $state);
-
-        $aliasMap = $oldRowResult['mappings'];
-        $fieldLabels = array_merge(
-            $newRowResult['field_labels'],
-            $diffResult['field_labels'],
-            $oldRowResult['field_labels']
-        );
-
-        $attemptNumber = $record['attempts'] + 1;
-        $delaySeconds = $this->backoffDelaySeconds($record['attempts']);
+        // Prepare for API call with backoff delay
+        $delaySeconds = $this->backoffDelaySeconds($record->attempts);
         if ($delaySeconds > 0) {
             usleep($delaySeconds * 1_000_000);
         }
 
+        // Build prompt messages
         $messages = $this->buildMessages(
             (string) ($context['operation'] ?? ''),
             $context,
-            $newRowResult['payload'],
-            $diffResult['payload'],
-            $oldRowResult['payload']
+            $obfuscatedData->newRow,
+            $obfuscatedData->diff,
+            $obfuscatedData->oldRow
         );
 
+        // Call OpenAI API
         $start = microtime(true);
-        $response = $this->callOpenAI($messages, self::MODEL);
-
+        $response = $this->callOpenAI($messages);
         $elapsed = (int) round((microtime(true) - $start) * 1000);
 
-        $record['attempts'] = $attemptNumber;
-        $record['processing_time_ms'] = $elapsed;
+        // Update record with attempt info
+        $record = $record->incrementAttempts();
 
         $this->metrics['attempts']++;
         $this->metrics['processing_time_ms'] += $elapsed;
 
-        if ($response['success'] === true) {
-            $summaryText = $this->normaliseSummaryText($response['content']);
+        // Process response and return result
+        return $this->processApiResponse($response, $record, $obfuscatedData, $elapsed);
+    }
 
-            $record['status'] = 'success';
-            $record['summary'] = $summaryText;
-            $record['error_code'] = null;
-            $record['error_message'] = null;
-            $record['generated_at'] = gmdate('c');
-            $record['model'] = $response['model'];
-            $record['tokens_used'] = $response['tokens'];
-
-            $this->metrics['success']++;
-            $this->metrics['total_tokens'] += $response['tokens'];
-
-            return [
-                'record' => $record,
-                'email_context' => [
-                    'alias_map' => $aliasMap,
-                    'field_labels' => $fieldLabels,
-                    'obfuscated' => [
-                        'new_row' => $newRowResult['payload'],
-                        'diff' => $diffResult['payload'],
-                        'old_row' => $oldRowResult['payload'],
-                    ],
-                ],
-                'status' => 'success',
-            ];
-        }
-
-        $record['error_code'] = $response['error_code'];
-        $record['error_message'] = $response['error_message'];
-        $record['model'] = $record['model'] ?? $response['model'];
-        $record['status'] = $record['attempts'] >= $this->maxAttempts ? 'failed' : 'pending';
-
-        if ($record['status'] === 'failed') {
-            $this->metrics['failed']++;
-        }
-
-        return [
-            'record' => $record,
-            'email_context' => [
-                'alias_map' => $aliasMap,
-                'field_labels' => $fieldLabels,
-                'obfuscated' => [
-                    'new_row' => $newRowResult['payload'],
-                    'diff' => $diffResult['payload'],
-                    'old_row' => $oldRowResult['payload'],
-                ],
-            ],
-            'status' => $record['status'],
-        ];
+    /**
+     * Generate summary returning array format (backward compatibility)
+     *
+     * @deprecated Use generateSummary() which returns SummaryResultDTO
+     * @param array<string,mixed> $context
+     * @param array<string,mixed>|null $existing
+     * @return array{record:array<string,mixed>, email_context:array<string,mixed>, status:string}
+     */
+    public function generateSummaryArray(array $context, ?array $existing = null): array
+    {
+        return $this->generateSummary($context, $existing)->toArray();
     }
 
     /**
@@ -195,7 +142,7 @@ final class AISummaryService
      * @param array<int,array<string,string>> $messages
      * @return array{success:bool,content:string,error_code:?string,error_message:?string,retryable:bool,model:?string,tokens:int}
      */
-    private function callOpenAI(array $messages, string $model): array
+    private function callOpenAI(array $messages): array
     {
         $apiKey = $this->config->getApiKey();
         if ($apiKey === null) {
@@ -210,6 +157,9 @@ final class AISummaryService
             ];
         }
 
+        $apiUrl = $this->config->getApiUrl();
+        $model = $this->config->getModel();
+
         $payload = [
             'model' => $model,
             'messages' => $messages
@@ -218,7 +168,7 @@ final class AISummaryService
         ];
 
         $response = ($this->httpClient)([
-            'url' => self::API_URL,
+            'url' => $apiUrl,
             'timeout' => self::TIMEOUT_SECONDS,
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -284,42 +234,123 @@ final class AISummaryService
     }
 
     /**
+     * Normalise existing record into RecordDTO
+     *
      * @param array<string,mixed>|null $existing
-     * @return array<string,mixed>
      */
-    private function normaliseRecord(?array $existing): array
+    private function normaliseRecord(?array $existing): RecordDTO
     {
-        $base = [
-            'summary' => null,
-            'status' => 'pending',
-            'error_code' => null,
-            'error_message' => null,
-            'attempts' => 0,
-            'viewed' => false,
-            'viewed_at' => null,
-            'generated_at' => null,
-            'model' => null,
-            'tokens_used' => 0,
-            'processing_time_ms' => 0,
-        ];
+        return RecordDTO::fromArray($existing);
+    }
 
-        if ($existing === null) {
-            return $base;
+    /**
+     * Check if summary generation should be skipped
+     */
+    private function shouldSkipGeneration(RecordDTO $record): bool
+    {
+        return $record->status === SummaryStatus::SUCCESS->value
+            || $record->attempts >= $this->maxAttempts;
+    }
+
+    /**
+     * Build result for skipped generation (already success or max attempts)
+     */
+    private function buildSkippedResult(RecordDTO $record): SummaryResultDTO
+    {
+        $emailContext = EmailContextDTO::empty();
+
+        if ($record->status === SummaryStatus::SUCCESS->value) {
+            return SummaryResultDTO::success($record, $emailContext);
         }
 
-        return array_merge($base, [
-            'summary' => $existing['summary'] ?? null,
-            'status' => (string) ($existing['status'] ?? 'pending'),
-            'error_code' => $existing['error_code'] ?? null,
-            'error_message' => $existing['error_message'] ?? null,
-            'attempts' => max(0, (int) ($existing['attempts'] ?? 0)),
-            'viewed' => (bool) ($existing['viewed'] ?? false),
-            'viewed_at' => $existing['viewed_at'] ?? null,
-            'generated_at' => $existing['generated_at'] ?? null,
-            'model' => $existing['model'] ?? null,
-            'tokens_used' => isset($existing['tokens_used']) ? (int) $existing['tokens_used'] : 0,
-            'processing_time_ms' => isset($existing['processing_time_ms']) ? (int) $existing['processing_time_ms'] : 0,
-        ]);
+        // Max attempts reached
+        $record = $record->withStatus(SummaryStatus::FAILED->value);
+        return SummaryResultDTO::failed($record, $emailContext);
+    }
+
+    /**
+     * Obfuscate PII from context data
+     *
+     * @param array<string,mixed> $context Raw context with potential PII
+     * @return ObfuscatedDataDTO Obfuscated payloads with alias mappings
+     */
+    private function obfuscateContext(array $context): ObfuscatedDataDTO
+    {
+        $state = null;
+
+        $newRowResult = $this->obfuscatePayloadWithLabels(
+            (array) ($context['new_row'] ?? []),
+            $state
+        );
+        $state = $newRowResult['state'];
+
+        $diffResult = $this->obfuscatePayloadWithLabels(
+            (array) ($context['diff'] ?? []),
+            $state
+        );
+        $state = $diffResult['state'];
+
+        $oldRowResult = $this->obfuscatePayloadWithLabels(
+            (array) ($context['old_row'] ?? []),
+            $state
+        );
+
+        return ObfuscatedDataDTO::fromResults($newRowResult, $diffResult, $oldRowResult);
+    }
+
+    /**
+     * Process OpenAI API response and build result DTO
+     *
+     * @param array{success:bool,content:string,error_code:?string,error_message:?string,model:?string,tokens:int} $response
+     * @param RecordDTO $record Current record state
+     * @param ObfuscatedDataDTO $obfuscatedData Obfuscation results
+     * @param int $elapsed Processing time in milliseconds
+     * @return SummaryResultDTO
+     */
+    private function processApiResponse(
+        array $response,
+        RecordDTO $record,
+        ObfuscatedDataDTO $obfuscatedData,
+        int $elapsed
+    ): SummaryResultDTO {
+        $emailContext = $obfuscatedData->toEmailContext();
+
+        if ($response['success'] === true) {
+            $summaryText = $this->normaliseSummaryText($response['content']);
+
+            $record = $record
+                ->withStatus(SummaryStatus::SUCCESS->value)
+                ->withSummary($summaryText)
+                ->withError(null, null)
+                ->withGeneratedAt(gmdate('c'))
+                ->withModel($response['model'])
+                ->withTokensUsed($response['tokens'])
+                ->withProcessingTimeMs($elapsed);
+
+            $this->metrics['success']++;
+            $this->metrics['total_tokens'] += $response['tokens'];
+
+            return SummaryResultDTO::success($record, $emailContext);
+        }
+
+        // Handle failure
+        $record = $record
+            ->withError($response['error_code'], $response['error_message'])
+            ->withModel($record->model ?? $response['model'])
+            ->withProcessingTimeMs($elapsed);
+
+        $newStatus = $record->attempts >= $this->maxAttempts
+            ? SummaryStatus::FAILED->value
+            : SummaryStatus::PENDING->value;
+
+        $record = $record->withStatus($newStatus);
+
+        if ($newStatus === SummaryStatus::FAILED->value) {
+            $this->metrics['failed']++;
+            return SummaryResultDTO::failed($record, $emailContext);
+        }
+
+        return SummaryResultDTO::pending($record, $emailContext);
     }
 
     /**

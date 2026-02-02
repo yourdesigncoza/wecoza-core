@@ -512,6 +512,48 @@ jQuery(document).ready(function($) {
             });
         }
     });
+
+    /*------------------YDCOZA-----------------------*/
+    /* Portfolio PDF Validation                       */
+    /* Client-side validation for immediate UX        */
+    /*-----------------------------------------------*/
+
+    function validatePdfFiles(fileInput) {
+        const files = fileInput.files;
+        const errorContainer = fileInput.parentElement.querySelector('.portfolio-upload-error')
+            || createErrorContainer(fileInput);
+
+        errorContainer.textContent = '';
+        errorContainer.classList.add('d-none');
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            // Check both extension and MIME type
+            const ext = file.name.split('.').pop().toLowerCase();
+            const validMime = file.type === 'application/pdf';
+            const validExt = ext === 'pdf';
+
+            if (!validExt || !validMime) {
+                errorContainer.textContent = 'Invalid file type. Please upload a PDF document.';
+                errorContainer.classList.remove('d-none');
+                fileInput.value = ''; // Clear the invalid selection
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function createErrorContainer(fileInput) {
+        const container = document.createElement('div');
+        container.className = 'portfolio-upload-error text-danger small mt-1 d-none';
+        fileInput.parentElement.appendChild(container);
+        return container;
+    }
+
+    // Attach validation to portfolio file inputs
+    $(document).on('change', 'input[type="file"][name="portfolio_file"], input[type="file"][id="portfolio_file"]', function() {
+        validatePdfFiles(this);
+    });
 });
 
     /*------------------YDCOZA-----------------------*/
