@@ -17,8 +17,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Bootstrap Integration** - Module initialization and activation hooks
 - [x] **Phase 4: Task Management** - Class change monitoring and task dashboard
 - [x] **Phase 5: Material Tracking** - Delivery status tracking and alerts
-- [ ] **Phase 6: AI Summarization** - OpenAI integration for class change summaries
-- [ ] **Phase 7: Email Notifications** - Automated notifications on class changes
+- [x] **Phase 6: AI Summarization** - OpenAI integration for class change summaries
+- [x] **Phase 7: Email Notifications** - Automated notifications on class changes
 
 ## Phase Details
 
@@ -105,13 +105,13 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Admin can configure OpenAI API key via WordPress options
   2. Class change events trigger AI summary generation
-  3. User can view AI summaries via `[wecoza_ai_summary]` shortcode
+  3. User can view AI summaries via `[wecoza_insert_update_ai_summary]` shortcode
   4. Summary generation handles API errors gracefully (no crashes)
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Verify API key configuration, shortcode registration, and display infrastructure
-- [ ] 06-02-PLAN.md — Verify event-triggered summary generation and error handling
+- [x] 06-01-PLAN.md — Verify API key configuration and shortcode infrastructure
+- [x] 06-02-PLAN.md — Verify event-triggered summary generation and error handling
 
 ### Phase 7: Email Notifications
 **Goal**: Users receive automated email notifications on class changes
@@ -122,11 +122,11 @@ Plans:
   2. Updating a class triggers email notification to configured recipients
   3. Admin can configure notification recipients via WordPress options
   4. Email sending is handled via WordPress cron (not blocking request)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [x] 07-01-PLAN.md — Cron hook registration and template path fix
+- [x] 07-02-PLAN.md — Email notification verification test suite
 
 ## Progress
 
@@ -140,9 +140,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Bootstrap Integration | 1/1 | Complete | 2026-02-02 |
 | 4. Task Management | 1/1 | Complete | 2026-02-02 |
 | 5. Material Tracking | 2/2 | Complete | 2026-02-02 |
-| 6. AI Summarization | 0/2 | Planned | - |
-| 7. Email Notifications | 0/2 | Not started | - |
+| 6. AI Summarization | 2/2 | Complete | 2026-02-02 |
+| 7. Email Notifications | 2/2 | Complete | 2026-02-02 |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 6 planning*
+*Last updated: 2026-02-02 after Phase 7 completion*
