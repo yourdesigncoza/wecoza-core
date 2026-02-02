@@ -32,6 +32,7 @@ use function trim;
 
 trait DataObfuscator
 {
+    use PIIDetector;
     /**
      * @param array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}|null $state
      * @return array{payload:array<string|int,mixed>, state:array{aliases:array<string,string>, reverse:array<string,string>, nameCounter:int}}
@@ -183,6 +184,12 @@ trait DataObfuscator
             return $this->maskPhone($value);
         }
 
+        // NEW: Heuristic PII detection for values in non-standard fields
+        $piiPattern = $this->detectPIIPattern($value);
+        if ($piiPattern !== null) {
+            return $this->maskDetectedPII($value, $piiPattern, $normalizedKey);
+        }
+
         return $value;
     }
 
@@ -299,5 +306,30 @@ trait DataObfuscator
         $masked = str_repeat('X', max($length - 2, 0)) . substr($digits, -2);
 
         return $masked;
+    }
+
+    /**
+     * Mask a value based on detected PII pattern type.
+     * Uses field name hints to refine passport detection.
+     */
+    private function maskDetectedPII(string $value, string $patternType, string $fieldKey): string
+    {
+        return match ($patternType) {
+            'sa_id' => $this->maskSouthAfricanID($value),
+            'passport' => $this->shouldTreatAsPassport($fieldKey) ? $this->maskPassport($value) : $value,
+            'phone' => $this->maskPhone($value),
+            default => $value,
+        };
+    }
+
+    /**
+     * Check if field name suggests passport content.
+     * Reduces false positives for passport detection.
+     */
+    private function shouldTreatAsPassport(string $fieldKey): bool
+    {
+        return str_contains($fieldKey, 'passport')
+            || str_contains($fieldKey, 'travel')
+            || str_contains($fieldKey, 'document');
     }
 }
