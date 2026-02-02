@@ -12,6 +12,7 @@
 namespace WeCoza\Classes\Models;
 
 use WeCoza\Core\Abstract\BaseModel;
+use WeCoza\Classes\Repositories\ClassRepository;
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -142,50 +143,45 @@ class ClassModel extends BaseModel
             $this->setCreatedAt($now);
             $this->setUpdatedAt($now);
 
-            $stopRestartJson = $this->prepareStopRestartDates();
-
-            $sql = "INSERT INTO classes (
-                client_id, site_id, class_address_line, class_type, class_subject,
-                class_code, class_duration, original_start_date, seta_funded, seta,
-                exam_class, exam_type, class_agent, initial_class_agent,
-                initial_agent_start_date, project_supervisor_id,
-                learner_ids, exam_learners, backup_agent_ids, schedule_data, stop_restart_dates,
-                class_notes_data, event_dates, order_nr, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            $params = [
-                $this->getClientId(),
-                $this->getSiteId(),
-                $this->getClassAddressLine(),
-                $this->getClassType(),
-                $this->getClassSubject(),
-                $this->getClassCode(),
-                $this->getClassDuration(),
-                $this->getOriginalStartDate(),
-                $this->getSetaFunded() ? 'true' : 'false',
-                $this->getSeta(),
-                $this->getExamClass() ? 'true' : 'false',
-                $this->getExamType(),
-                $this->getClassAgent(),
-                $this->getInitialClassAgent(),
-                $this->getInitialAgentStartDate(),
-                $this->getProjectSupervisorId(),
-                json_encode($this->getLearnerIds()),
-                json_encode($this->getExamLearners()),
-                json_encode($this->getBackupAgentIds()),
-                json_encode($this->getScheduleData()),
-                $stopRestartJson,
-                json_encode($this->getClassNotesData()),
-                json_encode($this->getEventDates()),
-                $this->getOrderNr(),
-                $this->getCreatedAt(),
-                $this->getUpdatedAt()
+            // Prepare data for repository (uses column whitelisting for security)
+            $data = [
+                'client_id' => $this->getClientId(),
+                'site_id' => $this->getSiteId(),
+                'class_address_line' => $this->getClassAddressLine(),
+                'class_type' => $this->getClassType(),
+                'class_subject' => $this->getClassSubject(),
+                'class_code' => $this->getClassCode(),
+                'class_duration' => $this->getClassDuration(),
+                'original_start_date' => $this->getOriginalStartDate(),
+                'seta_funded' => $this->getSetaFunded() ? 'true' : 'false',
+                'seta' => $this->getSeta(),
+                'exam_class' => $this->getExamClass() ? 'true' : 'false',
+                'exam_type' => $this->getExamType(),
+                'class_agent' => $this->getClassAgent(),
+                'initial_class_agent' => $this->getInitialClassAgent(),
+                'initial_agent_start_date' => $this->getInitialAgentStartDate(),
+                'project_supervisor_id' => $this->getProjectSupervisorId(),
+                'learner_ids' => json_encode($this->getLearnerIds()),
+                'exam_learners' => json_encode($this->getExamLearners()),
+                'backup_agent_ids' => json_encode($this->getBackupAgentIds()),
+                'schedule_data' => json_encode($this->getScheduleData()),
+                'stop_restart_dates' => $this->prepareStopRestartDates(),
+                'class_notes_data' => json_encode($this->getClassNotesData()),
+                'event_dates' => json_encode($this->getEventDates()),
+                'order_nr' => $this->getOrderNr(),
+                'created_at' => $this->getCreatedAt(),
+                'updated_at' => $this->getUpdatedAt()
             ];
 
-            $db->query($sql, $params);
-            $classId = $db->lastInsertId();
-            $this->setId($classId);
+            // Use repository for secure insert (column whitelisting)
+            $repository = new ClassRepository();
+            $classId = $repository->insertClass($data);
 
+            if (!$classId) {
+                throw new Exception('Failed to insert class');
+            }
+
+            $this->setId($classId);
             $this->saveAgentReplacements();
 
             $db->commit();
@@ -206,35 +202,44 @@ class ClassModel extends BaseModel
             $db->beginTransaction();
 
             $this->setUpdatedAt(date('Y-m-d H:i:s'));
-            $stopRestartJson = $this->prepareStopRestartDates();
 
-            $sql = "UPDATE classes SET
-                client_id = ?, site_id = ?, class_address_line = ?, class_type = ?,
-                class_subject = ?, class_code = ?, class_duration = ?, original_start_date = ?,
-                seta_funded = ?, seta = ?, exam_class = ?, exam_type = ?,
-                class_agent = ?, initial_class_agent = ?, initial_agent_start_date = ?,
-                project_supervisor_id = ?, learner_ids = ?, exam_learners = ?, backup_agent_ids = ?,
-                schedule_data = ?, stop_restart_dates = ?, class_notes_data = ?, event_dates = ?, order_nr = ?, updated_at = ?
-                WHERE class_id = ?";
-
-            $params = [
-                $this->getClientId(), $this->getSiteId(), $this->getClassAddressLine(),
-                $this->getClassType(), $this->getClassSubject(), $this->getClassCode(),
-                $this->getClassDuration(), $this->getOriginalStartDate(),
-                $this->getSetaFunded() ? 'true' : 'false',
-                $this->getSeta(),
-                $this->getExamClass() ? 'true' : 'false',
-                $this->getExamType(),
-                $this->getClassAgent(), $this->getInitialClassAgent(),
-                $this->getInitialAgentStartDate(), $this->getProjectSupervisorId(),
-                json_encode($this->getLearnerIds()),
-                json_encode($this->getExamLearners()), json_encode($this->getBackupAgentIds()), json_encode($this->getScheduleData()),
-                $stopRestartJson, json_encode($this->getClassNotesData()),
-                json_encode($this->getEventDates()), $this->getOrderNr(),
-                $this->getUpdatedAt(), $this->getId()
+            // Prepare data for repository (uses column whitelisting for security)
+            $data = [
+                'client_id' => $this->getClientId(),
+                'site_id' => $this->getSiteId(),
+                'class_address_line' => $this->getClassAddressLine(),
+                'class_type' => $this->getClassType(),
+                'class_subject' => $this->getClassSubject(),
+                'class_code' => $this->getClassCode(),
+                'class_duration' => $this->getClassDuration(),
+                'original_start_date' => $this->getOriginalStartDate(),
+                'seta_funded' => $this->getSetaFunded() ? 'true' : 'false',
+                'seta' => $this->getSeta(),
+                'exam_class' => $this->getExamClass() ? 'true' : 'false',
+                'exam_type' => $this->getExamType(),
+                'class_agent' => $this->getClassAgent(),
+                'initial_class_agent' => $this->getInitialClassAgent(),
+                'initial_agent_start_date' => $this->getInitialAgentStartDate(),
+                'project_supervisor_id' => $this->getProjectSupervisorId(),
+                'learner_ids' => json_encode($this->getLearnerIds()),
+                'exam_learners' => json_encode($this->getExamLearners()),
+                'backup_agent_ids' => json_encode($this->getBackupAgentIds()),
+                'schedule_data' => json_encode($this->getScheduleData()),
+                'stop_restart_dates' => $this->prepareStopRestartDates(),
+                'class_notes_data' => json_encode($this->getClassNotesData()),
+                'event_dates' => json_encode($this->getEventDates()),
+                'order_nr' => $this->getOrderNr(),
+                'updated_at' => $this->getUpdatedAt()
             ];
 
-            $db->query($sql, $params);
+            // Use repository for secure update (column whitelisting)
+            $repository = new ClassRepository();
+            $success = $repository->updateClass($this->getId(), $data);
+
+            if (!$success) {
+                throw new Exception('Failed to update class');
+            }
+
             $this->saveAgentReplacements();
 
             $db->commit();
@@ -251,9 +256,9 @@ class ClassModel extends BaseModel
     public function delete(): bool
     {
         try {
-            $db = wecoza_db();
-            $db->query("DELETE FROM classes WHERE class_id = ?", [$this->getId()]);
-            return true;
+            // Use repository for secure delete
+            $repository = new ClassRepository();
+            return $repository->deleteClass($this->getId());
         } catch (Exception $e) {
             error_log('WeCoza Core: Error deleting class: ' . $e->getMessage());
             return false;

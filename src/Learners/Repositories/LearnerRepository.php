@@ -33,6 +33,63 @@ class LearnerRepository extends BaseRepository
 
     /*
     |--------------------------------------------------------------------------
+    | Column Whitelisting (Security)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Columns allowed for ORDER BY
+     */
+    protected function getAllowedOrderColumns(): array
+    {
+        return [
+            'id', 'first_name', 'surname', 'email_address',
+            'created_at', 'updated_at', 'city_town_id', 'employer_id'
+        ];
+    }
+
+    /**
+     * Columns allowed for WHERE filtering
+     */
+    protected function getAllowedFilterColumns(): array
+    {
+        return [
+            'id', 'first_name', 'surname', 'email_address', 'sa_id_no',
+            'city_town_id', 'province_region_id', 'employer_id',
+            'employment_status', 'disability_status', 'created_at', 'updated_at'
+        ];
+    }
+
+    /**
+     * Columns allowed for INSERT
+     */
+    protected function getAllowedInsertColumns(): array
+    {
+        return [
+            'title', 'first_name', 'second_name', 'initials', 'surname',
+            'gender', 'race', 'sa_id_no', 'passport_number',
+            'tel_number', 'alternative_tel_number', 'email_address',
+            'address_line_1', 'address_line_2', 'suburb',
+            'city_town_id', 'province_region_id', 'postal_code',
+            'highest_qualification', 'assessment_status',
+            'placement_assessment_date', 'numeracy_level', 'communication_level',
+            'employment_status', 'employer_id', 'disability_status',
+            'scanned_portfolio', 'created_at', 'updated_at'
+        ];
+    }
+
+    /**
+     * Columns allowed for UPDATE
+     */
+    protected function getAllowedUpdateColumns(): array
+    {
+        // Same as insert, minus created_at
+        $columns = $this->getAllowedInsertColumns();
+        return array_values(array_diff($columns, ['created_at']));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Query Methods with Mappings
     |--------------------------------------------------------------------------
     */
@@ -173,21 +230,30 @@ class LearnerRepository extends BaseRepository
      */
     public function insert(array $data): ?int
     {
+        // Filter data to only allowed columns (SQL injection prevention)
+        $allowedColumns = $this->getAllowedInsertColumns();
+        $filteredData = $this->filterAllowedColumns($data, $allowedColumns);
+
+        if (empty($filteredData)) {
+            error_log("WeCoza Core: LearnerRepository insert rejected - no valid columns in data");
+            return null;
+        }
+
         try {
             $pdo = $this->db->getPdo();
             $pdo->beginTransaction();
 
             // Validate highest_qualification if provided
-            if (!empty($data['highest_qualification'])) {
+            if (!empty($filteredData['highest_qualification'])) {
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM learner_qualifications WHERE id = :id");
-                $stmt->execute(['id' => $data['highest_qualification']]);
+                $stmt->execute(['id' => $filteredData['highest_qualification']]);
                 if ($stmt->fetchColumn() == 0) {
-                    throw new Exception("Invalid highest qualification ID: " . $data['highest_qualification']);
+                    throw new Exception("Invalid highest qualification ID: " . $filteredData['highest_qualification']);
                 }
             }
 
             // Build insert SQL
-            $columns = array_keys($data);
+            $columns = array_keys($filteredData);
             $placeholders = array_map(fn($c) => ":{$c}", $columns);
 
             $sql = sprintf(
@@ -199,7 +265,7 @@ class LearnerRepository extends BaseRepository
             );
 
             $stmt = $pdo->prepare($sql);
-            $stmt->execute($data);
+            $stmt->execute($filteredData);
             $newId = (int) $stmt->fetchColumn();
 
             $pdo->commit();

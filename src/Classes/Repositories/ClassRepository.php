@@ -29,6 +29,185 @@ class ClassRepository extends BaseRepository
 
     private const CACHE_DURATION = 12 * HOUR_IN_SECONDS;
 
+    /*
+    |--------------------------------------------------------------------------
+    | Column Whitelisting (Security)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Columns allowed for ORDER BY
+     */
+    protected function getAllowedOrderColumns(): array
+    {
+        return [
+            'class_id', 'client_id', 'class_type', 'class_subject',
+            'original_start_date', 'created_at', 'updated_at', 'class_code'
+        ];
+    }
+
+    /**
+     * Columns allowed for WHERE filtering
+     */
+    protected function getAllowedFilterColumns(): array
+    {
+        return [
+            'class_id', 'client_id', 'site_id', 'class_type', 'class_subject',
+            'class_code', 'seta_funded', 'seta', 'exam_class', 'class_agent',
+            'project_supervisor_id', 'created_at', 'updated_at'
+        ];
+    }
+
+    /**
+     * Columns allowed for INSERT
+     */
+    protected function getAllowedInsertColumns(): array
+    {
+        return [
+            'client_id', 'site_id', 'class_address_line', 'class_type',
+            'class_subject', 'class_code', 'class_duration', 'original_start_date',
+            'seta_funded', 'seta', 'exam_class', 'exam_type', 'class_agent',
+            'initial_class_agent', 'initial_agent_start_date', 'project_supervisor_id',
+            'learner_ids', 'exam_learners', 'backup_agent_ids', 'agent_replacements',
+            'schedule_data', 'stop_restart_dates', 'event_dates', 'class_notes_data',
+            'order_nr', 'created_at', 'updated_at'
+        ];
+    }
+
+    /**
+     * Columns allowed for UPDATE
+     */
+    protected function getAllowedUpdateColumns(): array
+    {
+        // Same as insert, minus created_at
+        $columns = $this->getAllowedInsertColumns();
+        return array_values(array_diff($columns, ['created_at']));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD Operations (Delegated from ClassModel)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Insert a new class record
+     *
+     * @param array $data Class data
+     * @return int|null The new class ID or null on failure
+     */
+    public function insertClass(array $data): ?int
+    {
+        // Filter to only allowed columns
+        $filteredData = $this->filterAllowedColumns($data, $this->getAllowedInsertColumns());
+
+        if (empty($filteredData)) {
+            error_log('WeCoza Core: Insert rejected - no valid columns in data');
+            return null;
+        }
+
+        $columns = array_keys($filteredData);
+        $placeholders = array_map(fn($c) => ":{$c}", $columns);
+
+        $sql = sprintf(
+            "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
+            static::$table,
+            implode(', ', $columns),
+            implode(', ', $placeholders),
+            static::$primaryKey
+        );
+
+        try {
+            $stmt = $this->db->query($sql, $filteredData);
+            $result = $stmt->fetch();
+            return $result ? (int)$result[static::$primaryKey] : null;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error inserting class: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Update a class record
+     *
+     * @param int $id Class ID
+     * @param array $data Class data
+     * @return bool Success status
+     */
+    public function updateClass(int $id, array $data): bool
+    {
+        // Filter to only allowed columns
+        $filteredData = $this->filterAllowedColumns($data, $this->getAllowedUpdateColumns());
+
+        if (empty($filteredData)) {
+            error_log('WeCoza Core: Update rejected - no valid columns in data');
+            return false;
+        }
+
+        $setClauses = array_map(fn($c) => "{$c} = :{$c}", array_keys($filteredData));
+        $filteredData['id'] = $id;
+
+        $sql = sprintf(
+            "UPDATE %s SET %s WHERE %s = :id",
+            static::$table,
+            implode(', ', $setClauses),
+            static::$primaryKey
+        );
+
+        try {
+            $this->db->query($sql, $filteredData);
+            return true;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error updating class: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete a class record
+     *
+     * @param int $id Class ID
+     * @return bool Success status
+     */
+    public function deleteClass(int $id): bool
+    {
+        $sql = sprintf(
+            "DELETE FROM %s WHERE %s = ?",
+            static::$table,
+            static::$primaryKey
+        );
+
+        try {
+            $this->db->query($sql, [$id]);
+            return true;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error deleting class: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Filter data to only include allowed columns
+     *
+     * @param array $data Input data
+     * @param array $allowedColumns Allowed column names
+     * @return array Filtered data
+     */
+    protected function filterAllowedColumns(array $data, array $allowedColumns): array
+    {
+        return array_filter(
+            $data,
+            fn($key) => in_array($key, $allowedColumns, true),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reference Data Methods
+    |--------------------------------------------------------------------------
+    */
+
     /**
      * Get all clients ordered by name
      */

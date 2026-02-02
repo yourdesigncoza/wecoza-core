@@ -57,8 +57,13 @@ if (!function_exists('wecoza_view')) {
      * Supports both .view.php (Classes style) and .php (Learners style) extensions.
      * Data is extracted to local scope using EXTR_SKIP for security.
      *
+     * WARNING: Data array keys become local variables via extract().
+     * Avoid using these reserved keys in $data as they may conflict:
+     * - 'file', 'basePath', 'return', 'data', 'view'
+     * - Any PHP superglobals ($_GET, $_POST, etc.)
+     *
      * @param string $view View path relative to views directory (without extension)
-     * @param array $data Data to pass to the view
+     * @param array $data Data to pass to the view.
      * @param bool $return Whether to return output (true) or echo it (false)
      * @return string|void HTML output if $return is true
      */
