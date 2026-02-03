@@ -582,7 +582,7 @@ final class EventTasksShortcode
                     var formData = new FormData();
                     formData.append('action', 'wecoza_events_task_update');
                     formData.append('nonce', wrapper.dataset.nonce);
-                    formData.append('log_id', panel.dataset.logId || '');
+                    formData.append('class_id', panel.dataset.classId || '');
                     formData.append('task_id', taskItem.dataset.taskId || '');
                     formData.append('task_action', button.dataset.action || '');
 
