@@ -18,6 +18,7 @@ final class Task
     private ?int $completedBy;
     private ?string $completedAt;
     private ?string $note;
+    private ?string $eventDate;
 
     public function __construct(
         string $id,
@@ -25,7 +26,8 @@ final class Task
         string $status = self::STATUS_OPEN,
         ?int $completedBy = null,
         ?string $completedAt = null,
-        ?string $note = null
+        ?string $note = null,
+        ?string $eventDate = null
     ) {
         $this->id = $id;
         $this->label = $label;
@@ -33,6 +35,7 @@ final class Task
         $this->completedBy = $completedBy;
         $this->completedAt = $completedAt;
         $this->note = $note;
+        $this->eventDate = $eventDate;
     }
 
     public static function fromArray(array $payload): self
@@ -43,7 +46,8 @@ final class Task
             (string) ($payload['status'] ?? self::STATUS_OPEN),
             isset($payload['completed_by']) ? (int) $payload['completed_by'] : null,
             isset($payload['completed_at']) ? (string) $payload['completed_at'] : null,
-            isset($payload['note']) ? (string) $payload['note'] : null
+            isset($payload['note']) ? (string) $payload['note'] : null,
+            isset($payload['event_date']) ? (string) $payload['event_date'] : null
         );
     }
 
@@ -65,6 +69,10 @@ final class Task
 
         if ($this->note !== null && $this->note !== '') {
             $payload['note'] = $this->note;
+        }
+
+        if ($this->eventDate !== null) {
+            $payload['event_date'] = $this->eventDate;
         }
 
         return $payload;
@@ -103,6 +111,11 @@ final class Task
     public function getNote(): ?string
     {
         return $this->note;
+    }
+
+    public function getEventDate(): ?string
+    {
+        return $this->eventDate;
     }
 
     public function markCompleted(int $userId, string $timestamp, ?string $note = null): self
