@@ -57,11 +57,12 @@ final class TaskController
             $this->responder->error(__('Please sign in to manage tasks.', 'wecoza-events'), 403);
         }
 
-        $logId = $this->request->getPostInt('log_id') ?? 0;
+        // CHANGED: class_id instead of log_id
+        $classId = $this->request->getPostInt('class_id') ?? 0;
         $taskId = $this->request->getPostString('task_id', '') ?? '';
         $taskAction = $this->request->getPostString('task_action', '') ?? '';
 
-        if ($logId <= 0 || $taskId === '' || !in_array($taskAction, ['complete', 'reopen'], true)) {
+        if ($classId <= 0 || $taskId === '' || !in_array($taskAction, ['complete', 'reopen'], true)) {
             $this->responder->error(__('Invalid task request.', 'wecoza-events'), 400);
         }
 
@@ -69,15 +70,17 @@ final class TaskController
             if ($taskAction === 'complete') {
                 $note = $this->request->getPostString('note');
                 $note = $note !== null ? trim($note) : null;
+                // CHANGED: Pass classId, not logId
                 $tasks = $this->manager->markTaskCompleted(
-                    $logId,
+                    $classId,
                     $taskId,
                     get_current_user_id(),
                     current_time('mysql', true),
                     $note
                 );
             } else {
-                $tasks = $this->manager->reopenTask($logId, $taskId);
+                // CHANGED: Pass classId, not logId
+                $tasks = $this->manager->reopenTask($classId, $taskId);
             }
         } catch (Throwable $exception) {
             $this->responder->error($exception->getMessage(), 500);
