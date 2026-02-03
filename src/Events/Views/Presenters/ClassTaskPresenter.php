@@ -428,6 +428,7 @@ final class ClassTaskPresenter
                     $payload['note_required'] = false;
                 }
 
+                $payload['note'] = $task->getNote();
                 $payload['complete_label'] = __('Complete', 'wecoza-events');
                 $open[] = $payload;
             }

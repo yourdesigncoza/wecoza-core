@@ -226,6 +226,7 @@ echo $assets;
                                                                                 id="wecoza-note-<?php echo esc_attr($class['id'] . '-' . $task['id']); ?>"
                                                                                 class="form-control form-control-sm wecoza-task-note"
                                                                                 type="text"
+                                                                                value="<?php echo esc_attr($task['note'] ?? ''); ?>"
                                                                                 placeholder="<?php echo esc_attr($task['note_placeholder']); ?>"
                                                                                 data-note-required="<?php echo !empty($task['note_required']) ? '1' : '0'; ?>"
                                                                                 <?php echo !empty($task['note_required']) ? 'aria-required="true"' : ''; ?>
