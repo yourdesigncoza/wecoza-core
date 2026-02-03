@@ -396,7 +396,9 @@ final class EventTasksShortcode
                         : '';
                     return '' +
                         '<li class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2 m-1" data-task-id="' + escapeHtml(task.id) + '">' +
-                            '<div class="fw-semibold text-body w-30">' + escapeHtml(task.label) + '</div>' +
+                            '<div class="fw-semibold text-body w-30">' + escapeHtml(task.label) +
+                                (task.event_date ? '<div class="text-body-tertiary small">' + escapeHtml(task.event_date) + '</div>' : '') +
+                            '</div>' +
                             '<div class="d-flex flex-row gap-2 align-items-start flex-grow-1">' +
                                 '<div class="flex-grow-1">' +
                                     '<label class="visually-hidden" for="' + escapeHtml(noteId) + '">' + escapeHtml(task.note_label) + '</label>' +

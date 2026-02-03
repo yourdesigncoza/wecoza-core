@@ -218,7 +218,12 @@ echo $assets;
                                                         <ul class="list-group list-group-flush wecoza-task-list wecoza-task-list-open" data-role="open-list">
                                                             <?php foreach ($class['tasks']['open'] as $task): ?>
                                                                 <li class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2 m-1" data-task-id="<?php echo esc_attr($task['id']); ?>">
-                                                                    <div class="fw-semibold text-body w-30"><?php echo esc_html($task['label']); ?></div>
+                                                                    <div class="fw-semibold text-body w-30">
+                                                                        <?php echo esc_html($task['label']); ?>
+                                                                        <?php if (!empty($task['event_date'])): ?>
+                                                                            <div class="text-body-tertiary small"><?php echo esc_html($task['event_date']); ?></div>
+                                                                        <?php endif; ?>
+                                                                    </div>
                                                                     <div class="d-flex flex-row gap-2 align-items-start flex-grow-1">
                                                                         <div class="flex-grow-1">
                                                                             <label class="visually-hidden" for="wecoza-note-<?php echo esc_attr($class['id'] . '-' . $task['id']); ?>"><?php echo esc_html($task['note_label']); ?></label>
