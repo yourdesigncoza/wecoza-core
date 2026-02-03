@@ -421,6 +421,184 @@ try {
 echo "\n";
 
 // ============================================================================
+// TASK 5: BIDIRECTIONAL SYNC METHODS
+// ============================================================================
+
+echo "--- Task 5: Bidirectional Sync Methods ---\n\n";
+
+// Test 5.1: Verify parseEventIndex() returns correct index for valid event IDs
+try {
+    $task_manager = new \WeCoza\Events\Services\TaskManager();
+
+    $index_0 = $task_manager->parseEventIndex('event-0');
+    $index_3 = $task_manager->parseEventIndex('event-3');
+    $index_123 = $task_manager->parseEventIndex('event-123');
+
+    $parse_valid = ($index_0 === 0) && ($index_3 === 3) && ($index_123 === 123);
+    test_result(
+        'parseEventIndex returns correct index for valid event IDs',
+        $parse_valid,
+        $parse_valid ? '' : "Expected 0, 3, 123 but got {$index_0}, {$index_3}, {$index_123}"
+    );
+
+    // Test 5.2: Verify parseEventIndex() returns null for non-event IDs
+    $agent_order = $task_manager->parseEventIndex('agent-order');
+    $invalid = $task_manager->parseEventIndex('invalid');
+    $event_empty = $task_manager->parseEventIndex('event-');
+
+    $parse_invalid = ($agent_order === null) && ($invalid === null) && ($event_empty === null);
+    test_result(
+        'parseEventIndex returns null for non-event IDs',
+        $parse_invalid,
+        $parse_invalid ? '' : 'Expected null for agent-order, invalid, event-'
+    );
+} catch (Exception $e) {
+    test_result('parseEventIndex functionality', false, $e->getMessage());
+}
+
+// Test 5.3: Verify Task::reopen() preserves notes
+try {
+    $task = new \WeCoza\Events\Models\Task(
+        'test-1',
+        'Test Task',
+        \WeCoza\Events\Models\Task::STATUS_COMPLETED,
+        1,
+        '2026-02-03 12:00:00',
+        'Important note to preserve'
+    );
+
+    $reopened = $task->reopen();
+
+    $status_open = $reopened->getStatus() === \WeCoza\Events\Models\Task::STATUS_OPEN;
+    $cleared_by = $reopened->getCompletedBy() === null;
+    $cleared_at = $reopened->getCompletedAt() === null;
+    $note_preserved = $reopened->getNote() === 'Important note to preserve';
+
+    $reopen_correct = $status_open && $cleared_by && $cleared_at && $note_preserved;
+    test_result(
+        'Task::reopen() preserves notes while clearing completion metadata',
+        $reopen_correct,
+        $reopen_correct ? '' : sprintf(
+            'Status=%s, CompletedBy=%s, CompletedAt=%s, Note=%s',
+            $reopened->getStatus(),
+            $reopened->getCompletedBy() ?? 'null',
+            $reopened->getCompletedAt() ?? 'null',
+            $reopened->getNote() ?? 'null'
+        )
+    );
+} catch (Exception $e) {
+    test_result('Task::reopen() note preservation', false, $e->getMessage());
+}
+
+// Test 5.4: Verify TaskController accepts class_id parameter
+try {
+    // Check the controller source uses class_id
+    $controller_source = file_get_contents(wecoza_plugin_path('src/Events/Controllers/TaskController.php'));
+    $has_class_id = strpos($controller_source, "getPostInt('class_id')") !== false;
+    $no_log_id = strpos($controller_source, "getPostInt('log_id')") === false;
+
+    $controller_uses_class_id = $has_class_id && $no_log_id;
+    test_result(
+        'TaskController uses class_id parameter (not log_id)',
+        $controller_uses_class_id,
+        $controller_uses_class_id ? '' : 'Expected class_id, but found log_id or missing class_id'
+    );
+} catch (Exception $e) {
+    test_result('TaskController parameter check', false, $e->getMessage());
+}
+
+// Test 5.5: Verify TaskManager::markTaskCompleted() uses classId parameter
+try {
+    $manager_source = file_get_contents(wecoza_plugin_path('src/Events/Services/TaskManager.php'));
+
+    // Check method signature has int $classId as first parameter
+    $has_class_id_param = preg_match('/markTaskCompleted\s*\(\s*int\s+\$classId/', $manager_source);
+
+    test_result(
+        'TaskManager::markTaskCompleted() has classId parameter',
+        $has_class_id_param === 1,
+        $has_class_id_param === 1 ? '' : 'Expected first parameter to be int $classId'
+    );
+} catch (Exception $e) {
+    test_result('TaskManager::markTaskCompleted() signature check', false, $e->getMessage());
+}
+
+// Test 5.6: Verify TaskManager::reopenTask() uses classId parameter
+try {
+    $manager_source = file_get_contents(wecoza_plugin_path('src/Events/Services/TaskManager.php'));
+
+    // Check method signature has int $classId as first parameter
+    $has_class_id_param = preg_match('/reopenTask\s*\(\s*int\s+\$classId/', $manager_source);
+
+    test_result(
+        'TaskManager::reopenTask() has classId parameter',
+        $has_class_id_param === 1,
+        $has_class_id_param === 1 ? '' : 'Expected first parameter to be int $classId'
+    );
+} catch (Exception $e) {
+    test_result('TaskManager::reopenTask() signature check', false, $e->getMessage());
+}
+
+// Test 5.7: Verify TaskManager calls updateEventStatus for event tasks
+try {
+    $manager_source = file_get_contents(wecoza_plugin_path('src/Events/Services/TaskManager.php'));
+
+    // Check markTaskCompleted calls updateEventStatus
+    $calls_update_event = strpos($manager_source, '$this->updateEventStatus(') !== false;
+
+    test_result(
+        'TaskManager::markTaskCompleted() calls updateEventStatus()',
+        $calls_update_event,
+        $calls_update_event ? '' : 'Expected call to updateEventStatus()'
+    );
+} catch (Exception $e) {
+    test_result('TaskManager updateEventStatus call check', false, $e->getMessage());
+}
+
+// Test 5.8: Verify buildEventTask extracts completion metadata
+try {
+    $task_manager = new \WeCoza\Events\Services\TaskManager();
+
+    $sample_class = [
+        'class_id' => 999,
+        'order_nr' => null,
+        'event_dates' => json_encode([
+            [
+                'type' => 'Training',
+                'description' => 'Week 1',
+                'status' => 'Completed',
+                'completed_by' => 42,
+                'completed_at' => '2026-02-03 10:00:00',
+                'notes' => 'Test note'
+            ]
+        ])
+    ];
+
+    $tasks = $task_manager->buildTasksFromEvents($sample_class);
+    $event_task = $tasks->get('event-0');
+
+    $has_completed_by = $event_task->getCompletedBy() === 42;
+    $has_completed_at = $event_task->getCompletedAt() === '2026-02-03 10:00:00';
+    $has_note = $event_task->getNote() === 'Test note';
+
+    $extracts_metadata = $has_completed_by && $has_completed_at && $has_note;
+    test_result(
+        'buildTasksFromEvents extracts completed_by, completed_at, notes',
+        $extracts_metadata,
+        $extracts_metadata ? '' : sprintf(
+            'completedBy=%s, completedAt=%s, note=%s',
+            $event_task->getCompletedBy() ?? 'null',
+            $event_task->getCompletedAt() ?? 'null',
+            $event_task->getNote() ?? 'null'
+        )
+    );
+} catch (Exception $e) {
+    test_result('buildTasksFromEvents metadata extraction', false, $e->getMessage());
+}
+
+echo "\n";
+
+// ============================================================================
 // FINAL SUMMARY
 // ============================================================================
 
@@ -459,7 +637,12 @@ $requirements = [
     'TASK-03' => 'Task IDs: agent-order and event-{index}',
     'TASK-04' => 'Task labels: {type}: {description} or {type}',
     'REPO-01' => 'ClassTaskRepository queries classes directly',
-    'REPO-02' => 'ClassTaskService uses buildTasksFromEvents()'
+    'REPO-02' => 'ClassTaskService uses buildTasksFromEvents()',
+    'SYNC-01' => 'TaskController accepts class_id parameter',
+    'SYNC-02' => 'TaskManager::markTaskCompleted uses classId',
+    'SYNC-03' => 'TaskManager::reopenTask uses classId',
+    'SYNC-04' => 'Task::reopen() preserves notes',
+    'SYNC-05' => 'updateEventStatus() called for event tasks'
 ];
 
 foreach ($requirements as $req => $desc) {
