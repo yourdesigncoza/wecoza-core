@@ -138,7 +138,6 @@ echo $assets;
                                 data-open-tasks="<?php echo esc_attr($class['search']['open_tokens']); ?>"
                                 data-status-label="<?php echo esc_attr($class['search']['status']); ?>"
                                 data-class-id="<?php echo esc_attr((string) $class['id']); ?>"
-                                data-log-id="<?php echo esc_attr((string) ($class['log_id'] ?? '')); ?>"
                                 data-manageable="<?php echo $class['manageable'] ? '1' : '0'; ?>"
                                 data-panel-id="task-panel-<?php echo esc_attr((string) $class['id']); ?>"
                             >
@@ -200,7 +199,7 @@ echo $assets;
                             >
                             
                                 <td colspan="11" class="bg-body-tertiary">
-                                    <div class="p-4 wecoza-task-panel-content" data-log-id="<?php echo esc_attr((string) ($class['log_id'] ?? '')); ?>" data-class-id="<?php echo esc_attr((string) $class['id']); ?>" data-manageable="<?php echo $class['manageable'] ? '1' : '0'; ?>">
+                                    <div class="p-4 wecoza-task-panel-content" data-class-id="<?php echo esc_attr((string) $class['id']); ?>" data-manageable="<?php echo $class['manageable'] ? '1' : '0'; ?>">
                                         <div class="row g-4 align-items-start">
                                             <?php /* if (!$class['manageable']): ?>
                                                 <div class="col-12">
