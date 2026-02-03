@@ -26,6 +26,11 @@ Replace trigger-based task system with manual event capture integration. Tasks w
 
 **Requirements:** DB-01, DB-02, DB-03
 
+**Plans:** 1 plan (complete)
+
+Plans:
+- [x] 13-01-PLAN.md — Drop trigger, function, and table
+
 **Success Criteria:**
 1. Trigger `log_class_change_trigger` no longer exists on classes table
 2. Function `log_class_change()` no longer exists
@@ -44,6 +49,12 @@ Replace trigger-based task system with manual event capture integration. Tasks w
 **Goal:** Rewrite core task services to build tasks from event_dates JSONB instead of change logs.
 
 **Requirements:** TASK-01, TASK-02, TASK-03, TASK-04, REPO-01, REPO-02
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — Add buildTasksFromEvents() factory method to TaskManager
+- [ ] 14-02-PLAN.md — Update repository and service for direct class queries
 
 **Success Criteria:**
 1. TaskManager builds TaskCollection from `classes.event_dates` array
@@ -130,14 +141,14 @@ Replace trigger-based task system with manual event capture integration. Tasks w
 
 ```
 Phase 13 (DB Cleanup)
-    ↓
-Phase 14 (Task Refactor) ← depends on triggers being gone
-    ↓
-Phase 15 (Sync) ← depends on new TaskManager
-    ↓
-Phase 16 (UI) ← depends on sync working
-    ↓
-Phase 17 (Cleanup) ← must be last, removes old code
+    |
+Phase 14 (Task Refactor) <- depends on triggers being gone
+    |
+Phase 15 (Sync) <- depends on new TaskManager
+    |
+Phase 16 (UI) <- depends on sync working
+    |
+Phase 17 (Cleanup) <- must be last, removes old code
 ```
 
 ## Risk Mitigation
@@ -151,4 +162,4 @@ Phase 17 (Cleanup) ← must be last, removes old code
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-03 after initial creation*
+*Last updated: 2026-02-03 after Phase 14 planning*
