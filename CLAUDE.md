@@ -135,3 +135,16 @@ wp wecoza version    # Show plugin version
 - Plugin loads at priority 5 on `plugins_loaded`
 - Dependent plugins should use priority 10+
 - Views support both `.view.php` and `.php` extensions
+
+
+## Database Access Restrictions
+- postgres-do MCP tool has read-only access only
+- Only the following SQL operations are allowed: SELECT, WITH, EXPLAIN, ANALYZE, SHOW
+- No INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, or other write operations permitted
+
+
+## CSS Styles Location
+- ALL CSS styles must be added to: `/opt/lampp/htdocs/wecoza/wp-content/themes/wecoza_3_child_theme/includes/css/ydcoza-styles.css`
+- Do NOT create separate CSS files in plugin directories or elsewhere
+- Always append new styles to the existing ydcoza-styles.css file 
+- The '/home/laudes/zoot/projects/phoenix/phoenix-extracted' folder & all it's content is to be used to guide your UI, never make any changes to anything inside the folder
