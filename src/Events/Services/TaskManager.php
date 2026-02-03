@@ -593,13 +593,26 @@ SQL;
         // Extract notes
         $notes = isset($event['notes']) && $event['notes'] !== '' ? (string) $event['notes'] : null;
 
+        // Extract and format event date
+        $rawDate = $event['date'] ?? null;
+        $eventDate = null;
+        if ($rawDate !== null && $rawDate !== '') {
+            try {
+                $dt = new \DateTimeImmutable((string) $rawDate);
+                $eventDate = $dt->format('j M Y'); // e.g., "20 Feb 2026"
+            } catch (\Exception $e) {
+                // Leave as null if unparseable
+            }
+        }
+
         return new Task(
             "event-{$index}",
             $label,
             $status,
             $completedBy,
             $completedAt,
-            $notes
+            $notes,
+            $eventDate
         );
     }
 }
