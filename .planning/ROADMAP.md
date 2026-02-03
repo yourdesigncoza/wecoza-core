@@ -105,6 +105,12 @@ Plans:
 
 **Requirements:** UI-01, UI-02, UI-03
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Fix JavaScript AJAX parameter (log_id to class_id) and clean view templates
+- [ ] 16-02-PLAN.md — UI verification checkpoint
+
 **Success Criteria:**
 1. ClassTaskPresenter formats event-based tasks for display
 2. Open Tasks column shows pending events + Agent Order Number
@@ -168,4 +174,4 @@ Phase 17 (Cleanup) <- must be last, removes old code
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 15 execution*
+*Last updated: 2026-02-03 after Phase 16 planning*
