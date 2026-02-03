@@ -2,97 +2,76 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-02)
+See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Event Tasks Refactor
 
 ## Current Position
 
-Phase: N/A (milestone complete, awaiting next)
-Plan: N/A
-Status: Ready for next milestone
-Last activity: 2026-02-02 — v1.1 milestone archived
+Phase: 13 (Database Cleanup) — not started
+Plan: —
+Status: Ready for planning
+Last activity: 2026-02-03 — Milestone v1.2 defined
 
-Progress: v1.1 complete [=============================] 100%
+Progress: v1.2 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0%
+
+## Milestone v1.2: Event Tasks Refactor
+
+**Goal:** Replace trigger-based task system with manual event capture integration.
+
+**Phases:**
+| # | Phase | Status | Requirements |
+|---|-------|--------|--------------|
+| 13 | Database Cleanup | ○ Pending | DB-01..03 |
+| 14 | Task System Refactor | ○ Pending | TASK-01..04, REPO-01..02 |
+| 15 | Bidirectional Sync | ○ Pending | SYNC-01..05, REPO-03 |
+| 16 | Presentation Layer | ○ Pending | UI-01..03 |
+| 17 | Code Cleanup | ○ Pending | CLEAN-01..06 |
+
+**Key deliverables:**
+- Tasks derived from `classes.event_dates` JSONB (not triggers)
+- Agent Order Number always present, writes to `order_nr`
+- Bidirectional sync between dashboard and class form
+- 6 deprecated files removed
 
 ## Milestone History
 
-**v1 Events Integration (Shipped: 2026-02-02)**
-- 7 phases, 13 plans, 24 requirements
-- 50 files (37 PHP + 9 templates + 4 tests)
-- 6,288 LOC in Events module
-- 4 days from start to ship
-
 **v1.1 Quality & Performance (Shipped: 2026-02-02)**
 - 5 phases, 13 plans, 21 requirements
-- Bug fixes, security hardening, data privacy, architecture, performance
-- Key additions: Action Scheduler, typed DTOs, PHP 8.1 Enums, async processing
+- Bug fixes, security hardening, async processing
 - 3 hours from definition to ship
 
+**v1 Events Integration (Shipped: 2026-02-02)**
+- 7 phases, 13 plans, 24 requirements
+- Events module migration, task management, AI summaries
+- 4 days from start to ship
+
 See: .planning/MILESTONES.md for full details
-See: .planning/milestones/v1-* and v1.1-* for archived artifacts
-
-## Performance Metrics
-
-**v1 Velocity:**
-- Total plans completed: 13
-- Average duration: 3.2min
-- Total execution time: ~45min
-- Phases per day: 7 in 1 day
-
-**v1.1 Velocity:**
-- Total plans completed: 13
-- Average duration: 2.6min
-- Total execution time: ~34min
-- Phases per day: 5 in 3 hours
-
-**By Phase (v1):**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-code-foundation | 3 | 19min | 6min |
-| 02-database-migration | 2 | 4min | 2min |
-| 03-bootstrap-integration | 1 | 2min | 2min |
-| 04-task-management | 1 | 4min | 4min |
-| 05-material-tracking | 2 | 7min | 3.5min |
-| 06-ai-summarization | 2 | 4min | 2min |
-| 07-email-notifications | 2 | 4min | 2min |
-
-**By Phase (v1.1):**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 08-bug-fixes-core-security | 4 | 7min | 1.75min |
-| 09-data-privacy-hardening | 3 | 6min | 2min |
-| 10-architecture-type-safety | 3 | 13min | 4.3min |
-| 11-ai-service-quality | 1 | 3min | 3min |
-| 12-performance-async-processing | 2 | 5min | 2.5min |
 
 ## Accumulated Context
 
 ### Decisions
 
-Key decisions archived in:
-- PROJECT.md Key Decisions table (decisions with outcomes)
-- milestones/v1-ROADMAP.md (v1 milestone-specific decisions)
-- milestones/v1.1-ROADMAP.md (v1.1 milestone-specific decisions)
-
-(Recent decisions cleared on milestone completion — see archives)
+| Decision | Rationale | Status |
+|----------|-----------|--------|
+| Replace triggers with manual events | Simpler architecture, user controls events | Pending |
+| Agent Order Number always present | Class activation confirmation | Pending |
+| Bidirectional sync | Dashboard ↔ form stay in sync | Pending |
+| Preserve notes on reopen | User data should not be lost | Pending |
 
 ### Pending Todos
 
-None — awaiting next milestone definition.
+None — ready to start Phase 13.
 
 ### Blockers/Concerns
 
-**Tech Debt (deferred):**
-- NotificationEnricher/NotificationEmailer lack explicit exception handling (low priority)
+None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-02T22:30:00Z
-Stopped at: v1.1 milestone archived and completed
+Last session: 2026-02-03T12:00:00Z
+Stopped at: Milestone v1.2 defined, ready for planning
 Resume file: None
 
-**Next action:** Use `/gsd:new-milestone` to define v1.2 or v2.0
+**Next action:** Use `/gsd:plan-phase 13` to create detailed plan for Database Cleanup phase

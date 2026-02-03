@@ -51,7 +51,17 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(None — use `/gsd:new-milestone` to define next milestone requirements)
+**v1.2 Event Tasks Refactor:**
+- [ ] TASK-01: Remove PostgreSQL triggers and class_change_logs table
+- [ ] TASK-02: Rewrite TaskManager to read/write classes.event_dates JSONB
+- [ ] TASK-03: Simplify ClassTaskRepository to query classes directly
+- [ ] TASK-04: Update TaskController AJAX handler for event_dates sync
+- [ ] TASK-05: Implement Agent Order Number as special always-present task
+- [ ] TASK-06: Add completed_by/completed_at metadata to event schema
+- [ ] TASK-07: Update ClassTaskPresenter for event-based task display
+- [ ] TASK-08: Implement bidirectional status sync (dashboard ↔ form)
+- [ ] TASK-09: Remove deprecated files (6 files: ClassChangeSchema, ClassChangeListener, etc.)
+- [ ] TASK-10: Update FormDataProcessor to handle completion metadata
 
 ### Out of Scope
 
@@ -61,6 +71,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - OAuth/social login — not required
 
 ## Context
+
+### Current Milestone: v1.2 Event Tasks Refactor
+
+**Goal:** Replace trigger-based task system with manual event capture integration.
+
+**Target features:**
+- Tasks derived from user-entered events in class form (not auto-generated from INSERT/UPDATE)
+- Agent Order Number as special always-present task
+- Bidirectional sync between dashboard and class form
+- Remove deprecated trigger/change-log infrastructure
 
 ### Current State (v1.1 Shipped)
 
@@ -130,6 +150,9 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Store OpenAI config in WordPress options | Leverage existing WP admin UI, Azure support | ✓ v1.1 |
 | Action Scheduler for async processing | Industry-standard job queue, WooCommerce compatible | ✓ v1.1 |
 | Separate NotificationEnricher/Emailer services | Single Responsibility, independent failure | ✓ v1.1 |
+| Replace triggers with manual events | User captures events explicitly in form, simpler architecture | — Pending |
+| Agent Order Number always present | Confirms class activation, writes to order_nr field | — Pending |
+| Bidirectional event/task sync | Dashboard completion updates event_dates, form edits reflect in dashboard | — Pending |
 
 ---
-*Last updated: 2026-02-02 after v1.1 milestone complete*
+*Last updated: 2026-02-03 after v1.2 milestone started*
