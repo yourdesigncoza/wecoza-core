@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-Phase: 15 (Bidirectional Sync) — in progress
-Plan: 02/05 complete
-Status: Plan 02 complete, ready for Plan 03
-Last activity: 2026-02-03 — Completed 15-02-PLAN.md
+Phase: 15 (Bidirectional Sync) — complete
+Plan: 02/02 complete
+Status: Phase 15 complete, ready for Phase 16
+Last activity: 2026-02-03 — Completed Phase 15 execution
 
-Progress: v1.2 ████████████████░░░░░░░░░░░░░░ 56%
+Progress: v1.2 ██████████████████░░░░░░░░░░░░ 60%
 
 ## Milestone v1.2: Event Tasks Refactor
 
@@ -23,11 +23,11 @@ Progress: v1.2 ████████████████░░░░░�
 **Phases:**
 | # | Phase | Status | Requirements |
 |---|-------|--------|--------------|
-| 13 | Database Cleanup | Complete | DB-01..03 |
-| 14 | Task System Refactor | Complete | TASK-01..04, REPO-01..02 |
-| 15 | Bidirectional Sync | In Progress | SYNC-01..05, REPO-03 |
-| 16 | Presentation Layer | Pending | UI-01..03 |
-| 17 | Code Cleanup | Pending | CLEAN-01..06 |
+| 13 | Database Cleanup | ✓ Complete | DB-01..03 |
+| 14 | Task System Refactor | ✓ Complete | TASK-01..04, REPO-01..02 |
+| 15 | Bidirectional Sync | ✓ Complete | SYNC-01..05, REPO-03 |
+| 16 | Presentation Layer | ○ Pending | UI-01..03 |
+| 17 | Code Cleanup | ○ Pending | CLEAN-01..06 |
 
 **Key deliverables:**
 - Tasks derived from `classes.event_dates` JSONB (not triggers)
@@ -57,20 +57,20 @@ See: .planning/MILESTONES.md for full details
 |----------|-----------|--------|
 | Replace triggers with manual events | Simpler architecture, user controls events | In Progress |
 | Agent Order Number always present | Class activation confirmation | Implemented (14-01) |
-| Bidirectional sync | Dashboard - form stay in sync | In Progress |
+| Bidirectional sync | Dashboard ↔ form stay in sync | Implemented (15) |
 | Preserve notes on reopen | User data should not be lost | Implemented (15-01) |
 | Task IDs: agent-order, event-{index} | Predictable access pattern | Implemented (14-01) |
 | Empty string order_nr = incomplete | Explicit completion semantics | Implemented (14-01) |
 | Remove log_id from service return | Classes identified by class_id only | Implemented (14-02) |
 | All classes manageable | No skip logic for missing logs | Implemented (14-02) |
 | Tasks built at query time | Derived from event_dates, not persisted | Implemented (14-02) |
-| jsonb_set for atomic updates | Avoid read-modify-write races | Implemented (15-01) |
-| class_id replaces log_id for AJAX | Simplified API, no log lookup needed | Implemented (15-02) |
-| Agent Order reopen sets empty string | Explicit incomplete state | Implemented (15-02) |
+| TaskController uses class_id | log_id obsolete after trigger removal | Implemented (15-02) |
+| jsonb_set() for atomic updates | Prevents race conditions | Implemented (15-01) |
+| completion metadata passthrough | Form saves preserve dashboard changes | Implemented (15-01) |
 
 ### Pending Todos
 
-None.
+None — ready for Phase 16.
 
 ### Blockers/Concerns
 
@@ -78,8 +78,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:07:07Z
-Stopped at: Completed 15-02-PLAN.md
+Last session: 2026-02-03T13:10:00Z
+Stopped at: Completed Phase 15 execution
 Resume file: None
 
-**Next action:** Execute Phase 15 Plan 03 (or continue to Plan 04/05 if ready)
+**Next action:** Discuss or plan Phase 16 (Presentation Layer)

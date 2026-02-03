@@ -22,17 +22,17 @@ Requirements for Event Tasks Refactor milestone. Replaces trigger-based task sys
 
 ### Data Sync
 
-- [ ] **SYNC-01**: Update TaskController to write completion to `event_dates` JSONB
-- [ ] **SYNC-02**: Add `completed_by` field to event schema (WordPress user ID)
-- [ ] **SYNC-03**: Add `completed_at` field to event schema (ISO timestamp)
-- [ ] **SYNC-04**: Implement reopen behavior (preserve notes, clear completion metadata)
-- [ ] **SYNC-05**: Write Agent Order Number completion to `classes.order_nr` field
+- [x] **SYNC-01**: Update TaskController to write completion to `event_dates` JSONB
+- [x] **SYNC-02**: Add `completed_by` field to event schema (WordPress user ID)
+- [x] **SYNC-03**: Add `completed_at` field to event schema (ISO timestamp)
+- [x] **SYNC-04**: Implement reopen behavior (preserve notes, clear completion metadata)
+- [x] **SYNC-05**: Write Agent Order Number completion to `classes.order_nr` field
 
 ### Repository & Service Changes
 
 - [x] **REPO-01**: Simplify ClassTaskRepository to query classes directly (no JOIN to change logs)
 - [x] **REPO-02**: Update ClassTaskService to pass class data to TaskManager
-- [ ] **REPO-03**: Update FormDataProcessor to handle completion metadata fields
+- [x] **REPO-03**: Update FormDataProcessor to handle completion metadata fields
 
 ### Presentation Layer
 
@@ -81,14 +81,14 @@ Explicitly excluded from this milestone.
 | TASK-02 | Phase 14 | Done |
 | TASK-03 | Phase 14 | Done |
 | TASK-04 | Phase 14 | Done |
-| SYNC-01 | Phase 15 | Pending |
-| SYNC-02 | Phase 15 | Pending |
-| SYNC-03 | Phase 15 | Pending |
-| SYNC-04 | Phase 15 | Pending |
-| SYNC-05 | Phase 15 | Pending |
+| SYNC-01 | Phase 15 | Done |
+| SYNC-02 | Phase 15 | Done |
+| SYNC-03 | Phase 15 | Done |
+| SYNC-04 | Phase 15 | Done |
+| SYNC-05 | Phase 15 | Done |
 | REPO-01 | Phase 14 | Done |
 | REPO-02 | Phase 14 | Done |
-| REPO-03 | Phase 15 | Pending |
+| REPO-03 | Phase 15 | Done |
 | UI-01 | Phase 16 | Pending |
 | UI-02 | Phase 16 | Pending |
 | UI-03 | Phase 16 | Pending |
@@ -106,4 +106,4 @@ Explicitly excluded from this milestone.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after initial definition*
+*Last updated: 2026-02-03 after Phase 15 completion*
