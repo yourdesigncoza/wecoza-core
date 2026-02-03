@@ -122,128 +122,127 @@ test_result(
 echo "\n";
 
 // ============================================================================
-// TASK 2: DATABASE INTEGRATION AND TASK GENERATION
+// TASK 2: EVENT-BASED TASK BUILDING
 // ============================================================================
 
-echo "--- Task 2: Database Integration and Task Generation ---\n\n";
+echo "--- Task 2: Event-Based Task Building ---\n\n";
 
-// Test 2.1: Verify class_change_logs table exists
+// Test 2.1: Verify TaskManager::buildTasksFromEvents() method exists
 try {
-    $db = wecoza_db();
-    $table_check = $db->query("
-        SELECT EXISTS (
-            SELECT FROM information_schema.tables
-            WHERE table_schema = 'public'
-            AND table_name = 'class_change_logs'
-        ) as exists
-    ")->fetch(PDO::FETCH_ASSOC);
+    $task_manager = new \WeCoza\Events\Services\TaskManager();
 
-    $table_exists = (bool)$table_check['exists'];
+    $has_method = method_exists($task_manager, 'buildTasksFromEvents');
     test_result(
-        'class_change_logs table exists',
-        $table_exists,
-        $table_exists ? '' : 'Table not found in information_schema'
+        'TaskManager has buildTasksFromEvents() method',
+        $has_method,
+        $has_method ? '' : 'Method not found in TaskManager class'
     );
-} catch (Exception $e) {
-    test_result('class_change_logs table exists', false, $e->getMessage());
-    $table_exists = false;
-}
 
-// Test 2.2: Verify PostgreSQL trigger exists
-if ($table_exists) {
-    try {
-        $trigger_check = $db->query("
-            SELECT EXISTS (
-                SELECT FROM information_schema.triggers
-                WHERE event_object_table = 'classes'
-                AND trigger_name = 'classes_log_insert_update'
-            ) as exists
-        ")->fetch(PDO::FETCH_ASSOC);
+    // Test 2.2: Test buildTasksFromEvents with sample class data (no events)
+    if ($has_method) {
+        $sample_class = [
+            'class_id' => 999,
+            'order_nr' => null,
+            'event_dates' => null
+        ];
 
-        $has_trigger = (bool)$trigger_check['exists'];
+        $tasks = $task_manager->buildTasksFromEvents($sample_class);
+        $is_collection = $tasks instanceof \WeCoza\Events\Models\TaskCollection;
         test_result(
-            'classes_log_insert_update trigger exists on classes table',
-            $has_trigger,
-            $has_trigger ? '' : 'Trigger not found (run schema/migrations/001-verify-triggers.sql)'
+            'buildTasksFromEvents returns TaskCollection',
+            $is_collection,
+            $is_collection ? '' : 'Expected TaskCollection, got ' . gettype($tasks)
         );
 
-        // Test log_class_change function exists
-        $function_check = $db->query("
-            SELECT EXISTS (
-                SELECT FROM information_schema.routines
-                WHERE routine_schema = 'public'
-                AND routine_name = 'log_class_change'
-                AND routine_type = 'FUNCTION'
-            ) as exists
-        ")->fetch(PDO::FETCH_ASSOC);
-
-        $has_function = (bool)$function_check['exists'];
+        // Test 2.3: Agent Order Number always present
+        $has_agent_order = $tasks->has('agent-order');
         test_result(
-            'log_class_change() function exists',
-            $has_function,
-            $has_function ? '' : 'Trigger function not found'
+            'Agent Order Number task always present',
+            $has_agent_order,
+            $has_agent_order ? '' : 'agent-order task not found'
         );
-    } catch (Exception $e) {
-        test_result('PostgreSQL trigger verification', false, $e->getMessage());
-    }
-}
 
-// Test 2.3: Verify TaskTemplateRegistry returns correct templates
-try {
-    $registry = new \WeCoza\Events\Services\TaskTemplateRegistry();
+        // Test 2.4: Agent Order status when order_nr is empty
+        if ($has_agent_order) {
+            $agent_order_task = $tasks->get('agent-order');
+            $is_open = !$agent_order_task->isCompleted();
+            test_result(
+                'Agent Order is open when order_nr is null/empty',
+                $is_open,
+                $is_open ? '' : 'Expected task to be open'
+            );
+        }
 
-    // Test INSERT operation templates
-    $insert_collection = $registry->getTemplateForOperation('INSERT');
-    $expected_insert = ['agent-order', 'load-learners', 'training-schedule', 'material-delivery', 'agent-paperwork'];
-    $has_insert_templates = true;
-    foreach ($expected_insert as $task_id) {
-        if (!$insert_collection->has($task_id)) {
-            $has_insert_templates = false;
-            break;
+        // Test 2.5: Agent Order status when order_nr is set
+        $sample_class_with_order = [
+            'class_id' => 999,
+            'order_nr' => 'ABC-123',
+            'event_dates' => null
+        ];
+        $tasks_with_order = $task_manager->buildTasksFromEvents($sample_class_with_order);
+        $agent_order_task = $tasks_with_order->get('agent-order');
+        $is_complete = $agent_order_task->isCompleted();
+        test_result(
+            'Agent Order is completed when order_nr has value',
+            $is_complete,
+            $is_complete ? '' : 'Expected task to be completed'
+        );
+
+        // Test 2.6: Event tasks from event_dates JSONB
+        $sample_class_with_events = [
+            'class_id' => 999,
+            'order_nr' => null,
+            'event_dates' => json_encode([
+                ['type' => 'Training', 'description' => 'Week 1', 'status' => 'Pending'],
+                ['type' => 'Assessment', 'description' => '', 'status' => 'Completed']
+            ])
+        ];
+        $tasks_with_events = $task_manager->buildTasksFromEvents($sample_class_with_events);
+
+        $has_event_0 = $tasks_with_events->has('event-0');
+        $has_event_1 = $tasks_with_events->has('event-1');
+        test_result(
+            'Event tasks have IDs event-{index}',
+            $has_event_0 && $has_event_1,
+            ($has_event_0 && $has_event_1) ? '' : 'Expected event-0 and event-1 tasks'
+        );
+
+        // Test 2.7: Event task labels
+        if ($has_event_0 && $has_event_1) {
+            $event_0 = $tasks_with_events->get('event-0');
+            $event_1 = $tasks_with_events->get('event-1');
+
+            $label_0_correct = $event_0->getLabel() === 'Training: Week 1';
+            $label_1_correct = $event_1->getLabel() === 'Assessment';  // No description, just type
+            test_result(
+                'Event task labels formatted as {type}: {description} or {type}',
+                $label_0_correct && $label_1_correct,
+                ($label_0_correct && $label_1_correct) ? '' : 'Label format incorrect: ' . $event_0->getLabel() . ', ' . $event_1->getLabel()
+            );
+
+            // Test 2.8: Event task status derived from event status
+            $event_0_open = !$event_0->isCompleted();
+            $event_1_complete = $event_1->isCompleted();
+            test_result(
+                'Event task status derived from event status field',
+                $event_0_open && $event_1_complete,
+                ($event_0_open && $event_1_complete) ? '' : 'Status derivation incorrect'
+            );
         }
     }
-    test_result(
-        'TaskTemplateRegistry returns correct INSERT templates',
-        $has_insert_templates,
-        $has_insert_templates ? '' : 'Not all expected INSERT templates found'
-    );
-
-    // Test UPDATE operation templates
-    $update_collection = $registry->getTemplateForOperation('UPDATE');
-    $expected_update = ['review-update', 'notify-agents', 'adjust-materials'];
-    $has_update_templates = true;
-    foreach ($expected_update as $task_id) {
-        if (!$update_collection->has($task_id)) {
-            $has_update_templates = false;
-            break;
-        }
-    }
-    test_result(
-        'TaskTemplateRegistry returns correct UPDATE templates',
-        $has_update_templates,
-        $has_update_templates ? '' : 'Not all expected UPDATE templates found'
-    );
-
-    // Test DELETE operation templates
-    $delete_collection = $registry->getTemplateForOperation('DELETE');
-    $expected_delete = ['inform-stakeholders', 'archive-records'];
-    $has_delete_templates = true;
-    foreach ($expected_delete as $task_id) {
-        if (!$delete_collection->has($task_id)) {
-            $has_delete_templates = false;
-            break;
-        }
-    }
-    test_result(
-        'TaskTemplateRegistry returns correct DELETE templates',
-        $has_delete_templates,
-        $has_delete_templates ? '' : 'Not all expected DELETE templates found'
-    );
 } catch (Exception $e) {
-    test_result('TaskTemplateRegistry initialization', false, $e->getMessage());
+    test_result('TaskManager buildTasksFromEvents', false, $e->getMessage());
 }
 
-// Test 2.4: Verify ClassTaskRepository can fetch classes
+echo "\n";
+
+// ============================================================================
+// TASK 3: REPOSITORY AND SERVICE INTEGRATION
+// ============================================================================
+
+echo "--- Task 3: Repository and Service Integration ---\n\n";
+
+// Test 3.1: Verify ClassTaskRepository.fetchClasses() returns event_dates field
 try {
     $repository = new \WeCoza\Events\Repositories\ClassTaskRepository();
     $classes = $repository->fetchClasses(5, 'desc', null);
@@ -254,51 +253,98 @@ try {
         $fetch_works,
         $fetch_works ? '' : 'Expected array return type'
     );
+
+    if ($fetch_works && !empty($classes)) {
+        $first = $classes[0];
+
+        // Test 3.2: Has event_dates field
+        $has_event_dates = array_key_exists('event_dates', $first);
+        test_result(
+            'ClassTaskRepository returns event_dates field',
+            $has_event_dates,
+            $has_event_dates ? '' : 'event_dates field missing'
+        );
+
+        // Test 3.3: Has order_nr field
+        $has_order_nr = array_key_exists('order_nr', $first);
+        test_result(
+            'ClassTaskRepository returns order_nr field',
+            $has_order_nr,
+            $has_order_nr ? '' : 'order_nr field missing'
+        );
+
+        // Test 3.4: No log_id field (removed)
+        $no_log_id = !isset($first['log_id']);
+        test_result(
+            'ClassTaskRepository does NOT return log_id field',
+            $no_log_id,
+            $no_log_id ? '' : 'log_id field should be removed'
+        );
+    }
 } catch (Exception $e) {
     test_result('ClassTaskRepository.fetchClasses()', false, $e->getMessage());
 }
 
-// Test 2.5: Verify TaskManager can work with task collections
+// Test 3.5: Verify ClassTaskService.getClassTasks() returns items without log_id
 try {
-    $task_manager = new \WeCoza\Events\Services\TaskManager();
+    $service = new \WeCoza\Events\Services\ClassTaskService();
+    $result = $service->getClassTasks(5, 'desc', false, null);
 
-    // Check if method exists
-    $has_method = method_exists($task_manager, 'getTasksForLog');
+    $service_works = is_array($result);
     test_result(
-        'TaskManager has getTasksForLog() method',
-        $has_method,
-        $has_method ? '' : 'Method not found in TaskManager class'
+        'ClassTaskService.getClassTasks() executes without errors',
+        $service_works,
+        $service_works ? '' : 'Method execution failed'
     );
 
-    // If we have change logs, test the method
-    if ($has_method && $table_exists) {
-        $logs = $db->query("SELECT log_id FROM class_change_logs LIMIT 1")->fetchAll(PDO::FETCH_ASSOC);
+    if ($service_works && !empty($result)) {
+        $first = $result[0];
 
-        if (!empty($logs)) {
-            $tasks = $task_manager->getTasksForLog($logs[0]['log_id']);
-            $is_collection = $tasks instanceof \WeCoza\Events\Models\TaskCollection;
-            test_result(
-                'TaskManager.getTasksForLog() returns TaskCollection instance',
-                $is_collection,
-                $is_collection ? '' : 'Expected TaskCollection, got ' . get_class($tasks)
-            );
-        } else {
-            echo "  (Skipping TaskCollection test - no change logs exist)\n";
-        }
+        // Test 3.6: Has class_id
+        $has_class_id = isset($first['class_id']);
+        test_result(
+            'ClassTaskService returns class_id in result',
+            $has_class_id,
+            $has_class_id ? '' : 'class_id missing'
+        );
+
+        // Test 3.7: No log_id
+        $no_log_id = !isset($first['log_id']);
+        test_result(
+            'ClassTaskService does NOT return log_id in result',
+            $no_log_id,
+            $no_log_id ? '' : 'log_id should be removed'
+        );
+
+        // Test 3.8: manageable is always true
+        $always_manageable = $first['manageable'] === true;
+        test_result(
+            'All classes are manageable (manageable=true always)',
+            $always_manageable,
+            $always_manageable ? '' : 'manageable should be true'
+        );
+
+        // Test 3.9: tasks is TaskCollection
+        $is_collection = $first['tasks'] instanceof \WeCoza\Events\Models\TaskCollection;
+        test_result(
+            'ClassTaskService returns TaskCollection in tasks field',
+            $is_collection,
+            $is_collection ? '' : 'Expected TaskCollection'
+        );
     }
 } catch (Exception $e) {
-    test_result('TaskManager functionality', false, $e->getMessage());
+    test_result('ClassTaskService.getClassTasks()', false, $e->getMessage());
 }
 
 echo "\n";
 
 // ============================================================================
-// TASK 3: FILTERING AND PRESENTER FUNCTIONALITY
+// TASK 4: FILTERING AND PRESENTER FUNCTIONALITY
 // ============================================================================
 
-echo "--- Task 3: Filtering and Presenter Functionality ---\n\n";
+echo "--- Task 4: Filtering and Presenter Functionality ---\n\n";
 
-// Test 3.1: Verify ClassTaskPresenter formats data correctly
+// Test 4.1: Verify ClassTaskPresenter formats data correctly
 try {
     $presenter = new \WeCoza\Events\Views\Presenters\ClassTaskPresenter();
 
@@ -339,42 +385,7 @@ try {
     test_result('ClassTaskPresenter functionality', false, $e->getMessage());
 }
 
-// Test 3.2: Verify ClassTaskService filtering works
-try {
-    $service = new \WeCoza\Events\Services\ClassTaskService();
-
-    // Test getClassTasks method exists
-    $has_method = method_exists($service, 'getClassTasks');
-    test_result(
-        'ClassTaskService has getClassTasks() method',
-        $has_method,
-        $has_method ? '' : 'Method not found'
-    );
-
-    // Test with limit and sort
-    if ($has_method) {
-        $result = $service->getClassTasks(5, 'desc', false, null);
-        $filtering_works = is_array($result);
-        test_result(
-            'ClassTaskService.getClassTasks() executes without errors',
-            $filtering_works,
-            $filtering_works ? '' : 'Method execution failed'
-        );
-
-        // Test ascending sort
-        $result_asc = $service->getClassTasks(5, 'asc', false, null);
-        $sort_works = is_array($result_asc);
-        test_result(
-            'ClassTaskService sorting (asc/desc) works',
-            $sort_works,
-            $sort_works ? '' : 'Ascending sort failed'
-        );
-    }
-} catch (Exception $e) {
-    test_result('ClassTaskService functionality', false, $e->getMessage());
-}
-
-// Test 3.3: Verify TemplateRenderer works
+// Test 4.2: Verify TemplateRenderer works
 try {
     $base_path = wecoza_plugin_path('views/events/');
     $renderer = new \WeCoza\Events\Views\TemplateRenderer($base_path);
@@ -443,11 +454,12 @@ echo "REQUIREMENTS VERIFICATION\n";
 echo "====================================\n\n";
 
 $requirements = [
-    'TASK-01' => 'Class change monitoring via PostgreSQL triggers',
-    'TASK-02' => 'Task generation from class INSERT/UPDATE events',
-    'TASK-03' => 'Task completion/reopening via AJAX handler',
-    'TASK-04' => 'Task list shortcode [wecoza_event_tasks] renders',
-    'TASK-05' => 'Task filtering by status, date, class'
+    'TASK-01' => 'TaskManager builds tasks from event_dates JSONB',
+    'TASK-02' => 'Agent Order Number always present with order_nr status',
+    'TASK-03' => 'Task IDs: agent-order and event-{index}',
+    'TASK-04' => 'Task labels: {type}: {description} or {type}',
+    'REPO-01' => 'ClassTaskRepository queries classes directly',
+    'REPO-02' => 'ClassTaskService uses buildTasksFromEvents()'
 ];
 
 foreach ($requirements as $req => $desc) {
