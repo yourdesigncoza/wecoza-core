@@ -157,19 +157,32 @@ class FormDataProcessor
                 $dates = isset($data['event_dates_input']) ? $data['event_dates_input'] : [];
                 $statuses = isset($data['event_statuses']) ? $data['event_statuses'] : [];
                 $notes = isset($data['event_notes']) ? $data['event_notes'] : [];
+                // Extract completion metadata arrays (SYNC-04: preserve dashboard completions)
+                $completedByArr = isset($data['event_completed_by']) ? $data['event_completed_by'] : [];
+                $completedAtArr = isset($data['event_completed_at']) ? $data['event_completed_at'] : [];
 
                 for ($i = 0; $i < count($types); $i++) {
                     $currentType = $types[$i] ?? '';
                     $currentDate = $dates[$i] ?? '';
                     if (!empty($currentType) && !empty($currentDate)) {
                         $status = self::sanitizeText($statuses[$i] ?? 'Pending');
-                        $eventDates[] = [
+                        $event = [
                             'type' => self::sanitizeText($currentType),
                             'description' => self::sanitizeText($descriptions[$i] ?? ''),
                             'date' => self::sanitizeText($currentDate),
                             'status' => in_array($status, $allowedStatuses) ? $status : 'Pending',
                             'notes' => self::sanitizeText($notes[$i] ?? '')
                         ];
+
+                        // Preserve completion metadata if present
+                        if (isset($completedByArr[$i]) && $completedByArr[$i] !== '') {
+                            $event['completed_by'] = intval($completedByArr[$i]);
+                        }
+                        if (isset($completedAtArr[$i]) && $completedAtArr[$i] !== '') {
+                            $event['completed_at'] = self::sanitizeText($completedAtArr[$i]);
+                        }
+
+                        $eventDates[] = $event;
                     }
                 }
             }
