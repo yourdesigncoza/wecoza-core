@@ -50,11 +50,11 @@ Plans:
 
 **Requirements:** TASK-01, TASK-02, TASK-03, TASK-04, REPO-01, REPO-02
 
-**Plans:** 2 plans
+**Plans:** 2 plans (complete)
 
 Plans:
-- [ ] 14-01-PLAN.md — Add buildTasksFromEvents() factory method to TaskManager
-- [ ] 14-02-PLAN.md — Update repository and service for direct class queries
+- [x] 14-01-PLAN.md — Add buildTasksFromEvents() factory method to TaskManager
+- [x] 14-02-PLAN.md — Update repository and service for direct class queries
 
 **Success Criteria:**
 1. TaskManager builds TaskCollection from `classes.event_dates` array
@@ -162,4 +162,4 @@ Phase 17 (Cleanup) <- must be last, removes old code
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 14 planning*
+*Last updated: 2026-02-03 after Phase 14 execution*

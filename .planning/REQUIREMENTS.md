@@ -9,16 +9,16 @@ Requirements for Event Tasks Refactor milestone. Replaces trigger-based task sys
 
 ### Database Cleanup
 
-- [ ] **DB-01**: Drop PostgreSQL trigger `log_class_change_trigger` on classes table
-- [ ] **DB-02**: Drop trigger function `log_class_change()`
-- [ ] **DB-03**: Drop `class_change_logs` table
+- [x] **DB-01**: Drop PostgreSQL trigger `log_class_change_trigger` on classes table
+- [x] **DB-02**: Drop trigger function `log_class_change()`
+- [x] **DB-03**: Drop `class_change_logs` table
 
 ### Task System Refactor
 
-- [ ] **TASK-01**: Rewrite TaskManager to build tasks from `classes.event_dates` JSONB
-- [ ] **TASK-02**: Implement Agent Order Number as special always-present task
-- [ ] **TASK-03**: Generate task IDs as `agent-order` and `event-{index}`
-- [ ] **TASK-04**: Derive task labels from event type and description
+- [x] **TASK-01**: Rewrite TaskManager to build tasks from `classes.event_dates` JSONB
+- [x] **TASK-02**: Implement Agent Order Number as special always-present task
+- [x] **TASK-03**: Generate task IDs as `agent-order` and `event-{index}`
+- [x] **TASK-04**: Derive task labels from event type and description
 
 ### Data Sync
 
@@ -30,8 +30,8 @@ Requirements for Event Tasks Refactor milestone. Replaces trigger-based task sys
 
 ### Repository & Service Changes
 
-- [ ] **REPO-01**: Simplify ClassTaskRepository to query classes directly (no JOIN to change logs)
-- [ ] **REPO-02**: Update ClassTaskService to pass class data to TaskManager
+- [x] **REPO-01**: Simplify ClassTaskRepository to query classes directly (no JOIN to change logs)
+- [x] **REPO-02**: Update ClassTaskService to pass class data to TaskManager
 - [ ] **REPO-03**: Update FormDataProcessor to handle completion metadata fields
 
 ### Presentation Layer
@@ -74,20 +74,20 @@ Explicitly excluded from this milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | Phase 13 | Pending |
-| DB-02 | Phase 13 | Pending |
-| DB-03 | Phase 13 | Pending |
-| TASK-01 | Phase 14 | Pending |
-| TASK-02 | Phase 14 | Pending |
-| TASK-03 | Phase 14 | Pending |
-| TASK-04 | Phase 14 | Pending |
+| DB-01 | Phase 13 | Done |
+| DB-02 | Phase 13 | Done |
+| DB-03 | Phase 13 | Done |
+| TASK-01 | Phase 14 | Done |
+| TASK-02 | Phase 14 | Done |
+| TASK-03 | Phase 14 | Done |
+| TASK-04 | Phase 14 | Done |
 | SYNC-01 | Phase 15 | Pending |
 | SYNC-02 | Phase 15 | Pending |
 | SYNC-03 | Phase 15 | Pending |
 | SYNC-04 | Phase 15 | Pending |
 | SYNC-05 | Phase 15 | Pending |
-| REPO-01 | Phase 14 | Pending |
-| REPO-02 | Phase 14 | Pending |
+| REPO-01 | Phase 14 | Done |
+| REPO-02 | Phase 14 | Done |
 | REPO-03 | Phase 15 | Pending |
 | UI-01 | Phase 16 | Pending |
 | UI-02 | Phase 16 | Pending |
