@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 15 (Bidirectional Sync) — in progress
-Plan: 01/05 complete
-Status: Plan 01 complete, ready for Plan 02
-Last activity: 2026-02-03 — Completed 15-01-PLAN.md
+Plan: 02/05 complete
+Status: Plan 02 complete, ready for Plan 03
+Last activity: 2026-02-03 — Completed 15-02-PLAN.md
 
-Progress: v1.2 ██████████████░░░░░░░░░░░░░░░░ 48%
+Progress: v1.2 ████████████████░░░░░░░░░░░░░░ 56%
 
 ## Milestone v1.2: Event Tasks Refactor
 
@@ -65,6 +65,8 @@ See: .planning/MILESTONES.md for full details
 | All classes manageable | No skip logic for missing logs | Implemented (14-02) |
 | Tasks built at query time | Derived from event_dates, not persisted | Implemented (14-02) |
 | jsonb_set for atomic updates | Avoid read-modify-write races | Implemented (15-01) |
+| class_id replaces log_id for AJAX | Simplified API, no log lookup needed | Implemented (15-02) |
+| Agent Order reopen sets empty string | Explicit incomplete state | Implemented (15-02) |
 
 ### Pending Todos
 
@@ -76,8 +78,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:05:00Z
-Stopped at: Completed 15-01-PLAN.md
+Last session: 2026-02-03T13:07:07Z
+Stopped at: Completed 15-02-PLAN.md
 Resume file: None
 
-**Next action:** Execute Phase 15 Plan 02 (AJAX handler integration)
+**Next action:** Execute Phase 15 Plan 03 (or continue to Plan 04/05 if ready)
