@@ -16,8 +16,8 @@ if (!defined('ABSPATH')) {
 
 final class ClassTaskRepository extends BaseRepository
 {
-    protected static string $table = 'class_change_logs';
-    protected static string $primaryKey = 'log_id';
+    protected static string $table = 'classes';
+    protected static string $primaryKey = 'class_id';
 
     /**
      * Get columns allowed for ORDER BY clauses
@@ -26,7 +26,7 @@ final class ClassTaskRepository extends BaseRepository
      */
     protected function getAllowedOrderColumns(): array
     {
-        return ['log_id', 'class_id', 'changed_at', 'operation', 'original_start_date'];
+        return ['class_id', 'original_start_date'];
     }
 
     /**
@@ -36,7 +36,7 @@ final class ClassTaskRepository extends BaseRepository
      */
     protected function getAllowedFilterColumns(): array
     {
-        return ['log_id', 'class_id', 'operation'];
+        return ['class_id'];
     }
 
     /**
@@ -80,22 +80,13 @@ SELECT
     COALESCE(c.seta, cl.seta) AS seta_name,
     c.stop_restart_dates,
     c.updated_at,
-    cl.client_name,
-    l.log_id AS log_id,
-    l.operation,
-    l.changed_at
+    c.order_nr,
+    c.event_dates,
+    cl.client_name
 FROM classes c
 LEFT JOIN clients cl ON cl.client_id = c.client_id
 LEFT JOIN agents ia ON ia.agent_id = c.initial_class_agent
 LEFT JOIN agents pa ON pa.agent_id = c.class_agent
-LEFT JOIN LATERAL (
-    SELECT log_id, operation, changed_at
-    FROM class_change_logs log
-    WHERE log.class_id = c.class_id
-      AND LOWER(log.operation) IN ('insert', 'update')
-    ORDER BY log.changed_at DESC
-    LIMIT 1
-) l ON TRUE
 {$whereClause}
 ORDER BY c.original_start_date {$orderDirection} NULLS LAST, c.class_id {$orderDirection}
 LIMIT :limit;
