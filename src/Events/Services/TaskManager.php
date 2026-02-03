@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 use PDO;
 use RuntimeException;
 use WeCoza\Core\Database\PostgresConnection;
+use WeCoza\Events\Models\Task;
 use WeCoza\Events\Models\TaskCollection;
 
 use JsonException;
@@ -296,5 +297,115 @@ SQL;
         }
 
         return $value;
+    }
+
+    /**
+     * Build a TaskCollection from the class's event_dates JSONB array.
+     *
+     * Always includes the Agent Order Number task, plus one task per event.
+     *
+     * @param array<string, mixed> $class Class data array with 'order_nr' and 'event_dates' keys
+     * @return TaskCollection Collection of tasks derived from events
+     */
+    public function buildTasksFromEvents(array $class): TaskCollection
+    {
+        $collection = new TaskCollection();
+
+        // Agent Order Number task is always present
+        $collection->add($this->buildAgentOrderTask($class));
+
+        // Decode event_dates JSONB
+        $eventDatesRaw = $class['event_dates'] ?? null;
+        $events = [];
+
+        if ($eventDatesRaw !== null && $eventDatesRaw !== '') {
+            if (is_string($eventDatesRaw)) {
+                $decoded = json_decode($eventDatesRaw, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $events = $decoded;
+                } else {
+                    wecoza_log('Invalid JSON in event_dates: ' . json_last_error_msg(), 'warning');
+                }
+            } elseif (is_array($eventDatesRaw)) {
+                $events = $eventDatesRaw;
+            }
+        }
+
+        // Build task for each event
+        foreach ($events as $index => $event) {
+            if (is_array($event)) {
+                $collection->add($this->buildEventTask((int) $index, $event));
+            }
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Build the Agent Order Number task.
+     *
+     * Status is completed if order_nr is non-null AND non-empty string.
+     *
+     * @param array<string, mixed> $class Class data array
+     * @return Task The Agent Order Number task
+     */
+    private function buildAgentOrderTask(array $class): Task
+    {
+        $orderNr = $class['order_nr'] ?? null;
+
+        // Explicit check: completed only if non-null AND non-empty string
+        $isComplete = $orderNr !== null && $orderNr !== '';
+        $status = $isComplete ? Task::STATUS_COMPLETED : Task::STATUS_OPEN;
+
+        return new Task(
+            'agent-order',
+            'Agent Order Number',
+            $status,
+            null, // completedBy - Phase 15 adds this
+            null, // completedAt - Phase 15 adds this
+            $isComplete ? (string) $orderNr : null
+        );
+    }
+
+    /**
+     * Build a task from an event array.
+     *
+     * Label format: "{type}: {description}" if description non-empty, else just "{type}".
+     * Status derived from event['status'] field.
+     *
+     * @param int $index Event index for ID generation
+     * @param array<string, mixed> $event Event data from event_dates JSONB
+     * @return Task The event task
+     */
+    private function buildEventTask(int $index, array $event): Task
+    {
+        // Extract type with fallback
+        $type = isset($event['type']) && $event['type'] !== '' ? (string) $event['type'] : 'Unknown Event';
+
+        // Extract and trim description
+        $description = isset($event['description']) ? trim((string) $event['description']) : '';
+
+        // Format label
+        $label = $description !== '' ? "{$type}: {$description}" : $type;
+
+        // Derive status from event status field
+        $eventStatus = $event['status'] ?? 'Pending';
+        $status = match ($eventStatus) {
+            'Completed' => Task::STATUS_COMPLETED,
+            'Pending', 'Cancelled' => Task::STATUS_OPEN,
+            default => Task::STATUS_OPEN,
+        };
+
+        // Extract notes
+        $notes = isset($event['notes']) && $event['notes'] !== '' ? (string) $event['notes'] : null;
+
+        return new Task(
+            "event-{$index}",
+            $label,
+            $status,
+            null, // completedBy - Phase 15 adds this
+            null, // completedAt - Phase 15 adds this
+            $notes
+        );
     }
 }
