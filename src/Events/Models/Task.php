@@ -121,7 +121,7 @@ final class Task
         $clone->status = self::STATUS_OPEN;
         $clone->completedBy = null;
         $clone->completedAt = null;
-        $clone->note = null;
+        // Note: deliberately preserve $clone->note (SYNC-04 requirement)
         return $clone;
     }
 }
