@@ -77,6 +77,12 @@ Plans:
 
 **Requirements:** SYNC-01, SYNC-02, SYNC-03, SYNC-04, SYNC-05, REPO-03
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Foundation methods (JSONB update, notes preservation, metadata passthrough)
+- [ ] 15-02-PLAN.md — TaskController refactor (class_id, completion/reopen persistence)
+
 **Success Criteria:**
 1. Completing task updates `event_dates[N].status` to 'Completed'
 2. Completing task sets `event_dates[N].completed_by` to current user ID
@@ -162,4 +168,4 @@ Phase 17 (Cleanup) <- must be last, removes old code
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 14 execution*
+*Last updated: 2026-02-03 after Phase 15 planning*
