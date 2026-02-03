@@ -300,6 +300,87 @@ SQL;
     }
 
     /**
+     * Parse the event index from a task ID.
+     *
+     * @param string $taskId Task ID (e.g., "event-3" or "agent-order")
+     * @return int|null Integer index for event tasks, null for non-event tasks
+     */
+    public function parseEventIndex(string $taskId): ?int
+    {
+        if (preg_match('/^event-(\d+)$/', $taskId, $matches)) {
+            return (int) $matches[1];
+        }
+        return null;
+    }
+
+    /**
+     * Update a specific event's status in the classes.event_dates JSONB array.
+     *
+     * Uses PostgreSQL jsonb_set() for atomic update of a single event element.
+     *
+     * @param int $classId Class ID
+     * @param int $eventIndex Zero-based index of the event in the array
+     * @param string $status New status ('Pending' or 'Completed')
+     * @param int|null $completedBy User ID who completed (null for Pending)
+     * @param string|null $completedAt ISO timestamp of completion (null for Pending)
+     * @param string|null $notes Optional notes to include
+     * @throws RuntimeException If update fails
+     */
+    public function updateEventStatus(
+        int $classId,
+        int $eventIndex,
+        string $status,
+        ?int $completedBy,
+        ?string $completedAt,
+        ?string $notes = null
+    ): void {
+        // Build the updates object
+        $updates = ['status' => $status];
+
+        if ($status === 'Completed') {
+            $updates['completed_by'] = $completedBy;
+            $updates['completed_at'] = $completedAt;
+        } else {
+            // Pending: clear completion metadata
+            $updates['completed_by'] = null;
+            $updates['completed_at'] = null;
+        }
+
+        if ($notes !== null) {
+            $updates['notes'] = $notes;
+        }
+
+        $updatesJson = json_encode($updates, JSON_THROW_ON_ERROR);
+        $path = '{' . $eventIndex . '}';
+
+        $sql = <<<SQL
+UPDATE classes
+SET event_dates = jsonb_set(
+    event_dates,
+    :path::text[],
+    (event_dates->:index) || :updates::jsonb,
+    true
+),
+    updated_at = NOW()
+WHERE class_id = :class_id
+SQL;
+
+        $stmt = $this->db->getPdo()->prepare($sql);
+        if ($stmt === false) {
+            throw new RuntimeException('Failed to prepare event status update.');
+        }
+
+        $stmt->bindValue(':path', $path, PDO::PARAM_STR);
+        $stmt->bindValue(':index', $eventIndex, PDO::PARAM_INT);
+        $stmt->bindValue(':updates', $updatesJson, PDO::PARAM_STR);
+        $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
+
+        if (!$stmt->execute()) {
+            throw new RuntimeException('Failed to update event status.');
+        }
+    }
+
+    /**
      * Build a TaskCollection from the class's event_dates JSONB array.
      *
      * Always includes the Agent Order Number task, plus one task per event.
