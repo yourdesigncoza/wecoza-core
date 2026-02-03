@@ -72,47 +72,127 @@ final class TaskManager
         return $existing;
     }
 
+    /**
+     * Mark a task as completed.
+     *
+     * For event tasks, updates event_dates JSONB at the specified index.
+     * For agent-order task, writes order number to classes.order_nr.
+     *
+     * @param int $classId Class ID
+     * @param string $taskId Task ID (e.g., "agent-order" or "event-0")
+     * @param int $userId User ID who completed
+     * @param string $timestamp Completion timestamp
+     * @param string|null $note Optional note (required for agent-order)
+     * @return TaskCollection Fresh task collection after update
+     * @throws RuntimeException If task ID invalid or order number missing
+     */
     public function markTaskCompleted(
-        int $logId,
+        int $classId,
         string $taskId,
         int $userId,
         string $timestamp,
         ?string $note = null
     ): TaskCollection {
         $cleanNote = $note !== null ? trim($note) : null;
-        $tasks = $this->getTasksWithTemplate($logId);
 
-        if ($this->requiresNote($taskId)) {
-            $orderNumber = $this->normaliseOrderNumber($cleanNote ?? '');
-            if ($orderNumber === '') {
-                throw new RuntimeException(__('An order number is required before completing this task.', 'wecoza-events'));
-            }
-
-            $classId = $this->fetchClassIdForLog($logId);
-            $this->updateClassOrderNumber($classId, $orderNumber);
-            $cleanNote = $orderNumber;
+        // Handle agent-order task specially
+        if ($taskId === 'agent-order') {
+            return $this->completeAgentOrderTask($classId, $userId, $timestamp, $cleanNote);
         }
 
-        $task = $tasks->get($taskId)->markCompleted(
-            $userId,
-            $timestamp,
-            $cleanNote === null || $cleanNote === '' ? null : $cleanNote
-        );
-        $tasks->replace($task);
-        $this->saveTasksForLog($logId, $tasks);
+        // Parse event index from task ID
+        $eventIndex = $this->parseEventIndex($taskId);
+        if ($eventIndex === null) {
+            throw new RuntimeException(__('Invalid task ID format.', 'wecoza-events'));
+        }
 
-        return $tasks;
+        // Update event_dates JSONB at specific index
+        $this->updateEventStatus($classId, $eventIndex, 'Completed', $userId, $timestamp, $cleanNote);
+
+        // Return fresh tasks
+        $class = $this->fetchClassById($classId);
+        return $this->buildTasksFromEvents($class);
     }
 
-    public function reopenTask(int $logId, string $taskId): TaskCollection
+    /**
+     * Complete the Agent Order Number task.
+     *
+     * Validates order number and writes to classes.order_nr.
+     *
+     * @param int $classId Class ID
+     * @param int $userId User ID who completed
+     * @param string $timestamp Completion timestamp
+     * @param string|null $note Order number value
+     * @return TaskCollection Fresh task collection after update
+     * @throws RuntimeException If order number missing or empty
+     */
+    private function completeAgentOrderTask(
+        int $classId,
+        int $userId,
+        string $timestamp,
+        ?string $note
+    ): TaskCollection {
+        $orderNumber = $this->normaliseOrderNumber($note ?? '');
+        if ($orderNumber === '') {
+            throw new RuntimeException(__('An order number is required before completing this task.', 'wecoza-events'));
+        }
+
+        $this->updateClassOrderNumber($classId, $orderNumber);
+
+        // Return fresh tasks
+        $class = $this->fetchClassById($classId);
+        return $this->buildTasksFromEvents($class);
+    }
+
+    /**
+     * Reopen a previously completed task.
+     *
+     * For event tasks, sets status to Pending and clears completion metadata (preserves notes).
+     * For agent-order task, sets order_nr to empty string.
+     *
+     * @param int $classId Class ID
+     * @param string $taskId Task ID (e.g., "agent-order" or "event-0")
+     * @return TaskCollection Fresh task collection after update
+     * @throws RuntimeException If task ID invalid
+     */
+    public function reopenTask(int $classId, string $taskId): TaskCollection
     {
-        $tasks = $this->getTasksWithTemplate($logId);
+        // Handle agent-order task specially - set order_nr to empty string
+        if ($taskId === 'agent-order') {
+            return $this->reopenAgentOrderTask($classId);
+        }
 
-        $task = $tasks->get($taskId)->reopen();
-        $tasks->replace($task);
-        $this->saveTasksForLog($logId, $tasks);
+        // Parse event index from task ID
+        $eventIndex = $this->parseEventIndex($taskId);
+        if ($eventIndex === null) {
+            throw new RuntimeException(__('Invalid task ID format.', 'wecoza-events'));
+        }
 
-        return $tasks;
+        // Update event_dates JSONB: set status to Pending, clear completion metadata
+        // Note: The updateEventStatus method preserves notes when they exist
+        $this->updateEventStatus($classId, $eventIndex, 'Pending', null, null, null);
+
+        // Return fresh tasks
+        $class = $this->fetchClassById($classId);
+        return $this->buildTasksFromEvents($class);
+    }
+
+    /**
+     * Reopen the Agent Order Number task.
+     *
+     * Sets order_nr to empty string which marks the task as incomplete.
+     *
+     * @param int $classId Class ID
+     * @return TaskCollection Fresh task collection after update
+     */
+    private function reopenAgentOrderTask(int $classId): TaskCollection
+    {
+        // Set order_nr to empty string = incomplete
+        $this->updateClassOrderNumber($classId, '');
+
+        // Return fresh tasks
+        $class = $this->fetchClassById($classId);
+        return $this->buildTasksFromEvents($class);
     }
 
     private function fetchOperation(int $logId): string
@@ -263,6 +343,35 @@ SQL;
         }
 
         return (int) $classId;
+    }
+
+    /**
+     * Fetch a class by ID with fields needed for task building.
+     *
+     * @param int $classId Class ID
+     * @return array<string, mixed> Class data with class_id, order_nr, event_dates
+     * @throws RuntimeException If class not found
+     */
+    private function fetchClassById(int $classId): array
+    {
+        $sql = "SELECT class_id, order_nr, event_dates FROM classes WHERE class_id = :class_id LIMIT 1";
+
+        $stmt = $this->db->getPdo()->prepare($sql);
+        if ($stmt === false) {
+            throw new RuntimeException('Failed to prepare class lookup.');
+        }
+
+        $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
+        if (!$stmt->execute()) {
+            throw new RuntimeException('Failed to execute class lookup.');
+        }
+
+        $class = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($class === false) {
+            throw new RuntimeException(__('Class not found.', 'wecoza-events'));
+        }
+
+        return $class;
     }
 
     private function updateClassOrderNumber(int $classId, string $orderNumber): void
@@ -477,6 +586,10 @@ SQL;
             default => Task::STATUS_OPEN,
         };
 
+        // Extract completion metadata
+        $completedBy = isset($event['completed_by']) ? (int) $event['completed_by'] : null;
+        $completedAt = isset($event['completed_at']) && $event['completed_at'] !== '' ? (string) $event['completed_at'] : null;
+
         // Extract notes
         $notes = isset($event['notes']) && $event['notes'] !== '' ? (string) $event['notes'] : null;
 
@@ -484,8 +597,8 @@ SQL;
             "event-{$index}",
             $label,
             $status,
-            null, // completedBy - Phase 15 adds this
-            null, // completedAt - Phase 15 adds this
+            $completedBy,
+            $completedAt,
             $notes
         );
     }
