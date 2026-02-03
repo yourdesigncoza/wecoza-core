@@ -7,27 +7,21 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use RuntimeException;
 use WeCoza\Events\Repositories\ClassTaskRepository;
-use WeCoza\Events\Models\TaskCollection;
 
 use function count;
-use function strtolower;
 
 final class ClassTaskService
 {
     private ClassTaskRepository $repository;
     private TaskManager $taskManager;
-    private TaskTemplateRegistry $templateRegistry;
 
     public function __construct(
         ?ClassTaskRepository $repository = null,
-        ?TaskManager $taskManager = null,
-        ?TaskTemplateRegistry $templateRegistry = null
+        ?TaskManager $taskManager = null
     ) {
         $this->repository = $repository ?? new ClassTaskRepository();
         $this->taskManager = $taskManager ?? new TaskManager();
-        $this->templateRegistry = $templateRegistry ?? new TaskTemplateRegistry();
     }
 
     /**
@@ -39,25 +33,14 @@ final class ClassTaskService
 
         $items = [];
         foreach ($rows as $row) {
-            $logId = isset($row['log_id']) ? (int) $row['log_id'] : null;
-            if ($logId === null || $logId <= 0) {
-                // Skip classes without a log entry; they cannot be managed yet.
-                continue;
-            }
-
-            $operation = strtolower((string) ($row['operation'] ?? 'insert')) ?: 'insert';
-            $tasks = $this->taskManager->getTasksWithTemplate($logId, $operation);
-
-            if (!$tasks instanceof TaskCollection) {
-                throw new RuntimeException('Invalid tasks payload.');
-            }
+            // Build tasks from event_dates (no log_id needed)
+            $tasks = $this->taskManager->buildTasksFromEvents($row);
 
             $items[] = [
                 'row' => $row,
                 'tasks' => $tasks,
-                'log_id' => $logId,
-                'operation' => $operation,
-                'manageable' => true,
+                'class_id' => (int) $row['class_id'],
+                'manageable' => true,  // All classes manageable now
                 'open_count' => count($tasks->open()),
             ];
         }
