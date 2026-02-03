@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 Phase: 16 (Presentation Layer) — in progress
 Plan: 01/02 complete
 Status: Plan 16-01 complete, ready for 16-02
-Last activity: 2026-02-03 — Completed 16-01-PLAN.md
+Last activity: 2026-02-03 — Completed quick task 001: event notes display fix
 
 Progress: v1.2 ████████████████████░░░░░░░░░░ 70%
 
@@ -76,6 +76,12 @@ None — continue to 16-02.
 ### Blockers/Concerns
 
 None identified.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Event notes not showing in Open Tasks view | 2026-02-03 | 02ab22e | [001-event-notes-not-showing-in-tasks](./quick/001-event-notes-not-showing-in-tasks/) |
 
 ## Session Continuity
 
