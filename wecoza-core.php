@@ -208,9 +208,10 @@ add_action('plugins_loaded', function () {
     if (class_exists(\WeCoza\Events\Shortcodes\MaterialTrackingShortcode::class)) {
         \WeCoza\Events\Shortcodes\MaterialTrackingShortcode::register();
     }
-    if (class_exists(\WeCoza\Events\Shortcodes\AISummaryShortcode::class)) {
-        \WeCoza\Events\Shortcodes\AISummaryShortcode::register();
-    }
+    // AI Summary shortcode disabled - requires class_change_logs table (dropped in Phase 13)
+    // if (class_exists(\WeCoza\Events\Shortcodes\AISummaryShortcode::class)) {
+    //     \WeCoza\Events\Shortcodes\AISummaryShortcode::register();
+    // }
     if (class_exists(\WeCoza\Events\Controllers\TaskController::class)) {
         \WeCoza\Events\Controllers\TaskController::register();
     }
@@ -510,8 +511,8 @@ if (defined('WP_CLI') && WP_CLI) {
         WP_CLI::log('  wp wecoza version    - Show plugin version');
     });
 
-    // Events CLI commands
-    if (class_exists(\WeCoza\Events\CLI\AISummaryStatusCommand::class)) {
-        \WeCoza\Events\CLI\AISummaryStatusCommand::register();
-    }
+    // AI Summary CLI command disabled - requires class_change_logs table (dropped in Phase 13)
+    // if (class_exists(\WeCoza\Events\CLI\AISummaryStatusCommand::class)) {
+    //     \WeCoza\Events\CLI\AISummaryStatusCommand::register();
+    // }
 }
