@@ -257,7 +257,11 @@ add_action('plugins_loaded', function () {
         }
     });
 
-    // Email Notification Cron Handler
+    // DEPRECATED: Email Notification Cron Handler
+    // Disabled after Phase 13 dropped class_change_logs table.
+    // The entire notification system was built on trigger-based change logs which no longer exist.
+    // TODO: Phase 16+ will redesign notifications for new architecture (classes.event_dates JSONB).
+    /*
     add_action('wecoza_email_notifications_process', function () {
         if (!class_exists(\WeCoza\Events\Services\NotificationProcessor::class)) {
             return;
@@ -266,8 +270,11 @@ add_action('plugins_loaded', function () {
         $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
         $processor->process();
     });
+    */
 
-    // Action Scheduler Job Handlers for Async Notifications
+    // DEPRECATED: Action Scheduler Job Handlers for Async Notifications
+    // Disabled after Phase 13 dropped class_change_logs table.
+    /*
     add_action('wecoza_enrich_notification', function (int $logId) {
         if (!class_exists(\WeCoza\Events\Services\NotificationEnricher::class)) {
             return;
@@ -298,6 +305,7 @@ add_action('plugins_loaded', function () {
         $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
         $emailer->send($logId, $recipient, $emailContext);
     }, 10, 3);
+    */
 
     /*
     |--------------------------------------------------------------------------
@@ -396,10 +404,18 @@ register_activation_hook(__FILE__, function () {
         wp_schedule_event(time(), 'daily', 'wecoza_material_notifications_check');
     }
 
-    // Schedule email notification cron if not already scheduled
+    // DEPRECATED: Schedule email notification cron if not already scheduled
+    // Disabled after Phase 13 dropped class_change_logs table.
+    // Unschedule any existing cron to prevent errors.
+    $emailTimestamp = wp_next_scheduled('wecoza_email_notifications_process');
+    if ($emailTimestamp) {
+        wp_unschedule_event($emailTimestamp, 'wecoza_email_notifications_process');
+    }
+    /*
     if (!wp_next_scheduled('wecoza_email_notifications_process')) {
         wp_schedule_event(time(), 'hourly', 'wecoza_email_notifications_process');
     }
+    */
 
     /**
      * Fires when WeCoza Core is activated.
