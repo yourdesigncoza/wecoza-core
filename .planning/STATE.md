@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 Phase: 18 (Notification System) — in progress
 Plan: 07/08 complete
 Status: Phase 18 in progress
-Last activity: 2026-02-05 — Completed 18-07-PLAN.md (Admin Settings UI)
+Last activity: 2026-02-05 — Completed 18-06-PLAN.md (Enable Notification Hooks)
 
 Progress: v1.2 ████████████████████████████░░ 93%
 Progress: Phase 18 █████████████████████████░░░░░ 87% (7/8 plans)
@@ -86,6 +86,9 @@ See: .planning/MILESTONES.md for full details
 | Click-to-mark-viewed interaction | Automatic view tracking on notification click | Implemented (18-04) |
 | WordPress Settings API for recipient config | Standard WP pattern, automatic save handling | Implemented (18-07) |
 | Multi-recipient per event type | Comma-separated emails, validated on save | Implemented (18-07) |
+| wecoza_notification_recipients option | Array storage for multi-recipient support | Implemented (18-06) |
+| Separate process_event from send_email | Enrichment and delivery as separate Action Scheduler jobs | Implemented (18-06) |
+| Dashboard AJAX via notifications nonce | Separate nonce for notification operations | Implemented (18-06) |
 
 ### Pending Todos
 
@@ -104,8 +107,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-05T09:37:00Z
-Stopped at: Completed 18-07-PLAN.md
+Last session: 2026-02-05T09:40:00Z
+Stopped at: Completed 18-06-PLAN.md
 Resume file: None
 
 **Next action:** Execute 18-08-PLAN.md (Email delivery integration)
