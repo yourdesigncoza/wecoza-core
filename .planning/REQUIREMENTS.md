@@ -42,12 +42,12 @@ Requirements for Event Tasks Refactor milestone. Replaces trigger-based task sys
 
 ### Code Cleanup
 
-- [ ] **CLEAN-01**: Remove `src/Events/Models/ClassChangeSchema.php`
-- [ ] **CLEAN-02**: Remove `src/Events/Services/ClassChangeListener.php`
-- [ ] **CLEAN-03**: Remove `src/Events/Services/TaskTemplateRegistry.php`
-- [ ] **CLEAN-04**: Remove `src/Events/Repositories/ClassChangeLogRepository.php`
-- [ ] **CLEAN-05**: Remove `src/Events/Models/ClassChangeLogDTO.php`
-- [ ] **CLEAN-06**: Remove `src/Events/Enums/ChangeOperation.php`
+- [x] **CLEAN-01**: Remove `src/Events/Models/ClassChangeSchema.php`
+- [x] **CLEAN-02**: Remove `src/Events/Services/ClassChangeListener.php`
+- [x] **CLEAN-03**: Remove `src/Events/Services/TaskTemplateRegistry.php`
+- [x] **CLEAN-04**: Remove `src/Events/Repositories/ClassChangeLogRepository.php`
+- [x] **CLEAN-05**: Remove `src/Events/Models/ClassChangeLogDTO.php`
+- [x] **CLEAN-06**: Remove `src/Events/Enums/ChangeOperation.php`
 
 ### Notification System (Phase 18)
 
@@ -98,12 +98,12 @@ Explicitly excluded from this milestone.
 | UI-01 | Phase 16 | Done |
 | UI-02 | Phase 16 | Done |
 | UI-03 | Phase 16 | Done |
-| CLEAN-01 | Phase 17 | Pending |
-| CLEAN-02 | Phase 17 | Pending |
-| CLEAN-03 | Phase 17 | Pending |
-| CLEAN-04 | Phase 17 | Pending |
-| CLEAN-05 | Phase 17 | Pending |
-| CLEAN-06 | Phase 17 | Pending |
+| CLEAN-01 | Phase 17 | Done |
+| CLEAN-02 | Phase 17 | Done |
+| CLEAN-03 | Phase 17 | Done |
+| CLEAN-04 | Phase 17 | Done |
+| CLEAN-05 | Phase 17 | Done |
+| CLEAN-06 | Phase 17 | Done |
 | NOTIF-01 | Phase 18 | Done |
 | NOTIF-02 | Phase 18 | Done |
 | NOTIF-03 | Phase 18 | Done |
@@ -120,4 +120,4 @@ Explicitly excluded from this milestone.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-05 — Phase 16 requirements complete*
+*Last updated: 2026-02-05 — Phase 17 requirements complete (v1.2 complete)*

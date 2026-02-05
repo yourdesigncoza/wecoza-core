@@ -133,10 +133,10 @@ Plans:
 
 **Requirements:** CLEAN-01, CLEAN-02, CLEAN-03, CLEAN-04, CLEAN-05, CLEAN-06
 
-**Plans:** 1 plan (revised based on research)
+**Plans:** 1 plan (complete)
 
 Plans:
-- [ ] 17-01-PLAN.md — Delete deprecated files, clean TaskManager dead methods, update Container and test file
+- [x] 17-01-PLAN.md — Delete deprecated files, clean TaskManager dead methods, update Container and test file
 
 **Success Criteria:**
 1. `src/Events/Controllers/ClassChangeController.php` removed (added based on research)
@@ -232,4 +232,4 @@ Phase 18 (Notifications) <- can run parallel to 16-17, independent data path
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-05 — Phase 17 planned*
+*Last updated: 2026-02-05 — Phase 17 complete*
