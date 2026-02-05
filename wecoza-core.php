@@ -135,6 +135,12 @@ add_action('wp_enqueue_scripts', function () {
         'view_learner_url' => home_url('app/view-learner'),
         'update_learner_url' => home_url('app/update-learners')
     ]);
+
+    // Localize notifications data for dashboard AJAX
+    wp_localize_script('wecoza-learners-app', 'WeCozaNotifications', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('wecoza_notifications_nonce'),
+    ]);
 });
 
 /*
@@ -302,6 +308,70 @@ add_action('plugins_loaded', function () {
         $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
         $emailer->send($eventId, $recipient, $emailContext);
     }, 10, 3);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Dashboard AJAX Handlers
+    |--------------------------------------------------------------------------
+    |
+    | AJAX handlers for marking notifications as viewed/acknowledged from
+    | the notification dashboard UI.
+    |
+    */
+
+    // Mark notification as viewed
+    add_action('wp_ajax_wecoza_mark_notification_viewed', function () {
+        check_ajax_referer('wecoza_notifications_nonce', 'nonce');
+
+        if (!current_user_can('read')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+
+        $eventId = absint($_POST['event_id'] ?? 0);
+        if ($eventId <= 0) {
+            wp_send_json_error(['message' => 'Invalid event ID'], 400);
+        }
+
+        if (!class_exists(\WeCoza\Events\Services\NotificationDashboardService::class)) {
+            wp_send_json_error(['message' => 'Dashboard service not available'], 500);
+        }
+
+        $service = \WeCoza\Events\Services\NotificationDashboardService::boot();
+        $success = $service->markAsViewed($eventId);
+
+        if ($success) {
+            wp_send_json_success(['message' => 'Marked as viewed']);
+        } else {
+            wp_send_json_error(['message' => 'Failed to update'], 500);
+        }
+    });
+
+    // Mark notification as acknowledged
+    add_action('wp_ajax_wecoza_mark_notification_acknowledged', function () {
+        check_ajax_referer('wecoza_notifications_nonce', 'nonce');
+
+        if (!current_user_can('read')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+
+        $eventId = absint($_POST['event_id'] ?? 0);
+        if ($eventId <= 0) {
+            wp_send_json_error(['message' => 'Invalid event ID'], 400);
+        }
+
+        if (!class_exists(\WeCoza\Events\Services\NotificationDashboardService::class)) {
+            wp_send_json_error(['message' => 'Dashboard service not available'], 500);
+        }
+
+        $service = \WeCoza\Events\Services\NotificationDashboardService::boot();
+        $success = $service->markAsAcknowledged($eventId);
+
+        if ($success) {
+            wp_send_json_success(['message' => 'Acknowledged']);
+        } else {
+            wp_send_json_error(['message' => 'Failed to update'], 500);
+        }
+    });
 
     /*
     |--------------------------------------------------------------------------
