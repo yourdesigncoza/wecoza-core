@@ -81,6 +81,9 @@ See: .planning/MILESTONES.md for full details
 | Dispatch events in ClassAjaxController | Single point where class CRUD and learner roster changes occur | Implemented (18-05) |
 | No changes to FormDataProcessor | Pure data transformation, no DB interaction | Implemented (18-05) |
 | No changes to LearnerAjaxHandlers | Handles standalone learner CRUD, not class-learner associations | Implemented (18-05) |
+| NotificationDashboardService replaces AISummaryDisplayService | Cleaner abstraction for dashboard use cases | Implemented (18-04) |
+| Unread filtering via viewed_at IS NULL | Standard database null check for unread state | Implemented (18-04) |
+| Click-to-mark-viewed interaction | Automatic view tracking on notification click | Implemented (18-04) |
 
 ### Pending Todos
 
