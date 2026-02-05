@@ -9,12 +9,13 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-Phase: 16 (Presentation Layer) — in progress
-Plan: 01/02 complete
-Status: Plan 16-01 complete, ready for 16-02
-Last activity: 2026-02-03 — Completed quick task 002: add event dates to Open Tasks view
+Phase: 18 (Notification System) — in progress
+Plan: 01/05 complete
+Status: Plan 18-01 complete, ready for 18-02
+Last activity: 2026-02-05 — Completed 18-01-PLAN.md (Event Storage Infrastructure)
 
 Progress: v1.2 ████████████████████░░░░░░░░░░ 70%
+Progress: Phase 18 ████░░░░░░░░░░░░░░░░░░░░░░░░░░ 20% (1/5 plans)
 
 ## Milestone v1.2: Event Tasks Refactor
 
@@ -28,6 +29,7 @@ Progress: v1.2 ████████████████████░�
 | 15 | Bidirectional Sync | Complete | SYNC-01..05, REPO-03 |
 | 16 | Presentation Layer | In Progress | UI-01..03 |
 | 17 | Code Cleanup | Pending | CLEAN-01..06 |
+| 18 | Notification System | In Progress | NOTIFY-01..05 |
 
 **Key deliverables:**
 - Tasks derived from `classes.event_dates` JSONB (not triggers)
@@ -68,6 +70,9 @@ See: .planning/MILESTONES.md for full details
 | jsonb_set() for atomic updates | Prevents race conditions | Implemented (15-01) |
 | completion metadata passthrough | Form saves preserve dashboard changes | Implemented (15-01) |
 | Remove log_id from presentation layer | Obsolete since Phase 13 | Implemented (16-01) |
+| JSONB for event_data and ai_summary | Flexible schema for varied event payloads | Implemented (18-01) |
+| Notification workflow states | pending -> enriching -> sending -> sent/failed | Implemented (18-01) |
+| Partial indexes for event queries | Optimized for status queue and unread events | Implemented (18-01) |
 
 ### Pending Todos
 
@@ -86,8 +91,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:57:54Z
-Stopped at: Completed quick-002-PLAN.md
+Last session: 2026-02-05T09:36:00Z
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None
 
-**Next action:** Execute 16-02 (remaining presentation layer work)
+**Next action:** Execute 18-02 (Event Emitter Service)
