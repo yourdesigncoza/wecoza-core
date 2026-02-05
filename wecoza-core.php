@@ -208,10 +208,10 @@ add_action('plugins_loaded', function () {
     if (class_exists(\WeCoza\Events\Shortcodes\MaterialTrackingShortcode::class)) {
         \WeCoza\Events\Shortcodes\MaterialTrackingShortcode::register();
     }
-    // AI Summary shortcode disabled - requires class_change_logs table (dropped in Phase 13)
-    // if (class_exists(\WeCoza\Events\Shortcodes\AISummaryShortcode::class)) {
-    //     \WeCoza\Events\Shortcodes\AISummaryShortcode::register();
-    // }
+    // AI Summary shortcode (re-enabled for class_events table in Phase 18)
+    if (class_exists(\WeCoza\Events\Shortcodes\AISummaryShortcode::class)) {
+        \WeCoza\Events\Shortcodes\AISummaryShortcode::register();
+    }
     if (class_exists(\WeCoza\Events\Controllers\TaskController::class)) {
         \WeCoza\Events\Controllers\TaskController::register();
     }
@@ -258,12 +258,8 @@ add_action('plugins_loaded', function () {
         }
     });
 
-    // DEPRECATED: Email Notification Cron Handler
-    // Disabled after Phase 13 dropped class_change_logs table.
-    // The entire notification system was built on trigger-based change logs which no longer exist.
-    // TODO: Phase 16+ will redesign notifications for new architecture (classes.event_dates JSONB).
-    /*
-    add_action('wecoza_email_notifications_process', function () {
+    // Notification Processor Cron Handler (re-enabled for class_events table in Phase 18)
+    add_action('wecoza_process_notifications', function () {
         if (!class_exists(\WeCoza\Events\Services\NotificationProcessor::class)) {
             return;
         }
@@ -271,42 +267,41 @@ add_action('plugins_loaded', function () {
         $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
         $processor->process();
     });
-    */
 
-    // DEPRECATED: Action Scheduler Job Handlers for Async Notifications
-    // Disabled after Phase 13 dropped class_change_logs table.
-    /*
-    add_action('wecoza_enrich_notification', function (int $logId) {
+    // Action Scheduler Job Handlers for Async Notifications (re-enabled for class_events table in Phase 18)
+    add_action('wecoza_process_event', function (int $eventId) {
         if (!class_exists(\WeCoza\Events\Services\NotificationEnricher::class)) {
             return;
         }
 
         $enricher = \WeCoza\Events\Services\NotificationEnricher::boot();
-        $result = $enricher->enrich($logId);
+        $result = $enricher->enrich($eventId);
 
-        if ($result['success'] && $result['should_email'] && $result['recipient'] !== null) {
-            // Chain to email job
-            as_enqueue_async_action(
-                'wecoza_send_notification_email',
-                [
-                    'log_id' => $logId,
-                    'recipient' => $result['recipient'],
-                    'email_context' => $result['email_context'],
-                ],
-                'wecoza-notifications'
-            );
+        if ($result['success'] && $result['should_email']) {
+            // Schedule email for each recipient
+            $recipients = $result['recipients'] ?? [];
+            foreach ($recipients as $recipient) {
+                as_enqueue_async_action(
+                    'wecoza_send_notification_email',
+                    [
+                        'event_id' => $eventId,
+                        'recipient' => $recipient,
+                        'email_context' => $result['email_context'],
+                    ],
+                    'wecoza-notifications'
+                );
+            }
         }
     }, 10, 1);
 
-    add_action('wecoza_send_notification_email', function (int $logId, string $recipient, array $emailContext = []) {
+    add_action('wecoza_send_notification_email', function (int $eventId, string $recipient, array $emailContext = []) {
         if (!class_exists(\WeCoza\Events\Services\NotificationEmailer::class)) {
             return;
         }
 
         $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
-        $emailer->send($logId, $recipient, $emailContext);
+        $emailer->send($eventId, $recipient, $emailContext);
     }, 10, 3);
-    */
 
     /*
     |--------------------------------------------------------------------------
@@ -405,18 +400,16 @@ register_activation_hook(__FILE__, function () {
         wp_schedule_event(time(), 'daily', 'wecoza_material_notifications_check');
     }
 
-    // DEPRECATED: Schedule email notification cron if not already scheduled
-    // Disabled after Phase 13 dropped class_change_logs table.
-    // Unschedule any existing cron to prevent errors.
-    $emailTimestamp = wp_next_scheduled('wecoza_email_notifications_process');
-    if ($emailTimestamp) {
-        wp_unschedule_event($emailTimestamp, 'wecoza_email_notifications_process');
+    // Unschedule legacy email notification cron (replaced by wecoza_process_notifications)
+    $legacyTimestamp = wp_next_scheduled('wecoza_email_notifications_process');
+    if ($legacyTimestamp) {
+        wp_unschedule_event($legacyTimestamp, 'wecoza_email_notifications_process');
     }
-    /*
-    if (!wp_next_scheduled('wecoza_email_notifications_process')) {
-        wp_schedule_event(time(), 'hourly', 'wecoza_email_notifications_process');
+
+    // Schedule notification processor cron (re-enabled for class_events table in Phase 18)
+    if (!wp_next_scheduled('wecoza_process_notifications')) {
+        wp_schedule_event(time(), 'hourly', 'wecoza_process_notifications');
     }
-    */
 
     /**
      * Fires when WeCoza Core is activated.
@@ -444,10 +437,16 @@ register_deactivation_hook(__FILE__, function () {
         wp_unschedule_event($timestamp, 'wecoza_material_notifications_check');
     }
 
-    // Unschedule email notification cron
-    $emailTimestamp = wp_next_scheduled('wecoza_email_notifications_process');
-    if ($emailTimestamp) {
-        wp_unschedule_event($emailTimestamp, 'wecoza_email_notifications_process');
+    // Unschedule notification processor cron
+    $notificationTimestamp = wp_next_scheduled('wecoza_process_notifications');
+    if ($notificationTimestamp) {
+        wp_unschedule_event($notificationTimestamp, 'wecoza_process_notifications');
+    }
+
+    // Unschedule legacy email notification cron (if any lingering)
+    $legacyEmailTimestamp = wp_next_scheduled('wecoza_email_notifications_process');
+    if ($legacyEmailTimestamp) {
+        wp_unschedule_event($legacyEmailTimestamp, 'wecoza_email_notifications_process');
     }
 
     /**
@@ -511,8 +510,8 @@ if (defined('WP_CLI') && WP_CLI) {
         WP_CLI::log('  wp wecoza version    - Show plugin version');
     });
 
-    // AI Summary CLI command disabled - requires class_change_logs table (dropped in Phase 13)
-    // if (class_exists(\WeCoza\Events\CLI\AISummaryStatusCommand::class)) {
-    //     \WeCoza\Events\CLI\AISummaryStatusCommand::register();
-    // }
+    // AI Summary CLI command (re-enabled for class_events table in Phase 18)
+    if (class_exists(\WeCoza\Events\CLI\AISummaryStatusCommand::class)) {
+        \WeCoza\Events\CLI\AISummaryStatusCommand::register();
+    }
 }

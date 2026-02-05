@@ -52,24 +52,26 @@ final class NotificationEnricher
      * Enrich a single event with AI summary
      *
      * @param int $eventId The event_id to enrich
-     * @return array{success: bool, should_email: bool, recipient: ?string, email_context: array}
+     * @return array{success: bool, should_email: bool, recipients: array<string>, email_context: array}
      */
     public function enrich(int $eventId): array
     {
         $event = $this->eventRepository->findByEventId($eventId);
         if ($event === null) {
             wecoza_log("NotificationEnricher: Event not found for event_id {$eventId}", 'warning');
-            return ['success' => false, 'should_email' => false, 'recipient' => null, 'email_context' => []];
+            return ['success' => false, 'should_email' => false, 'recipients' => [], 'email_context' => []];
         }
 
-        // Map EventType to operation for recipient lookup
+        // Get recipients for event type (supports multiple recipients)
+        $recipients = $this->settings->getRecipientsForEventType($event->eventType->value);
+
+        if (empty($recipients)) {
+            wecoza_log("NotificationEnricher: No recipients for event type {$event->eventType->value} on event_id {$eventId}", 'debug');
+            return ['success' => true, 'should_email' => false, 'recipients' => [], 'email_context' => []];
+        }
+
+        // Map EventType to operation for AI summary context
         $operation = $this->mapEventTypeToOperation($event);
-        $recipient = $this->settings->getRecipientForOperation($operation);
-
-        if ($recipient === null) {
-            wecoza_log("NotificationEnricher: No recipient for event type {$event->eventType->value} on event_id {$eventId}", 'debug');
-            return ['success' => true, 'should_email' => false, 'recipient' => null, 'email_context' => []];
-        }
 
         // Extract data from eventData JSONB
         $newRow = $event->eventData['new_row'] ?? [];
@@ -112,7 +114,7 @@ final class NotificationEnricher
         return [
             'success' => true,
             'should_email' => true,
-            'recipient' => $recipient,
+            'recipients' => $recipients,
             'email_context' => $emailContext,
         ];
     }

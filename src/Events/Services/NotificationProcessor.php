@@ -7,7 +7,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use WeCoza\Events\DTOs\ClassEventDTO;
 use WeCoza\Events\Repositories\ClassEventRepository;
 use WeCoza\Events\Support\OpenAIConfig;
 
@@ -75,12 +74,9 @@ final class NotificationProcessor
                     continue;
                 }
 
-                // Map EventType to operation for recipient lookup
-                $operation = $this->mapEventTypeToOperation($event);
-
-                // Check if this operation has a recipient configured
-                $recipient = $this->settings->getRecipientForOperation($operation);
-                if ($recipient === null) {
+                // Get recipients for this event type (supports multiple recipients)
+                $recipients = $this->settings->getRecipientsForEventType($event->eventType->value);
+                if (empty($recipients)) {
                     continue;
                 }
 
@@ -92,9 +88,9 @@ final class NotificationProcessor
                     // Update status to 'enriching' before scheduling
                     $this->eventRepository->updateStatus($eventId, 'enriching');
 
-                    // Schedule AI enrichment first (will chain to email on success)
+                    // Schedule AI enrichment first (enricher will chain to emails for each recipient)
                     as_enqueue_async_action(
-                        'wecoza_enrich_notification',
+                        'wecoza_process_event',
                         ['event_id' => $eventId],
                         'wecoza-notifications'
                     );
@@ -102,12 +98,14 @@ final class NotificationProcessor
                     // Update status to 'sending' before scheduling
                     $this->eventRepository->updateStatus($eventId, 'sending');
 
-                    // Skip AI, schedule email directly
-                    as_enqueue_async_action(
-                        'wecoza_send_notification_email',
-                        ['event_id' => $eventId, 'recipient' => $recipient, 'email_context' => []],
-                        'wecoza-notifications'
-                    );
+                    // Skip AI, schedule email directly for each recipient
+                    foreach ($recipients as $recipient) {
+                        as_enqueue_async_action(
+                            'wecoza_send_notification_email',
+                            ['event_id' => $eventId, 'recipient' => $recipient, 'email_context' => []],
+                            'wecoza-notifications'
+                        );
+                    }
                 }
 
                 // Periodic memory cleanup
@@ -129,22 +127,6 @@ final class NotificationProcessor
         } finally {
             $this->releaseLock();
         }
-    }
-
-    /**
-     * Map EventType enum to operation string for NotificationSettings lookup.
-     *
-     * @param ClassEventDTO $event Event DTO
-     * @return string Operation string ('INSERT', 'UPDATE', etc.)
-     */
-    private function mapEventTypeToOperation(ClassEventDTO $event): string
-    {
-        return match ($event->eventType->value) {
-            'CLASS_INSERT', 'LEARNER_ADD' => 'INSERT',
-            'CLASS_UPDATE', 'LEARNER_UPDATE', 'STATUS_CHANGE' => 'UPDATE',
-            'CLASS_DELETE', 'LEARNER_REMOVE' => 'DELETE',
-            default => 'UPDATE',
-        };
     }
 
     private function shouldStop(float $start): bool
