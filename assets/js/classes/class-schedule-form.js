@@ -1236,11 +1236,23 @@
                 }
 
                 // Add Type, Description, Date, Status columns
+                const status = event.status || 'Pending';
+                const $statusCell = $('<td>');
+
+                // Add badge styling based on status
+                if (status === 'Completed') {
+                    $statusCell.html('<span class="wecoza-badge wecoza-badge-success">' + status.toUpperCase() + '</span>');
+                } else if (status === 'Cancelled') {
+                    $statusCell.html('<span class="wecoza-badge wecoza-badge-danger">' + status.toUpperCase() + '</span>');
+                } else {
+                    $statusCell.html('<span class="wecoza-badge wecoza-badge-secondary">' + status.toUpperCase() + '</span>');
+                }
+
                 $newRow.append(
                     $('<td>').text(event.type),
                     $('<td>').text(event.description),
                     $('<td>').text(formatDateDDMMYYYY(event.date)),
-                    $('<td>').text(event.status || 'Pending')
+                    $statusCell
                 );
 
                 // Add Notes column (show '-' if empty)
