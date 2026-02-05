@@ -88,9 +88,9 @@ $end_date = $end_date ?? null;
                      <?php if (!empty($delivery['description'])): ?>
                         <span class="text-muted small"> - <?php echo esc_html($delivery['description']); ?></span>
                      <?php endif; ?>
-                     <span class="badge <?php
+                     <span class="badge badge-phoenix <?php
                         $status = $delivery['status'] ?? 'Pending';
-                        echo $status === 'Completed' ? 'bg-success' : ($status === 'Cancelled' ? 'bg-danger' : 'bg-warning text-dark');
+                        echo $status === 'Completed' ? 'badge-phoenix-success' : ($status === 'Cancelled' ? 'badge-phoenix-danger' : 'badge-phoenix-warning');
                      ?> ms-2"><?php echo esc_html($status); ?></span>
                   </div>
                   <?php endforeach; ?>
