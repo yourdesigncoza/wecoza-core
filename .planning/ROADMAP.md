@@ -133,24 +133,30 @@ Plans:
 
 **Requirements:** CLEAN-01, CLEAN-02, CLEAN-03, CLEAN-04, CLEAN-05, CLEAN-06
 
-**Plans:** 1 plan
+**Plans:** 1 plan (revised based on research)
 
 Plans:
-- [ ] 17-01-PLAN.md — Delete deprecated files and clean up references
+- [ ] 17-01-PLAN.md — Delete deprecated files, clean TaskManager dead methods, update Container and test file
 
 **Success Criteria:**
-1. `src/Events/Models/ClassChangeSchema.php` removed
-2. `src/Events/Services/ClassChangeListener.php` removed
-3. `src/Events/Services/TaskTemplateRegistry.php` removed
-4. `src/Events/Repositories/ClassChangeLogRepository.php` removed
-5. `src/Events/Models/ClassChangeLogDTO.php` removed
-6. `src/Events/Enums/ChangeOperation.php` removed
-7. No PHP errors or undefined class references
-8. All imports/uses of removed classes cleaned up
+1. `src/Events/Controllers/ClassChangeController.php` removed (added based on research)
+2. `src/Events/Models/ClassChangeSchema.php` removed
+3. `src/Events/Services/ClassChangeListener.php` removed
+4. `src/Events/Services/TaskTemplateRegistry.php` removed
+5. `src/Events/Repositories/ClassChangeLogRepository.php` removed
+6. `src/Events/Services/AISummaryDisplayService.php` removed (added based on research)
+7. `src/Events/Models/ClassChangeLogDTO.php` removed (ALREADY DELETED - CLEAN-05)
+8. `src/Events/Enums/ChangeOperation.php` removed (ALREADY DELETED - CLEAN-06)
+9. TaskManager dead methods removed (query class_change_logs)
+10. Container.php TaskTemplateRegistry references removed
+11. Test file updated to skip deprecated sections
+12. No PHP errors or undefined class references
 
 **Notes:**
-- Search codebase for any references to removed classes
-- Update any autoloader configurations if needed
+- ClassChangeController added to deletion list (references all deprecated files)
+- AISummaryDisplayService added (depends on ClassChangeLogRepository)
+- CLEAN-05 and CLEAN-06 were already completed in prior phases
+- TaskManager methods querying dropped table also removed (dead code)
 - Run full test suite after cleanup
 
 ---
