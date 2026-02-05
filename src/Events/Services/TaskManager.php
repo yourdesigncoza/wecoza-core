@@ -29,47 +29,10 @@ use const JSON_THROW_ON_ERROR;
 final class TaskManager
 {
     private PostgresConnection $db;
-    private TaskTemplateRegistry $registry;
 
-    public function __construct(?TaskTemplateRegistry $registry = null)
+    public function __construct()
     {
         $this->db = PostgresConnection::getInstance();
-        $this->registry = $registry ?? new TaskTemplateRegistry();
-    }
-
-    public function getTasksWithTemplate(int $logId, ?string $operation = null): TaskCollection
-    {
-        $operation = $operation ?? $this->fetchOperation($logId);
-
-        $existing = $this->getTasksForLog($logId);
-        $needsPersist = false;
-
-        if ($existing->isEmpty()) {
-            $classId = $this->fetchClassIdForLog($logId);
-            $previous = $this->getPreviousTasksSnapshot($classId, $logId);
-            if ($previous !== null && !$previous->isEmpty()) {
-                $existing = $previous;
-                $needsPersist = true;
-            } else {
-                $existing = $this->registry->getTemplateForOperation('insert');
-                $needsPersist = true;
-            }
-        }
-
-        $template = $this->registry->getTemplateForOperation($operation);
-
-        foreach ($template->all() as $task) {
-            if (!$existing->has($task->getId())) {
-                $existing->add($task);
-                $needsPersist = true;
-            }
-        }
-
-        if ($needsPersist) {
-            $this->saveTasksForLog($logId, $existing);
-        }
-
-        return $existing;
     }
 
     /**
@@ -201,72 +164,6 @@ final class TaskManager
         return $this->buildTasksFromEvents($class);
     }
 
-    private function fetchOperation(int $logId): string
-    {
-        $sql = "SELECT operation FROM class_change_logs WHERE log_id = :id LIMIT 1";
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare operation lookup.');
-        }
-
-        $stmt->bindValue(':id', $logId, PDO::PARAM_INT);
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute operation lookup.');
-        }
-
-        $operation = $stmt->fetchColumn();
-        if (!is_string($operation) || $operation === '') {
-            throw new RuntimeException('Unable to determine log operation.');
-        }
-
-        return $operation;
-    }
-
-    public function getTasksForLog(int $logId): TaskCollection
-    {
-        $sql = "SELECT tasks FROM class_change_logs WHERE log_id = :id LIMIT 1";
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare task lookup query.');
-        }
-
-        $stmt->bindValue(':id', $logId, PDO::PARAM_INT);
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute task lookup query.');
-        }
-
-        $payload = $stmt->fetchColumn();
-        if ($payload === false || $payload === null) {
-            return new TaskCollection();
-        }
-
-        $decoded = $this->decodeJson($payload);
-        if (!is_array($decoded)) {
-            return new TaskCollection();
-        }
-
-        return TaskCollection::fromArray($decoded);
-    }
-
-    public function saveTasksForLog(int $logId, TaskCollection $tasks): void
-    {
-        $sql = "UPDATE class_change_logs SET tasks = :tasks WHERE log_id = :id";
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare task update query.');
-        }
-
-        $stmt->bindValue(':id', $logId, PDO::PARAM_INT);
-        $stmt->bindValue(':tasks', $this->encodeJson($tasks->toArray()), PDO::PARAM_STR);
-
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to persist tasks payload.');
-        }
-    }
-
     private function decodeJson(string $payload): mixed
     {
         if ($payload === '') {
@@ -285,70 +182,9 @@ final class TaskManager
         }
     }
 
-    private function getPreviousTasksSnapshot(int $classId, int $currentLogId): ?TaskCollection
-    {
-        $sql = <<<SQL
-SELECT tasks
-FROM class_change_logs
-WHERE class_id = :class_id
-  AND log_id <> :log_id
-  AND tasks IS NOT NULL
-  AND jsonb_typeof(tasks) = 'array'
-  AND jsonb_array_length(tasks) > 0
-ORDER BY changed_at DESC, log_id DESC
-LIMIT 1
-SQL;
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare previous tasks lookup.');
-        }
-
-        $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
-        $stmt->bindValue(':log_id', $currentLogId, PDO::PARAM_INT);
-
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute previous tasks lookup.');
-        }
-
-        $payload = $stmt->fetchColumn();
-        if ($payload === false || $payload === null) {
-            return null;
-        }
-
-        $decoded = $this->decodeJson((string) $payload);
-        if (!is_array($decoded)) {
-            return null;
-        }
-
-        return TaskCollection::fromArray($decoded);
-    }
-
     private function requiresNote(string $taskId): bool
     {
         return $taskId === 'agent-order';
-    }
-
-    private function fetchClassIdForLog(int $logId): int
-    {
-        $sql = "SELECT class_id FROM class_change_logs WHERE log_id = :id LIMIT 1";
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare class lookup.');
-        }
-
-        $stmt->bindValue(':id', $logId, PDO::PARAM_INT);
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute class lookup.');
-        }
-
-        $classId = $stmt->fetchColumn();
-        if ($classId === false || $classId === null) {
-            throw new RuntimeException('Unable to determine class for the supplied task.');
-        }
-
-        return (int) $classId;
     }
 
     /**
