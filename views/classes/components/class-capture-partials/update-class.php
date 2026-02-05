@@ -902,7 +902,7 @@ if (isset($data['class_data']) && $data['class_data']):
                   </tr>
                   <!-- Event Dates Statistics -->
                   <tr class="ydcoza-table-subheader">
-                     <th colspan="3">Event Dates</th>
+                     <th colspan="5">Event Dates</th>
                   </tr>
                   <tr class="ydcoza-table-subheader" style="font-size: 0.85em; font-weight: 500;">
                      <th>Type</th>
