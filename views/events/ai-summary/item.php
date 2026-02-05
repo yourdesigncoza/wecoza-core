@@ -39,7 +39,7 @@ $searchIndex = esc_attr($item['search_index'] ?? '');
 $readStateClass = $item['read_state_class'] ?? ($isRead ? 'notification-read' : 'notification-unread');
 ?>
 
-<div class="notification-item card mb-2 <?php echo esc_attr($readStateClass); ?> <?php echo !$isRead ? 'border-primary border-start border-3' : ''; ?>"
+<div class="notification-item card mb-2 <?php echo esc_attr($readStateClass); ?> <?php echo !$isRead ? 'border-start border-3' : ''; ?>"
      data-role="summary-item"
      data-event-id="<?php echo $eventId; ?>"
      data-operation="<?php echo $operation; ?>"

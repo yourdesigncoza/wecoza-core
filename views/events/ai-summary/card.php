@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
             data-operation="<?php echo esc_attr($summary['operation'] ?? ''); ?>"
             data-is-read="<?php echo $isRead ? '1' : '0'; ?>"
         >
-            <div class="card h-100 shadow-sm <?php echo !$isRead ? 'border-primary border-2' : ''; ?>">
+            <div class="card h-100 shadow-sm <?php echo !$isRead ? 'border border-1' : ''; ?>">
                 <div class="card-header bg-body-tertiary border-bottom">
                     <div class="d-flex align-items-start justify-content-between gap-2">
                         <div class="flex-grow-1">
@@ -68,7 +68,7 @@ if (!defined('ABSPATH')) {
                         <?php if (!empty($summary['summary_model'])): ?>
                             <div class="d-flex align-items-center gap-2">
                                 <i class="bi bi-cpu"></i>
-                                <span><?php echo esc_html($summary['summary_model']); ?></span>
+                                <span>AI-Generated</span>
                             </div>
                         <?php endif; ?>
                     </div>

@@ -132,7 +132,7 @@ if (!defined('ABSPATH')) {
                             </span>
                             <?php if (!empty($summary['summary_model'])): ?>
                                 <span class="text-body-secondary">
-                                    <i class="bi bi-cpu"></i> <?php echo esc_html($summary['summary_model']); ?>
+                                    <i class="bi bi-cpu"></i> AI-Generated
                                 </span>
                             <?php endif; ?>
                         </div>
