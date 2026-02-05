@@ -11,7 +11,9 @@ use WeCoza\Events\DTOs\ClassEventDTO;
 use WeCoza\Events\Repositories\ClassEventRepository;
 use WeCoza\Events\Views\Presenters\NotificationEmailPresenter;
 
+use function add_action;
 use function error_log;
+use function remove_action;
 use function sprintf;
 use function wp_mail;
 use function wecoza_log;
@@ -88,10 +90,25 @@ final class NotificationEmailer
         $body = $mailData['body'];
         $headers = $mailData['headers'];
 
+        // Capture wp_mail_failed errors for debugging
+        $lastMailError = null;
+        $errorHandler = function (\WP_Error $error) use (&$lastMailError) {
+            $lastMailError = $error->get_error_message();
+            $errorData = $error->get_error_data();
+            if (!empty($errorData['phpmailer_exception_code'])) {
+                $lastMailError .= ' (code: ' . $errorData['phpmailer_exception_code'] . ')';
+            }
+        };
+        add_action('wp_mail_failed', $errorHandler);
+
         $sent = wp_mail($recipient, $subject, $body, $headers);
 
+        remove_action('wp_mail_failed', $errorHandler);
+
         if (!$sent) {
-            error_log(sprintf('WeCoza notification failed for event %d to %s', $eventId, $recipient));
+            $errorDetail = $lastMailError ? " - Error: {$lastMailError}" : '';
+            error_log(sprintf('WeCoza notification failed for event %d to %s%s', $eventId, $recipient, $errorDetail));
+            wecoza_log(sprintf('NotificationEmailer: Email failed for event %d to %s%s', $eventId, $recipient, $errorDetail), 'error');
             // Update status to 'failed' on email failure
             $this->eventRepository->updateStatus($eventId, 'failed');
         } else {
