@@ -133,6 +133,11 @@ Plans:
 
 **Requirements:** CLEAN-01, CLEAN-02, CLEAN-03, CLEAN-04, CLEAN-05, CLEAN-06
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 17-01-PLAN.md — Delete deprecated files and clean up references
+
 **Success Criteria:**
 1. `src/Events/Models/ClassChangeSchema.php` removed
 2. `src/Events/Services/ClassChangeListener.php` removed
@@ -221,4 +226,4 @@ Phase 18 (Notifications) <- can run parallel to 16-17, independent data path
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-05 — Phase 16 complete*
+*Last updated: 2026-02-05 — Phase 17 planned*
