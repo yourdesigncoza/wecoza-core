@@ -1239,14 +1239,14 @@
                 const status = event.status || 'Pending';
                 const $statusCell = $('<td>');
 
-                // Add badge styling based on status
+                // Add badge styling based on status (using Phoenix badge classes)
+                let badgeClass = 'badge-phoenix-warning'; // default for Pending
                 if (status === 'Completed') {
-                    $statusCell.html('<span class="wecoza-badge wecoza-badge-success">' + status.toUpperCase() + '</span>');
+                    badgeClass = 'badge-phoenix-success';
                 } else if (status === 'Cancelled') {
-                    $statusCell.html('<span class="wecoza-badge wecoza-badge-danger">' + status.toUpperCase() + '</span>');
-                } else {
-                    $statusCell.html('<span class="wecoza-badge wecoza-badge-secondary">' + status.toUpperCase() + '</span>');
+                    badgeClass = 'badge-phoenix-secondary';
                 }
+                $statusCell.html('<span class="badge badge-phoenix fs-10 ' + badgeClass + '">' + status + '</span>');
 
                 $newRow.append(
                     $('<td>').text(event.type),
