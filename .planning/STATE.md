@@ -106,11 +106,12 @@ None identified.
 | 002 | Add event dates to Open Tasks view | 2026-02-03 | 95b11a2 | [002-add-date-to-open-tasks-view](./quick/002-add-date-to-open-tasks-view/) |
 | 003 | Add Edit Class button to Actions column | 2026-02-05 | d6d5828 | [003-add-edit-class-button-to-actions-column-](./quick/003-add-edit-class-button-to-actions-column-/) |
 | 004 | Fix task metadata and preserve notes on reopen | 2026-02-05 | cab8521 | [004-fix-task-metadata-and-preserve-notes-on-reopen](./quick/004-fix-task-metadata-and-preserve-notes-on-reopen/) |
+| 005 | Filter completed events from form, show in statistics | 2026-02-05 | 7e8956b | [005-filter-completed-events-show-in-statistics](./quick/005-filter-completed-events-show-in-statistics/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05T11:33:40Z
-Stopped at: Completed quick-004 (Fix task metadata and preserve notes on reopen)
+Last session: 2026-02-05T11:51:58Z
+Stopped at: Completed quick-005 (Filter completed events, show in statistics)
 Resume file: None
 
 **Next action:** Execute 18-08-PLAN.md (Email delivery integration)
