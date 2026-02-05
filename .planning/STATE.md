@@ -107,11 +107,12 @@ None identified.
 | 003 | Add Edit Class button to Actions column | 2026-02-05 | d6d5828 | [003-add-edit-class-button-to-actions-column-](./quick/003-add-edit-class-button-to-actions-column-/) |
 | 004 | Fix task metadata and preserve notes on reopen | 2026-02-05 | cab8521 | [004-fix-task-metadata-and-preserve-notes-on-reopen](./quick/004-fix-task-metadata-and-preserve-notes-on-reopen/) |
 | 005 | Filter completed events from form, show in statistics | 2026-02-05 | 7e8956b | [005-filter-completed-events-show-in-statistics](./quick/005-filter-completed-events-show-in-statistics/) |
+| 006 | Add green badge for completed status in Event Dates | 2026-02-05 | 504653f | [006-add-green-badge-for-completed-status](./quick/006-add-green-badge-for-completed-status/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05T11:51:58Z
-Stopped at: Completed quick-005 (Filter completed events, show in statistics)
+Last session: 2026-02-05T12:15:00Z
+Stopped at: Completed quick-006 (Add green badge for completed status)
 Resume file: None
 
 **Next action:** Execute 18-08-PLAN.md (Email delivery integration)
