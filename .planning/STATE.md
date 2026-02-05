@@ -109,11 +109,12 @@ None identified.
 | 005 | Filter completed events from form, show in statistics | 2026-02-05 | 7e8956b | [005-filter-completed-events-show-in-statistics](./quick/005-filter-completed-events-show-in-statistics/) |
 | 006 | Add green badge for completed status in Event Dates | 2026-02-05 | 504653f | [006-add-green-badge-for-completed-status](./quick/006-add-green-badge-for-completed-status/) |
 | 007 | Remove Events text, fix Event Dates table columns | 2026-02-05 | b0074ec | [007-remove-events-text-fix-table-columns](./quick/007-remove-events-text-fix-table-columns/) |
+| 008 | Fix Event Dates heading border colspan | 2026-02-05 | 7c997f4 | [008-fix-event-dates-heading-border](./quick/008-fix-event-dates-heading-border/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05T12:30:00Z
-Stopped at: Completed quick-007 (Remove Events text, fix table columns)
+Last session: 2026-02-05T12:35:00Z
+Stopped at: Completed quick-008 (Fix Event Dates heading border)
 Resume file: None
 
 **Next action:** Execute 18-08-PLAN.md (Email delivery integration)
