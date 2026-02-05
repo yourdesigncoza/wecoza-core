@@ -89,8 +89,8 @@ final class NotificationEnricher
                 $this->persistSummary($eventId, $summaryRecord);
                 $this->emitSummaryMetrics($eventId, $summaryRecord);
             }
-            // Update status to 'enriched' even if skipped
-            $this->eventRepository->updateStatus($eventId, 'enriched');
+            // Update status to 'sending' (enriched and ready to send)
+            $this->eventRepository->updateStatus($eventId, 'sending');
         } elseif ($this->shouldGenerateSummary($summaryRecord)) {
             $result = $this->aiSummaryService->generateSummary([
                 'event_id' => $eventId,
@@ -107,8 +107,8 @@ final class NotificationEnricher
             $this->persistSummary($eventId, $summaryRecord);
             $this->emitSummaryMetrics($eventId, $summaryRecord);
 
-            // Update status to 'enriched' after successful AI processing
-            $this->eventRepository->updateStatus($eventId, 'enriched');
+            // Update status to 'sending' (enriched and ready to send)
+            $this->eventRepository->updateStatus($eventId, 'sending');
         }
 
         return [
