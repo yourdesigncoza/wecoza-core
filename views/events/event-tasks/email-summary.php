@@ -42,7 +42,7 @@ $metrics = [
     </section>
 
     <section style="margin-bottom: 20px;">
-        <h2 style="font-size: 16px; margin-bottom: 8px;">AI Summary</h2>
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Summary</h2>
         <?php if ($status === 'success' && $summaryText !== ''): ?>
             <div style="background: #f3f4f6; padding: 12px; border-radius: 6px;">
                 <?php echo nl2br(esc_html($summaryText)); ?>
@@ -65,7 +65,7 @@ $metrics = [
     </section>
 
     <section style="margin-bottom: 20px;">
-        <h2 style="font-size: 16px; margin-bottom: 8px;">AI Generation Details</h2>
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Generation Details</h2>
         <table style="width: 100%; border-collapse: collapse;">
             <?php foreach ($metrics as $label => $value): ?>
                 <?php if ($value === null || $value === '') { continue; } ?>
