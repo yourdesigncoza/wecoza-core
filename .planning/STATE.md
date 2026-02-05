@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 18 (Notification System) — in progress
-Plan: 03/05 complete
-Status: Plan 18-03 complete, ready for 18-04
-Last activity: 2026-02-05 — Completed 18-03-PLAN.md (Notification Services Update)
+Plan: 05/05 complete
+Status: Phase 18 complete
+Last activity: 2026-02-05 — Completed 18-05-PLAN.md (Controller Event Integration)
 
-Progress: v1.2 ██████████████████████░░░░░░░░ 76%
-Progress: Phase 18 ████████████████░░░░░░░░░░░░░░ 60% (3/5 plans)
+Progress: v1.2 ██████████████████████████████ 100%
+Progress: Phase 18 ██████████████████████████████ 100% (5/5 plans)
 
 ## Milestone v1.2: Event Tasks Refactor
 
@@ -29,13 +29,14 @@ Progress: Phase 18 ████████████████░░░░�
 | 15 | Bidirectional Sync | Complete | SYNC-01..05, REPO-03 |
 | 16 | Presentation Layer | In Progress | UI-01..03 |
 | 17 | Code Cleanup | Pending | CLEAN-01..06 |
-| 18 | Notification System | In Progress | NOTIFY-01..05 |
+| 18 | Notification System | Complete | NOTIFY-01..05 |
 
 **Key deliverables:**
 - Tasks derived from `classes.event_dates` JSONB (not triggers)
 - Agent Order Number always present, writes to `order_nr`
 - Bidirectional sync between dashboard and class form
 - 6 deprecated files removed
+- Notification events captured from controllers
 
 ## Milestone History
 
@@ -57,7 +58,7 @@ See: .planning/MILESTONES.md for full details
 
 | Decision | Rationale | Status |
 |----------|-----------|--------|
-| Replace triggers with manual events | Simpler architecture, user controls events | In Progress |
+| Replace triggers with manual events | Simpler architecture, user controls events | Implemented (18-05) |
 | Agent Order Number always present | Class activation confirmation | Implemented (14-01) |
 | Bidirectional sync | Dashboard <-> form stay in sync | Implemented (15) |
 | Preserve notes on reopen | User data should not be lost | Implemented (15-01) |
@@ -77,10 +78,13 @@ See: .planning/MILESTONES.md for full details
 | Significant fields filter | Prevent notification spam from minor edits | Implemented (18-02) |
 | Filter hook for dispatch | Site-specific customization via wecoza_event_dispatch_enabled | Implemented (18-02) |
 | EventType to operation mapping | Legacy NotificationSettings uses INSERT/UPDATE/DELETE strings | Implemented (18-03) |
+| Dispatch events in ClassAjaxController | Single point where class CRUD and learner roster changes occur | Implemented (18-05) |
+| No changes to FormDataProcessor | Pure data transformation, no DB interaction | Implemented (18-05) |
+| No changes to LearnerAjaxHandlers | Handles standalone learner CRUD, not class-learner associations | Implemented (18-05) |
 
 ### Pending Todos
 
-None — continue to 18-04.
+None — Phase 18 complete. Continue to Phase 16 or 17.
 
 ### Blockers/Concerns
 
@@ -95,8 +99,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-05T09:33:00Z
-Stopped at: Completed 18-03-PLAN.md
+Last session: 2026-02-05T09:35:00Z
+Stopped at: Completed 18-05-PLAN.md
 Resume file: None
 
-**Next action:** Execute 18-04 (Dashboard Service)
+**Next action:** Execute Phase 16 (Presentation Layer) or Phase 17 (Code Cleanup)
