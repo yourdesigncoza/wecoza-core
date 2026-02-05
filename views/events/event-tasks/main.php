@@ -158,7 +158,7 @@ echo $assets;
                                     <div class="fw-semibold text-body"><?php echo esc_html((string) $class['client']['id']); ?> : <?php echo esc_html($class['client']['name']); ?></div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary"><?php echo esc_html($class['type']); ?></span>
+                                    <span class="badge badge-phoenix badge-phoenix-primary"><?php echo esc_html($class['type']); ?></span>
                                 </td>
                                 <td><?php echo esc_html($class['subject']); ?></td>
                                 <td>

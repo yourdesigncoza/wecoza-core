@@ -48,7 +48,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                 Started: <?php echo date('M j, Y', strtotime($currentLP['start_date'])); ?>
                             </small>
                         </div>
-                        <span class="badge bg-primary">In Progress</span>
+                        <span class="badge badge-phoenix badge-phoenix-primary">In Progress</span>
                     </div>
                     <div class="card-body">
                         <!-- Progress Bar -->
@@ -179,7 +179,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                         </div>
                                     </div>
                                     <div>
-                                        <span class="badge bg-success">Completed</span>
+                                        <span class="badge badge-phoenix badge-phoenix-success">Completed</span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

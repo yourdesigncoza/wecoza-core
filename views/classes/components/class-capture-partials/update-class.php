@@ -745,8 +745,8 @@ if (isset($data['class_data']) && $data['class_data']):
                <td class="holiday-date">{formatted_date}</td>
                <td class="holiday-name">{name}</td>
                <td class="holiday-status">
-                  <span class="badge bg-danger holiday-skipped">Skipped</span>
-                  <span class="badge bg-info holiday-overridden d-none">Included</span>
+                  <span class="badge badge-phoenix badge-phoenix-danger holiday-skipped">Skipped</span>
+                  <span class="badge badge-phoenix badge-phoenix-info holiday-overridden d-none">Included</span>
                </td>
             </tr>
          </template>

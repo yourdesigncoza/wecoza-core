@@ -180,7 +180,7 @@ $controller = $controller ?? null;
                                     </td>
                                     <td>
                                         <?php if (!empty($class['class_type'])): ?>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                                        <span class="badge badge-phoenix badge-phoenix-primary">
                                             <?php echo esc_html($class['class_type']); ?>
                                         </span>
                                         <?php else: ?>

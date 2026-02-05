@@ -368,22 +368,22 @@ $component_data = [
                            <span class="fw-bold"><?php echo number_format($data['hours'], 1); ?></span>
                         </div>
                         <?php if ($data['exceptions'] > 0): ?>
-                        <span class="badge bg-warning text-dark me-1" title="Exception dates">
+                        <span class="badge badge-phoenix badge-phoenix-warning me-1" title="Exception dates">
                            <i class="bi bi-x-circle"></i> <?php echo $data['exceptions']; ?> exc
                         </span>
                         <?php endif; ?>
                         <?php if ($data['holidays'] > 0): ?>
-                        <span class="badge bg-info me-1" title="Public holidays">
+                        <span class="badge badge-phoenix badge-phoenix-info me-1" title="Public holidays">
                            <i class="bi bi-calendar-heart"></i> <?php echo $data['holidays']; ?> hol
                         </span>
                         <?php endif; ?>
                         <?php if ($data['stop_periods'] > 0): ?>
-                        <span class="badge bg-secondary me-1" title="Stop period days">
+                        <span class="badge badge-phoenix badge-phoenix-secondary me-1" title="Stop period days">
                            <i class="bi bi-pause-circle"></i> <?php echo $data['stop_periods']; ?> stop
                         </span>
                         <?php endif; ?>
                         <?php if ($data['additions'] > 0): ?>
-                        <span class="badge bg-success me-1" title="Holiday override additions">
+                        <span class="badge badge-phoenix badge-phoenix-success me-1" title="Holiday override additions">
                            <i class="bi bi-plus-circle"></i> <?php echo $data['additions']; ?> add
                         </span>
                         <?php endif; ?>

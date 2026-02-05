@@ -99,7 +99,7 @@ $learners = $class['learner_ids'] ?? [];
                         <i class="bi bi-mortarboard me-1"></i>
                         <?php echo esc_html($examLearner['name'] ?? 'Unknown'); ?>
                         <?php if (!empty($examLearner['exam_status'])): ?>
-                        <span class="badge bg-light text-dark ms-1" style="font-size: 0.7rem;">
+                        <span class="badge badge-phoenix badge-phoenix-secondary ms-1 fs-10">
                         <?php echo esc_html($examLearner['exam_status']); ?>
                         </span>
                         <?php endif; ?>

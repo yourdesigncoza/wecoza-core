@@ -30,7 +30,7 @@ if (empty($class['qa_reports']) || !is_array($class['qa_reports'])) {
    <div class="card-header">
       <h5 class="mb-0">
          <i class="bi bi-file-earmark-check me-2"></i>Quality Assurance Reports
-         <span class="badge bg-secondary ms-2"><?php echo count($class['qa_reports']); ?></span>
+         <span class="badge badge-phoenix badge-phoenix-secondary ms-2"><?php echo count($class['qa_reports']); ?></span>
       </h5>
    </div>
    <div class="card-body">
