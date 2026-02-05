@@ -112,8 +112,6 @@ final class EventDispatcher
         // Schedule async processing
         $this->scheduleProcessing($eventId);
 
-        wecoza_log("EventDispatcher: Created event {$eventId} for class {$classId} ({$type->value})", 'debug');
-
         return $eventId;
     }
 

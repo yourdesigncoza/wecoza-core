@@ -112,7 +112,6 @@ final class NotificationEmailer
             // Update status to 'failed' on email failure
             $this->eventRepository->updateStatus($eventId, 'failed');
         } else {
-            wecoza_log(sprintf('WeCoza notification sent for event %d to %s', $eventId, $recipient), 'debug');
             // Mark event as sent with timestamp
             $this->eventRepository->markSent($eventId);
         }
