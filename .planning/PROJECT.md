@@ -2,7 +2,7 @@
 
 ## What This Is
 
-WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, LP progression tracking, and event/task management. Consolidates previously separate plugins (wecoza-classes-plugin, wecoza-learners-plugin, wecoza-events-plugin) into a single maintainable codebase with PostgreSQL backend and MVC architecture.
+WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, LP progression tracking, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend and MVC architecture.
 
 ## Core Value
 
@@ -27,41 +27,21 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Unified database connection (consolidate to single PostgresConnection) — v1
 - ✓ PSR-4 autoloading for Events module — v1
 - ✓ Fix delivery_date column references (bug from schema migration) — v1
-- ✓ SEC-01: Add `quoteIdentifier()` helper for PostgreSQL reserved words — v1.1
-- ✓ SEC-02: Remove PII mappings from DataObfuscator return value — v1.1
-- ✓ SEC-03: Strengthen email masking (show domain only) — v1.1
-- ✓ SEC-04: Add MIME type validation on PDF uploads — v1.1
-- ✓ SEC-05: Reduce verbose exception logging (schema leak risk) — v1.1
-- ✓ SEC-06: Add heuristic field detection for custom PII fields — v1.1
-- ✓ PERF-01: Increase NotificationProcessor BATCH_LIMIT to 50+ — v1.1
-- ✓ PERF-02: Implement async email via Action Scheduler — v1.1
-- ✓ PERF-03: Separate AI enrichment job from email sending job — v1.1
-- ✓ PERF-04: Increase lock TTL to prevent race conditions — v1.1
-- ✓ PERF-05: Add memory cleanup for long-running DataObfuscator — v1.1
-- ✓ BUG-01: Fix column name mismatch (`sa_id_no` vs `sa_id_number`) — v1.1
-- ✓ BUG-02: Fix savePortfolios() overwrite bug (append, don't replace) — v1.1
-- ✓ BUG-03: processPortfolioDetails() method verified existing — v1.1
-- ✓ BUG-04: Fix unsafe `$pdo` access in catch block — v1.1
-- ✓ QUAL-01: Fix invalid model name (`gpt-5-mini` → `gpt-4o-mini`) — v1.1
-- ✓ QUAL-02: Extract DTOs for `$record`, `$context`, `$summary` arrays — v1.1
-- ✓ QUAL-03: Implement PHP 8.1 Enums for status strings — v1.1
-- ✓ QUAL-04: Make API URL configurable (support Azure/proxy) — v1.1
-- ✓ ARCH-01: Refactor `generateSummary()` for Single Responsibility — v1.1
-- ✓ ARCH-02: BaseRepository `count()` method verified existing — v1.1
+- ✓ Security hardening (SEC-01..06) — v1.1
+- ✓ Performance improvements (PERF-01..05) — v1.1
+- ✓ Bug fixes (BUG-01..04) — v1.1
+- ✓ Quality improvements (QUAL-01..04) — v1.1
+- ✓ Architecture improvements (ARCH-01..02) — v1.1
+- ✓ Event-based task system (tasks from event_dates JSONB) — v1.2
+- ✓ Agent Order Number (always-present task for class activation) — v1.2
+- ✓ Bidirectional sync (dashboard ↔ form completion metadata) — v1.2
+- ✓ Code cleanup (8 deprecated files removed) — v1.2
+- ✓ Notification system (email + dashboard with AI enrichment) — v1.2
+- ✓ Multi-recipient notification config — v1.2
 
 ### Active
 
-**v1.2 Event Tasks Refactor:**
-- [ ] TASK-01: Remove PostgreSQL triggers and class_change_logs table
-- [ ] TASK-02: Rewrite TaskManager to read/write classes.event_dates JSONB
-- [ ] TASK-03: Simplify ClassTaskRepository to query classes directly
-- [ ] TASK-04: Update TaskController AJAX handler for event_dates sync
-- [ ] TASK-05: Implement Agent Order Number as special always-present task
-- [ ] TASK-06: Add completed_by/completed_at metadata to event schema
-- [ ] TASK-07: Update ClassTaskPresenter for event-based task display
-- [ ] TASK-08: Implement bidirectional status sync (dashboard ↔ form)
-- [ ] TASK-09: Remove deprecated files (6 files: ClassChangeSchema, ClassChangeListener, etc.)
-- [ ] TASK-10: Update FormDataProcessor to handle completion metadata
+(None — awaiting next milestone definition)
 
 ### Out of Scope
 
@@ -72,29 +52,19 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current Milestone: v1.2 Event Tasks Refactor
-
-**Goal:** Replace trigger-based task system with manual event capture integration.
-
-**Target features:**
-- Tasks derived from user-entered events in class form (not auto-generated from INSERT/UPDATE)
-- Agent Order Number as special always-present task
-- Bidirectional sync between dashboard and class form
-- Remove deprecated trigger/change-log infrastructure
-
-### Current State (v1.1 Shipped)
+### Current State (v1.2 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~19,200 lines of PHP across 3 modules
-- **Events module:** 45+ PHP files in `src/Events/` (including new DTOs, Enums, Services)
-- **View templates:** 9 templates in `views/events/`
+- **Total:** ~21,400 lines of PHP across 3 modules
+- **Events module:** 40+ PHP files in `src/Events/` (DTOs, Enums, Services, Repositories)
+- **View templates:** 10+ templates in `views/events/`
 - **Test coverage:** 4 test files in `tests/Events/`
 
 **Architecture:**
 - `core/` — Framework abstractions (Base classes, security helpers)
 - `src/Learners/` — Learner module
 - `src/Classes/` — Classes module
-- `src/Events/` — Events module with DTOs, Enums, async services
+- `src/Events/` — Events module with notification system
 - `views/` — PHP templates
 - `assets/` — JS/CSS files
 - `vendor/` — Action Scheduler 3.9.3 (Composer-managed)
@@ -104,22 +74,21 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 **Shortcodes (Events module):**
 - `[wecoza_event_tasks]` — Task management dashboard
 - `[wecoza_material_tracking]` — Material delivery tracking
-- `[wecoza_insert_update_ai_summary]` — AI-generated summaries
+- `[wecoza_notification_dashboard]` — Notification timeline with unread filter
 
 **Async jobs (Action Scheduler):**
-- `wecoza_enrich_notification` — AI enrichment of notification
-- `wecoza_send_notification_email` — Send enriched email notification
+- `wecoza_process_notifications` — Batch notification processing
+- `wecoza_process_event` — AI enrichment per event
+- `wecoza_send_notification_email` — Email delivery per recipient
 
 **Cron jobs:**
-- `wecoza_email_notifications_process` — Hourly batch processing (50 notifications)
 - `wecoza_material_notifications_check` — Daily material alerts
 
 ### Known Issues
 
-- Phase 3 (Bootstrap Integration) lacks formal VERIFICATION.md (functionality verified via dependent phases)
 - Settings page may need admin menu entry for easier discovery
 - 2 test failures in AI summarization test suite (test format issues, not production bugs)
-- Minor tech debt: NotificationEnricher/NotificationEmailer lack explicit exception handling (deferred)
+- Minor tech debt: Some test sections replaced with skip notices
 
 ## Constraints
 
@@ -127,32 +96,21 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - **Architecture:** Must follow existing MVC patterns in wecoza-core
 - **Dependencies:** OpenAI API key required for AI summaries
 - **Compatibility:** Must not break existing Learners/Classes functionality
-- **Database:** PostgreSQL triggers and functions must be migrated
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Migrate all events features | User confirmed all features needed | ✓ All 24 requirements shipped |
-| Fix delivery_date during migration | Cleaner than pre-fixing in old plugin | ✓ Zero delivery_date references |
-| Use src/Events/ structure | Consistent with src/Learners/, src/Classes/ | ✓ 37 files in proper structure |
-| Namespace: WeCoza\Events\* | Consistent with WeCoza\Learners\*, WeCoza\Classes\* | ✓ All classes use correct namespace |
+| Migrate all events features | User confirmed all features needed | ✓ All v1 requirements shipped |
+| Use src/Events/ structure | Consistent with src/Learners/, src/Classes/ | ✓ All classes use correct namespace |
 | Single PostgresConnection | Eliminate duplicate database code | ✓ All modules use wecoza_db() |
-| Use gpt-4o-mini model (not gpt-5-mini) | Valid model name, cost-effective | ✓ Fixed in v1.1 |
-| PII protection via DataObfuscator | Prevent leaking sensitive data to OpenAI | ✓ Enhanced in v1.1 with PIIDetector |
-| Hourly email cron | Non-blocking notifications without real-time complexity | ✓ Upgraded to Action Scheduler in v1.1 |
-| Initialize PDO to null before try blocks | Prevent secondary errors in catch blocks | ✓ Pattern established v1.1 |
-| finfo_file() for MIME validation | Prevents malicious files disguised as PDFs | ✓ v1.1 |
-| Sanitize all exception messages | Prevent schema exposure in logs | ✓ v1.1 |
-| Remove 'mappings' from obfuscation returns | Prevent PII reverse-engineering | ✓ v1.1 |
-| Hide entire email local part (****@domain.com) | Stronger privacy than partial masking | ✓ v1.1 |
-| PHP 8.1 readonly DTOs with with*() methods | Immutable type-safe data structures | ✓ v1.1 |
-| Store OpenAI config in WordPress options | Leverage existing WP admin UI, Azure support | ✓ v1.1 |
-| Action Scheduler for async processing | Industry-standard job queue, WooCommerce compatible | ✓ v1.1 |
-| Separate NotificationEnricher/Emailer services | Single Responsibility, independent failure | ✓ v1.1 |
-| Replace triggers with manual events | User captures events explicitly in form, simpler architecture | — Pending |
-| Agent Order Number always present | Confirms class activation, writes to order_nr field | — Pending |
-| Bidirectional event/task sync | Dashboard completion updates event_dates, form edits reflect in dashboard | — Pending |
+| PII protection via DataObfuscator | Prevent leaking sensitive data to OpenAI | ✓ Enhanced in v1.1 |
+| Action Scheduler for async | Industry-standard job queue | ✓ v1.1 |
+| Replace triggers with manual events | User controls events explicitly, simpler architecture | ✓ v1.2 |
+| Agent Order Number always present | Confirms class activation, writes to order_nr | ✓ v1.2 |
+| Bidirectional event/task sync | Dashboard ↔ form stay in sync | ✓ v1.2 |
+| Application-level event dispatch | More flexible and testable than triggers | ✓ v1.2 |
+| JSONB for event storage | Flexible schema for varied event payloads | ✓ v1.2 |
 
 ---
-*Last updated: 2026-02-03 after v1.2 milestone started*
+*Last updated: 2026-02-05 after v1.2 milestone shipped*

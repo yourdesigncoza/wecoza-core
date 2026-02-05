@@ -1,5 +1,33 @@
 # Project Milestones: WeCoza Core
 
+## v1.2 Event Tasks Refactor (Shipped: 2026-02-05)
+
+**Delivered:** Replaced trigger-based task system with manual event capture — tasks derived from user-entered events in class form, bidirectional sync between dashboard and form, and full notification system with AI enrichment.
+
+**Phases completed:** 13-18 (16 plans total)
+
+**Key accomplishments:**
+
+- Event-based task system: Tasks derived from `classes.event_dates` JSONB instead of triggers
+- Agent Order Number: Always-present task for class activation confirmation
+- Bidirectional sync: Dashboard ↔ form completion metadata stays in sync
+- Notification system: Email + dashboard notifications with AI enrichment via Action Scheduler
+- Multi-recipient config: WordPress Settings API for notification recipients per event type
+- Code cleanup: 8 deprecated files removed (803 lines dead code)
+
+**Stats:**
+
+- 71 commits
+- 21,444 lines of PHP total
+- 6 phases, 16 plans, 32 requirements
+- 3 days from definition to ship (2026-02-03 → 2026-02-05)
+
+**Git range:** `docs(13)` → `docs(17): complete code-cleanup phase`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+
 ## v1.1 Quality & Performance (Shipped: 2026-02-02)
 
 **Delivered:** Production-ready polish addressing 21 issues from code analysis — bug fixes, security hardening, data privacy improvements, architecture refactoring, and async processing for high-volume notifications.
