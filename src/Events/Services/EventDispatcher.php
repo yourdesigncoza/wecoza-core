@@ -313,10 +313,12 @@ final class EventDispatcher
     /**
      * Check if event type is significant based on diff
      *
+     * Public method for external use (e.g., testing, conditional logic)
+     *
      * @param array<string, array{old: mixed, new: mixed}> $diff Computed diff
      * @return bool True if any significant field changed
      */
-    private function isSignificantChange(array $diff): bool
+    public function isSignificantChange(array $diff): bool
     {
         if (empty($diff)) {
             return false;
@@ -332,14 +334,52 @@ final class EventDispatcher
     }
 
     /**
+     * Get list of significant class fields
+     *
+     * @return array<int, string>
+     */
+    public static function getSignificantFields(): array
+    {
+        return self::SIGNIFICANT_CLASS_FIELDS;
+    }
+
+    /**
      * Check if we should dispatch events of this type
      *
+     * Events are always recorded for audit trail purposes. This method checks
+     * if the system is configured to process notifications for this event type.
+     *
      * @param EventType $type Event type
-     * @return bool True if notifications are enabled for this type
+     * @return bool True if event should be dispatched
      */
     private function shouldDispatch(EventType $type): bool
     {
-        // Check if NotificationSettings has a recipient configured for this operation
+        // Events are always recorded for audit trail purposes
+        // The notification processing step will check if recipients are configured
+        // This ensures we have a complete event history regardless of notification settings
+
+        // Check for explicit disable via filter (allows site-specific customization)
+        $enabled = apply_filters('wecoza_event_dispatch_enabled', true, $type);
+        if (!$enabled) {
+            wecoza_log("EventDispatcher: Event type {$type->value} disabled via filter", 'debug');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if notifications are enabled for a specific operation
+     *
+     * Uses NotificationSettings to determine if there's a recipient configured.
+     * This is separate from shouldDispatch() because we want to record events
+     * even when notifications are disabled.
+     *
+     * @param EventType $type Event type
+     * @return bool True if notification should be sent
+     */
+    public function isNotificationEnabled(EventType $type): bool
+    {
         $settings = new NotificationSettings();
 
         // Map event type to operation string for settings lookup
@@ -353,10 +393,8 @@ final class EventDispatcher
             EventType::LEARNER_UPDATE => 'UPDATE',
         };
 
-        // If no recipient is configured, we still want to record the event
-        // but skip if notifications are explicitly disabled
-        // For now, always record events - filtering happens at notification send time
-        return true;
+        // Check if a recipient is configured for this operation
+        return $settings->getRecipientForOperation($operation) !== null;
     }
 
     /*
