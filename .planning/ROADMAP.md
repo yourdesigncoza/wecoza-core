@@ -2,7 +2,7 @@
 
 **Created:** 2026-02-03
 **Milestone:** v1.2
-**Phases:** 13-17 (continues from v1.1)
+**Phases:** 13-18 (continues from v1.1)
 
 ## Overview
 
@@ -17,6 +17,7 @@ Replace trigger-based task system with manual event capture integration. Tasks w
 | 15 | Bidirectional Sync | Implement dashboard ↔ form synchronization | SYNC-01..05, REPO-03 |
 | 16 | Presentation Layer | Update UI components for new data flow | UI-01, UI-02, UI-03 |
 | 17 | Code Cleanup | Remove deprecated files | CLEAN-01..06 |
+| 18 | Notification System | Email + dashboard notifications for class/learner changes | NOTIF-01..08 |
 
 ---
 
@@ -149,6 +150,50 @@ Plans:
 
 ---
 
+## Phase 18: Notification System
+
+**Goal:** Implement email and dashboard notifications for class and learner changes using application-level events.
+
+**Requirements:** NOTIF-01, NOTIF-02, NOTIF-03, NOTIF-04, NOTIF-05, NOTIF-06, NOTIF-07, NOTIF-08
+
+**Plans:** 8 plans in 4 waves
+
+Plans:
+- [ ] 18-01-PLAN.md — Database schema (class_events table) + repository + DTOs + enums
+- [ ] 18-02-PLAN.md — EventDispatcher service for capturing application events
+- [ ] 18-03-PLAN.md — Update NotificationProcessor/Enricher/Emailer for new schema
+- [ ] 18-04-PLAN.md — Dashboard service + shortcode + presenter updates
+- [ ] 18-05-PLAN.md — Controller integration (dispatch events from class/learner changes)
+- [ ] 18-06-PLAN.md — Enable hooks in wecoza-core.php + multi-recipient settings
+- [ ] 18-07-PLAN.md — Admin settings UI for recipient configuration
+- [ ] 18-08-PLAN.md — Dashboard view templates + verification checkpoint
+
+**Success Criteria:**
+1. New `class_events` table stores change events (replaces dropped class_change_logs)
+2. Application-level event dispatching via Action Scheduler
+3. Email notifications sent immediately on class create + major updates
+4. Email notifications sent on learner changes (add/remove/update)
+5. AI summaries (GPT) enrich notification emails with change explanations
+6. Multiple configurable recipients per notification type
+7. Dashboard shortcode displays notification timeline with unread filter
+8. Task management UI integrated with notifications
+9. Full audit trail (sent, viewed, acknowledged timestamps)
+10. Modular, documented code for easy future modifications
+
+**Architecture Decisions:**
+- Application-level events (NOT database triggers) — more flexible, testable
+- Action Scheduler for job queue — reliable async processing
+- Separate event table — decoupled from classes table
+- 3-stage pipeline: Detect → Enrich (AI) → Send
+
+**Notes:**
+- Replaces disabled notification code from shelved wecoza-events-plugin
+- Must NOT use dropped class_change_logs table
+- Email + Dashboard are equal priority
+- Forever retention for audit compliance
+
+---
+
 ## Dependencies
 
 ```
@@ -160,7 +205,9 @@ Phase 15 (Sync) <- depends on new TaskManager
     |
 Phase 16 (UI) <- depends on sync working
     |
-Phase 17 (Cleanup) <- must be last, removes old code
+Phase 17 (Cleanup) <- removes old code
+    |
+Phase 18 (Notifications) <- can run parallel to 16-17, independent data path
 ```
 
 ## Risk Mitigation
@@ -174,4 +221,4 @@ Phase 17 (Cleanup) <- must be last, removes old code
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 16 planning*
+*Last updated: 2026-02-05 after Phase 18 added (Notification System)*
