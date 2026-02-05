@@ -156,17 +156,17 @@ Plans:
 
 **Requirements:** NOTIF-01, NOTIF-02, NOTIF-03, NOTIF-04, NOTIF-05, NOTIF-06, NOTIF-07, NOTIF-08
 
-**Plans:** 8 plans in 4 waves
+**Plans:** 8 plans in 4 waves (complete)
 
 Plans:
-- [ ] 18-01-PLAN.md — Database schema (class_events table) + repository + DTOs + enums
-- [ ] 18-02-PLAN.md — EventDispatcher service for capturing application events
-- [ ] 18-03-PLAN.md — Update NotificationProcessor/Enricher/Emailer for new schema
-- [ ] 18-04-PLAN.md — Dashboard service + shortcode + presenter updates
-- [ ] 18-05-PLAN.md — Controller integration (dispatch events from class/learner changes)
-- [ ] 18-06-PLAN.md — Enable hooks in wecoza-core.php + multi-recipient settings
-- [ ] 18-07-PLAN.md — Admin settings UI for recipient configuration
-- [ ] 18-08-PLAN.md — Dashboard view templates + verification checkpoint
+- [x] 18-01-PLAN.md — Database schema (class_events table) + repository + DTOs + enums
+- [x] 18-02-PLAN.md — EventDispatcher service for capturing application events
+- [x] 18-03-PLAN.md — Update NotificationProcessor/Enricher/Emailer for new schema
+- [x] 18-04-PLAN.md — Dashboard service + shortcode + presenter updates
+- [x] 18-05-PLAN.md — Controller integration (dispatch events from class/learner changes)
+- [x] 18-06-PLAN.md — Enable hooks in wecoza-core.php + multi-recipient settings
+- [x] 18-07-PLAN.md — Admin settings UI for recipient configuration
+- [x] 18-08-PLAN.md — Dashboard view templates + verification checkpoint
 
 **Success Criteria:**
 1. New `class_events` table stores change events (replaces dropped class_change_logs)
@@ -221,4 +221,4 @@ Phase 18 (Notifications) <- can run parallel to 16-17, independent data path
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-05 after Phase 18 added (Notification System)*
+*Last updated: 2026-02-05 — Phase 18 complete*

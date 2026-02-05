@@ -49,12 +49,20 @@ Requirements for Event Tasks Refactor milestone. Replaces trigger-based task sys
 - [ ] **CLEAN-05**: Remove `src/Events/Models/ClassChangeLogDTO.php`
 - [ ] **CLEAN-06**: Remove `src/Events/Enums/ChangeOperation.php`
 
+### Notification System (Phase 18)
+
+- [x] **NOTIF-01**: Create `class_events` table for application-level event storage
+- [x] **NOTIF-02**: Implement event dispatching via Action Scheduler on class/learner changes
+- [x] **NOTIF-03**: Email notifications sent immediately on class create + major updates (dates, status, learners)
+- [x] **NOTIF-04**: Email notifications sent on learner changes (add/remove/update)
+- [x] **NOTIF-05**: AI summaries (GPT) enrich notification emails with change explanations
+- [x] **NOTIF-06**: Multiple configurable recipients per notification type
+- [x] **NOTIF-07**: Dashboard shortcode with timeline, unread filter, task management
+- [x] **NOTIF-08**: Full audit trail (sent, viewed, acknowledged timestamps)
+
 ## Future Requirements
 
 Deferred to future milestones.
-
-### Notifications
-- **NOTIF-01**: Email notifications on event status changes (if needed)
 
 ### Reporting
 - **RPT-01**: Event completion reports by type/date range
@@ -65,9 +73,7 @@ Explicitly excluded from this milestone.
 
 | Feature | Reason |
 |---------|--------|
-| AI summaries for events | Trigger-based AI summaries being removed with triggers |
-| Email notifications on event changes | Notifications tied to old trigger system, revisit later |
-| Material tracking changes | Separate system, not affected by this refactor |
+| Material tracking notifications | Separate system, already working independently |
 | New event types | 8 existing types sufficient for v1.2 |
 
 ## Traceability
@@ -98,12 +104,20 @@ Explicitly excluded from this milestone.
 | CLEAN-04 | Phase 17 | Pending |
 | CLEAN-05 | Phase 17 | Pending |
 | CLEAN-06 | Phase 17 | Pending |
+| NOTIF-01 | Phase 18 | Done |
+| NOTIF-02 | Phase 18 | Done |
+| NOTIF-03 | Phase 18 | Done |
+| NOTIF-04 | Phase 18 | Done |
+| NOTIF-05 | Phase 18 | Done |
+| NOTIF-06 | Phase 18 | Done |
+| NOTIF-07 | Phase 18 | Done |
+| NOTIF-08 | Phase 18 | Done |
 
 **Coverage:**
-- v1.2 requirements: 24 total
-- Mapped to phases: 24
+- v1.2 requirements: 32 total
+- Mapped to phases: 32
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 15 completion*
+*Last updated: 2026-02-05 — Phase 18 requirements complete*
