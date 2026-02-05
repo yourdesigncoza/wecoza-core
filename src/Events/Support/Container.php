@@ -12,14 +12,12 @@ use WeCoza\Events\Repositories\ClassTaskRepository;
 use WeCoza\Events\Services\AISummaryService;
 use WeCoza\Events\Services\ClassTaskService;
 use WeCoza\Events\Services\TaskManager;
-use WeCoza\Events\Services\TaskTemplateRegistry;
 use WeCoza\Events\Support\OpenAIConfig;
 use WeCoza\Events\Views\Presenters\ClassTaskPresenter;
 use WeCoza\Events\Views\TemplateRenderer;
 
 final class Container
 {
-    private static ?TaskTemplateRegistry $taskTemplateRegistry = null;
     private static ?ClassTaskRepository $classTaskRepository = null;
     private static ?TaskManager $taskManager = null;
     private static ?ClassTaskService $classTaskService = null;
@@ -29,15 +27,6 @@ final class Container
     private static ?JsonResponder $jsonResponder = null;
     private static ?OpenAIConfig $openAIConfig = null;
     private static ?AISummaryService $aiSummaryService = null;
-
-    public static function taskTemplateRegistry(): TaskTemplateRegistry
-    {
-        if (self::$taskTemplateRegistry === null) {
-            self::$taskTemplateRegistry = new TaskTemplateRegistry();
-        }
-
-        return self::$taskTemplateRegistry;
-    }
 
     public static function classTaskRepository(): ClassTaskRepository
     {
@@ -51,7 +40,7 @@ final class Container
     public static function taskManager(): TaskManager
     {
         if (self::$taskManager === null) {
-            self::$taskManager = new TaskManager(self::taskTemplateRegistry());
+            self::$taskManager = new TaskManager();
         }
 
         return self::$taskManager;
@@ -62,8 +51,7 @@ final class Container
         if (self::$classTaskService === null) {
             self::$classTaskService = new ClassTaskService(
                 self::classTaskRepository(),
-                self::taskManager(),
-                self::taskTemplateRegistry()
+                self::taskManager()
             );
         }
 
