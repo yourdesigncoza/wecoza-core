@@ -168,9 +168,15 @@ final class TaskManager
             throw new RuntimeException(__('Invalid task ID format.', 'wecoza-events'));
         }
 
-        // Update event_dates JSONB: set status to Pending, clear completion metadata
-        // Note: The updateEventStatus method preserves notes when they exist
-        $this->updateEventStatus($classId, $eventIndex, 'Pending', null, null, null);
+        // Fetch existing event to preserve notes
+        $class = $this->fetchClassById($classId);
+        $events = $this->parseEventDates($class['event_dates'] ?? null);
+        $existingNotes = isset($events[$eventIndex]['notes']) && $events[$eventIndex]['notes'] !== ''
+            ? (string) $events[$eventIndex]['notes']
+            : null;
+
+        // Update event_dates JSONB: set status to Pending, clear completion metadata, preserve notes
+        $this->updateEventStatus($classId, $eventIndex, 'Pending', null, null, $existingNotes);
 
         // Return fresh tasks
         $class = $this->fetchClassById($classId);
@@ -509,6 +515,32 @@ SQL;
     }
 
     /**
+     * Parse event_dates JSONB field into an array.
+     *
+     * Handles both string (JSONB from database) and array (already decoded) formats.
+     *
+     * @param mixed $eventDatesRaw Raw event_dates value from database
+     * @return array<int, array<string, mixed>> Array of events
+     */
+    private function parseEventDates($eventDatesRaw): array
+    {
+        if ($eventDatesRaw === null || $eventDatesRaw === '') {
+            return [];
+        }
+
+        if (is_string($eventDatesRaw)) {
+            $decoded = json_decode($eventDatesRaw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+            wecoza_log('Invalid JSON in event_dates: ' . json_last_error_msg(), 'warning');
+            return [];
+        }
+
+        return is_array($eventDatesRaw) ? $eventDatesRaw : [];
+    }
+
+    /**
      * Build a TaskCollection from the class's event_dates JSONB array.
      *
      * Always includes the Agent Order Number task, plus one task per event.
@@ -523,22 +555,8 @@ SQL;
         // Agent Order Number task is always present
         $collection->add($this->buildAgentOrderTask($class));
 
-        // Decode event_dates JSONB
-        $eventDatesRaw = $class['event_dates'] ?? null;
-        $events = [];
-
-        if ($eventDatesRaw !== null && $eventDatesRaw !== '') {
-            if (is_string($eventDatesRaw)) {
-                $decoded = json_decode($eventDatesRaw, true);
-                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                    $events = $decoded;
-                } else {
-                    wecoza_log('Invalid JSON in event_dates: ' . json_last_error_msg(), 'warning');
-                }
-            } elseif (is_array($eventDatesRaw)) {
-                $events = $eventDatesRaw;
-            }
-        }
+        // Parse event_dates JSONB
+        $events = $this->parseEventDates($class['event_dates'] ?? null);
 
         // Build task for each event
         foreach ($events as $index => $event) {
