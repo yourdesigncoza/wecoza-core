@@ -117,7 +117,7 @@ final class TaskManager
     /**
      * Complete the Agent Order Number task.
      *
-     * Validates order number and writes to classes.order_nr.
+     * Validates order number and writes to classes.order_nr with completion metadata.
      *
      * @param int $classId Class ID
      * @param int $userId User ID who completed
@@ -137,7 +137,7 @@ final class TaskManager
             throw new RuntimeException(__('An order number is required before completing this task.', 'wecoza-events'));
         }
 
-        $this->updateClassOrderNumber($classId, $orderNumber);
+        $this->updateClassOrderNumber($classId, $orderNumber, $userId, $timestamp);
 
         // Return fresh tasks
         $class = $this->fetchClassById($classId);
@@ -349,12 +349,12 @@ SQL;
      * Fetch a class by ID with fields needed for task building.
      *
      * @param int $classId Class ID
-     * @return array<string, mixed> Class data with class_id, order_nr, event_dates
+     * @return array<string, mixed> Class data with class_id, order_nr, order_nr_metadata, event_dates
      * @throws RuntimeException If class not found
      */
     private function fetchClassById(int $classId): array
     {
-        $sql = "SELECT class_id, order_nr, event_dates FROM classes WHERE class_id = :class_id LIMIT 1";
+        $sql = "SELECT class_id, order_nr, order_nr_metadata, event_dates FROM classes WHERE class_id = :class_id LIMIT 1";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if ($stmt === false) {
@@ -374,9 +374,26 @@ SQL;
         return $class;
     }
 
-    private function updateClassOrderNumber(int $classId, string $orderNumber): void
+    /**
+     * Update the class order number and optionally store completion metadata.
+     *
+     * When completing (non-empty order number), stores metadata as JSONB.
+     * When reopening (empty order number), clears metadata.
+     *
+     * @param int $classId Class ID
+     * @param string $orderNumber Order number value (empty string = incomplete)
+     * @param int|null $userId User ID who completed (null for reopen)
+     * @param string|null $timestamp Completion timestamp (null for reopen)
+     * @throws RuntimeException If update fails
+     */
+    private function updateClassOrderNumber(int $classId, string $orderNumber, ?int $userId = null, ?string $timestamp = null): void
     {
-        $sql = "UPDATE classes SET order_nr = :order_nr, updated_at = now() WHERE class_id = :class_id";
+        $metadata = null;
+        if ($orderNumber !== '' && $userId !== null && $timestamp !== null) {
+            $metadata = json_encode(['completed_by' => $userId, 'completed_at' => $timestamp], JSON_THROW_ON_ERROR);
+        }
+
+        $sql = "UPDATE classes SET order_nr = :order_nr, order_nr_metadata = :metadata, updated_at = now() WHERE class_id = :class_id";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if ($stmt === false) {
@@ -385,6 +402,7 @@ SQL;
 
         $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
         $stmt->bindValue(':order_nr', $orderNumber, PDO::PARAM_STR);
+        $stmt->bindValue(':metadata', $metadata, $metadata !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
 
         if (!$stmt->execute()) {
             throw new RuntimeException('Failed to update class order number.');
@@ -536,6 +554,7 @@ SQL;
      * Build the Agent Order Number task.
      *
      * Status is completed if order_nr is non-null AND non-empty string.
+     * Reads completion metadata from order_nr_metadata JSONB column.
      *
      * @param array<string, mixed> $class Class data array
      * @return Task The Agent Order Number task
@@ -548,12 +567,30 @@ SQL;
         $isComplete = $orderNr !== null && $orderNr !== '';
         $status = $isComplete ? Task::STATUS_COMPLETED : Task::STATUS_OPEN;
 
+        // Extract completion metadata from JSONB column
+        $metadata = null;
+        $completedBy = null;
+        $completedAt = null;
+
+        if (isset($class['order_nr_metadata']) && $class['order_nr_metadata'] !== null) {
+            if (is_string($class['order_nr_metadata'])) {
+                $metadata = json_decode($class['order_nr_metadata'], true);
+            } elseif (is_array($class['order_nr_metadata'])) {
+                $metadata = $class['order_nr_metadata'];
+            }
+        }
+
+        if (is_array($metadata)) {
+            $completedBy = isset($metadata['completed_by']) ? (int) $metadata['completed_by'] : null;
+            $completedAt = isset($metadata['completed_at']) && $metadata['completed_at'] !== '' ? (string) $metadata['completed_at'] : null;
+        }
+
         return new Task(
             'agent-order',
             'Agent Order Number',
             $status,
-            null, // completedBy - Phase 15 adds this
-            null, // completedAt - Phase 15 adds this
+            $completedBy,
+            $completedAt,
             $isComplete ? (string) $orderNr : null
         );
     }
