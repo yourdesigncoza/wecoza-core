@@ -36,9 +36,9 @@ Requirements for Event Tasks Refactor milestone. Replaces trigger-based task sys
 
 ### Presentation Layer
 
-- [ ] **UI-01**: Update ClassTaskPresenter to present event-based tasks
-- [ ] **UI-02**: Preserve existing UI interaction (Open/Completed columns, Complete/Reopen buttons)
-- [ ] **UI-03**: Show all classes in dashboard (even those with no events)
+- [x] **UI-01**: Update ClassTaskPresenter to present event-based tasks
+- [x] **UI-02**: Preserve existing UI interaction (Open/Completed columns, Complete/Reopen buttons)
+- [x] **UI-03**: Show all classes in dashboard (even those with no events)
 
 ### Code Cleanup
 
@@ -95,9 +95,9 @@ Explicitly excluded from this milestone.
 | REPO-01 | Phase 14 | Done |
 | REPO-02 | Phase 14 | Done |
 | REPO-03 | Phase 15 | Done |
-| UI-01 | Phase 16 | Pending |
-| UI-02 | Phase 16 | Pending |
-| UI-03 | Phase 16 | Pending |
+| UI-01 | Phase 16 | Done |
+| UI-02 | Phase 16 | Done |
+| UI-03 | Phase 16 | Done |
 | CLEAN-01 | Phase 17 | Pending |
 | CLEAN-02 | Phase 17 | Pending |
 | CLEAN-03 | Phase 17 | Pending |
@@ -120,4 +120,4 @@ Explicitly excluded from this milestone.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-05 — Phase 18 requirements complete*
+*Last updated: 2026-02-05 — Phase 16 requirements complete*

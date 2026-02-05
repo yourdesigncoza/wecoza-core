@@ -106,11 +106,11 @@ Plans:
 
 **Requirements:** UI-01, UI-02, UI-03
 
-**Plans:** 2 plans
+**Plans:** 2 plans (complete)
 
 Plans:
-- [ ] 16-01-PLAN.md — Fix JavaScript AJAX parameter (log_id to class_id) and clean view templates
-- [ ] 16-02-PLAN.md — UI verification checkpoint
+- [x] 16-01-PLAN.md — Fix JavaScript AJAX parameter (log_id to class_id) and clean view templates
+- [x] 16-02-PLAN.md — UI verification checkpoint
 
 **Success Criteria:**
 1. ClassTaskPresenter formats event-based tasks for display
@@ -221,4 +221,4 @@ Phase 18 (Notifications) <- can run parallel to 16-17, independent data path
 
 ---
 *Roadmap created: 2026-02-03*
-*Last updated: 2026-02-05 — Phase 18 complete*
+*Last updated: 2026-02-05 — Phase 16 complete*
