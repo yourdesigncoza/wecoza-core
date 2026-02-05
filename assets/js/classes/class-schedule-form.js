@@ -1228,13 +1228,6 @@
             events.forEach(function(event, index) {
                 const $newRow = $('<tr class="event-dates-stat-row"></tr>');
 
-                if (index === 0) {
-                    // First row has rowspan for "Events" category label
-                    $newRow.append(
-                        $('<td>').addClass('align-middle').attr('rowspan', events.length).text('Events')
-                    );
-                }
-
                 // Add Type, Description, Date, Status columns
                 const status = event.status || 'Pending';
                 const $statusCell = $('<td>');

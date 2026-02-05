@@ -902,10 +902,9 @@ if (isset($data['class_data']) && $data['class_data']):
                   </tr>
                   <!-- Event Dates Statistics -->
                   <tr class="ydcoza-table-subheader">
-                     <th colspan="5">Event Dates</th>
+                     <th colspan="3">Event Dates</th>
                   </tr>
                   <tr class="ydcoza-table-subheader" style="font-size: 0.85em; font-weight: 500;">
-                     <th></th>
                      <th>Type</th>
                      <th>Description</th>
                      <th>Date</th>
@@ -913,7 +912,6 @@ if (isset($data['class_data']) && $data['class_data']):
                      <th>Notes</th>
                   </tr>
                   <tr id="event-dates-stats-empty-row">
-                     <td class="align-middle">Events</td>
                      <td colspan="5" class="text-muted">No event dates added</td>
                   </tr>
                   <!-- Dynamic event date rows will be inserted here by JavaScript -->
