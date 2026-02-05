@@ -105,11 +105,12 @@ None identified.
 | 001 | Event notes not showing in Open Tasks view | 2026-02-03 | 02ab22e | [001-event-notes-not-showing-in-tasks](./quick/001-event-notes-not-showing-in-tasks/) |
 | 002 | Add event dates to Open Tasks view | 2026-02-03 | 95b11a2 | [002-add-date-to-open-tasks-view](./quick/002-add-date-to-open-tasks-view/) |
 | 003 | Add Edit Class button to Actions column | 2026-02-05 | d6d5828 | [003-add-edit-class-button-to-actions-column-](./quick/003-add-edit-class-button-to-actions-column-/) |
+| 004 | Fix task metadata and preserve notes on reopen | 2026-02-05 | cab8521 | [004-fix-task-metadata-and-preserve-notes-on-reopen](./quick/004-fix-task-metadata-and-preserve-notes-on-reopen/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05T10:02:00Z
-Stopped at: Completed quick-003 (Add Edit Class button to Actions column)
+Last session: 2026-02-05T11:33:40Z
+Stopped at: Completed quick-004 (Fix task metadata and preserve notes on reopen)
 Resume file: None
 
 **Next action:** Execute 18-08-PLAN.md (Email delivery integration)
