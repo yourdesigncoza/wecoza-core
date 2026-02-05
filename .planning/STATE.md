@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-Phase: 16 (Presentation Layer) — complete
-Plan: 02/02 complete
-Status: Phase 16 complete
-Last activity: 2026-02-05 — Completed 16-02-PLAN.md (Presentation Layer Verification)
+Phase: 17 (Code Cleanup) — complete
+Plan: 01/01 complete
+Status: Phase 17 complete, v1.2 milestone complete
+Last activity: 2026-02-05 — Completed 17-01-PLAN.md (Code Cleanup)
 
 Progress: v1.2 ██████████████████████████████ 100%
-Progress: Phase 16 ██████████████████████████████ 100% (2/2 plans)
+Progress: Phase 17 ██████████████████████████████ 100% (1/1 plans)
 Progress: Phase 18 ██████████████████████████████ 100% (8/8 plans)
 
 ## Milestone v1.2: Event Tasks Refactor
@@ -29,7 +29,7 @@ Progress: Phase 18 ████████████████████�
 | 14 | Task System Refactor | Complete | TASK-01..04, REPO-01..02 |
 | 15 | Bidirectional Sync | Complete | SYNC-01..05, REPO-03 |
 | 16 | Presentation Layer | Complete | UI-01..03 |
-| 17 | Code Cleanup | Pending | CLEAN-01..06 |
+| 17 | Code Cleanup | Complete | CLEAN-01..06 |
 | 18 | Notification System | Complete | NOTIFY-01..08 |
 
 **Key deliverables:**
@@ -40,6 +40,12 @@ Progress: Phase 18 ████████████████████�
 - Notification events captured from controllers
 
 ## Milestone History
+
+**v1.2 Event Tasks Refactor (Shipped: 2026-02-05)**
+- 6 phases, 12 plans
+- Replaced trigger-based system with event-based tasks
+- Notification system with AI enrichment
+- 3 days from definition to ship
 
 **v1.1 Quality & Performance (Shipped: 2026-02-02)**
 - 5 phases, 13 plans, 21 requirements
@@ -90,10 +96,12 @@ See: .planning/MILESTONES.md for full details
 | wecoza_notification_recipients option | Array storage for multi-recipient support | Implemented (18-06) |
 | Separate process_event from send_email | Enrichment and delivery as separate Action Scheduler jobs | Implemented (18-06) |
 | Dashboard AJAX via notifications nonce | Separate nonce for notification operations | Implemented (18-06) |
+| Delete files querying dropped table | Safe since class_change_logs removed in Phase 13 | Implemented (17-01) |
+| Update CLI to use class_events | Maintains AI summary status functionality | Implemented (17-01) |
 
 ### Pending Todos
 
-- None for Phase 18 (complete)
+None - v1.2 milestone complete.
 
 ### Blockers/Concerns
 
@@ -116,8 +124,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-05T18:15:00Z
-Stopped at: Completed 16-02-PLAN.md (Presentation Layer Verification)
+Last session: 2026-02-05T14:42:13Z
+Stopped at: Completed 17-01-PLAN.md (Code Cleanup)
 Resume file: None
 
-**Next action:** Phase 16 complete. Continue with Phase 17 (Code Cleanup)
+**Next action:** v1.2 milestone complete. Ready for next milestone definition.
