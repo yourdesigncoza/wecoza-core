@@ -462,12 +462,14 @@ SQL;
         $updatesJson = json_encode($updates, JSON_THROW_ON_ERROR);
         $path = '{' . $eventIndex . '}';
 
+        // Note: We embed $eventIndex directly in the SQL because PostgreSQL's -> operator
+        // doesn't work reliably with PDO bound parameters. The index is validated as int above.
         $sql = <<<SQL
 UPDATE classes
 SET event_dates = jsonb_set(
     event_dates,
     :path::text[],
-    (event_dates->:index) || :updates::jsonb,
+    (event_dates->{$eventIndex}) || :updates::jsonb,
     true
 ),
     updated_at = NOW()
@@ -480,7 +482,6 @@ SQL;
         }
 
         $stmt->bindValue(':path', $path, PDO::PARAM_STR);
-        $stmt->bindValue(':index', $eventIndex, PDO::PARAM_INT);
         $stmt->bindValue(':updates', $updatesJson, PDO::PARAM_STR);
         $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
 
