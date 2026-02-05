@@ -18,6 +18,7 @@ use WeCoza\Classes\Services\FormDataProcessor;
 use WeCoza\Classes\Services\ScheduleService;
 use WeCoza\Classes\Services\UploadService;
 use WeCoza\Learners\Services\ProgressionService;
+use WeCoza\Events\Services\EventDispatcher;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -92,6 +93,10 @@ class ClassAjaxController extends BaseController
                     return;
                 }
 
+                // Capture old state before update for event dispatching
+                $oldClassData = null;
+                $oldLearnerIds = [];
+
                 if ($isUpdate) {
                     $class = ClassModel::getById($classId);
                     if (!$class) {
@@ -100,6 +105,10 @@ class ClassAjaxController extends BaseController
                         wp_send_json_error('Class not found for update.');
                         return;
                     }
+
+                    // Capture old state for event diffing
+                    $oldClassData = $class->toArray();
+                    $oldLearnerIds = $class->getLearnerIdsOnly();
 
                     $class = FormDataProcessor::populateClassModel($class, $formData);
                     $result = $class->update();
@@ -113,6 +122,9 @@ class ClassAjaxController extends BaseController
                     if (!empty($_POST) || !empty($_FILES)) {
                         QAController::saveQAVisits($class->getId(), $_POST, $_FILES);
                     }
+
+                    // Dispatch notification events (non-blocking)
+                    self::dispatchClassEvents($class, $isUpdate, $oldClassData, $oldLearnerIds);
 
                     // Auto-create LP records for newly assigned learners
                     $lpCreationResults = self::createLPsForNewLearners($class, $formData, $isUpdate);
@@ -192,6 +204,19 @@ class ClassAjaxController extends BaseController
 
         try {
             $db = wecoza_db();
+
+            // Capture class data before deletion for event dispatching
+            $classDataBeforeDelete = null;
+            try {
+                $class = ClassModel::getById($class_id);
+                if ($class) {
+                    $classDataBeforeDelete = $class->toArray();
+                }
+            } catch (\Exception $e) {
+                // Non-blocking: continue with deletion even if we can't capture data
+                wecoza_log("Could not capture class data before deletion: " . $e->getMessage(), 'warning');
+            }
+
             $db->beginTransaction();
 
             try {
@@ -208,6 +233,16 @@ class ClassAjaxController extends BaseController
                 }
 
                 $db->commit();
+
+                // Dispatch CLASS_DELETE event (non-blocking)
+                if ($classDataBeforeDelete) {
+                    try {
+                        EventDispatcher::classDeleted($class_id, $classDataBeforeDelete);
+                    } catch (\Throwable $e) {
+                        wecoza_log('Class delete event dispatch failed: ' . $e->getMessage(), 'warning');
+                    }
+                }
+
                 wp_send_json_success([
                     'message' => 'Class deleted successfully.',
                     'class_id' => $class_id
@@ -609,6 +644,101 @@ class ClassAjaxController extends BaseController
         delete_transient('wecoza_class_learners_with_progression');
 
         return $results;
+    }
+
+    /**
+     * Dispatch notification events for class create/update and learner roster changes
+     *
+     * Events are dispatched asynchronously and failures do not affect the main operation.
+     *
+     * @param ClassModel $class The saved class model
+     * @param bool $isUpdate Whether this was an update operation
+     * @param array|null $oldClassData Previous class data (for updates)
+     * @param array $oldLearnerIds Previous learner IDs (for updates)
+     */
+    private static function dispatchClassEvents(
+        ClassModel $class,
+        bool $isUpdate,
+        ?array $oldClassData,
+        array $oldLearnerIds
+    ): void {
+        try {
+            $classId = $class->getId();
+            $newClassData = $class->toArray();
+
+            if ($isUpdate) {
+                // Dispatch CLASS_UPDATE event
+                EventDispatcher::classUpdated($classId, $newClassData, $oldClassData);
+
+                // Detect and dispatch learner roster changes
+                self::dispatchLearnerRosterEvents($class, $oldLearnerIds);
+
+                // Check for status change (explicit event for visibility)
+                $oldStatus = $oldClassData['class_status'] ?? null;
+                $newStatus = $newClassData['class_status'] ?? null;
+                if ($oldStatus !== null && $newStatus !== null && $oldStatus !== $newStatus) {
+                    EventDispatcher::boot()->dispatchStatusChange(
+                        $classId,
+                        (string) $oldStatus,
+                        (string) $newStatus,
+                        $newClassData
+                    );
+                }
+            } else {
+                // Dispatch CLASS_INSERT event
+                EventDispatcher::classCreated($classId, $newClassData);
+
+                // Dispatch LEARNER_ADD events for initial learners
+                $initialLearnerIds = $class->getLearnerIdsOnly();
+                foreach ($initialLearnerIds as $learnerId) {
+                    EventDispatcher::learnerAdded($classId, (int) $learnerId, [
+                        'learner_id' => $learnerId,
+                        'action' => 'initial_assignment',
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Log but don't fail the main operation - notifications are secondary
+            wecoza_log('Event dispatch failed: ' . $e->getMessage(), 'warning');
+        }
+    }
+
+    /**
+     * Dispatch LEARNER_ADD and LEARNER_REMOVE events for roster changes
+     *
+     * @param ClassModel $class The updated class model
+     * @param array $oldLearnerIds Previous learner IDs
+     */
+    private static function dispatchLearnerRosterEvents(ClassModel $class, array $oldLearnerIds): void
+    {
+        $classId = $class->getId();
+        $newLearnerIds = $class->getLearnerIdsOnly();
+
+        // Find added learners (in new but not in old)
+        $addedLearnerIds = array_diff($newLearnerIds, $oldLearnerIds);
+        foreach ($addedLearnerIds as $learnerId) {
+            try {
+                EventDispatcher::learnerAdded($classId, (int) $learnerId, [
+                    'learner_id' => $learnerId,
+                    'action' => 'added_to_class',
+                ]);
+            } catch (\Throwable $e) {
+                wecoza_log("Learner add event dispatch failed for learner {$learnerId}: " . $e->getMessage(), 'warning');
+            }
+        }
+
+        // Find removed learners (in old but not in new)
+        $removedLearnerIds = array_diff($oldLearnerIds, $newLearnerIds);
+        foreach ($removedLearnerIds as $learnerId) {
+            try {
+                EventDispatcher::learnerRemoved($classId, (int) $learnerId, [
+                    'learner_id' => $learnerId,
+                    'action' => 'removed_from_class',
+                ]);
+            } catch (\Throwable $e) {
+                wecoza_log("Learner remove event dispatch failed for learner {$learnerId}: " . $e->getMessage(), 'warning');
+            }
+        }
     }
 
     /**
