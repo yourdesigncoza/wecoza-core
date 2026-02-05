@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 18 (Notification System) — in progress
-Plan: 01/05 complete
-Status: Plan 18-01 complete, ready for 18-02
-Last activity: 2026-02-05 — Completed 18-01-PLAN.md (Event Storage Infrastructure)
+Plan: 02/05 complete
+Status: Plan 18-02 complete, ready for 18-03
+Last activity: 2026-02-05 — Completed 18-02-PLAN.md (EventDispatcher Service)
 
 Progress: v1.2 ████████████████████░░░░░░░░░░ 70%
-Progress: Phase 18 ████░░░░░░░░░░░░░░░░░░░░░░░░░░ 20% (1/5 plans)
+Progress: Phase 18 ████████░░░░░░░░░░░░░░░░░░░░░░ 40% (2/5 plans)
 
 ## Milestone v1.2: Event Tasks Refactor
 
@@ -73,6 +73,9 @@ See: .planning/MILESTONES.md for full details
 | JSONB for event_data and ai_summary | Flexible schema for varied event payloads | Implemented (18-01) |
 | Notification workflow states | pending -> enriching -> sending -> sent/failed | Implemented (18-01) |
 | Partial indexes for event queries | Optimized for status queue and unread events | Implemented (18-01) |
+| Always record events | Audit trail separate from notification delivery | Implemented (18-02) |
+| Significant fields filter | Prevent notification spam from minor edits | Implemented (18-02) |
+| Filter hook for dispatch | Site-specific customization via wecoza_event_dispatch_enabled | Implemented (18-02) |
 
 ### Pending Todos
 
@@ -91,8 +94,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-05T09:36:00Z
-Stopped at: Completed 18-01-PLAN.md
+Last session: 2026-02-05T09:29:00Z
+Stopped at: Completed 18-02-PLAN.md
 Resume file: None
 
-**Next action:** Execute 18-02 (Event Emitter Service)
+**Next action:** Execute 18-03 (Controller Integration)
