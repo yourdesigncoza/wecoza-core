@@ -108,11 +108,12 @@ None identified.
 | 004 | Fix task metadata and preserve notes on reopen | 2026-02-05 | cab8521 | [004-fix-task-metadata-and-preserve-notes-on-reopen](./quick/004-fix-task-metadata-and-preserve-notes-on-reopen/) |
 | 005 | Filter completed events from form, show in statistics | 2026-02-05 | 7e8956b | [005-filter-completed-events-show-in-statistics](./quick/005-filter-completed-events-show-in-statistics/) |
 | 006 | Add green badge for completed status in Event Dates | 2026-02-05 | 504653f | [006-add-green-badge-for-completed-status](./quick/006-add-green-badge-for-completed-status/) |
+| 007 | Remove Events text, fix Event Dates table columns | 2026-02-05 | b0074ec | [007-remove-events-text-fix-table-columns](./quick/007-remove-events-text-fix-table-columns/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05T12:15:00Z
-Stopped at: Completed quick-006 (Add green badge for completed status)
+Last session: 2026-02-05T12:30:00Z
+Stopped at: Completed quick-007 (Remove Events text, fix table columns)
 Resume file: None
 
 **Next action:** Execute 18-08-PLAN.md (Email delivery integration)
