@@ -7,42 +7,36 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use PDO;
-use RuntimeException;
-use WeCoza\Core\Database\PostgresConnection;
+use WeCoza\Events\DTOs\ClassEventDTO;
+use WeCoza\Events\Repositories\ClassEventRepository;
 use WeCoza\Events\Support\OpenAIConfig;
 
-use function error_log;
-use function is_array;
 use function is_string;
-use function json_decode;
-use function json_encode;
 use function strtolower;
-use function strtoupper;
 use function absint;
 use function do_action;
 use function gmdate;
 use function wecoza_log;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
 
 /**
- * Handles AI enrichment for individual notifications.
+ * Handles AI enrichment for individual notification events
  *
  * Designed to run as an Action Scheduler job. On success, schedules
  * the email sending job. On failure, logs error and leaves notification
  * for manual review or retry.
+ *
+ * @since 1.2.0
  */
 final class NotificationEnricher
 {
-    private PostgresConnection $db;
+    private ClassEventRepository $eventRepository;
 
     public function __construct(
         private readonly AISummaryService $aiSummaryService,
         private readonly OpenAIConfig $openAIConfig,
         private readonly NotificationSettings $settings
     ) {
-        $this->db = PostgresConnection::getInstance();
+        $this->eventRepository = new ClassEventRepository();
     }
 
     public static function boot(): self
@@ -55,48 +49,52 @@ final class NotificationEnricher
     }
 
     /**
-     * Enrich a single notification with AI summary.
+     * Enrich a single event with AI summary
      *
-     * @param int $logId The log_id to enrich
+     * @param int $eventId The event_id to enrich
      * @return array{success: bool, should_email: bool, recipient: ?string, email_context: array}
      */
-    public function enrich(int $logId): array
+    public function enrich(int $eventId): array
     {
-        $row = $this->fetchRow($logId);
-        if ($row === null) {
-            wecoza_log("NotificationEnricher: Row not found for log_id {$logId}", 'warning');
+        $event = $this->eventRepository->findByEventId($eventId);
+        if ($event === null) {
+            wecoza_log("NotificationEnricher: Event not found for event_id {$eventId}", 'warning');
             return ['success' => false, 'should_email' => false, 'recipient' => null, 'email_context' => []];
         }
 
-        $operation = strtoupper((string) ($row['operation'] ?? ''));
+        // Map EventType to operation for recipient lookup
+        $operation = $this->mapEventTypeToOperation($event);
         $recipient = $this->settings->getRecipientForOperation($operation);
 
         if ($recipient === null) {
-            wecoza_log("NotificationEnricher: No recipient for operation {$operation} on log_id {$logId}", 'debug');
+            wecoza_log("NotificationEnricher: No recipient for event type {$event->eventType->value} on event_id {$eventId}", 'debug');
             return ['success' => true, 'should_email' => false, 'recipient' => null, 'email_context' => []];
         }
 
-        $newRow = $this->decodeJson($row['new_row'] ?? null);
-        $oldRow = $this->decodeJson($row['old_row'] ?? null);
-        $diff = $this->decodeJson($row['diff'] ?? null);
-        $summaryRecord = $this->decodeJson($row['ai_summary'] ?? null);
+        // Extract data from eventData JSONB
+        $newRow = $event->eventData['new_row'] ?? [];
+        $oldRow = $event->eventData['old_row'] ?? [];
+        $diff = $event->eventData['diff'] ?? [];
+        $summaryRecord = $event->aiSummary ?? [];
 
         $emailContext = ['alias_map' => [], 'obfuscated' => []];
-        $eligibility = $this->openAIConfig->assessEligibility($logId);
+        $eligibility = $this->openAIConfig->assessEligibility($eventId);
 
         if ($eligibility['eligible'] === false) {
             if ($this->shouldMarkFailure($summaryRecord)) {
                 $reason = is_string($eligibility['reason']) ? $eligibility['reason'] : 'feature_disabled';
                 $summaryRecord = $this->finalizeSkippedSummary($summaryRecord, $reason);
-                $this->persistSummary($logId, $summaryRecord);
-                $this->emitSummaryMetrics($logId, $summaryRecord);
+                $this->persistSummary($eventId, $summaryRecord);
+                $this->emitSummaryMetrics($eventId, $summaryRecord);
             }
+            // Update status to 'enriched' even if skipped
+            $this->eventRepository->updateStatus($eventId, 'enriched');
         } elseif ($this->shouldGenerateSummary($summaryRecord)) {
             $result = $this->aiSummaryService->generateSummary([
-                'log_id' => $logId,
+                'event_id' => $eventId,
                 'operation' => $operation,
-                'changed_at' => $row['changed_at'] ?? null,
-                'class_id' => $row['class_id'] ?? null,
+                'changed_at' => $event->createdAt,
+                'class_id' => $event->entityId,
                 'new_row' => $newRow,
                 'old_row' => $oldRow,
                 'diff' => $diff,
@@ -104,8 +102,11 @@ final class NotificationEnricher
 
             $summaryRecord = $result->record->toArray();
             $emailContext = $result->emailContext->toArray();
-            $this->persistSummary($logId, $summaryRecord);
-            $this->emitSummaryMetrics($logId, $summaryRecord);
+            $this->persistSummary($eventId, $summaryRecord);
+            $this->emitSummaryMetrics($eventId, $summaryRecord);
+
+            // Update status to 'enriched' after successful AI processing
+            $this->eventRepository->updateStatus($eventId, 'enriched');
         }
 
         return [
@@ -116,53 +117,20 @@ final class NotificationEnricher
         ];
     }
 
-    private function fetchRow(int $logId): ?array
+    /**
+     * Map EventType enum to operation string for NotificationSettings lookup.
+     *
+     * @param ClassEventDTO $event Event DTO
+     * @return string Operation string ('INSERT', 'UPDATE', etc.)
+     */
+    private function mapEventTypeToOperation(ClassEventDTO $event): string
     {
-        $sql = <<<SQL
-SELECT
-    log_id,
-    operation,
-    changed_at,
-    class_id,
-    new_row,
-    old_row,
-    diff,
-    ai_summary
-FROM class_change_logs
-WHERE log_id = :log_id
-SQL;
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if (!$stmt) {
-            throw new RuntimeException('Failed to prepare notification query.');
-        }
-
-        $stmt->bindValue(':log_id', $logId, PDO::PARAM_INT);
-
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute notification query.');
-        }
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row !== false ? $row : null;
-    }
-
-    private function decodeJson(mixed $value): array
-    {
-        if ($value === null) {
-            return [];
-        }
-
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if (!is_string($value) || $value === '') {
-            return [];
-        }
-
-        $decoded = json_decode($value, true);
-        return is_array($decoded) ? $decoded : [];
+        return match ($event->eventType->value) {
+            'CLASS_INSERT', 'LEARNER_ADD' => 'INSERT',
+            'CLASS_UPDATE', 'LEARNER_UPDATE', 'STATUS_CHANGE' => 'UPDATE',
+            'CLASS_DELETE', 'LEARNER_REMOVE' => 'DELETE',
+            default => 'UPDATE',
+        };
     }
 
     private function shouldGenerateSummary(array $summary): bool
@@ -221,27 +189,21 @@ SQL;
         ];
     }
 
-    private function persistSummary(int $logId, array $summary): void
+    /**
+     * Persist AI summary to class_events table
+     *
+     * @param int $eventId Event ID
+     * @param array $summary Summary record to persist
+     */
+    private function persistSummary(int $eventId, array $summary): void
     {
-        $stmt = $this->db->getPdo()->prepare('UPDATE class_change_logs SET ai_summary = :summary WHERE log_id = :log_id');
-        if (!$stmt) {
-            throw new RuntimeException('Failed to prepare AI summary update.');
-        }
-
-        $payload = json_encode($summary, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        if ($payload === false) {
-            $payload = '{}';
-        }
-        $stmt->bindValue(':summary', $payload, PDO::PARAM_STR);
-        $stmt->bindValue(':log_id', $logId, PDO::PARAM_INT);
-
-        $stmt->execute();
+        $this->eventRepository->updateAiSummary($eventId, $summary);
     }
 
-    private function emitSummaryMetrics(int $logId, array $summary): void
+    private function emitSummaryMetrics(int $eventId, array $summary): void
     {
         do_action('wecoza_ai_summary_generated', [
-            'log_id' => $logId,
+            'event_id' => $eventId,
             'status' => $summary['status'] ?? 'pending',
             'model' => $summary['model'] ?? null,
             'tokens_used' => $summary['tokens_used'] ?? 0,
