@@ -74,8 +74,8 @@ final class AISummaryStatusCommand extends WP_CLI_Command
     private function fetchStatusCounts(PDO $pdo, int $hours): array
     {
         $sql = 'SELECT COALESCE(ai_summary->>\'status\', \'pending\') AS status, COUNT(*)::int AS total
-             FROM class_change_logs
-             WHERE changed_at >= (NOW() AT TIME ZONE \'UTC\' - (:hours || \' hours\')::interval)
+             FROM class_events
+             WHERE created_at >= (NOW() AT TIME ZONE \'UTC\' - (:hours || \' hours\')::interval)
              AND ai_summary IS NOT NULL
              GROUP BY status
              ORDER BY status ASC';
@@ -103,8 +103,8 @@ final class AISummaryStatusCommand extends WP_CLI_Command
                 COALESCE(ai_summary->>\'model\', \'unknown\') AS model,
                 SUM(COALESCE((ai_summary->>\'tokens_used\')::int, 0))::int AS tokens,
                 SUM(COALESCE((ai_summary->>\'processing_time_ms\')::int, 0))::int AS processing_ms
-             FROM class_change_logs
-             WHERE changed_at >= (NOW() AT TIME ZONE \'UTC\' - (:hours || \' hours\')::interval)
+             FROM class_events
+             WHERE created_at >= (NOW() AT TIME ZONE \'UTC\' - (:hours || \' hours\')::interval)
              AND ai_summary IS NOT NULL
              GROUP BY model
              ORDER BY model ASC';
