@@ -179,6 +179,14 @@ echo $assets;
                                     </span>
                                 </td>
                                 <td class="text-end pe-4">
+                                    <a
+                                        href="/wecoza/app/new-class/?mode=update&class_id=<?php echo esc_attr((string) $class['id']); ?>"
+                                        class="btn btn-link btn-sm px-1 text-decoration-none"
+                                        title="<?php echo esc_attr__('Edit Class', 'wecoza-events'); ?>"
+                                    >
+                                        <span class="visually-hidden"><?php echo esc_html__('Edit Class', 'wecoza-events'); ?></span>
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
                                     <button
                                         type="button"
                                         class="btn btn-link btn-sm px-1 text-decoration-none wecoza-task-toggle"
