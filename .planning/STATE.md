@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 18 (Notification System) — in progress
-Plan: 02/05 complete
-Status: Plan 18-02 complete, ready for 18-03
-Last activity: 2026-02-05 — Completed 18-02-PLAN.md (EventDispatcher Service)
+Plan: 03/05 complete
+Status: Plan 18-03 complete, ready for 18-04
+Last activity: 2026-02-05 — Completed 18-03-PLAN.md (Notification Services Update)
 
-Progress: v1.2 ████████████████████░░░░░░░░░░ 70%
-Progress: Phase 18 ████████░░░░░░░░░░░░░░░░░░░░░░ 40% (2/5 plans)
+Progress: v1.2 ██████████████████████░░░░░░░░ 76%
+Progress: Phase 18 ████████████████░░░░░░░░░░░░░░ 60% (3/5 plans)
 
 ## Milestone v1.2: Event Tasks Refactor
 
@@ -76,10 +76,11 @@ See: .planning/MILESTONES.md for full details
 | Always record events | Audit trail separate from notification delivery | Implemented (18-02) |
 | Significant fields filter | Prevent notification spam from minor edits | Implemented (18-02) |
 | Filter hook for dispatch | Site-specific customization via wecoza_event_dispatch_enabled | Implemented (18-02) |
+| EventType to operation mapping | Legacy NotificationSettings uses INSERT/UPDATE/DELETE strings | Implemented (18-03) |
 
 ### Pending Todos
 
-None — continue to 16-02.
+None — continue to 18-04.
 
 ### Blockers/Concerns
 
@@ -94,8 +95,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-05T09:29:00Z
-Stopped at: Completed 18-02-PLAN.md
+Last session: 2026-02-05T09:33:00Z
+Stopped at: Completed 18-03-PLAN.md
 Resume file: None
 
-**Next action:** Execute 18-03 (Controller Integration)
+**Next action:** Execute 18-04 (Dashboard Service)
