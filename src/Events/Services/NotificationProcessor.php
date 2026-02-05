@@ -7,28 +7,29 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use PDO;
-use RuntimeException;
-use WeCoza\Core\Database\PostgresConnection;
+use WeCoza\Events\DTOs\ClassEventDTO;
+use WeCoza\Events\Repositories\ClassEventRepository;
 use WeCoza\Events\Support\OpenAIConfig;
 
 use function as_enqueue_async_action;
-use function get_option;
 use function get_transient;
-use function is_string;
 use function microtime;
 use function set_transient;
 use function delete_transient;
-use function max;
 use function sprintf;
-use function strtoupper;
-use function update_option;
 use function gc_collect_cycles;
 use function wecoza_log;
 
+/**
+ * Batch processor for pending notification events
+ *
+ * Reads pending events from class_events table, determines whether
+ * AI enrichment is needed, and schedules appropriate Action Scheduler jobs.
+ *
+ * @since 1.2.0
+ */
 final class NotificationProcessor
 {
-    private const OPTION_LAST_ID = 'wecoza_last_notified_log_id';
     private const LOCK_KEY = 'wecoza_ai_summary_lock';
     private const LOCK_TTL = 120;  // 2 minutes for 50+ item batches
     private const MAX_RUNTIME_SECONDS = 90;  // Room for 50 items
@@ -36,13 +37,13 @@ final class NotificationProcessor
     private const BATCH_LIMIT = 50;
     private const MEMORY_CLEANUP_INTERVAL = 50;  // Every 50 records
 
-    private PostgresConnection $db;
+    private ClassEventRepository $eventRepository;
 
     public function __construct(
         private readonly NotificationSettings $settings,
         private readonly OpenAIConfig $openAIConfig
     ) {
-        $this->db = PostgresConnection::getInstance();
+        $this->eventRepository = new ClassEventRepository();
     }
 
     public static function boot(): self
@@ -58,22 +59,24 @@ final class NotificationProcessor
         }
 
         $start = microtime(true);
-        $lastProcessed = (int) get_option(self::OPTION_LAST_ID, 0);
-        $latestId = $lastProcessed;
 
         try {
-            $rows = $this->fetchRows($lastProcessed, self::BATCH_LIMIT);
+            $events = $this->eventRepository->findPendingForProcessing(self::BATCH_LIMIT);
             $iteration = 0;
 
-            foreach ($rows as $row) {
+            foreach ($events as $event) {
                 $iteration++;
                 if ($this->shouldStop($start)) {
                     break;
                 }
 
-                $latestId = max($latestId, (int) $row['log_id']);
-                $logId = (int) $row['log_id'];
-                $operation = strtoupper((string) ($row['operation'] ?? ''));
+                $eventId = $event->eventId;
+                if ($eventId === null) {
+                    continue;
+                }
+
+                // Map EventType to operation for recipient lookup
+                $operation = $this->mapEventTypeToOperation($event);
 
                 // Check if this operation has a recipient configured
                 $recipient = $this->settings->getRecipientForOperation($operation);
@@ -82,21 +85,27 @@ final class NotificationProcessor
                 }
 
                 // Check AI eligibility to decide which job to schedule
-                $eligibility = $this->openAIConfig->assessEligibility($logId);
+                $eligibility = $this->openAIConfig->assessEligibility($eventId);
                 $needsAI = $eligibility['eligible'] !== false;
 
                 if ($needsAI) {
+                    // Update status to 'enriching' before scheduling
+                    $this->eventRepository->updateStatus($eventId, 'enriching');
+
                     // Schedule AI enrichment first (will chain to email on success)
                     as_enqueue_async_action(
                         'wecoza_enrich_notification',
-                        ['log_id' => $logId],
+                        ['event_id' => $eventId],
                         'wecoza-notifications'
                     );
                 } else {
+                    // Update status to 'sending' before scheduling
+                    $this->eventRepository->updateStatus($eventId, 'sending');
+
                     // Skip AI, schedule email directly
                     as_enqueue_async_action(
                         'wecoza_send_notification_email',
-                        ['log_id' => $logId, 'recipient' => $recipient, 'email_context' => []],
+                        ['event_id' => $eventId, 'recipient' => $recipient, 'email_context' => []],
                         'wecoza-notifications'
                     );
                 }
@@ -117,51 +126,25 @@ final class NotificationProcessor
 
             // Final memory cleanup after batch
             gc_collect_cycles();
-
-            if ($latestId !== $lastProcessed) {
-                update_option(self::OPTION_LAST_ID, $latestId, false);
-            }
         } finally {
             $this->releaseLock();
         }
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * Map EventType enum to operation string for NotificationSettings lookup.
+     *
+     * @param ClassEventDTO $event Event DTO
+     * @return string Operation string ('INSERT', 'UPDATE', etc.)
      */
-    private function fetchRows(int $afterId, int $limit): array
+    private function mapEventTypeToOperation(ClassEventDTO $event): string
     {
-        $sql = <<<SQL
-SELECT
-    log_id,
-    operation,
-    changed_at,
-    class_id,
-    new_row,
-    old_row,
-    diff,
-    ai_summary
-FROM class_change_logs
-WHERE log_id > :after_id
-ORDER BY log_id ASC
-LIMIT :limit;
-SQL;
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if (!$stmt) {
-            throw new RuntimeException('Failed to prepare notification query.');
-        }
-
-        $stmt->bindValue(':after_id', $afterId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute notification query.');
-        }
-
-        /** @var array<int, array<string, mixed>> $results */
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $results;
+        return match ($event->eventType->value) {
+            'CLASS_INSERT', 'LEARNER_ADD' => 'INSERT',
+            'CLASS_UPDATE', 'LEARNER_UPDATE', 'STATUS_CHANGE' => 'UPDATE',
+            'CLASS_DELETE', 'LEARNER_REMOVE' => 'DELETE',
+            default => 'UPDATE',
+        };
     }
 
     private function shouldStop(float $start): bool
@@ -182,12 +165,6 @@ SQL;
         }
 
         return set_transient(self::LOCK_KEY, '1', self::LOCK_TTL);
-    }
-
-    private function refreshLock(): void
-    {
-        // Extend lock during long processing
-        set_transient(self::LOCK_KEY, '1', self::LOCK_TTL);
     }
 
     private function releaseLock(): void
