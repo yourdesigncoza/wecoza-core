@@ -16,10 +16,8 @@ if (!function_exists('shortcode_exists')) {
 use WeCoza\Events\Support\OpenAIConfig;
 use WeCoza\Events\Admin\SettingsPage;
 use WeCoza\Events\Services\AISummaryService;
-use WeCoza\Events\Services\AISummaryDisplayService;
 use WeCoza\Events\Shortcodes\AISummaryShortcode;
 use WeCoza\Events\Views\Presenters\AISummaryPresenter;
-use WeCoza\Events\Repositories\ClassChangeLogRepository;
 use WeCoza\Events\Services\Traits\DataObfuscator;
 use WeCoza\Events\Services\NotificationProcessor;
 use WeCoza\Events\CLI\AISummaryStatusCommand;
@@ -316,54 +314,11 @@ try {
 echo "\n";
 
 // =====================================================
-// SECTION 5: AI-03 AISummaryDisplayService
+// SECTION 5: AISummaryDisplayService - SKIPPED
 // =====================================================
 
-echo "SECTION 5: AI-03 AISummaryDisplayService\n";
-echo "-----------------------------------------\n";
-
-// Test 5.1: AISummaryDisplayService class exists and is instantiable
-try {
-    $displayService = new AISummaryDisplayService();
-    $runner->test('AISummaryDisplayService class exists and is instantiable', true);
-} catch (Throwable $e) {
-    $runner->test('AISummaryDisplayService class exists and is instantiable', false, $e->getMessage());
-    $displayService = null;
-}
-
-if ($displayService !== null) {
-    // Test 5.2: getSummaries() method exists
-    $displayReflection = new ReflectionClass(AISummaryDisplayService::class);
-    $hasGetSummaries = $displayReflection->hasMethod('getSummaries');
-    $runner->test('AISummaryDisplayService::getSummaries() method exists', $hasGetSummaries);
-
-    // Test 5.3: getSummaries() returns array without errors
-    try {
-        $summaries = $displayService->getSummaries(10, null, null);
-        $isArray = is_array($summaries);
-        $runner->test('getSummaries(10, null, null) returns array', $isArray);
-    } catch (Throwable $e) {
-        $runner->test('getSummaries(10, null, null) returns array', false, $e->getMessage());
-    }
-
-    // Test 5.4: Filtering by class_id works (no errors)
-    try {
-        $summariesFiltered = $displayService->getSummaries(10, 1, null);
-        $runner->test('getSummaries() accepts class_id parameter', true);
-    } catch (Throwable $e) {
-        $runner->test('getSummaries() accepts class_id parameter', false, $e->getMessage());
-    }
-
-    // Test 5.5: Filtering by operation works (no errors)
-    try {
-        $summariesByOp = $displayService->getSummaries(10, null, 'INSERT');
-        $runner->test('getSummaries() accepts operation parameter', true);
-    } catch (Throwable $e) {
-        $runner->test('getSummaries() accepts operation parameter', false, $e->getMessage());
-    }
-}
-
-echo "\n";
+echo "SECTION 5: AISummaryDisplayService - SKIPPED (deprecated, removed in Phase 17)\n";
+echo "------------------------------------------------------------------------------\n\n";
 
 // =====================================================
 // SECTION 6: AI-03 AISummaryPresenter
@@ -431,56 +386,11 @@ $runner->test('views/events/ai-summary/timeline.php exists', $timelineViewExists
 echo "\n";
 
 // =====================================================
-// SECTION 8: Repository and Data Layer
+// SECTION 8: Repository and Data Layer - SKIPPED
 // =====================================================
 
-echo "SECTION 8: Repository and Data Layer\n";
-echo "-------------------------------------\n";
-
-// Test 8.1: ClassChangeLogRepository exists
-try {
-    $repoReflection = new ReflectionClass(ClassChangeLogRepository::class);
-    $runner->test('ClassChangeLogRepository class exists', true);
-
-    // Test 8.2: Extends BaseRepository
-    $extendsBase = $repoReflection->getParentClass()->getName() === 'WeCoza\\Core\\Abstract\\BaseRepository';
-    $runner->test('ClassChangeLogRepository extends BaseRepository', $extendsBase);
-
-    // Test 8.3: getLogsWithAISummary() method exists
-    $hasGetLogsWithSummary = $repoReflection->hasMethod('getLogsWithAISummary');
-    $runner->test('ClassChangeLogRepository::getLogsWithAISummary() method exists', $hasGetLogsWithSummary);
-
-    // Test 8.4: getLogsWithAISummary() returns array
-    $repo = new ClassChangeLogRepository();
-    try {
-        $logs = $repo->getLogsWithAISummary(5, null, null);
-        $isArray = is_array($logs);
-        $runner->test('getLogsWithAISummary(5, null, null) returns array', $isArray);
-    } catch (Throwable $e) {
-        $runner->test('getLogsWithAISummary(5, null, null) returns array', false, $e->getMessage());
-    }
-
-    // Test 8.5: Filtering by class_id parameter
-    try {
-        $logsByClass = $repo->getLogsWithAISummary(5, 1, null);
-        $runner->test('getLogsWithAISummary() accepts class_id parameter', true);
-    } catch (Throwable $e) {
-        $runner->test('getLogsWithAISummary() accepts class_id parameter', false, $e->getMessage());
-    }
-
-    // Test 8.6: Filtering by operation parameter
-    try {
-        $logsByOp = $repo->getLogsWithAISummary(5, null, 'INSERT');
-        $runner->test('getLogsWithAISummary() accepts operation parameter', true);
-    } catch (Throwable $e) {
-        $runner->test('getLogsWithAISummary() accepts operation parameter', false, $e->getMessage());
-    }
-
-} catch (ReflectionException $e) {
-    $runner->test('ClassChangeLogRepository class exists', false, $e->getMessage());
-}
-
-echo "\n";
+echo "SECTION 8: Repository and Data Layer - SKIPPED (deprecated, removed in Phase 17)\n";
+echo "--------------------------------------------------------------------------------\n\n";
 
 // =====================================================
 // SECTION 9: DataObfuscator Trait
@@ -669,34 +579,11 @@ $runner->test('AISummaryService::backoffDelaySeconds() method exists', $hasBacko
 echo "\n";
 
 // =====================================================
-// SECTION 14: AI-02 Database Persistence
+// SECTION 14: AI-02 Database Persistence - SKIPPED
 // =====================================================
 
-echo "SECTION 14: AI-02 Database Persistence\n";
-echo "---------------------------------------\n";
-
-// Test 14.1: Verify ai_summary column exists in class_change_logs table
-try {
-    $db = \WeCoza\Core\Database\PostgresConnection::getInstance();
-    $stmt = $db->getPdo()->prepare("
-        SELECT column_name, data_type
-        FROM information_schema.columns
-        WHERE table_name = 'class_change_logs'
-        AND column_name = 'ai_summary'
-    ");
-    $stmt->execute();
-    $columnInfo = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $columnExists = $columnInfo !== false;
-    $runner->test('ai_summary column exists in class_change_logs table', $columnExists);
-
-    if ($columnExists) {
-        $isJsonb = strtolower($columnInfo['data_type']) === 'jsonb';
-        $runner->test('ai_summary column is JSONB type', $isJsonb);
-    }
-} catch (Throwable $e) {
-    $runner->test('ai_summary column exists in class_change_logs table', false, $e->getMessage());
-}
+echo "SECTION 14: AI-02 Database Persistence - SKIPPED (table dropped in Phase 13)\n";
+echo "-----------------------------------------------------------------------------\n\n";
 
 // Test 14.2: Test summary can be persisted as JSONB (structure verification)
 try {
@@ -730,9 +617,6 @@ try {
 } catch (Throwable $e) {
     $runner->test('Summary structure is valid JSONB format', false, $e->getMessage());
 }
-
-// Test 14.3: getLogsWithAISummary() retrieves stored summaries (already tested in Section 8)
-$runner->test('ClassChangeLogRepository::getLogsWithAISummary() verified in Section 8', true);
 
 echo "\n";
 echo "AI-02 Event-Triggered Summary Tests Complete\n";
