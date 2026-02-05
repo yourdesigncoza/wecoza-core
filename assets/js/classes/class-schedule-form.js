@@ -12,6 +12,9 @@
         window.holidayOverrides = {};
     }
 
+    // Store completed events separately (not rendered in form, but shown in statistics)
+    let completedEvents = [];
+
     /**
      * Initialize the class schedule form
      */
@@ -1100,9 +1103,24 @@
 
         if (existingEventsInput && existingEventsInput.value) {
             try {
+                // Clear previous completed events
+                completedEvents = [];
+
                 const existingEvents = JSON.parse(existingEventsInput.value);
                 if (Array.isArray(existingEvents) && existingEvents.length > 0) {
                     existingEvents.forEach(function(event) {
+                        // Store completed events for statistics display
+                        if (event.status === 'Completed') {
+                            completedEvents.push({
+                                type: event.type || '',
+                                description: event.description || '',
+                                date: event.date || '',
+                                status: 'Completed',
+                                notes: event.notes || ''
+                            });
+                            return; // Skip rendering in form
+                        }
+
                         const $newRow = $template.clone();
                         $newRow.removeClass('d-none').removeAttr('id');
 
@@ -1142,6 +1160,7 @@
      */
     function collectEventDatesForStats() {
         const events = [];
+        // Collect from visible form rows
         $('.event-date-row:not(.d-none):not(#event-date-row-template)').each(function() {
             const $row = $(this);
             const type = $row.find('select[name="event_types[]"]').val();
@@ -1159,6 +1178,8 @@
                 });
             }
         });
+        // Add completed events that aren't shown in form
+        events.push(...completedEvents);
         return events;
     }
 
@@ -1214,11 +1235,12 @@
                     );
                 }
 
-                // Add Type, Description, Date columns
+                // Add Type, Description, Date, Status columns
                 $newRow.append(
                     $('<td>').text(event.type),
                     $('<td>').text(event.description),
-                    $('<td>').text(formatDateDDMMYYYY(event.date))
+                    $('<td>').text(formatDateDDMMYYYY(event.date)),
+                    $('<td>').text(event.status || 'Pending')
                 );
 
                 // Add Notes column (show '-' if empty)

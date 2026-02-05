@@ -603,11 +603,12 @@
                         <th>Type</th>
                         <th>Description</th>
                         <th>Date</th>
+                        <th>Status</th>
                         <th>Notes</th>
                      </tr>
                      <tr id="event-dates-stats-empty-row">
                         <td class="align-middle">Events</td>
-                        <td colspan="4" class="text-muted">No event dates added</td>
+                        <td colspan="5" class="text-muted">No event dates added</td>
                      </tr>
                      <!-- Dynamic event date rows will be inserted here by JavaScript -->
                   </tbody>
