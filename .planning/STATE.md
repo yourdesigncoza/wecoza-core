@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 ## Current Position
 
 Phase: 19 — Material Tracking Dashboard Data Source Fix
-Plan: 1 of 1 (19-01 complete)
-Status: In progress
-Last activity: 2026-02-06 — Completed 19-01-PLAN.md
+Plan: 2 of 2 (19-01, 19-02 complete)
+Status: Phase complete
+Last activity: 2026-02-06 — Completed 19-02-PLAN.md
 
-Progress: v1.3 █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 33%
+Progress: v1.3 ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 67%
 
 ## Milestone History
 
@@ -36,6 +36,9 @@ See: .planning/MILESTONES.md for full details
 | 19 | 01 | Status filter uses event-based values ('pending', 'completed') instead of cron values ('notified', 'delivered') | Events represent user-entered delivery schedules, not cron notification states |
 | 19 | 01 | Remove days_range filter | Events exist permanently in JSONB, not time-windowed like cron records |
 | 19 | 01 | Map 'delivered' to 'completed' in service layer | Backward compatibility for existing API consumers |
+| 19 | 02 | Event-based status badges as primary, cron notification badges as supplementary | Events represent actual delivery schedule, cron notifications are just automated reminders |
+| 19 | 02 | Remove notification type filter from UI | Cron notifications are supplementary info, not a primary dimension for filtering |
+| 19 | 02 | Pass event_index in checkbox actions | Enables per-event tracking when multiple delivery events exist for same class |
 
 ### Pending Todos
 
@@ -45,7 +48,8 @@ None.
 
 | Phase | Plan | Issue | Impact |
 |-------|------|-------|--------|
-| 19 | 01 | Controllers and AJAX handlers still call old service signature with notification_type and days_range parameters | Will be addressed in 19-02 (Controller and API rewrite) |
+| 19 | 02 | AJAX handler (wecoza_mark_material_delivered) still expects old signature without event_index parameter | UI now passes event_index but handler doesn't process it yet - needs update |
+| 19 | 02 | Controllers still call service with old notification_type and days_range parameters | Service layer rewritten but controllers not updated yet |
 
 ### Quick Tasks Completed
 
@@ -64,8 +68,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-06T09:32:16Z
-Stopped at: Completed 19-01-PLAN.md
+Last session: 2026-02-06T09:39:22Z
+Stopped at: Completed 19-02-PLAN.md (Phase 19 complete)
 Resume file: None
 
-**Next action:** Continue phase 19 with plan 02 (Controller and API rewrite)
+**Next action:** Phase 19 complete. Ready for next milestone planning or quick fixes.
