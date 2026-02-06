@@ -13,8 +13,8 @@ if (!defined('ABSPATH')) {
 <div class="col-12">
     <div class="scrollbar">
         <div class="row g-0 flex-nowrap">
-            <?php 
-            $statKeys = ['total', 'pending', 'notified', 'delivered'];
+            <?php
+            $statKeys = ['total', 'pending', 'completed'];
             $lastKey = end($statKeys);
             reset($statKeys);
             foreach ($statKeys as $key): 

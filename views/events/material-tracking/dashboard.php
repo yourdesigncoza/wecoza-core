@@ -41,13 +41,7 @@ if (!defined('ABSPATH')) {
                         <select class="form-select form-select-sm" id="status-filter" style="width: auto;">
                             <option value="all">All Statuses</option>
                             <option value="pending">Pending</option>
-                            <option value="notified">Notified</option>
-                            <option value="delivered">Delivered</option>
-                        </select>
-                        <select class="form-select form-select-sm" id="notification-type-filter" style="width: auto;">
-                            <option value="all">All Types</option>
-                            <option value="orange">Orange (7d)</option>
-                            <option value="red">Red (5d)</option>
+                            <option value="completed">Completed</option>
                         </select>
                         <button class="btn btn-phoenix-secondary btn-sm" id="refresh-dashboard">
                             Refresh
@@ -79,8 +73,12 @@ if (!defined('ABSPATH')) {
                                 Class Start Date
                                 <span class="sort-indicator ms-1 d-none"><i class="bi bi-chevron-up"></i></span>
                             </th>
+                            <th scope="col" class="border-0" data-sortable="true" data-sort-key="event_date" data-sort-type="date" style="cursor: pointer;">
+                                Delivery Date
+                                <span class="sort-indicator ms-1 d-none"><i class="bi bi-chevron-up"></i></span>
+                            </th>
                             <th scope="col" class="border-0" data-sortable="true" data-sort-key="notification_type" data-sort-type="text" style="cursor: pointer;">
-                                Notification Type
+                                Notification
                                 <span class="sort-indicator ms-1 d-none"><i class="bi bi-chevron-up"></i></span>
                             </th>
                             <th scope="col" class="border-0" data-sortable="true" data-sort-key="status" data-sort-type="text" style="cursor: pointer;">
@@ -95,7 +93,7 @@ if (!defined('ABSPATH')) {
                     <tbody>
                         <?php if (empty($records)): ?>
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="7" class="text-center py-5">
                                     <?php echo $this->render('material-tracking/empty-state', []); ?>
                                 </td>
                             </tr>
@@ -308,8 +306,13 @@ jQuery(document).ready(function($) {
                 aVal = aVal.toString().toLowerCase();
                 bVal = bVal.toString().toLowerCase();
             } else if (sortType === 'date') {
-                aVal = new Date($(a).data('start-date') || 0).getTime();
-                bVal = new Date($(b).data('start-date') || 0).getTime();
+                if (sortKey === 'start_date') {
+                    aVal = new Date($(a).data('start-date') || 0).getTime();
+                    bVal = new Date($(b).data('start-date') || 0).getTime();
+                } else if (sortKey === 'event_date') {
+                    aVal = new Date($(a).data('event-date') || 0).getTime();
+                    bVal = new Date($(b).data('event-date') || 0).getTime();
+                }
             }
             
             if (currentSort.direction === 'asc') {
@@ -354,18 +357,20 @@ jQuery(document).ready(function($) {
     $(document).on('change', '.mark-delivered-checkbox:not(:disabled)', function() {
         const checkbox = $(this);
         const classId = checkbox.data('class-id');
+        const eventIndex = checkbox.data('event-index');
         const nonce = checkbox.data('nonce');
         const row = checkbox.closest('tr');
-        
+
         // Disable checkbox immediately
         checkbox.prop('disabled', true);
-        
+
         $.ajax({
             url: ajaxUrl,
             type: 'POST',
             data: {
                 action: 'wecoza_mark_material_delivered',
                 class_id: classId,
+                event_index: eventIndex,
                 nonce: nonce
             },
             success: function(response) {
@@ -374,14 +379,14 @@ jQuery(document).ready(function($) {
                     
                     // Update UI - keep checkbox checked and disabled
                     checkbox.prop('checked', true).prop('disabled', true);
-                    row.find('.delivery-status-badge').html('<span class="badge badge-phoenix badge-phoenix-success fs-10">✅ Delivered</span>');
+                    row.find('.delivery-status-badge').html('<span class="badge badge-phoenix badge-phoenix-success fs-10">Completed</span>');
                     row.data('status', 'delivered');
-                    
+
                     // Update statistics
-                    const notifiedCount = parseInt($('#stat-notified').text()) - 1;
-                    const deliveredCount = parseInt($('#stat-delivered').text()) + 1;
-                    $('#stat-notified').text(notifiedCount);
-                    $('#stat-delivered').text(deliveredCount);
+                    const pendingCount = parseInt($('#stat-pending').text()) - 1;
+                    const completedCount = parseInt($('#stat-completed').text()) + 1;
+                    $('#stat-pending').text(pendingCount);
+                    $('#stat-completed').text(completedCount);
                     
                     lastUpdateTime = Date.now();
                     updateLastUpdatedTime();
@@ -401,38 +406,32 @@ jQuery(document).ready(function($) {
     function filterRecords() {
         const searchTerm = $('#material-tracking-search').val().toLowerCase();
         const statusFilter = $('#status-filter').val();
-        const typeFilter = $('#notification-type-filter').val();
         let visibleCount = 0;
-        
+
         $('#material-tracking-table tbody tr').each(function() {
             const row = $(this);
             const text = row.text().toLowerCase();
             const status = row.data('status');
-            const type = row.data('notification-type');
-            
+
             let visible = true;
-            
+
             if (searchTerm && !text.includes(searchTerm)) {
                 visible = false;
             }
-            
+
             if (statusFilter !== 'all' && status !== statusFilter) {
                 visible = false;
             }
-            
-            if (typeFilter !== 'all' && type !== typeFilter) {
-                visible = false;
-            }
-            
+
             row.toggle(visible);
             if (visible) visibleCount++;
         });
-        
+
         $('#visible-count').text(visibleCount);
     }
-    
+
     $('#material-tracking-search').on('input', filterRecords);
-    $('#status-filter, #notification-type-filter').on('change', filterRecords);
+    $('#status-filter').on('change', filterRecords);
     
     // Refresh dashboard
     $('#refresh-dashboard').on('click', function() {

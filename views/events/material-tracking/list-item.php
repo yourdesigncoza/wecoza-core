@@ -19,11 +19,11 @@ if (!empty($record['site_name'])) {
 ?>
 
 <tr data-status="<?php echo esc_attr($record['delivery_status']); ?>"
-    data-notification-type="<?php echo esc_attr($record['notification_type']); ?>"
     data-class-id="<?php echo esc_attr((string) $record['class_id']); ?>"
     data-class-code="<?php echo esc_attr($record['class_code']); ?>"
     data-client-name="<?php echo esc_attr($record['client_name']); ?>"
-    data-start-date="<?php echo esc_attr($record['original_start_date']); ?>">
+    data-start-date="<?php echo esc_attr($record['original_start_date']); ?>"
+    data-event-date="<?php echo esc_attr($record['event_date']); ?>">
     
     <!-- Class Code/Subject -->
     <td class="py-2 align-middle ps-3">
@@ -41,8 +41,16 @@ if (!empty($record['site_name'])) {
     <td class="py-2 align-middle">
         <?php echo esc_html($record['original_start_date']); ?>
     </td>
-    
-    <!-- Notification Type -->
+
+    <!-- Delivery Date -->
+    <td class="py-2 align-middle">
+        <?php echo esc_html($record['event_date']); ?>
+        <?php if (!empty($record['event_description'])): ?>
+            <br><small class="text-body-tertiary"><?php echo esc_html($record['event_description']); ?></small>
+        <?php endif; ?>
+    </td>
+
+    <!-- Notification -->
     <td class="py-2 align-middle">
         <?php echo $record['notification_badge_html']; ?>
     </td>
@@ -56,15 +64,16 @@ if (!empty($record['site_name'])) {
     <td class="py-2 align-middle text-center pe-3">
         <?php if ($can_manage): ?>
             <?php if ($record['delivery_status'] === 'delivered'): ?>
-                <input type="checkbox" 
-                       class="form-check-input mark-delivered-checkbox" 
-                       checked 
+                <input type="checkbox"
+                       class="form-check-input mark-delivered-checkbox"
+                       checked
                        disabled
                        title="Marked as delivered">
             <?php else: ?>
-                <input type="checkbox" 
-                       class="form-check-input mark-delivered-checkbox" 
+                <input type="checkbox"
+                       class="form-check-input mark-delivered-checkbox"
                        data-class-id="<?php echo esc_attr((string) $record['class_id']); ?>"
+                       data-event-index="<?php echo esc_attr((string) $record['event_index']); ?>"
                        data-nonce="<?php echo esc_attr($tracking_nonce); ?>"
                        title="Mark as delivered">
             <?php endif; ?>

@@ -22,7 +22,6 @@ use function sprintf;
 final class MaterialTrackingShortcode
 {
     private const DEFAULT_LIMIT = 50;
-    private const DEFAULT_DAYS_RANGE = 30;
 
     public function __construct(
         private readonly MaterialTrackingDashboardService $service,
@@ -66,15 +65,13 @@ final class MaterialTrackingShortcode
         $atts = shortcode_atts([
             'limit' => self::DEFAULT_LIMIT,
             'status' => 'all',
-            'notification_type' => 'all',
-            'days_range' => self::DEFAULT_DAYS_RANGE,
         ], $atts, 'wecoza_material_tracking');
 
         $filters = $this->parseAttributes($atts);
 
         try {
             $records = $this->service->getDashboardData($filters);
-            $stats = $this->service->getStatistics($filters['days_range']);
+            $stats = $this->service->getStatistics();
         } catch (\Throwable $e) {
             error_log('Material Tracking Dashboard Error: ' . $e->getMessage());
             return $this->wrapMessage(
@@ -107,17 +104,9 @@ final class MaterialTrackingShortcode
         $status = (string) $atts['status'];
         $status = $status === 'all' ? null : $status;
 
-        $notificationType = (string) $atts['notification_type'];
-        $notificationType = $notificationType === 'all' ? null : $notificationType;
-
-        $daysRange = absint($atts['days_range']);
-        $daysRange = $daysRange > 0 ? $daysRange : self::DEFAULT_DAYS_RANGE;
-
         return [
             'limit' => $limit,
             'status' => $status,
-            'notification_type' => $notificationType,
-            'days_range' => $daysRange,
         ];
     }
 
