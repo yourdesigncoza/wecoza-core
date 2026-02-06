@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 ## Current Position
 
 Phase: 19 — Material Tracking Dashboard Data Source Fix
-Plan: Not yet planned
-Status: Roadmap created, ready to plan
-Last activity: 2026-02-06 — Milestone v1.3 roadmap created
+Plan: 1 of 1 (19-01 complete)
+Status: In progress
+Last activity: 2026-02-06 — Completed 19-01-PLAN.md
 
-Progress: v1.3 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0%
+Progress: v1.3 █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 33%
 
 ## Milestone History
 
@@ -30,7 +30,12 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-- Material Tracking Dashboard will query `classes.event_dates` JSONB for Deliveries events (not just `class_material_tracking` cron records)
+| Phase | Plan | Decision | Rationale |
+|-------|------|----------|-----------|
+| 19 | 01 | Query event_dates JSONB as primary data source, LEFT JOIN class_material_tracking for supplementary cron info | Fixes "0 records" issue where dashboard was empty until cron created tracking records |
+| 19 | 01 | Status filter uses event-based values ('pending', 'completed') instead of cron values ('notified', 'delivered') | Events represent user-entered delivery schedules, not cron notification states |
+| 19 | 01 | Remove days_range filter | Events exist permanently in JSONB, not time-windowed like cron records |
+| 19 | 01 | Map 'delivered' to 'completed' in service layer | Backward compatibility for existing API consumers |
 
 ### Pending Todos
 
@@ -38,7 +43,9 @@ None.
 
 ### Blockers/Concerns
 
-None identified.
+| Phase | Plan | Issue | Impact |
+|-------|------|-------|--------|
+| 19 | 01 | Controllers and AJAX handlers still call old service signature with notification_type and days_range parameters | Will be addressed in 19-02 (Controller and API rewrite) |
 
 ### Quick Tasks Completed
 
@@ -57,8 +64,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-06
-Stopped at: Milestone v1.3 definition
+Last session: 2026-02-06T09:32:16Z
+Stopped at: Completed 19-01-PLAN.md
 Resume file: None
 
-**Next action:** Plan phase 19 with `/gsd:plan-phase 19`
+**Next action:** Continue phase 19 with plan 02 (Controller and API rewrite)
