@@ -25,8 +25,8 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 19-01-PLAN.md — Rewrite repository JSONB queries and service filter logic
-- [ ] 19-02-PLAN.md — Update presenter, views, and shortcode for new data shape
+- [x] 19-01-PLAN.md — Rewrite repository JSONB queries and service filter logic
+- [x] 19-02-PLAN.md — Update presenter, views, and shortcode for new data shape
 
 **Files modified:**
 - `src/Events/Repositories/MaterialTrackingRepository.php` — new JSONB queries
@@ -40,3 +40,4 @@ Plans:
 ---
 *Roadmap created: 2026-02-06*
 *Plans created: 2026-02-06*
+*Phase 19 completed: 2026-02-06*

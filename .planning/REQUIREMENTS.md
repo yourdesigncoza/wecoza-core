@@ -7,21 +7,21 @@
 
 ### Dashboard Data Source
 
-- [ ] **DASH-01**: Dashboard shows all classes with "Deliveries" events from `classes.event_dates` JSONB
-- [ ] **DASH-02**: Dashboard statistics reflect delivery event counts (total, pending, completed)
-- [ ] **DASH-03**: Dashboard displays delivery task status (Pending/Completed from event_dates)
-- [ ] **DASH-04**: Dashboard shows class code, subject, client/site, start date for each delivery record
+- [x] **DASH-01**: Dashboard shows all classes with "Deliveries" events from `classes.event_dates` JSONB
+- [x] **DASH-02**: Dashboard statistics reflect delivery event counts (total, pending, completed)
+- [x] **DASH-03**: Dashboard displays delivery task status (Pending/Completed from event_dates)
+- [x] **DASH-04**: Dashboard shows class code, subject, client/site, start date for each delivery record
 
 ### Filtering & Actions
 
-- [ ] **FILT-01**: User can filter dashboard by delivery status (pending/completed)
-- [ ] **FILT-02**: User can search dashboard by class code, subject, or client name
-- [ ] **FILT-03**: Dashboard preserves existing cron notification type column (orange/red) where applicable
+- [x] **FILT-01**: User can filter dashboard by delivery status (pending/completed)
+- [x] **FILT-02**: User can search dashboard by class code, subject, or client name
+- [x] **FILT-03**: Dashboard preserves existing cron notification type column (orange/red) where applicable
 
 ### Cron Integration
 
-- [ ] **CRON-01**: Existing cron notification system continues to work independently
-- [ ] **CRON-02**: Cron notification status shown as supplementary info on dashboard records
+- [x] **CRON-01**: Existing cron notification system continues to work independently
+- [x] **CRON-02**: Cron notification status shown as supplementary info on dashboard records
 
 ## Future Requirements
 
@@ -39,15 +39,15 @@ None identified.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DASH-01 | Phase 19 | Pending |
-| DASH-02 | Phase 19 | Pending |
-| DASH-03 | Phase 19 | Pending |
-| DASH-04 | Phase 19 | Pending |
-| FILT-01 | Phase 19 | Pending |
-| FILT-02 | Phase 19 | Pending |
-| FILT-03 | Phase 19 | Pending |
-| CRON-01 | Phase 19 | Pending |
-| CRON-02 | Phase 19 | Pending |
+| DASH-01 | Phase 19 | Complete |
+| DASH-02 | Phase 19 | Complete |
+| DASH-03 | Phase 19 | Complete |
+| DASH-04 | Phase 19 | Complete |
+| FILT-01 | Phase 19 | Complete |
+| FILT-02 | Phase 19 | Complete |
+| FILT-03 | Phase 19 | Complete |
+| CRON-01 | Phase 19 | Complete |
+| CRON-02 | Phase 19 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 9 total
