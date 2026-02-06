@@ -22,13 +22,21 @@
 5. Search and filter work on the new data source
 6. Existing cron notification system continues to function independently
 
-**Files likely modified:**
-- `src/Events/Services/MaterialTrackingDashboardService.php` — new query logic
+**Plans:** 2 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — Rewrite repository JSONB queries and service filter logic
+- [ ] 19-02-PLAN.md — Update presenter, views, and shortcode for new data shape
+
+**Files modified:**
 - `src/Events/Repositories/MaterialTrackingRepository.php` — new JSONB queries
+- `src/Events/Services/MaterialTrackingDashboardService.php` — updated filter logic
 - `src/Events/Views/Presenters/MaterialTrackingPresenter.php` — new data shape
+- `src/Events/Shortcodes/MaterialTrackingShortcode.php` — simplified attributes
 - `views/events/material-tracking/dashboard.php` — updated columns/layout
 - `views/events/material-tracking/list-item.php` — updated row rendering
-- `views/events/material-tracking/statistics.php` — updated stat display
+- `views/events/material-tracking/statistics.php` — updated stat keys
 
 ---
 *Roadmap created: 2026-02-06*
+*Plans created: 2026-02-06*
