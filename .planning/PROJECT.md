@@ -38,11 +38,12 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Code cleanup (8 deprecated files removed) — v1.2
 - ✓ Notification system (email + dashboard with AI enrichment) — v1.2
 - ✓ Multi-recipient notification config — v1.2
+- ✓ Material Tracking Dashboard shows classes with Deliveries events from event_dates JSONB — v1.3
+- ✓ Bridge event tasks system and material tracking dashboard — v1.3
 
 ### Active
 
-- [ ] Material Tracking Dashboard shows classes with Deliveries events from event_dates JSONB — v1.3
-- [ ] Bridge event tasks system and material tracking dashboard — v1.3
+(None — define next milestone requirements with `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -53,10 +54,10 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v1.2 Shipped)
+### Current State (v1.3 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~21,400 lines of PHP across 3 modules
+- **Total:** ~21,900 lines of PHP across 3 modules
 - **Events module:** 40+ PHP files in `src/Events/` (DTOs, Enums, Services, Repositories)
 - **View templates:** 10+ templates in `views/events/`
 - **Test coverage:** 4 test files in `tests/Events/`
@@ -112,16 +113,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Bidirectional event/task sync | Dashboard ↔ form stay in sync | ✓ v1.2 |
 | Application-level event dispatch | More flexible and testable than triggers | ✓ v1.2 |
 | JSONB for event storage | Flexible schema for varied event payloads | ✓ v1.2 |
+| Event_dates as primary dashboard source | Cron records alone caused "0 records" bug | ✓ v1.3 |
+| Event-based status filtering | Events represent user intent, cron is supplementary | ✓ v1.3 |
+| Remove days_range filter | Events exist permanently in JSONB, not time-windowed | ✓ v1.3 |
 
-## Current Milestone: v1.3 Fix Material Tracking Dashboard
+### Known Issues
 
-**Goal:** Make the Material Tracking Dashboard show classes with "Deliveries" events from `classes.event_dates` JSONB instead of only showing cron-created notification records from `class_material_tracking`.
-
-**Target features:**
-- Dashboard queries `classes.event_dates` JSONB for Deliveries-type events
-- Shows all classes with pending/completed delivery tasks
-- Preserves existing cron notification tracking as supplementary data
-- Status reflects both event task completion and cron notification state
+- AJAX handler (wecoza_mark_material_delivered) needs update to accept event_index parameter
+- Controllers still pass deprecated notification_type and days_range parameters to service
+- 2 test failures in AI summarization test suite (test format issues, not production bugs)
+- Settings page may need admin menu entry for easier discovery
 
 ---
-*Last updated: 2026-02-06 after v1.3 milestone started*
+*Last updated: 2026-02-06 after v1.3 milestone*

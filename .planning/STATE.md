@@ -5,21 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Fix Material Tracking Dashboard to use event_dates JSONB
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 19 — Material Tracking Dashboard Data Source Fix
-Plan: 2 of 2 (19-01, 19-02 complete)
-Status: Phase complete
-Last activity: 2026-02-06 — Completed 19-02-PLAN.md
+Phase: Next phase TBD
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-02-06 — v1.3 milestone complete
 
-Progress: v1.3 ████████████████████████████████ 100%
+Progress: Milestone complete. Run `/gsd:new-milestone` for next cycle.
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19 | 2 |
 | v1.2 | Event Tasks Refactor | 2026-02-05 | 13-18 | 16 |
 | v1.1 | Quality & Performance | 2026-02-02 | 8-12 | 13 |
 | v1 | Events Integration | 2026-02-02 | 1-7 | 13 |
@@ -30,15 +31,7 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-| Phase | Plan | Decision | Rationale |
-|-------|------|----------|-----------|
-| 19 | 01 | Query event_dates JSONB as primary data source, LEFT JOIN class_material_tracking for supplementary cron info | Fixes "0 records" issue where dashboard was empty until cron created tracking records |
-| 19 | 01 | Status filter uses event-based values ('pending', 'completed') instead of cron values ('notified', 'delivered') | Events represent user-entered delivery schedules, not cron notification states |
-| 19 | 01 | Remove days_range filter | Events exist permanently in JSONB, not time-windowed like cron records |
-| 19 | 01 | Map 'delivered' to 'completed' in service layer | Backward compatibility for existing API consumers |
-| 19 | 02 | Event-based status badges as primary, cron notification badges as supplementary | Events represent actual delivery schedule, cron notifications are just automated reminders |
-| 19 | 02 | Remove notification type filter from UI | Cron notifications are supplementary info, not a primary dimension for filtering |
-| 19 | 02 | Pass event_index in checkbox actions | Enables per-event tracking when multiple delivery events exist for same class |
+Cleared for v1.3 milestone. Full decision log in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -46,10 +39,10 @@ None.
 
 ### Blockers/Concerns
 
-| Phase | Plan | Issue | Impact |
-|-------|------|-------|--------|
-| 19 | 02 | AJAX handler (wecoza_mark_material_delivered) still expects old signature without event_index parameter | UI now passes event_index but handler doesn't process it yet - needs update |
-| 19 | 02 | Controllers still call service with old notification_type and days_range parameters | Service layer rewritten but controllers not updated yet |
+| Source | Issue | Impact |
+|--------|-------|--------|
+| v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
+| v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
 
 ### Quick Tasks Completed
 
@@ -68,8 +61,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-06T09:39:22Z
-Stopped at: Completed 19-02-PLAN.md (Phase 19 complete)
+Last session: 2026-02-06
+Stopped at: v1.3 milestone archived
 Resume file: None
 
-**Next action:** Milestone v1.3 complete. Run `/gsd:complete-milestone` to archive.
+**Next action:** Run `/gsd:new-milestone` to define next milestone.

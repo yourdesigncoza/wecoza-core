@@ -1,5 +1,32 @@
 # Project Milestones: WeCoza Core
 
+## v1.3 Fix Material Tracking Dashboard (Shipped: 2026-02-06)
+
+**Delivered:** Rewired Material Tracking Dashboard to show classes with Deliveries events from event_dates JSONB instead of only cron-created records.
+
+**Phases completed:** 19 (2 plans total)
+
+**Key accomplishments:**
+
+- Repository queries event_dates JSONB as primary data source (fixes "0 records" bug)
+- Event-based status badges (Pending/Completed) replace cron-based Notified/Delivered
+- Delivery Date column added to dashboard table
+- Simplified filters: Status + Search replaces multi-dimensional filter set
+- Cron notification data preserved as supplementary badges (7d/5d)
+
+**Stats:**
+
+- 7 files modified (PHP source + view templates)
+- 714 lines added, 226 removed
+- 1 phase, 2 plans, 4 tasks
+- Same day from definition to ship (2026-02-06)
+
+**Git range:** `refactor(19-01)` → `docs(19)`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+
 ## v1.2 Event Tasks Refactor (Shipped: 2026-02-05)
 
 **Delivered:** Replaced trigger-based task system with manual event capture — tasks derived from user-entered events in class form, bidirectional sync between dashboard and form, and full notification system with AI enrichment.
