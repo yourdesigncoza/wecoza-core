@@ -24,7 +24,7 @@ final class MaterialTrackingDashboardService
     /**
      * Get dashboard data with optional filters
      *
-     * @param array<string, mixed> $filters Array with keys: limit, status, notification_type, days_range
+     * @param array<string, mixed> $filters Array with keys: limit, status, search
      * @return array<int, array<string, mixed>> Array of tracking records
      */
     public function getDashboardData(array $filters = []): array
@@ -33,35 +33,32 @@ final class MaterialTrackingDashboardService
         $limit = max(1, min(200, $limit)); // Enforce 1-200 range
 
         $status = $filters['status'] ?? null;
-        if ($status !== null && !in_array($status, ['pending', 'notified', 'delivered'], true)) {
-            $status = null;
+        if ($status !== null) {
+            // Map old 'delivered' to new 'completed' for backward compat
+            if ($status === 'delivered') {
+                $status = 'completed';
+            }
+            if (!in_array($status, ['pending', 'completed'], true)) {
+                $status = null;
+            }
         }
 
-        $notificationType = $filters['notification_type'] ?? null;
-        if ($notificationType !== null && !in_array($notificationType, ['orange', 'red'], true)) {
-            $notificationType = null;
+        $search = isset($filters['search']) ? trim((string) $filters['search']) : null;
+        if ($search === '') {
+            $search = null;
         }
 
-        $daysRange = isset($filters['days_range']) ? (int) $filters['days_range'] : 30;
-        $daysRange = max(1, $daysRange);
-
-        return $this->repository->getTrackingDashboardData(
-            $limit,
-            $status,
-            $notificationType,
-            $daysRange
-        );
+        return $this->repository->getTrackingDashboardData($limit, $status, $search);
     }
 
     /**
      * Get tracking statistics
      *
-     * @param int $daysRange Number of days to look back
      * @return array<string, int> Statistics array
      */
-    public function getStatistics(int $daysRange = 30): array
+    public function getStatistics(): array
     {
-        return $this->repository->getTrackingStatistics($daysRange);
+        return $this->repository->getTrackingStatistics();
     }
 
     /**
