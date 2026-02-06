@@ -24,23 +24,21 @@ final class MaterialTrackingPresenter
 
         foreach ($records as $record) {
             $presented[] = [
-                'id' => (int) $record['id'],
                 'class_id' => (int) $record['class_id'],
                 'class_code' => esc_html((string) ($record['class_code'] ?? 'N/A')),
                 'class_subject' => esc_html((string) ($record['class_subject'] ?? 'N/A')),
                 'client_name' => esc_html((string) ($record['client_name'] ?? 'N/A')),
                 'site_name' => esc_html((string) ($record['site_name'] ?? 'N/A')),
-                'notification_type' => (string) $record['notification_type'],
-                'notification_sent_at' => $this->formatDateTime($record['notification_sent_at']),
-                'materials_delivered_at' => $this->formatDateTime($record['materials_delivered_at']),
-                'delivery_status' => (string) $record['delivery_status'],
-                'original_start_date' => $this->formatDate($record['original_start_date']),
-                'notification_badge_html' => $this->getNotificationBadge((string) $record['notification_type']),
-                'status_badge_html' => $this->getStatusBadge((string) $record['delivery_status']),
-                'action_button_html' => $this->getActionButton(
-                    (int) $record['class_id'],
-                    (string) $record['delivery_status']
-                ),
+                'original_start_date' => $this->formatDate($record['original_start_date'] ?? null),
+                'event_date' => $this->formatDate($record['event_date'] ?? null),
+                'event_description' => esc_html((string) ($record['event_description'] ?? '')),
+                'event_index' => (int) ($record['event_index'] ?? 0),
+                'event_status' => strtolower((string) ($record['event_status'] ?? 'pending')),
+                'notification_type' => (string) ($record['notification_type'] ?? ''),
+                'notification_sent_at' => $this->formatDateTime($record['notification_sent_at'] ?? null),
+                'notification_badge_html' => $this->getNotificationBadge($record['notification_type'] ?? null),
+                'status_badge_html' => $this->getEventStatusBadge(strtolower((string) ($record['event_status'] ?? 'pending'))),
+                'delivery_status' => $this->mapEventStatus(strtolower((string) ($record['event_status'] ?? 'pending'))),
             ];
         }
 
@@ -58,29 +56,22 @@ final class MaterialTrackingPresenter
         return [
             'total' => [
                 'count' => $stats['total'],
-                'label' => 'Total Tracking',
-                'sublabel' => 'records',
+                'label' => 'Total Deliveries',
+                'sublabel' => 'events',
                 'icon' => '',
                 'color' => 'secondary',
             ],
             'pending' => [
                 'count' => $stats['pending'],
                 'label' => 'Pending',
-                'sublabel' => 'awaiting notification',
+                'sublabel' => 'awaiting delivery',
                 'icon' => '',
                 'color' => 'warning',
             ],
-            'notified' => [
-                'count' => $stats['notified'],
-                'label' => 'Notified',
-                'sublabel' => 'emails sent',
-                'icon' => '',
-                'color' => 'info',
-            ],
-            'delivered' => [
-                'count' => $stats['delivered'],
-                'label' => 'Delivered',
-                'sublabel' => 'confirmed',
+            'completed' => [
+                'count' => $stats['completed'],
+                'label' => 'Completed',
+                'sublabel' => 'delivered',
                 'icon' => '',
                 'color' => 'success',
             ],
@@ -88,63 +79,49 @@ final class MaterialTrackingPresenter
     }
 
     /**
-     * Get notification type badge HTML
+     * Map event status to delivery status
      *
-     * @param string $type Notification type (orange or red)
-     * @return string Badge HTML
+     * @param string $eventStatus Event status from event_dates
+     * @return string Delivery status (pending or delivered)
      */
-    private function getNotificationBadge(string $type): string
+    private function mapEventStatus(string $eventStatus): string
     {
-        if ($type === 'orange') {
-            return '<span class="badge badge-phoenix badge-phoenix-warning fs-10">🟠 (7d)</span>';
-        }
-
-        if ($type === 'red') {
-            return '<span class="badge badge-phoenix badge-phoenix-danger fs-10">🔴 (5d)</span>';
-        }
-
-        return '';
+        return match ($eventStatus) {
+            'completed' => 'delivered',
+            'pending' => 'pending',
+            default => 'pending',
+        };
     }
 
     /**
-     * Get delivery status badge HTML
+     * Get event status badge HTML
      *
-     * @param string $status Delivery status
+     * @param string $status Event status
      * @return string Badge HTML
      */
-    private function getStatusBadge(string $status): string
+    private function getEventStatusBadge(string $status): string
     {
         return match ($status) {
-            'pending' => '<span class="badge badge-phoenix badge-phoenix-secondary fs-10">⏳ Pending</span>',
-            'notified' => '<span class="badge badge-phoenix badge-phoenix-info fs-10">📧 Notified</span>',
-            'delivered' => '<span class="badge badge-phoenix badge-phoenix-success fs-10">✅ Delivered</span>',
+            'pending' => '<span class="badge badge-phoenix badge-phoenix-secondary fs-10">Pending</span>',
+            'completed' => '<span class="badge badge-phoenix badge-phoenix-success fs-10">Completed</span>',
             default => '<span class="badge badge-phoenix badge-phoenix-secondary fs-10">' . esc_html($status) . '</span>',
         };
     }
 
     /**
-     * Get action button HTML
+     * Get notification type badge HTML
      *
-     * @param int $classId The class ID
-     * @param string $status Current delivery status
-     * @return string Button HTML or empty string
+     * @param string|null $type Notification type (orange or red)
+     * @return string Badge HTML
      */
-    private function getActionButton(int $classId, string $status): string
+    private function getNotificationBadge(?string $type): string
     {
-        if ($status === 'notified') {
-            return sprintf(
-                '<button class="btn btn-phoenix-primary btn-sm mark-delivered-btn" 
-                         data-class-id="%d" 
-                         data-nonce="%s">
-                    <i class="bi bi-check-circle me-1"></i>Mark as Delivered
-                </button>',
-                $classId,
-                wp_create_nonce('wecoza_material_tracking_action')
-            );
+        if ($type === 'orange') {
+            return '<span class="badge badge-phoenix badge-phoenix-warning fs-10">7d</span>';
         }
 
-        if ($status === 'delivered') {
-            return '<span class="text-success fw-bold fs-9">✓ Confirmed</span>';
+        if ($type === 'red') {
+            return '<span class="badge badge-phoenix badge-phoenix-danger fs-10">5d</span>';
         }
 
         return '';
