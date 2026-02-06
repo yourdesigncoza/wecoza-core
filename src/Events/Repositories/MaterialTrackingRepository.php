@@ -213,66 +213,64 @@ final class MaterialTrackingRepository extends BaseRepository
 
     /**
      * Get tracking dashboard data with class and client information
+     * Queries event_dates JSONB for Deliveries events as primary data source
      *
      * @param int $limit Maximum number of records to return
-     * @param string|null $status Filter by delivery status (pending, notified, delivered, or null for all)
-     * @param string|null $notificationType Filter by notification type (orange, red, or null for all)
-     * @param int $daysRange Number of days to look back (default 30)
+     * @param string|null $status Filter by event status (pending, completed, or null for all)
+     * @param string|null $search Search filter for class code/subject/client name (or null)
      * @return array<int, array<string, mixed>> Array of tracking records with joined data
      */
     public function getTrackingDashboardData(
         int $limit = 50,
         ?string $status = null,
-        ?string $notificationType = null,
-        int $daysRange = 30
+        ?string $search = null
     ): array {
-        // Build WHERE clause dynamically to avoid PostgreSQL ambiguous parameter issues
-        $whereConditions = ['cmt.created_at >= (CURRENT_DATE - INTERVAL \'' . (int)$daysRange . ' days\')'];
-        $params = [':limit' => $limit];
-
-        if ($status !== null) {
-            $whereConditions[] = 'cmt.delivery_status = :status';
-            $params[':status'] = $status;
-        }
-
-        if ($notificationType !== null) {
-            $whereConditions[] = 'cmt.notification_type = :notification_type';
-            $params[':notification_type'] = $notificationType;
-        }
-
-        $whereClause = implode(' AND ', $whereConditions);
-
-        $sql = sprintf(
-            'SELECT
-                cmt.id,
-                cmt.class_id,
-                cmt.notification_type,
-                cmt.notification_sent_at,
-                cmt.materials_delivered_at,
-                cmt.delivery_status,
-                cmt.created_at,
-                cmt.updated_at,
+        $sql = 'SELECT
+                c.class_id,
                 c.class_code,
                 c.class_subject,
                 c.original_start_date,
                 cl.client_name,
-                s.site_name
-             FROM class_material_tracking cmt
-             LEFT JOIN classes c ON cmt.class_id = c.class_id
-             LEFT JOIN clients cl ON c.client_id = cl.client_id
-             LEFT JOIN sites s ON c.site_id = s.site_id
-             WHERE %s
-             ORDER BY
-                 CASE cmt.delivery_status
-                     WHEN \'notified\' THEN 1
-                     WHEN \'pending\' THEN 2
-                     WHEN \'delivered\' THEN 3
-                 END,
-                 cmt.notification_sent_at DESC,
-                 cmt.created_at DESC
-             LIMIT :limit',
-            $whereClause
-        );
+                s.site_name,
+                elem->>\'type\' as event_type,
+                elem->>\'description\' as event_description,
+                elem->>\'date\' as event_date,
+                elem->>\'status\' as event_status,
+                elem->>\'notes\' as event_notes,
+                elem->>\'completed_by\' as event_completed_by,
+                elem->>\'completed_at\' as event_completed_at,
+                (elem_index - 1) as event_index,
+                cmt.notification_type,
+                cmt.notification_sent_at
+            FROM classes c
+            LEFT JOIN clients cl ON c.client_id = cl.client_id
+            LEFT JOIN sites s ON c.site_id = s.site_id
+            CROSS JOIN LATERAL jsonb_array_elements(COALESCE(c.event_dates, \'[]\'::jsonb))
+                WITH ORDINALITY AS events(elem, elem_index)
+            LEFT JOIN class_material_tracking cmt ON cmt.class_id = c.class_id
+            WHERE elem->>\'type\' = \'Deliveries\'';
+
+        $params = [':limit' => $limit];
+
+        if ($status !== null) {
+            $sql .= ' AND LOWER(elem->>\'status\') = :status';
+            $params[':status'] = strtolower($status);
+        }
+
+        if ($search !== null) {
+            $sql .= ' AND (c.class_code ILIKE :search OR c.class_subject ILIKE :search OR cl.client_name ILIKE :search)';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $sql .= ' ORDER BY
+                CASE LOWER(elem->>\'status\')
+                    WHEN \'pending\' THEN 1
+                    WHEN \'completed\' THEN 2
+                    ELSE 3
+                END,
+                c.original_start_date DESC NULLS LAST,
+                c.class_code
+            LIMIT :limit';
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if (!$stmt) {
@@ -293,40 +291,36 @@ final class MaterialTrackingRepository extends BaseRepository
 
     /**
      * Get tracking statistics for dashboard
+     * Counts Deliveries events from event_dates JSONB
      *
-     * @param int $daysRange Number of days to look back (default 30)
-     * @return array<string, int> Array with keys: total, pending, notified, delivered
+     * @return array<string, int> Array with keys: total, pending, completed
      */
-    public function getTrackingStatistics(int $daysRange = 30): array
+    public function getTrackingStatistics(): array
     {
-        $sql = sprintf(
-            'SELECT
+        $sql = 'SELECT
                 COUNT(*) as total,
-                COALESCE(SUM(CASE WHEN delivery_status = \'pending\' THEN 1 ELSE 0 END), 0) as pending,
-                COALESCE(SUM(CASE WHEN delivery_status = \'notified\' THEN 1 ELSE 0 END), 0) as notified,
-                COALESCE(SUM(CASE WHEN delivery_status = \'delivered\' THEN 1 ELSE 0 END), 0) as delivered
-             FROM class_material_tracking
-             WHERE created_at >= (CURRENT_DATE - INTERVAL \'%d days\')',
-            (int) $daysRange
-        );
+                COALESCE(SUM(CASE WHEN LOWER(elem->>\'status\') = \'pending\' THEN 1 ELSE 0 END), 0) as pending,
+                COALESCE(SUM(CASE WHEN LOWER(elem->>\'status\') = \'completed\' THEN 1 ELSE 0 END), 0) as completed
+            FROM classes c
+            CROSS JOIN LATERAL jsonb_array_elements(COALESCE(c.event_dates, \'[]\'::jsonb)) AS events(elem)
+            WHERE elem->>\'type\' = \'Deliveries\'';
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if (!$stmt) {
-            return ['total' => 0, 'pending' => 0, 'notified' => 0, 'delivered' => 0];
+            return ['total' => 0, 'pending' => 0, 'completed' => 0];
         }
 
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$result) {
-            return ['total' => 0, 'pending' => 0, 'notified' => 0, 'delivered' => 0];
+            return ['total' => 0, 'pending' => 0, 'completed' => 0];
         }
 
         return [
             'total' => (int) ($result['total'] ?? 0),
             'pending' => (int) ($result['pending'] ?? 0),
-            'notified' => (int) ($result['notified'] ?? 0),
-            'delivered' => (int) ($result['delivered'] ?? 0),
+            'completed' => (int) ($result['completed'] ?? 0),
         ];
     }
 }
