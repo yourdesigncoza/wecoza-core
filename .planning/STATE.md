@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-05)
+See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Awaiting next milestone definition
+**Current focus:** Fix Material Tracking Dashboard to use event_dates JSONB
 
 ## Current Position
 
-Phase: N/A — Between milestones
-Plan: N/A
-Status: v1.2 milestone shipped
-Last activity: 2026-02-05 — v1.2 Event Tasks Refactor milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-06 — Milestone v1.3 started
 
-Progress: v1.2 ██████████████████████████████ SHIPPED
+Progress: v1.3 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0%
 
 ## Milestone History
 
@@ -30,11 +30,11 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-All decisions archived to PROJECT.md and milestone archives.
+- Material Tracking Dashboard will query `classes.event_dates` JSONB for Deliveries events (not just `class_material_tracking` cron records)
 
 ### Pending Todos
 
-None — awaiting next milestone definition.
+None.
 
 ### Blockers/Concerns
 
@@ -57,8 +57,8 @@ None identified.
 
 ## Session Continuity
 
-Last session: 2026-02-05T17:00:00Z
-Stopped at: v1.2 milestone complete
+Last session: 2026-02-06
+Stopped at: Milestone v1.3 definition
 Resume file: None
 
-**Next action:** Define next milestone with `/gsd:new-milestone`
+**Next action:** Define requirements and roadmap for v1.3

@@ -41,7 +41,8 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(None — awaiting next milestone definition)
+- [ ] Material Tracking Dashboard shows classes with Deliveries events from event_dates JSONB — v1.3
+- [ ] Bridge event tasks system and material tracking dashboard — v1.3
 
 ### Out of Scope
 
@@ -112,5 +113,15 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Application-level event dispatch | More flexible and testable than triggers | ✓ v1.2 |
 | JSONB for event storage | Flexible schema for varied event payloads | ✓ v1.2 |
 
+## Current Milestone: v1.3 Fix Material Tracking Dashboard
+
+**Goal:** Make the Material Tracking Dashboard show classes with "Deliveries" events from `classes.event_dates` JSONB instead of only showing cron-created notification records from `class_material_tracking`.
+
+**Target features:**
+- Dashboard queries `classes.event_dates` JSONB for Deliveries-type events
+- Shows all classes with pending/completed delivery tasks
+- Preserves existing cron notification tracking as supplementary data
+- Status reflects both event task completion and cron notification state
+
 ---
-*Last updated: 2026-02-05 after v1.2 milestone shipped*
+*Last updated: 2026-02-06 after v1.3 milestone started*
