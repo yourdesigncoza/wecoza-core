@@ -65,16 +65,17 @@ final class MaterialTrackingDashboardService
      * Mark materials as delivered for a class
      *
      * @param int $classId The class ID
+     * @param int $eventIndex The index of the delivery event in event_dates JSONB array
      * @return bool True on success, false on failure
      */
-    public function markAsDelivered(int $classId): bool
+    public function markAsDelivered(int $classId, int $eventIndex): bool
     {
         if (!$this->canManageMaterialTracking()) {
             return false;
         }
 
         try {
-            $this->repository->markDelivered($classId);
+            $this->repository->markDelivered($classId, $eventIndex);
             return true;
         } catch (\Throwable $e) {
             error_log('Material Tracking: Failed to mark delivered - ' . $e->getMessage());

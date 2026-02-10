@@ -77,26 +77,72 @@ final class MaterialTrackingRepository extends BaseRepository
     }
 
     /**
-     * Mark materials as delivered for a class (all notification types)
+     * Mark materials as delivered for a specific delivery event
      *
      * @param int $classId The class ID
+     * @param int $eventIndex The index of the delivery event in event_dates JSONB array (0-based)
      * @throws RuntimeException If database operation fails
      */
-    public function markDelivered(int $classId): void
+    public function markDelivered(int $classId, int $eventIndex): void
     {
-        $sql = 'UPDATE class_material_tracking
-             SET delivery_status = \'delivered\',
-                 materials_delivered_at = NOW(),
-                 updated_at = NOW()
+        // Validate and sanitize event index (must be non-negative integer)
+        $eventIndex = (int) $eventIndex;
+        if ($eventIndex < 0) {
+            throw new RuntimeException('Event index must be non-negative.');
+        }
+
+        // Get current user ID for completed_by field
+        $currentUserId = get_current_user_id();
+        $completedBy = $currentUserId > 0 ? (string) $currentUserId : 'system';
+        $completedAt = current_time('Y-m-d H:i:s');
+
+        // Build JSONB path for the specific event (must be a string literal in PostgreSQL)
+        $jsonPath = sprintf('{%d}', $eventIndex);
+
+        // Update the specific event in the event_dates JSONB array
+        // Note: Using sprintf to inject sanitized event_index since PostgreSQL doesn't support
+        // placeholders for JSONB array indices
+        $sql = sprintf('UPDATE classes
+             SET event_dates = jsonb_set(
+                 event_dates,
+                 \'%s\',
+                 jsonb_build_object(
+                     \'type\', event_dates->%d->\'type\',
+                     \'description\', event_dates->%d->\'description\',
+                     \'date\', event_dates->%d->\'date\',
+                     \'status\', \'completed\',
+                     \'notes\', COALESCE(event_dates->%d->\'notes\', \'\'::jsonb),
+                     \'completed_by\', :completed_by,
+                     \'completed_at\', :completed_at
+                 )
+             ),
+             updated_at = NOW()
              WHERE class_id = :class_id
-               AND delivery_status != \'delivered\'';
+               AND jsonb_array_length(COALESCE(event_dates, \'[]\'::jsonb)) > %d',
+            $jsonPath,
+            $eventIndex,
+            $eventIndex,
+            $eventIndex,
+            $eventIndex,
+            $eventIndex
+        );
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if (!$stmt) {
             throw new RuntimeException('Failed to prepare material delivery update statement.');
         }
 
-        $stmt->execute([':class_id' => $classId]);
+        $success = $stmt->execute([
+            ':class_id' => $classId,
+            ':completed_by' => $completedBy,
+            ':completed_at' => $completedAt
+        ]);
+
+        if (!$success) {
+            throw new RuntimeException(
+                sprintf('Failed to mark delivery as completed for class %d, event index %d', $classId, $eventIndex)
+            );
+        }
     }
 
     /**

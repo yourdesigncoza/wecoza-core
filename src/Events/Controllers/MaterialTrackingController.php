@@ -66,17 +66,23 @@ final class MaterialTrackingController
         }
 
         $classId = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
+        $eventIndex = isset($_POST['event_index']) ? absint($_POST['event_index']) : null;
 
         if ($classId <= 0) {
             $this->responder->error(__('Invalid class ID.', 'wecoza-events'), 400);
         }
 
-        $success = $this->service->markAsDelivered($classId);
+        if ($eventIndex === null) {
+            $this->responder->error(__('Missing event index.', 'wecoza-events'), 400);
+        }
+
+        $success = $this->service->markAsDelivered($classId, $eventIndex);
 
         if ($success) {
             $this->responder->success([
                 'message' => __('Materials marked as delivered successfully.', 'wecoza-events'),
                 'class_id' => $classId,
+                'event_index' => $eventIndex,
             ]);
         } else {
             $this->responder->error(__('Failed to mark materials as delivered. Please try again.', 'wecoza-events'), 500);
