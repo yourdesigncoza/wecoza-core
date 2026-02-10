@@ -376,11 +376,12 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     showAlert('success', response.data.message);
-                    
+
                     // Update UI - keep checkbox checked and disabled
                     checkbox.prop('checked', true).prop('disabled', true);
                     row.find('.delivery-status-badge').html('<span class="badge badge-phoenix badge-phoenix-success fs-10">Completed</span>');
                     row.data('status', 'delivered');
+                    row.removeClass('urgency-overdue urgency-approaching');
 
                     // Update statistics
                     const pendingCount = parseInt($('#stat-pending').text()) - 1;

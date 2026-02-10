@@ -23,6 +23,8 @@ final class MaterialTrackingPresenter
         $presented = [];
 
         foreach ($records as $record) {
+            $eventStatus = strtolower((string) ($record['event_status'] ?? 'pending'));
+
             $presented[] = [
                 'class_id' => (int) $record['class_id'],
                 'class_code' => esc_html((string) ($record['class_code'] ?? 'N/A')),
@@ -33,12 +35,13 @@ final class MaterialTrackingPresenter
                 'event_date' => $this->formatDate($record['event_date'] ?? null),
                 'event_description' => esc_html((string) ($record['event_description'] ?? '')),
                 'event_index' => (int) ($record['event_index'] ?? 0),
-                'event_status' => strtolower((string) ($record['event_status'] ?? 'pending')),
+                'event_status' => $eventStatus,
                 'notification_type' => (string) ($record['notification_type'] ?? ''),
                 'notification_sent_at' => $this->formatDateTime($record['notification_sent_at'] ?? null),
                 'notification_badge_html' => $this->getNotificationBadge($record['notification_type'] ?? null),
-                'status_badge_html' => $this->getEventStatusBadge(strtolower((string) ($record['event_status'] ?? 'pending'))),
-                'delivery_status' => $this->mapEventStatus(strtolower((string) ($record['event_status'] ?? 'pending'))),
+                'status_badge_html' => $this->getEventStatusBadge($eventStatus),
+                'delivery_status' => $this->mapEventStatus($eventStatus),
+                'urgency_class' => $this->calculateUrgency((string) ($record['event_date'] ?? ''), $eventStatus),
             ];
         }
 
@@ -90,6 +93,36 @@ final class MaterialTrackingPresenter
             'completed' => 'delivered',
             'pending' => 'pending',
             default => 'pending',
+        };
+    }
+
+    /**
+     * Calculate urgency class based on delivery date proximity
+     *
+     * @param string $eventDate Raw date string from event_dates
+     * @param string $eventStatus Lowercased event status
+     * @return string CSS class name or empty string
+     */
+    private function calculateUrgency(string $eventDate, string $eventStatus): string
+    {
+        // Only apply urgency to pending rows
+        if ($eventStatus !== 'pending') {
+            return '';
+        }
+
+        // Validate date
+        if ($eventDate === '' || strtotime($eventDate) === false) {
+            return '';
+        }
+
+        // Calculate days until delivery
+        $daysUntil = (int) ((strtotime($eventDate) - strtotime(gmdate('Y-m-d'))) / 86400);
+
+        // Two-tier urgency system
+        return match (true) {
+            $daysUntil <= 0 => 'urgency-overdue',      // Today or past = red
+            $daysUntil <= 3 => 'urgency-approaching',  // 1-3 days = orange
+            default => '',                             // 4+ days = no border
         };
     }
 

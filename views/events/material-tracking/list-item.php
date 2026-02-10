@@ -18,7 +18,7 @@ if (!empty($record['site_name'])) {
 }
 ?>
 
-<tr data-status="<?php echo esc_attr($record['delivery_status']); ?>"
+<tr class="<?php echo esc_attr($record['urgency_class'] ?? ''); ?>" data-status="<?php echo esc_attr($record['delivery_status']); ?>"
     data-class-id="<?php echo esc_attr((string) $record['class_id']); ?>"
     data-class-code="<?php echo esc_attr($record['class_code']); ?>"
     data-client-name="<?php echo esc_attr($record['client_name']); ?>"
