@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Add visual urgency indicators to the material delivery tracking table (`[wecoza_material_tracking]` shortcode). Left-border color coding on each row communicates whether a pending delivery is overdue, approaching, or on track. No new capabilities — this enhances existing rows with urgency signaling.
+Add visual urgency indicators to the material delivery tracking table (`[wecoza_material_tracking]` shortcode). Left-border color coding on each row communicates whether a pending delivery is overdue or approaching. No border for items with comfortable lead time. No new capabilities — this enhances existing rows with urgency signaling.
 
 </domain>
 
@@ -16,12 +16,12 @@ Add visual urgency indicators to the material delivery tracking table (`[wecoza_
 ### Urgency thresholds
 - **Red** — delivery date is today OR has passed, AND status is still pending (today counts as expired)
 - **Orange** — delivery date is 1-3 calendar days away (upcoming, not yet expired)
-- **Green** — delivery date is more than 3 days away
+- **No border** — delivery date is more than 3 days away (no urgency, no visual indicator needed)
 - Red persists as long as the item remains pending — clears only when marked delivered/cancelled/etc.
 
 ### Border styling
 - 3px solid left border on each `<tr>` row
-- Color matches urgency tier: red / orange / green
+- Color matches urgency tier: red / orange (two-tier system, no green)
 - Use Phoenix theme color variables (not hardcoded hex)
 - No background tint — border only
 - Delivered/completed rows: no urgency border (only pending rows get borders)
@@ -35,7 +35,7 @@ Add visual urgency indicators to the material delivery tracking table (`[wecoza_
 - No OVERDUE badge — the left border is the sole urgency indicator
 
 ### Claude's Discretion
-- Exact Phoenix color variable mapping for red/orange/green
+- Exact Phoenix color variable mapping for red/orange
 - Whether urgency is computed in PHP (presenter) or JS (client-side)
 - CSS class naming convention
 
