@@ -96,34 +96,23 @@ final class MaterialTrackingRepository extends BaseRepository
         $completedBy = $currentUserId > 0 ? (string) $currentUserId : 'system';
         $completedAt = current_time('Y-m-d H:i:s');
 
-        // Build JSONB path for the specific event (must be a string literal in PostgreSQL)
-        $jsonPath = sprintf('{%d}', $eventIndex);
-
-        // Update the specific event in the event_dates JSONB array
-        // Note: Using sprintf to inject sanitized event_index since PostgreSQL doesn't support
-        // placeholders for JSONB array indices
-        $sql = sprintf('UPDATE classes
+        // Use chained jsonb_set to update only the fields we need,
+        // preserving all existing fields (type, description, date, notes, etc.)
+        $sql = sprintf(
+            'UPDATE classes
              SET event_dates = jsonb_set(
-                 event_dates,
-                 \'%s\',
-                 jsonb_build_object(
-                     \'type\', event_dates->%d->\'type\',
-                     \'description\', event_dates->%d->\'description\',
-                     \'date\', event_dates->%d->\'date\',
-                     \'status\', \'completed\',
-                     \'notes\', COALESCE(event_dates->%d->\'notes\', \'\'::jsonb),
-                     \'completed_by\', :completed_by,
-                     \'completed_at\', :completed_at
-                 )
+                 jsonb_set(
+                     jsonb_set(
+                         event_dates,
+                         \'{%1$d,status}\', \'"completed"\'
+                     ),
+                     \'{%1$d,completed_by}\', to_jsonb(:completed_by::text)
+                 ),
+                 \'{%1$d,completed_at}\', to_jsonb(:completed_at::text)
              ),
              updated_at = NOW()
              WHERE class_id = :class_id
-               AND jsonb_array_length(COALESCE(event_dates, \'[]\'::jsonb)) > %d',
-            $jsonPath,
-            $eventIndex,
-            $eventIndex,
-            $eventIndex,
-            $eventIndex,
+               AND jsonb_array_length(COALESCE(event_dates, \'[]\'::jsonb)) > %1$d',
             $eventIndex
         );
 
