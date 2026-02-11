@@ -229,6 +229,17 @@ add_action('plugins_loaded', function () {
         \WeCoza\Events\Admin\SettingsPage::register();
     }
 
+    // Initialize Clients Module
+    if (class_exists(\WeCoza\Clients\Controllers\ClientsController::class)) {
+        new \WeCoza\Clients\Controllers\ClientsController();
+    }
+    if (class_exists(\WeCoza\Clients\Controllers\LocationsController::class)) {
+        new \WeCoza\Clients\Controllers\LocationsController();
+    }
+    if (class_exists(\WeCoza\Clients\Ajax\ClientAjaxHandlers::class)) {
+        new \WeCoza\Clients\Ajax\ClientAjaxHandlers();
+    }
+
     // Action Scheduler Performance Tuning
     add_filter('action_scheduler_queue_runner_time_limit', function () {
         return 60;  // 60 seconds (default is 30)
@@ -464,6 +475,13 @@ register_activation_hook(__FILE__, function () {
         $admin->add_cap('manage_learners');
         $admin->add_cap('view_material_tracking');
         $admin->add_cap('manage_material_tracking');
+
+        // Clients module capabilities
+        $admin->add_cap('manage_wecoza_clients');
+        $admin->add_cap('view_wecoza_clients');
+        $admin->add_cap('edit_wecoza_clients');
+        $admin->add_cap('delete_wecoza_clients');
+        $admin->add_cap('export_wecoza_clients');
     }
 
     // Schedule material notification cron if not already scheduled
@@ -500,6 +518,13 @@ register_deactivation_hook(__FILE__, function () {
         $admin->remove_cap('manage_learners');
         $admin->remove_cap('view_material_tracking');
         $admin->remove_cap('manage_material_tracking');
+
+        // Remove Clients module capabilities
+        $admin->remove_cap('manage_wecoza_clients');
+        $admin->remove_cap('view_wecoza_clients');
+        $admin->remove_cap('edit_wecoza_clients');
+        $admin->remove_cap('delete_wecoza_clients');
+        $admin->remove_cap('export_wecoza_clients');
     }
 
     // Unschedule material notification cron
