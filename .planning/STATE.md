@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 ## Current Position
 
-Phase: 22 of 25 (Client Management)
-Plan: 1 of 2 complete
-Status: Plan 22-01 complete — shortcode rendering verified, hydrate() bug fixed
-Last activity: 2026-02-11 — Completed 22-01-PLAN.md (Shortcode rendering verification)
+Phase: 22 of 25 (Client Management) — COMPLETE
+Plan: 2 of 2 complete
+Status: Phase 22 complete — all client CRUD, hierarchy, export, statistics verified
+Last activity: 2026-02-11 — Completed 22-02-PLAN.md (AJAX endpoint testing & CRUD verification)
 
-Progress: [█████████████████████] 84.0% (21 phases complete, 4 phases remaining)
+Progress: [██████████████████████] 88.0% (22 phases complete, 3 phases remaining)
 
 ## Milestone History
 
@@ -45,6 +45,9 @@ Decisions from Phase 21:
 
 Decisions from Phase 22:
 - Clients models getById() returns arrays, not model instances — changed return type from ?static to array|null (22-01)
+- Added CRUD convenience methods to PostgresConnection — models depend on these rather than raw PDO (22-02)
+- Soft-delete uses deleted_at timestamp column, all queries filter WHERE deleted_at IS NULL (22-02)
+- JS localization uses camelCase keys (ajaxUrl, nonce) matching existing JS conventions (22-02)
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -77,7 +80,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Plan 22-01 complete — executing Plan 22-02
+Stopped at: Completed Phase 22 — all plans done, verification pending
 Resume file: —
 
-**Next action:** Execute Plan 22-02 (AJAX endpoint testing and CRUD verification)
+**Next action:** Plan Phase 23 (Location Management) or verify Phase 22 work.
