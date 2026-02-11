@@ -83,47 +83,47 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-01 | — | Pending |
-| ARCH-02 | — | Pending |
-| ARCH-03 | — | Pending |
-| ARCH-04 | — | Pending |
-| ARCH-05 | — | Pending |
-| ARCH-06 | — | Pending |
-| ARCH-07 | — | Pending |
-| ARCH-08 | — | Pending |
-| CLT-01 | — | Pending |
-| CLT-02 | — | Pending |
-| CLT-03 | — | Pending |
-| CLT-04 | — | Pending |
-| CLT-05 | — | Pending |
-| CLT-06 | — | Pending |
-| CLT-07 | — | Pending |
-| CLT-08 | — | Pending |
-| CLT-09 | — | Pending |
-| LOC-01 | — | Pending |
-| LOC-02 | — | Pending |
-| LOC-03 | — | Pending |
-| LOC-04 | — | Pending |
-| LOC-05 | — | Pending |
-| LOC-06 | — | Pending |
-| LOC-07 | — | Pending |
-| SITE-01 | — | Pending |
-| SITE-02 | — | Pending |
-| SITE-03 | — | Pending |
-| SITE-04 | — | Pending |
-| SC-01 | — | Pending |
-| SC-02 | — | Pending |
-| SC-03 | — | Pending |
-| SC-04 | — | Pending |
-| SC-05 | — | Pending |
-| CLN-01 | — | Pending |
-| CLN-02 | — | Pending |
+| ARCH-01 | Phase 21 | Pending |
+| ARCH-02 | Phase 21 | Pending |
+| ARCH-03 | Phase 21 | Pending |
+| ARCH-04 | Phase 21 | Pending |
+| ARCH-05 | Phase 21 | Pending |
+| ARCH-06 | Phase 21 | Pending |
+| ARCH-07 | Phase 21 | Pending |
+| ARCH-08 | Phase 21 | Pending |
+| CLT-01 | Phase 22 | Pending |
+| CLT-02 | Phase 22 | Pending |
+| CLT-03 | Phase 22 | Pending |
+| CLT-04 | Phase 22 | Pending |
+| CLT-05 | Phase 22 | Pending |
+| CLT-06 | Phase 22 | Pending |
+| CLT-07 | Phase 22 | Pending |
+| CLT-08 | Phase 22 | Pending |
+| CLT-09 | Phase 22 | Pending |
+| LOC-01 | Phase 23 | Pending |
+| LOC-02 | Phase 23 | Pending |
+| LOC-03 | Phase 23 | Pending |
+| LOC-04 | Phase 23 | Pending |
+| LOC-05 | Phase 23 | Pending |
+| LOC-06 | Phase 23 | Pending |
+| LOC-07 | Phase 23 | Pending |
+| SITE-01 | Phase 24 | Pending |
+| SITE-02 | Phase 24 | Pending |
+| SITE-03 | Phase 24 | Pending |
+| SITE-04 | Phase 24 | Pending |
+| SC-01 | Phase 22 | Pending |
+| SC-02 | Phase 22 | Pending |
+| SC-03 | Phase 23 | Pending |
+| SC-04 | Phase 23 | Pending |
+| SC-05 | Phase 23 | Pending |
+| CLN-01 | Phase 25 | Pending |
+| CLN-02 | Phase 25 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 35 total
-- Mapped to phases: 0
-- Unmapped: 35
+- Mapped to phases: 35
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-11*
-*Last updated: 2026-02-11 after initial definition*
+*Last updated: 2026-02-11 after roadmap creation*
