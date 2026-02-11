@@ -50,6 +50,7 @@ spl_autoload_register(function (string $class) {
         'WeCoza\\Learners\\' => WECOZA_CORE_PATH . 'src/Learners/',
         'WeCoza\\Classes\\' => WECOZA_CORE_PATH . 'src/Classes/',
         'WeCoza\\Events\\' => WECOZA_CORE_PATH . 'src/Events/',
+        'WeCoza\\Clients\\' => WECOZA_CORE_PATH . 'src/Clients/',
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
