@@ -373,8 +373,11 @@ class ClientsModel {
         return false; // Not implemented - use create() instead
     }
 
-    public function update(): bool {
-        return $this->updateById($this->resolvedPrimaryKey, []);
+    public function update($id = null, array $data = []): bool {
+        if ($id !== null && !empty($data)) {
+            return $this->updateById($id, $data);
+        }
+        return false;
     }
 
     public function updateById($id, array $data) {
@@ -393,8 +396,11 @@ class ClientsModel {
         return $result !== false;
     }
 
-    public function delete(): bool {
-        return $this->deleteById($this->resolvedPrimaryKey);
+    public function delete($id = null): bool {
+        if ($id !== null) {
+            return $this->deleteById($id);
+        }
+        return false;
     }
 
     public function deleteById($id) {

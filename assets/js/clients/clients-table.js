@@ -271,7 +271,7 @@
                 method: 'POST',
                 data: {
                     action: 'wecoza_delete_client',
-                    client_id: clientId,
+                    id: clientId,
                     nonce: wecozaClients.nonce
                 },
                 beforeSend: function() {

@@ -522,22 +522,23 @@
                 dataType: 'json'
             }).done(function (response) {
                 if (response && response.success) {
-                    var message = response.message || config.messages.form.saved;
+                    var data = response.data || {};
+                    var message = data.message || config.messages.form.saved;
                     renderMessage('success', message);
 
                     // Check if this was a new client and form should be cleared
                     var isNewClient = !form.find('input[name="id"]').val();
-                    if (response.client && response.client.id) {
+                    if (data.client && data.client.id) {
                         var idInput = form.find('input[name="id"]');
                         if (!idInput.length) {
                             idInput = $('<input>', { type: 'hidden', name: 'id' }).appendTo(form);
                         }
-                        idInput.val(response.client.id);
+                        idInput.val(data.client.id);
 
-                        if (response.client.head_site && response.client.head_site.site_id) {
-                            form.find('input[name="head_site_id"]').val(response.client.head_site.site_id);
-                            if (response.client.head_site.site_name && !form.find('input[name="site_name"]').val()) {
-                                form.find('input[name="site_name"]').val(response.client.head_site.site_name);
+                        if (data.client.head_site && data.client.head_site.site_id) {
+                            form.find('input[name="head_site_id"]').val(data.client.head_site.site_id);
+                            if (data.client.head_site.site_name && !form.find('input[name="site_name"]').val()) {
+                                form.find('input[name="site_name"]').val(data.client.head_site.site_name);
                             }
                         }
 
@@ -554,8 +555,8 @@
                     }
 
                     form.trigger('wecoza:client-saved', [response]);
-                } else if (response && response.errors) {
-                    renderMessage('error', extractErrors(response.errors));
+                } else if (response && response.data && response.data.errors) {
+                    renderMessage('error', extractErrors(response.data.errors));
                 } else {
                     renderMessage('error', config.messages.form.error);
                 }

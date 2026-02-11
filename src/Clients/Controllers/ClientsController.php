@@ -143,7 +143,7 @@ class ClientsController extends BaseController {
      */
     protected function getLocalizationPayload($nonce, array $overrides = array()) {
         $base = array(
-            'ajax_url' => admin_url('admin-ajax.php'),
+            'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => $nonce,
             'actions' => array(
                 'save' => 'wecoza_save_client',

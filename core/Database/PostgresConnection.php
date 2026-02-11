@@ -249,6 +249,181 @@ class PostgresConnection
 
     /*
     |--------------------------------------------------------------------------
+    | CRUD Convenience Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Execute query and return all rows
+     *
+     * @param string $sql SQL query
+     * @param array $params Bound parameters
+     * @return array|false Array of rows or false on failure
+     */
+    public function getAll(string $sql, array $params = []): array|false
+    {
+        try {
+            $stmt = $this->query($sql, $params);
+            return $stmt->fetchAll();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Execute query and return single row
+     *
+     * @param string $sql SQL query
+     * @param array $params Bound parameters
+     * @return array|false Single row or false on failure
+     */
+    public function getRow(string $sql, array $params = []): array|false
+    {
+        try {
+            $stmt = $this->query($sql, $params);
+            return $stmt->fetch();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Execute query and return single scalar value
+     *
+     * @param string $sql SQL query
+     * @param array $params Bound parameters
+     * @return mixed Single value or false on failure
+     */
+    public function getValue(string $sql, array $params = []): mixed
+    {
+        try {
+            $stmt = $this->query($sql, $params);
+            return $stmt->fetchColumn();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Insert a row into a table
+     *
+     * @param string $table Table name
+     * @param array $data Associative array of column => value
+     * @return string|bool Last insert ID or true (no RETURNING), false on failure
+     */
+    public function insert(string $table, array $data): string|bool
+    {
+        try {
+            $pdo = $this->getPdo();
+            if ($pdo === null) {
+                return false;
+            }
+
+            $fields = array_keys($data);
+            $placeholders = array_map(fn($f) => ':' . $f, $fields);
+
+            // Detect primary key column for RETURNING clause
+            $returningColumn = null;
+            foreach (['id', 'client_id', 'location_id', 'site_id', 'communication_id'] as $candidate) {
+                if ($this->tableHasColumn($table, $candidate)) {
+                    $returningColumn = $candidate;
+                    break;
+                }
+            }
+
+            $returningClause = $returningColumn ? ' RETURNING ' . $returningColumn : '';
+
+            $sql = sprintf(
+                'INSERT INTO %s (%s) VALUES (%s)%s',
+                $table,
+                implode(', ', $fields),
+                implode(', ', $placeholders),
+                $returningClause
+            );
+
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($data as $field => $value) {
+                $stmt->bindValue(':' . $field, $value);
+            }
+
+            $stmt->execute();
+
+            if ($returningColumn) {
+                return $stmt->fetchColumn();
+            }
+
+            return true;
+        } catch (\PDOException $e) {
+            error_log('WeCoza Core: Insert failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update rows in a table
+     *
+     * @param string $table Table name
+     * @param array $data Associative array of column => value to SET
+     * @param string $where WHERE clause (e.g. "id = :id")
+     * @param array $whereParams Parameters for WHERE clause
+     * @return int|false Number of affected rows or false on failure
+     */
+    public function update(string $table, array $data, string $where, array $whereParams = []): int|false
+    {
+        try {
+            $pdo = $this->getPdo();
+            if ($pdo === null) {
+                return false;
+            }
+
+            $setParts = [];
+            foreach ($data as $field => $value) {
+                $setParts[] = $field . ' = :set_' . $field;
+            }
+
+            $sql = sprintf('UPDATE %s SET %s WHERE %s', $table, implode(', ', $setParts), $where);
+
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($data as $field => $value) {
+                $stmt->bindValue(':set_' . $field, $value);
+            }
+
+            foreach ($whereParams as $param => $value) {
+                $stmt->bindValue($param, $value);
+            }
+
+            $stmt->execute();
+            return $stmt->rowCount();
+        } catch (\PDOException $e) {
+            error_log('WeCoza Core: Update failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete rows from a table
+     *
+     * @param string $table Table name
+     * @param string $where WHERE clause
+     * @param array $params Parameters for WHERE clause
+     * @return int|false Number of affected rows or false on failure
+     */
+    public function delete(string $table, string $where, array $params = []): int|false
+    {
+        try {
+            $sql = sprintf('DELETE FROM %s WHERE %s', $table, $where);
+            $stmt = $this->query($sql, $params);
+            return $stmt->rowCount();
+        } catch (\Exception $e) {
+            error_log('WeCoza Core: Delete failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Transaction Methods
     |--------------------------------------------------------------------------
     */
@@ -406,6 +581,31 @@ class PostgresConnection
             error_log('WeCoza Core: Error getting table columns: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Check if a table has a specific column
+     *
+     * @param string $tableName Table name (may include schema prefix like "public.locations")
+     * @param string $columnName Column name to check
+     * @return bool
+     */
+    public function tableHasColumn(string $tableName, string $columnName): bool
+    {
+        $schema = 'public';
+        if (str_contains($tableName, '.')) {
+            [$schema, $tableName] = explode('.', $tableName, 2);
+        }
+
+        $columns = $this->getTableColumns($tableName, $schema);
+
+        foreach ($columns as $col) {
+            if ($col['column_name'] === $columnName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

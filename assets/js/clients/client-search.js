@@ -67,7 +67,7 @@
                 }
             }).done(function (response) {
                 if (response && response.success) {
-                    populateSuggestions(response.clients || []);
+                    populateSuggestions((response.data && response.data.clients) || []);
                 } else {
                     clearSuggestions();
                 }
