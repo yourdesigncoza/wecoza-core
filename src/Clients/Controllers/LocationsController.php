@@ -311,7 +311,7 @@ class LocationsController extends BaseController {
             );
         }
 
-        $updated = $this->getModel()->update($id, $data);
+        $updated = $this->getModel()->updateById($id, $data);
         if (!$updated) {
             return array(
                 'success' => false,

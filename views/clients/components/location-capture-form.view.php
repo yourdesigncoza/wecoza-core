@@ -139,7 +139,7 @@ foreach ($provinces as $province) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var form = document.querySelector('.wecoza-locations-form-container form');
+    var form = document.querySelector('.wecoza-clients-form-container form');
     if (!form) {
         return;
     }

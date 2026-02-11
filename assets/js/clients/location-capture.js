@@ -16,8 +16,8 @@
         }
 
         var config = window.wecoza_locations || {};
-        var container = document.getElementById('wecozaClients_google_address_container');
-        var searchInput = document.getElementById('wecozaClients_google_address_search');
+        var container = document.getElementById('wecoza_clients_google_address_container');
+        var searchInput = document.getElementById('wecoza_clients_google_address_search');
         var form = $('.wecoza-clients-form-container form');
 
         if (!form.length || !container || !searchInput || !config.googleMapsEnabled) {
@@ -81,7 +81,7 @@
         };
 
         window.WeCozaClients.Location.initializeNewAutocomplete = function (PlaceAutocompleteElement) {
-            var originalInput = document.getElementById('wecozaClients_google_address_search');
+            var originalInput = document.getElementById('wecoza_clients_google_address_search');
             if (!originalInput) {
                 return;
             }
