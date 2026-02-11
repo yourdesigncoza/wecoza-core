@@ -278,6 +278,11 @@ class ClientsModel {
             }
         }
 
+        // Exclude soft-deleted records by default (only if deleted_at column exists)
+        if ((!isset($params['include_deleted']) || !$params['include_deleted']) && wecoza_db()->tableHasColumn($this->table, 'deleted_at')) {
+            $where[] = "{$alias}.deleted_at IS NULL";
+        }
+
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
@@ -393,8 +398,10 @@ class ClientsModel {
     }
 
     public function deleteById($id) {
+        // Soft delete: set deleted_at timestamp instead of hard delete
+        $data = ['deleted_at' => current_time('mysql')];
         $where = $this->resolvedPrimaryKey . ' = :id';
-        $result = wecoza_db()->delete($this->table, $where, [':id' => $id]);
+        $result = wecoza_db()->update($this->table, $data, $where, [':id' => $id]);
 
         return $result !== false;
     }
@@ -439,6 +446,11 @@ class ClientsModel {
             }
         }
 
+        // Exclude soft-deleted records by default (only if deleted_at column exists)
+        if ((!isset($params['include_deleted']) || !$params['include_deleted']) && wecoza_db()->tableHasColumn($this->table, 'deleted_at')) {
+            $where[] = "{$alias}.deleted_at IS NULL";
+        }
+
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
@@ -464,6 +476,10 @@ class ClientsModel {
         }
 
         $sql = 'SELECT ' . implode(', ', $select) . " FROM {$this->table} {$alias}";
+        // Exclude soft-deleted records (only if deleted_at column exists)
+        if (wecoza_db()->tableHasColumn($this->table, 'deleted_at')) {
+            $sql .= " WHERE {$alias}.deleted_at IS NULL";
+        }
         $row = wecoza_db()->getRow($sql) ?: [];
 
         return wp_parse_args($row, [
@@ -612,9 +628,15 @@ class ClientsModel {
             $select[] = "{$alias}.{$registrationColumn} AS company_registration_nr";
         }
 
+        $where = ["{$alias}.main_client_id IS NULL"];
+        // Exclude soft-deleted records (only if deleted_at column exists)
+        if (wecoza_db()->tableHasColumn($this->table, 'deleted_at')) {
+            $where[] = "{$alias}.deleted_at IS NULL";
+        }
+
         $sql = 'SELECT ' . implode(', ', $select) . "
                 FROM {$this->table} {$alias}
-                WHERE {$alias}.main_client_id IS NULL
+                WHERE " . implode(' AND ', $where) . "
                 ORDER BY {$alias}.{$nameColumn}";
 
         $rows = wecoza_db()->getAll($sql) ?: [];
@@ -650,9 +672,15 @@ class ClientsModel {
             $select[] = "{$alias}.{$registrationColumn} AS company_registration_nr";
         }
 
+        $where = ["{$alias}.main_client_id = :main_client_id"];
+        // Exclude soft-deleted records (only if deleted_at column exists)
+        if (wecoza_db()->tableHasColumn($this->table, 'deleted_at')) {
+            $where[] = "{$alias}.deleted_at IS NULL";
+        }
+
         $sql = 'SELECT ' . implode(', ', $select) . "
                 FROM {$this->table} {$alias}
-                WHERE {$alias}.main_client_id = :main_client_id
+                WHERE " . implode(' AND ', $where) . "
                 ORDER BY {$alias}.{$nameColumn}";
 
         $rows = wecoza_db()->getAll($sql, [':main_client_id' => $mainClientId]) ?: [];
