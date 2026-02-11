@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 21 of 25 (Foundation Architecture)
-Plan: 1 of 2 complete
-Status: In progress - Data layer foundation complete
-Last activity: 2026-02-11 — Completed 21-01-PLAN.md (Clients module foundation)
+Plan: 2 of 2 complete
+Status: Phase complete - Controllers, AJAX, Views, JS migrated
+Last activity: 2026-02-11 — Completed 21-02-PLAN.md (Controllers/AJAX/Views/JS migration)
 
-Progress: [████████████████████░] 80.4% (20 phases complete + 1/2 plans, 5 phases remaining)
+Progress: [█████████████████████] 84.0% (21 phases complete, 4 phases remaining)
 
 ## Milestone History
 
@@ -38,6 +38,10 @@ Decisions from Phase 21:
 - Convert SETA/province options to associative arrays for ViewHelpers consistency (21-01)
 - Preserve all column mapping and caching logic from source Models (21-01)
 - Add protected table/primaryKey properties to Models for BaseModel compatibility (21-01)
+- Extract AJAX handlers from Controllers into separate Ajax/ class (21-02)
+- Use AjaxSecurity helper for all AJAX endpoints with consistent nonce (21-02)
+- Conditional asset enqueuing: only load JS when shortcode present on page (21-02)
+- Preserve ViewHelpers fully-qualified namespace in views (21-02)
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -70,7 +74,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: 21-01 plan execution complete
-Resume file: .planning/phases/21-foundation-architecture/21-02-PLAN.md
+Stopped at: Phase 21 complete (Foundation Architecture)
+Resume file: .planning/phases/22-schema-migration/22-01-PLAN.md
 
-**Next action:** Execute Plan 21-02 (Controllers, AJAX, Views) using `/gsd:execute-plan 21 02`
+**Next action:** Begin Phase 22 (Schema Migration) using `/gsd:execute-plan 22 01`
