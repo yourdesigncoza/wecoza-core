@@ -212,8 +212,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 21-01-PLAN.md -- Foundation: autoloader, config, ViewHelpers, 4 Models, 2 Repositories
-- [ ] 21-02-PLAN.md -- Controllers, Views, JS assets, AJAX handlers, wecoza-core.php wiring
+- [x] 21-01-PLAN.md -- Foundation: autoloader, config, ViewHelpers, 4 Models, 2 Repositories
+- [x] 21-02-PLAN.md -- Controllers, Views, JS assets, AJAX handlers, wecoza-core.php wiring
 
 #### Phase 22: Client Management
 **Goal**: Full client CRUD with hierarchy, search, filter, CSV export, and statistics
@@ -300,7 +300,7 @@ Phases execute in numeric order.
 | 18. Multi-Recipient Config | v1.2 | 2/2 | Complete | 2026-02-05 |
 | 19. Material Dashboard Rewrite | v1.3 | 2/2 | Complete | 2026-02-06 |
 | 20. Dashboard Enhancements | v1.3 | 1/1 | Complete | 2026-02-06 |
-| 21. Foundation Architecture | v2.0 | 0/? | Not started | - |
+| 21. Foundation Architecture | v2.0 | 2/2 | Complete | 2026-02-11 |
 | 22. Client Management | v2.0 | 0/? | Not started | - |
 | 23. Location Management | v2.0 | 0/? | Not started | - |
 | 24. Sites Hierarchy | v2.0 | 0/? | Not started | - |

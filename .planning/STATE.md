@@ -74,7 +74,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 21 complete (Foundation Architecture)
-Resume file: .planning/phases/22-schema-migration/22-01-PLAN.md
+Stopped at: Phase 21 complete — verified (5/5 must-haves)
+Resume file: —
 
-**Next action:** Begin Phase 22 (Schema Migration) using `/gsd:execute-plan 22 01`
+**Next action:** Plan Phase 22 (Client Management) using `/gsd:plan-phase 22`
