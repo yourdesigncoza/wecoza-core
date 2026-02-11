@@ -2,25 +2,23 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-06)
+See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Planning next milestone
+**Current focus:** v2.0 Clients Integration
 
 ## Current Position
 
-Phase: 20 of TBD (material-tracking-urgency)
-Plan: 1 of 1 complete
-Status: Phase complete
-Last activity: 2026-02-10 — Completed 20-01-PLAN.md
-
-Progress: █ (Phase 20: 1/1 plans complete)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-11 — Milestone v2.0 started
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
-| v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19 | 2 |
+| v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19-20 | 3 |
 | v1.2 | Event Tasks Refactor | 2026-02-05 | 13-18 | 16 |
 | v1.1 | Quality & Performance | 2026-02-02 | 8-12 | 13 |
 | v1 | Events Integration | 2026-02-02 | 1-7 | 13 |
@@ -31,7 +29,7 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-Cleared for v1.3 milestone. Full decision log in PROJECT.md Key Decisions table.
+Cleared for v2.0 milestone. Full decision log in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -61,8 +59,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Phase 20 complete
-Resume file: .planning/phases/20-material-tracking-urgency/20-01-SUMMARY.md
+Last session: 2026-02-11
+Stopped at: Milestone v2.0 initialization
+Resume file: —
 
-**Next action:** Phase 20 complete. Define next phase or milestone.
+**Next action:** Define requirements for v2.0 Clients Integration.

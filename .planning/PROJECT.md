@@ -1,8 +1,8 @@
-# WeCoza Core - Events Integration
+# WeCoza Core
 
 ## What This Is
 
-WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, LP progression tracking, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend and MVC architecture.
+WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend and MVC architecture.
 
 ## Core Value
 
@@ -43,7 +43,17 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(None — define next milestone requirements with `/gsd:new-milestone`)
+## Current Milestone: v2.0 Clients Integration
+
+**Goal:** Integrate the standalone wecoza-clients-plugin into wecoza-core as a unified Clients module — client CRUD, location management, sites hierarchy, Google Maps integration, CSV export.
+
+**Target features:**
+- Client management (CRUD, hierarchical main/sub-clients, search, filter, CSV export)
+- Location management (suburbs/towns, Google Maps Places autocomplete, geocoordinates)
+- Sites hierarchy (head sites, sub-sites, location hydration)
+- Consolidate database to wecoza_db() singleton
+- Align namespace to WeCoza\Clients\, PSR-4 in src/Clients/
+- Replace standalone helpers with wecoza-core equivalents
 
 ### Out of Scope
 
@@ -54,7 +64,7 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v1.3 Shipped)
+### Current State (v2.0 Starting)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
 - **Total:** ~21,900 lines of PHP across 3 modules
@@ -124,5 +134,7 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - 2 test failures in AI summarization test suite (test format issues, not production bugs)
 - Settings page may need admin menu entry for easier discovery
 
+| Integrate clients plugin into core | Full integration with wecoza_db(), WeCoza\Clients\ namespace | — Pending |
+
 ---
-*Last updated: 2026-02-06 after v1.3 milestone*
+*Last updated: 2026-02-11 after v2.0 milestone start*
