@@ -228,7 +228,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md -- Shortcode rendering verification and wiring fixes
+- [x] 22-01-PLAN.md -- Shortcode rendering verification and wiring fixes
 - [ ] 22-02-PLAN.md -- AJAX endpoint testing and end-to-end CRUD verification
 
 #### Phase 23: Location Management

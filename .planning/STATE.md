@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v2.0 Clients Integration - Phase 21 (Foundation Architecture)
+**Current focus:** v2.0 Clients Integration - Phase 22 (Client Management)
 
 ## Current Position
 
-Phase: 21 of 25 (Foundation Architecture)
-Plan: 2 of 2 complete
-Status: Phase complete - Controllers, AJAX, Views, JS migrated
-Last activity: 2026-02-11 — Completed 21-02-PLAN.md (Controllers/AJAX/Views/JS migration)
+Phase: 22 of 25 (Client Management)
+Plan: 1 of 2 complete
+Status: Plan 22-01 complete — shortcode rendering verified, hydrate() bug fixed
+Last activity: 2026-02-11 — Completed 22-01-PLAN.md (Shortcode rendering verification)
 
 Progress: [█████████████████████] 84.0% (21 phases complete, 4 phases remaining)
 
@@ -42,6 +42,9 @@ Decisions from Phase 21:
 - Use AjaxSecurity helper for all AJAX endpoints with consistent nonce (21-02)
 - Conditional asset enqueuing: only load JS when shortcode present on page (21-02)
 - Preserve ViewHelpers fully-qualified namespace in views (21-02)
+
+Decisions from Phase 22:
+- Clients models getById() returns arrays, not model instances — changed return type from ?static to array|null (22-01)
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -74,7 +77,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 21 complete — verified (5/5 must-haves)
+Stopped at: Plan 22-01 complete — executing Plan 22-02
 Resume file: —
 
-**Next action:** Plan Phase 22 (Client Management) using `/gsd:plan-phase 22`
+**Next action:** Execute Plan 22-02 (AJAX endpoint testing and CRUD verification)
