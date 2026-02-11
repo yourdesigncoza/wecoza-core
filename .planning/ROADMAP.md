@@ -225,11 +225,11 @@ Plans:
   3. User can edit existing client and soft-delete client (sets deleted_at)
   4. User can set client as main or sub-client and view sub-clients under main client
   5. User can export filtered clients to CSV and view client statistics (counts, SETA breakdown)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 22-01: TBD
-- [ ] 22-02: TBD
+- [ ] 22-01-PLAN.md -- Shortcode rendering verification and wiring fixes
+- [ ] 22-02-PLAN.md -- AJAX endpoint testing and end-to-end CRUD verification
 
 #### Phase 23: Location Management
 **Goal**: Location CRUD with Google Maps autocomplete, geocoordinates, and duplicate detection
