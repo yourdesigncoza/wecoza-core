@@ -2,9 +2,7 @@
 
 namespace WeCoza\Clients\Models;
 
-use WeCoza\Core\Abstract\BaseModel;
-
-class LocationsModel extends BaseModel {
+class LocationsModel {
 
     protected string $table = 'public.locations';
 
@@ -214,7 +212,7 @@ class LocationsModel extends BaseModel {
         return isset($row['cnt']) ? (int) $row['cnt'] : 0;
     }
 
-    public static function getById(int $id): ?static {
+    public static function getById(int $id): array|null {
         if ($id <= 0) {
             return null;
         }
@@ -229,7 +227,7 @@ class LocationsModel extends BaseModel {
         $row['longitude'] = isset($row['longitude']) ? (float) $row['longitude'] : null;
         $row['latitude'] = isset($row['latitude']) ? (float) $row['latitude'] : null;
 
-        return (new static())->hydrate($row);
+        return $row;
     }
 
     public function save(): bool {

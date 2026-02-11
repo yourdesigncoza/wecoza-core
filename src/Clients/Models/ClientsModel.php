@@ -2,9 +2,7 @@
 
 namespace WeCoza\Clients\Models;
 
-use WeCoza\Core\Abstract\BaseModel;
-
-class ClientsModel extends BaseModel {
+class ClientsModel {
 
     protected string $table = 'clients';
 
@@ -313,7 +311,7 @@ class ClientsModel extends BaseModel {
         return $rows;
     }
 
-    public static function getById(int $id): ?static {
+    public static function getById(int $id): array|null {
         $instance = new static();
         $alias = 'c';
         $primaryKey = $instance->resolvedPrimaryKey;
@@ -327,7 +325,7 @@ class ClientsModel extends BaseModel {
         $normalized = $instance->normalizeRow($row);
         $instance->hydrateRows($normalized);
 
-        return $normalized ? $instance->hydrate($normalized) : null;
+        return $normalized ?: null;
     }
 
     public function getByRegistrationNumber($regNr) {
