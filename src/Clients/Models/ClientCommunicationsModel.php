@@ -2,14 +2,10 @@
 
 namespace WeCoza\Clients\Models;
 
-use WeCoza\Core\Abstract\BaseModel;
-
-
-
 /**
  * Data access for client_communications table
  */
-class ClientCommunicationsModel extends BaseModel {
+class ClientCommunicationsModel {
 
     protected string $table = 'client_communications';
 

@@ -2,11 +2,7 @@
 
 namespace WeCoza\Clients\Models;
 
-use WeCoza\Core\Abstract\BaseModel;
-
-
-
-class SitesModel extends BaseModel {
+class SitesModel {
 
     protected string $table = 'sites';
 
@@ -823,18 +819,10 @@ class SitesModel extends BaseModel {
      * Get all sites for a client with hierarchy
      */
     public function getAllSitesWithHierarchy($clientId) {
-        $sites = $this->getSitesForClient($clientId);
-        
-        $head = null;
-        $subSites = array();
-        
-        foreach ($sites as $site) {
-            if (empty($site['parent_site_id'])) {
-                $head = $site;
-            } else {
-                $subSites[] = $site;
-            }
-        }
+        $result = $this->getSitesByClient($clientId);
+
+        $head = $result['head'] ?? null;
+        $subSites = $result['sub_sites'] ?? array();
 
         return array(
             'head_sites' => $head ? array($head) : array(),
@@ -867,7 +855,6 @@ class SitesModel extends BaseModel {
             return false; // Cannot delete site with children
         }
 
-        $sql = 'DELETE FROM ' . $this->table . ' WHERE site_id = :site_id AND client_id = :client_id';
-        return wecoza_db()->delete($sql, array(':site_id' => $siteId, ':client_id' => $clientId)) !== false;
+        return wecoza_db()->delete($this->table, 'site_id = :site_id AND client_id = :client_id', array(':site_id' => $siteId, ':client_id' => $clientId)) !== false;
     }
 }

@@ -226,7 +226,7 @@ class LocationsController extends BaseController {
     }
 
     protected function getGoogleMapsApiKey() {
-        $optionKey = get_option('wecoza_agents_google_maps_api_key');
+        $optionKey = get_option('wecoza_google_maps_api_key');
         return !empty($optionKey) ? $optionKey : '';
     }
 
