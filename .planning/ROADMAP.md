@@ -209,11 +209,11 @@ Plans:
   3. View templates render via `wecoza_view('clients/...')` from `views/clients/`
   4. JavaScript assets load from `assets/js/clients/` through wecoza-core asset registration
   5. Shortcodes register through wecoza-core entry point and render correctly
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 21-01: TBD
-- [ ] 21-02: TBD
+- [ ] 21-01-PLAN.md -- Foundation: autoloader, config, ViewHelpers, 4 Models, 2 Repositories
+- [ ] 21-02-PLAN.md -- Controllers, Views, JS assets, AJAX handlers, wecoza-core.php wiring
 
 #### Phase 22: Client Management
 **Goal**: Full client CRUD with hierarchy, search, filter, CSV export, and statistics
