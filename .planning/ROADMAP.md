@@ -241,11 +241,11 @@ Plans:
   3. User can manually enter location when Google Maps unavailable
   4. System stores latitude/longitude for locations and warns about duplicate addresses
   5. User can view/edit locations via `[wecoza_locations_list]` and `[wecoza_locations_edit]`
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 23-01: TBD
-- [ ] 23-02: TBD
+- [ ] 23-01-PLAN.md -- Shortcode rendering, DOM wiring fixes, and method signature corrections
+- [ ] 23-02-PLAN.md -- AJAX endpoint fixes and end-to-end CRUD verification
 
 #### Phase 24: Sites Hierarchy
 **Goal**: Head sites and sub-sites with parent-child relationships and location hydration
@@ -302,6 +302,6 @@ Phases execute in numeric order.
 | 20. Dashboard Enhancements | v1.3 | 1/1 | Complete | 2026-02-06 |
 | 21. Foundation Architecture | v2.0 | 2/2 | Complete | 2026-02-11 |
 | 22. Client Management | v2.0 | 2/2 | Complete | 2026-02-11 |
-| 23. Location Management | v2.0 | 0/? | Not started | - |
+| 23. Location Management | v2.0 | 0/2 | Not started | - |
 | 24. Sites Hierarchy | v2.0 | 0/? | Not started | - |
 | 25. Integration Testing & Cleanup | v2.0 | 0/? | Not started | - |
