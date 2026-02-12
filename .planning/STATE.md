@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 
 ## Current Position
 
-Phase: 27 of 30 (Controllers, Views, JS, AJAX)
-Plan: 3 of 3 complete
-Status: Complete
-Last activity: 2026-02-12 — Phase 27 complete (Controllers, Views, JS, AJAX)
+Phase: 28 of 30 (Wiring Verification & Fixes)
+Plan: 1 of 2 complete
+Status: In progress
+Last activity: 2026-02-12 — Completed 28-01-PLAN.md (Wiring Fixes)
 
 Progress: [███████████████████████████░░░] 90% (27 phases complete, 3 phases remaining)
 
@@ -72,7 +72,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 27 complete (Controllers, Views, JS, AJAX)
-Resume file: .planning/phases/27-controllers-views-ajax/27-VERIFICATION.md
+Stopped at: Phase 28 Plan 01 complete (Wiring Fixes)
+Resume file: .planning/phases/28-wiring-verification/28-02-PLAN.md
 
-**Next action:** Plan Phase 28 (Wiring Verification & Fixes) — shortcode rendering, integration bugs, DOM ID matching, nonce consistency.
+**Next action:** Execute Phase 28 Plan 02 (Manual Testing Protocol) — validate agents display, pagination, search, delete functionality.
