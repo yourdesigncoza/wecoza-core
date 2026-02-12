@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v2.0 Clients Integration - Phase 24 complete, Phase 25 next
+**Current focus:** v2.0 Clients Integration - COMPLETE (all 25 phases shipped)
 
 ## Current Position
 
-Phase: 24 of 25 (Sites Hierarchy) — COMPLETE
+Phase: 25 of 25 (Integration Testing & Cleanup) — COMPLETE
 Plan: 2/2 complete
-Status: All sites hierarchy verified — head sites, sub-sites, hydration, modal, performance fix
-Last activity: 2026-02-12 — Completed Phase 24 execution
+Status: All cleanup complete — feature parity tests created, archived plugin removed, repository hygiene restored
+Last activity: 2026-02-12 — Completed Phase 25 execution
 
-Progress: [████████████████████████░] 96.0% (24 phases complete, 1 phase remaining)
+Progress: [█████████████████████████] 100.0% (25 phases complete, 0 phases remaining)
 
 ## Milestone History
 
@@ -32,7 +32,7 @@ See: .planning/MILESTONES.md for full details
 ### Decisions
 
 Decisions from v2.0 milestone:
-- Integrate clients plugin into core: Full integration with wecoza_db(), WeCoza\Clients\ namespace (In Progress - Data layer complete)
+- Integrate clients plugin into core: Full integration with wecoza_db(), WeCoza\Clients\ namespace (COMPLETE - all phases shipped)
 
 Decisions from Phase 21:
 - Convert SETA/province options to associative arrays for ViewHelpers consistency (21-01)
@@ -58,6 +58,10 @@ Decisions from Phase 24:
 - Fix inline scripts rather than extract to separate JS files — inline scripts localized to view, don't need global config (24-01)
 - Cache getTableColumns() results per table per request — eliminates ~16 redundant information_schema queries in ClientsModel constructor (24-02)
 - Remove redundant getHeadSite() in getClientDetails — site_name already hydrated by getById() (24-02)
+
+Decisions from Phase 25:
+- JavaScript namespace pattern (window.WeCozaClients) is part of integrated code, not a reference to old plugin — preserved as-is (25-02)
+- .integrate/ directory properly ignored by git — integration workspace never tracked in repository (25-02)
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -90,7 +94,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 24 complete — all sites hierarchy verified
+Stopped at: Phase 25 complete — all integration testing and cleanup verified
 Resume file: —
 
-**Next action:** `/gsd:plan-phase 25` or `/gsd:execute-phase 25` — Integration Testing & Cleanup
+**Next action:** v2.0 milestone complete! Ready for UAT or next milestone planning.
