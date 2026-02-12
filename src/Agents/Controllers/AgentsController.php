@@ -422,8 +422,143 @@ class AgentsController extends BaseController
      */
     private function collectFormData(): array
     {
-        // TODO: Task 1b - Implement form data collection
-        return [];
+        $data = [
+            // Personal Information
+            'title' => sanitize_text_field($_POST['title'] ?? ''),
+            'first_name' => sanitize_text_field($_POST['first_name'] ?? ''),
+            'second_name' => $this->processTextField($_POST['second_name'] ?? ''),
+            'surname' => sanitize_text_field($_POST['surname'] ?? ''),
+            'initials' => sanitize_text_field($_POST['initials'] ?? ''),
+            'gender' => sanitize_text_field($_POST['gender'] ?? ''),
+            'race' => sanitize_text_field($_POST['race'] ?? ''),
+
+            // Identification
+            'id_type' => sanitize_text_field($_POST['id_type'] ?? 'sa_id'),
+            'sa_id_no' => preg_replace('/[^0-9]/', '', $_POST['sa_id_no'] ?? ''),
+            'passport_number' => sanitize_text_field($_POST['passport_number'] ?? ''),
+
+            // Contact Information
+            'tel_number' => preg_replace('/[^0-9+\-\(\)\s]/', '', $_POST['tel_number'] ?? ''),
+            'email_address' => sanitize_email($_POST['email_address'] ?? ''),
+
+            // Address Information
+            'residential_address_line' => sanitize_text_field($_POST['address_line_1'] ?? ''),
+            'address_line_2' => sanitize_text_field($_POST['address_line_2'] ?? ''),
+            'residential_suburb' => sanitize_text_field($_POST['residential_suburb'] ?? ''),
+            'city' => sanitize_text_field($_POST['city_town'] ?? ''),
+            'province' => sanitize_text_field($_POST['province_region'] ?? ''),
+            'residential_postal_code' => preg_replace('/[^0-9]/', '', $_POST['postal_code'] ?? ''),
+
+            // Working Areas
+            'preferred_working_area_1' => $_POST['preferred_working_area_1'] ?? '',
+            'preferred_working_area_2' => $_POST['preferred_working_area_2'] ?? '',
+            'preferred_working_area_3' => $_POST['preferred_working_area_3'] ?? '',
+
+            // SACE Registration
+            'sace_number' => sanitize_text_field($_POST['sace_number'] ?? ''),
+            'sace_registration_date' => $this->processDateField($_POST['sace_registration_date'] ?? ''),
+            'sace_expiry_date' => $this->processDateField($_POST['sace_expiry_date'] ?? ''),
+            'phase_registered' => sanitize_text_field($_POST['phase_registered'] ?? ''),
+            'subjects_registered' => sanitize_textarea_field($_POST['subjects_registered'] ?? ''),
+
+            // Qualifications
+            'highest_qualification' => sanitize_text_field($_POST['highest_qualification'] ?? ''),
+
+            // Quantum Tests
+            'quantum_maths_score' => $this->processNumericField($_POST['quantum_maths_score'] ?? ''),
+            'quantum_science_score' => $this->processNumericField($_POST['quantum_science_score'] ?? ''),
+            'quantum_assessment' => $this->processNumericField($_POST['quantum_assessment'] ?? ''),
+
+            // Training
+            'agent_training_date' => $this->processDateField($_POST['agent_training_date'] ?? ''),
+
+            // Criminal Record
+            'criminal_record_date' => $this->processDateField($_POST['criminal_record_date'] ?? ''),
+
+            // Agreement
+            'signed_agreement_date' => $this->processDateField($_POST['signed_agreement_date'] ?? ''),
+
+            // Banking Details
+            'bank_name' => sanitize_text_field($_POST['bank_name'] ?? ''),
+            'account_holder' => sanitize_text_field($_POST['account_holder'] ?? ''),
+            'bank_account_number' => preg_replace('/[^0-9]/', '', $_POST['account_number'] ?? ''),
+            'bank_branch_code' => preg_replace('/[^0-9]/', '', $_POST['branch_code'] ?? ''),
+            'account_type' => sanitize_text_field($_POST['account_type'] ?? ''),
+        ];
+
+        // Clear unused field based on ID type
+        if ($data['id_type'] === 'passport') {
+            $data['sa_id_no'] = '';
+        } else {
+            $data['passport_number'] = '';
+        }
+
+        return $data;
+    }
+
+    /**
+     * Process text field (return null for empty values)
+     *
+     * @param string $value Text value from form
+     * @return string|null
+     */
+    private function processTextField(string $value): ?string
+    {
+        $value = sanitize_text_field($value);
+        $value = trim($value);
+        return empty($value) ? null : $value;
+    }
+
+    /**
+     * Process date field value
+     *
+     * @param string $date_value Date value from form
+     * @return string|null Processed date or null if empty
+     */
+    private function processDateField(string $date_value): ?string
+    {
+        $date_value = trim($date_value);
+
+        // Return null for empty dates
+        if (empty($date_value)) {
+            return null;
+        }
+
+        // Validate HTML5 date format and return as-is if valid
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_value)) {
+            return $date_value;
+        }
+
+        // Try to parse with strtotime
+        $timestamp = strtotime($date_value);
+        if ($timestamp !== false) {
+            return date('Y-m-d', $timestamp);
+        }
+
+        return null;
+    }
+
+    /**
+     * Process numeric field values
+     *
+     * @param string $value Numeric value from form
+     * @return int|null Processed numeric value or null if empty
+     */
+    private function processNumericField(string $value): ?int
+    {
+        $value = trim($value);
+
+        // Return null for empty values
+        if (empty($value)) {
+            return null;
+        }
+
+        // Return integer value for numeric values
+        if (is_numeric($value)) {
+            return intval($value);
+        }
+
+        return null;
     }
 
     /**
@@ -435,8 +570,98 @@ class AgentsController extends BaseController
      */
     private function validateFormData(array $data, ?array $current_agent): array
     {
-        // TODO: Task 1b - Implement form validation
-        return [];
+        $errors = [];
+
+        // Required fields
+        if (empty($data['first_name'])) {
+            $errors['first_name'] = __('First name is required.', 'wecoza-core');
+        }
+
+        if (empty($data['surname'])) {
+            $errors['surname'] = __('Surname is required.', 'wecoza-core');
+        }
+
+        if (empty($data['tel_number'])) {
+            $errors['tel_number'] = __('Contact number is required.', 'wecoza-core');
+        }
+
+        if (empty($data['email_address'])) {
+            $errors['email_address'] = __('Email address is required.', 'wecoza-core');
+        } elseif (!is_email($data['email_address'])) {
+            $errors['email_address'] = __('Please enter a valid email address.', 'wecoza-core');
+        }
+
+        if (empty($data['gender'])) {
+            $errors['gender'] = __('Gender is required.', 'wecoza-core');
+        }
+
+        if (empty($data['race'])) {
+            $errors['race'] = __('Race is required.', 'wecoza-core');
+        }
+
+        if (empty($data['residential_address_line'])) {
+            $errors['residential_address_line'] = __('Address is required.', 'wecoza-core');
+        }
+
+        if (empty($data['city'])) {
+            $errors['city'] = __('City is required.', 'wecoza-core');
+        }
+
+        if (empty($data['province'])) {
+            $errors['province'] = __('Province is required.', 'wecoza-core');
+        }
+
+        if (empty($data['residential_postal_code'])) {
+            $errors['residential_postal_code'] = __('Postal code is required.', 'wecoza-core');
+        }
+
+        if (empty($data['preferred_working_area_1'])) {
+            $errors['preferred_working_area_1'] = __('At least one preferred working area is required.', 'wecoza-core');
+        }
+
+        // Validate ID based on type
+        if ($data['id_type'] === 'sa_id') {
+            if (empty($data['sa_id_no'])) {
+                $errors['sa_id_no'] = __('SA ID number is required.', 'wecoza-core');
+            } else {
+                // Validate SA ID format and checksum
+                $validation = ValidationHelper::validate_sa_id($data['sa_id_no']);
+                if (is_array($validation) && !$validation['valid']) {
+                    $errors['sa_id_no'] = $validation['message'];
+                } elseif (is_bool($validation) && !$validation) {
+                    $errors['sa_id_no'] = __('SA ID number is invalid.', 'wecoza-core');
+                }
+            }
+        } else {
+            if (empty($data['passport_number'])) {
+                $errors['passport_number'] = __('Passport number is required.', 'wecoza-core');
+            } else {
+                $validation = ValidationHelper::validate_passport($data['passport_number']);
+                if (is_array($validation) && !$validation['valid']) {
+                    $errors['passport_number'] = $validation['message'];
+                } elseif (is_bool($validation) && !$validation) {
+                    $errors['passport_number'] = __('Passport number is invalid.', 'wecoza-core');
+                }
+            }
+        }
+
+        // Check for duplicate email (excluding current agent if editing)
+        if (!empty($data['email_address'])) {
+            $existing = $this->getRepository()->getAgentByEmail($data['email_address']);
+            if ($existing && (!$current_agent || $existing['agent_id'] != $current_agent['agent_id'])) {
+                $errors['email_address'] = __('This email address is already registered.', 'wecoza-core');
+            }
+        }
+
+        // Check for duplicate ID number
+        if (!empty($data['sa_id_no'])) {
+            $existing = $this->getRepository()->getAgentByIdNumber($data['sa_id_no']);
+            if ($existing && (!$current_agent || $existing['agent_id'] != $current_agent['agent_id'])) {
+                $errors['sa_id_no'] = __('This ID number is already registered.', 'wecoza-core');
+            }
+        }
+
+        return $errors;
     }
 
     /**
@@ -448,8 +673,25 @@ class AgentsController extends BaseController
      */
     private function handleFileUploads(int $agent_id, ?array $current_agent): array
     {
-        // TODO: Task 1b - Implement file upload handling
-        return [];
+        $uploaded_files = [];
+
+        // Handle signed agreement file
+        if (!empty($_FILES['signed_agreement_file']['name'])) {
+            $file_path = $this->uploadFile('signed_agreement_file', $agent_id);
+            if ($file_path) {
+                $uploaded_files['signed_agreement_file'] = $file_path;
+            }
+        }
+
+        // Handle criminal record file
+        if (!empty($_FILES['criminal_record_file']['name'])) {
+            $file_path = $this->uploadFile('criminal_record_file', $agent_id);
+            if ($file_path) {
+                $uploaded_files['criminal_record_file'] = $file_path;
+            }
+        }
+
+        return $uploaded_files;
     }
 
     /**
@@ -461,7 +703,35 @@ class AgentsController extends BaseController
      */
     private function uploadFile(string $field_name, int $agent_id): ?string
     {
-        // TODO: Task 1b - Implement single file upload
+        if (!isset($_FILES[$field_name]) || $_FILES[$field_name]['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $file = $_FILES[$field_name];
+
+        // Validate file type
+        $allowed_types = ['pdf', 'doc', 'docx'];
+        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($file_ext, $allowed_types)) {
+            return null;
+        }
+
+        // Require WordPress file handling functions
+        if (!function_exists('wp_handle_upload')) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
+        // Use WordPress file upload handler
+        $upload_overrides = ['test_form' => false];
+        $movefile = wp_handle_upload($file, $upload_overrides);
+
+        if ($movefile && !isset($movefile['error'])) {
+            // Return relative path from uploads directory
+            $upload_dir = wp_upload_dir();
+            return str_replace($upload_dir['basedir'], '', $movefile['file']);
+        }
+
         return null;
     }
 
@@ -473,8 +743,22 @@ class AgentsController extends BaseController
      */
     private function mapAgentFields(array $agent): array
     {
-        // TODO: Task 1b - Implement field mapping
-        return $agent;
+        return [
+            'id' => $agent['agent_id'],
+            'first_name' => $agent['first_name'],
+            'initials' => $agent['initials'] ?? '',
+            'last_name' => $agent['surname'],
+            'gender' => $agent['gender'] ?? '',
+            'race' => $agent['race'] ?? '',
+            'phone' => $agent['tel_number'],
+            'email' => $agent['email_address'],
+            'city' => $agent['city'] ?? '',
+            'status' => $agent['status'] ?? 'active',
+            'sa_id_no' => $agent['sa_id_no'] ?? '',
+            'sace_number' => $agent['sace_number'] ?? '',
+            'quantum_maths_score' => intval($agent['quantum_maths_score'] ?? 0),
+            'quantum_science_score' => intval($agent['quantum_science_score'] ?? 0),
+        ];
     }
 
     /**
@@ -485,8 +769,13 @@ class AgentsController extends BaseController
      */
     private function mapSortColumn(string $column): string
     {
-        // TODO: Task 1b - Implement sort column mapping
-        return $column;
+        $map = [
+            'last_name' => 'surname',
+            'phone' => 'tel_number',
+            'email' => 'email_address',
+        ];
+
+        return $map[$column] ?? $column;
     }
 
     /**
@@ -497,8 +786,32 @@ class AgentsController extends BaseController
      */
     private function getDisplayColumns(string $columns_setting): array
     {
-        // TODO: Task 1b - Implement display columns logic
-        return [];
+        $default_columns = [
+            'first_name' => __('First Name', 'wecoza-core'),
+            'initials' => __('Initials', 'wecoza-core'),
+            'last_name' => __('Surname', 'wecoza-core'),
+            'gender' => __('Gender', 'wecoza-core'),
+            'race' => __('Race', 'wecoza-core'),
+            'phone' => __('Tel Number', 'wecoza-core'),
+            'email' => __('Email Address', 'wecoza-core'),
+            'city' => __('City/Town', 'wecoza-core'),
+        ];
+
+        // If specific columns are requested, filter the default set
+        if (!empty($columns_setting)) {
+            $requested = array_map('trim', explode(',', $columns_setting));
+            $columns = [];
+
+            foreach ($requested as $col) {
+                if (isset($default_columns[$col])) {
+                    $columns[$col] = $default_columns[$col];
+                }
+            }
+
+            return !empty($columns) ? $columns : $default_columns;
+        }
+
+        return $default_columns;
     }
 
     /**
@@ -509,8 +822,10 @@ class AgentsController extends BaseController
      */
     private function getEditUrl(int $agent_id): string
     {
-        // TODO: Task 1b - Implement edit URL generation
-        return '';
+        return add_query_arg([
+            'update' => '',
+            'agent_id' => $agent_id
+        ], home_url('/new-agents/'));
     }
 
     /**
@@ -521,8 +836,7 @@ class AgentsController extends BaseController
      */
     private function getViewUrl(int $agent_id): string
     {
-        // TODO: Task 1b - Implement view URL generation
-        return '';
+        return add_query_arg('agent_id', $agent_id, home_url('/app/agent-view/'));
     }
 
     /**
@@ -532,7 +846,6 @@ class AgentsController extends BaseController
      */
     private function getBackUrl(): string
     {
-        // TODO: Task 1b - Implement back URL generation
         return home_url('/app/agents/');
     }
 
@@ -543,8 +856,86 @@ class AgentsController extends BaseController
      */
     private function getAgentStatistics(): array
     {
-        // TODO: Task 1b - Implement statistics retrieval
-        return [];
+        try {
+            $db = wecoza_db();
+
+            // Get total agents count
+            $total_sql = "SELECT COUNT(*) as count FROM agents WHERE status != 'deleted'";
+            $total_result = $db->query($total_sql);
+            $total_agents = $total_result ? $total_result->fetch()['count'] : 0;
+
+            // Get active agents count
+            $active_sql = "SELECT COUNT(*) as count FROM agents WHERE status = 'active'";
+            $active_result = $db->query($active_sql);
+            $active_agents = $active_result ? $active_result->fetch()['count'] : 0;
+
+            // Get SACE registered count
+            $sace_sql = "SELECT COUNT(*) as count FROM agents WHERE sace_number IS NOT NULL AND sace_number != '' AND status != 'deleted'";
+            $sace_result = $db->query($sace_sql);
+            $sace_registered = $sace_result ? $sace_result->fetch()['count'] : 0;
+
+            // Get quantum qualified count
+            $quantum_sql = "SELECT COUNT(*) as count FROM agents WHERE (quantum_maths_score > 0 OR quantum_science_score > 0) AND status != 'deleted'";
+            $quantum_result = $db->query($quantum_sql);
+            $quantum_qualified = $quantum_result ? $quantum_result->fetch()['count'] : 0;
+
+            return [
+                'total_agents' => [
+                    'label' => __('Total Agents', 'wecoza-core'),
+                    'count' => $total_agents,
+                    'badge' => null,
+                    'badge_type' => null
+                ],
+                'active_agents' => [
+                    'label' => __('Active Agents', 'wecoza-core'),
+                    'count' => $active_agents,
+                    'badge' => null,
+                    'badge_type' => null
+                ],
+                'sace_registered' => [
+                    'label' => __('SACE Registered', 'wecoza-core'),
+                    'count' => $sace_registered,
+                    'badge' => null,
+                    'badge_type' => null
+                ],
+                'quantum_qualified' => [
+                    'label' => __('Quantum Qualified', 'wecoza-core'),
+                    'count' => $quantum_qualified,
+                    'badge' => null,
+                    'badge_type' => null
+                ]
+            ];
+        } catch (\Exception $e) {
+            wecoza_log('Error fetching agent statistics: ' . $e->getMessage(), 'error');
+
+            // Return zeros on error
+            return [
+                'total_agents' => [
+                    'label' => __('Total Agents', 'wecoza-core'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ],
+                'active_agents' => [
+                    'label' => __('Active Agents', 'wecoza-core'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ],
+                'sace_registered' => [
+                    'label' => __('SACE Registered', 'wecoza-core'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ],
+                'quantum_qualified' => [
+                    'label' => __('Quantum Qualified', 'wecoza-core'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ]
+            ];
+        }
     }
 
     /**
