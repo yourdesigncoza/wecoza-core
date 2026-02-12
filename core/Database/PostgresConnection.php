@@ -49,6 +49,11 @@ class PostgresConnection
     private bool $connectionAttempted = false;
 
     /**
+     * Cache for table column metadata (avoids repeated information_schema queries)
+     */
+    private array $tableColumnsCache = [];
+
+    /**
      * Private constructor - use getInstance()
      */
     private function __construct()
@@ -564,6 +569,11 @@ class PostgresConnection
      */
     public function getTableColumns(string $tableName, string $schema = 'public'): array
     {
+        $cacheKey = "{$schema}.{$tableName}";
+        if (isset($this->tableColumnsCache[$cacheKey])) {
+            return $this->tableColumnsCache[$cacheKey];
+        }
+
         $pdo = $this->getPdo();
         if ($pdo === null) {
             return [];
@@ -576,7 +586,9 @@ class PostgresConnection
                     AND table_name = :table
                     ORDER BY ordinal_position";
             $stmt = $this->query($sql, ['schema' => $schema, 'table' => $tableName]);
-            return $stmt->fetchAll();
+            $columns = $stmt->fetchAll();
+            $this->tableColumnsCache[$cacheKey] = $columns;
+            return $columns;
         } catch (Exception $e) {
             error_log('WeCoza Core: Error getting table columns: ' . $e->getMessage());
             return [];

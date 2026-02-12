@@ -216,17 +216,13 @@ class ClientAjaxHandlers {
             AjaxSecurity::sendError('Client not found.');
         }
 
-        // Get additional data
-        $sitesModel = $model->getSitesModel();
-        $headSite = $sitesModel->getHeadSite($clientId);
-
         // Build edit URL
         $editUrl = site_url('/client-management', is_ssl() ? 'https' : 'http');
         $editUrl = add_query_arg(['mode' => 'update', 'id' => $clientId], $editUrl);
 
-        // Prepare response data
+        // site_name already hydrated by getById() -> hydrateClients()
         $data = array_merge($client, array(
-            'site_name' => $headSite['site_name'] ?? '',
+            'site_name' => $client['site_name'] ?? '',
             'edit_url' => $editUrl,
         ));
 
