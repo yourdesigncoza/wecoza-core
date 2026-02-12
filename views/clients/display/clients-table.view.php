@@ -381,12 +381,12 @@ function exportClients() {
     const nonce = document.createElement('input');
     nonce.type = 'hidden';
     nonce.name = 'nonce';
-    nonce.value = '<?php echo wp_create_nonce('wecoza_clients_ajax'); ?>';
-    
+    nonce.value = '<?php echo wp_create_nonce('clients_nonce_action'); ?>';
+
     const action = document.createElement('input');
     action.type = 'hidden';
     action.name = 'action';
-    action.value = 'export_clients';
+    action.value = 'wecoza_export_clients';
     
     form.appendChild(nonce);
     form.appendChild(action);
@@ -404,9 +404,9 @@ function deleteClient(clientId, clientName) {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-                action: 'delete_client',
-                client_id: clientId,
-                nonce: '<?php echo wp_create_nonce('wecoza_clients_ajax'); ?>'
+                action: 'wecoza_delete_client',
+                id: clientId,
+                nonce: '<?php echo wp_create_nonce('clients_nonce_action'); ?>'
             })
         })
         .then(response => response.json())
