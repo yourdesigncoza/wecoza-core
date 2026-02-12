@@ -52,6 +52,8 @@ spl_autoload_register(function (string $class) {
         'WeCoza\\Events\\' => WECOZA_CORE_PATH . 'src/Events/',
         'WeCoza\\Clients\\' => WECOZA_CORE_PATH . 'src/Clients/',
         'WeCoza\\Agents\\' => WECOZA_CORE_PATH . 'src/Agents/',
+        'WeCoza\\Settings\\' => WECOZA_CORE_PATH . 'src/Settings/',
+        'WeCoza\\ShortcodeInspector\\' => WECOZA_CORE_PATH . 'src/ShortcodeInspector/',
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
@@ -228,6 +230,16 @@ add_action('plugins_loaded', function () {
     }
     if (class_exists(\WeCoza\Events\Admin\SettingsPage::class)) {
         \WeCoza\Events\Admin\SettingsPage::register();
+    }
+
+    // Initialize Settings Module (WeCoza Settings page under Settings menu)
+    if (class_exists(\WeCoza\Settings\SettingsPage::class)) {
+        \WeCoza\Settings\SettingsPage::register();
+    }
+
+    // Initialize Shortcode Inspector (Tools > WeCoza Shortcodes)
+    if (class_exists(\WeCoza\ShortcodeInspector\ShortcodeInspector::class)) {
+        \WeCoza\ShortcodeInspector\ShortcodeInspector::register();
     }
 
     // Initialize Clients Module

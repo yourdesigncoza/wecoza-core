@@ -57,10 +57,6 @@ final class SettingsPage
 {
     private const OPTION_GROUP = 'wecoza_events_notifications';
     private const PAGE_SLUG = 'wecoza-events-notifications';
-    private const SECTION_ID = 'wecoza_events_notifications_section';
-    private const OPTION_INSERT = 'wecoza_notification_class_created';
-    private const OPTION_UPDATE = 'wecoza_notification_class_updated';
-    private const OPTION_MATERIAL = 'wecoza_notification_material_delivery';
     private const SECTION_AI = 'wecoza_events_ai_summaries_section';
     private const OPTION_AI_ENABLED = OpenAIConfig::OPTION_ENABLED;
     private const OPTION_AI_API_KEY = OpenAIConfig::OPTION_API_KEY;
@@ -99,18 +95,6 @@ final class SettingsPage
 
     public static function registerSettings(): void
     {
-        register_setting(self::OPTION_GROUP, self::OPTION_INSERT, [
-            'sanitize_callback' => [self::class, 'sanitizeEmail'],
-        ]);
-
-        register_setting(self::OPTION_GROUP, self::OPTION_UPDATE, [
-            'sanitize_callback' => [self::class, 'sanitizeEmail'],
-        ]);
-
-        register_setting(self::OPTION_GROUP, self::OPTION_MATERIAL, [
-            'sanitize_callback' => [self::class, 'sanitizeEmail'],
-        ]);
-
         register_setting(self::OPTION_GROUP, self::OPTION_AI_ENABLED, [
             'type' => 'boolean',
             'sanitize_callback' => [self::class, 'sanitizeCheckbox'],
@@ -123,37 +107,6 @@ final class SettingsPage
             'default' => '',
             'autoload' => false,
         ]);
-
-        add_settings_section(
-            self::SECTION_ID,
-            esc_html__('Notification Recipients', 'wecoza-events'),
-            [self::class, 'renderSectionIntro'],
-            self::PAGE_SLUG
-        );
-
-        add_settings_field(
-            self::OPTION_INSERT,
-            esc_html__('New Class notifications email', 'wecoza-events'),
-            [self::class, 'renderInsertField'],
-            self::PAGE_SLUG,
-            self::SECTION_ID
-        );
-
-        add_settings_field(
-            self::OPTION_UPDATE,
-            esc_html__('Update Class notifications email', 'wecoza-events'),
-            [self::class, 'renderUpdateField'],
-            self::PAGE_SLUG,
-            self::SECTION_ID
-        );
-
-        add_settings_field(
-            self::OPTION_MATERIAL,
-            esc_html__('Material Delivery notifications email', 'wecoza-events'),
-            [self::class, 'renderMaterialField'],
-            self::PAGE_SLUG,
-            self::SECTION_ID
-        );
 
         add_settings_section(
             self::SECTION_AI,
@@ -202,26 +155,6 @@ final class SettingsPage
                 ['event_type' => $type, 'label' => $label]
             );
         }
-    }
-
-    public static function renderSectionIntro(): void
-    {
-        echo '<p>' . esc_html__('Configure email recipients for automated class notifications.', 'wecoza-events') . '</p>';
-    }
-
-    public static function renderInsertField(): void
-    {
-        self::renderEmailField(self::OPTION_INSERT, esc_html__('Address to notify when a class is created.', 'wecoza-events'));
-    }
-
-    public static function renderUpdateField(): void
-    {
-        self::renderEmailField(self::OPTION_UPDATE, esc_html__('Address to notify when a class is updated.', 'wecoza-events'));
-    }
-
-    public static function renderMaterialField(): void
-    {
-        self::renderEmailField(self::OPTION_MATERIAL, esc_html__('Address to notify for material delivery reminders (7 days and 5 days before class start).', 'wecoza-events'));
     }
 
     public static function renderAiSectionIntro(): void
@@ -415,15 +348,6 @@ final class SettingsPage
         <?php
     }
 
-    /**
-     * @param mixed $value
-     */
-    public static function sanitizeEmail($value): string
-    {
-        $sanitised = sanitize_email((string) $value);
-        return $sanitised ?: '';
-    }
-
     public static function sanitizeCheckbox($value): string
     {
         return (string) ((int) (!empty($value)));
@@ -505,15 +429,6 @@ final class SettingsPage
         }
 
         return admin_url('admin.php?page=' . self::PAGE_SLUG);
-    }
-
-    private static function renderEmailField(string $optionName, string $description): void
-    {
-        $value = (string) get_option($optionName, '');
-        ?>
-        <input type="email" name="<?php echo esc_attr($optionName); ?>" value="<?php echo esc_attr($value); ?>" class="regular-text" />
-        <p class="description"><?php echo esc_html($description); ?></p>
-        <?php
     }
 
     /**

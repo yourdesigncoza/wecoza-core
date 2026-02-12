@@ -49,7 +49,11 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(None — define next milestone with `/gsd:new-milestone`)
+#### v3.0 — Agents Integration
+- Migrate wecoza-agents-plugin into wecoza-core
+- 13 classes, 3 shortcodes, 2 AJAX endpoints, 6 templates, 5 JS files
+- 4 DB tables (agents, agent_meta, agent_notes, agent_absences) — already exist
+- Phases 26-30
 
 ### Out of Scope
 
