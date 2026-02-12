@@ -40,20 +40,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Multi-recipient notification config — v1.2
 - ✓ Material Tracking Dashboard shows classes with Deliveries events from event_dates JSONB — v1.3
 - ✓ Bridge event tasks system and material tracking dashboard — v1.3
+- ✓ Clients module integration (ARCH-01..08) — architecture migration to wecoza-core — v2.0
+- ✓ Client management (CLT-01..09) — full CRUD, hierarchy, search, filter, CSV export — v2.0
+- ✓ Location management (LOC-01..07) — Google Maps, geocoordinates, duplicate detection — v2.0
+- ✓ Sites hierarchy (SITE-01..04) — head sites, sub-sites, location hydration — v2.0
+- ✓ Client shortcodes (SC-01..05) — 5 shortcodes for clients, locations, sites — v2.0
+- ✓ Standalone plugin cleanup (CLN-01..02) — plugin deactivated, .integrate/ removed — v2.0
 
 ### Active
 
-## Current Milestone: v2.0 Clients Integration
-
-**Goal:** Integrate the standalone wecoza-clients-plugin into wecoza-core as a unified Clients module — client CRUD, location management, sites hierarchy, Google Maps integration, CSV export.
-
-**Target features:**
-- Client management (CRUD, hierarchical main/sub-clients, search, filter, CSV export)
-- Location management (suburbs/towns, Google Maps Places autocomplete, geocoordinates)
-- Sites hierarchy (head sites, sub-sites, location hydration)
-- Consolidate database to wecoza_db() singleton
-- Align namespace to WeCoza\Clients\, PSR-4 in src/Clients/
-- Replace standalone helpers with wecoza-core equivalents
+(None — define next milestone with `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -61,32 +57,37 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - New reporting features — separate milestone
 - Mobile app — not planned
 - OAuth/social login — not required
+- Client billing/invoicing — separate domain
+- CRM-style pipeline — overkill for current needs
+- Client portal (self-service) — would require auth system changes
 
 ## Context
 
-### Current State (v2.0 Starting)
+### Current State (v2.0 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~21,900 lines of PHP across 3 modules
-- **Events module:** 40+ PHP files in `src/Events/` (DTOs, Enums, Services, Repositories)
-- **View templates:** 10+ templates in `views/events/`
-- **Test coverage:** 4 test files in `tests/Events/`
+- **Total:** ~26,500 lines of PHP across 4 modules
+- **Events module:** 40+ PHP files in `src/Events/`
+- **Clients module:** 15+ PHP files in `src/Clients/` (4,581 LOC)
+- **View templates:** 16+ templates in `views/events/` and `views/clients/`
+- **JavaScript:** 16+ JS files across `assets/js/`
+- **Test coverage:** 4 test files in `tests/Events/`, 1 integration test in `tests/integration/`
 
 **Architecture:**
 - `core/` — Framework abstractions (Base classes, security helpers)
 - `src/Learners/` — Learner module
 - `src/Classes/` — Classes module
 - `src/Events/` — Events module with notification system
+- `src/Clients/` — Clients module (client, location, site management)
 - `views/` — PHP templates
 - `assets/` — JS/CSS files
 - `vendor/` — Action Scheduler 3.9.3 (Composer-managed)
 
-**Tech stack:** PostgreSQL, PHP 8.1+, WordPress 6.0+, OpenAI API (configurable), Action Scheduler
+**Tech stack:** PostgreSQL, PHP 8.1+, WordPress 6.0+, OpenAI API (configurable), Action Scheduler, Google Maps Places API
 
-**Shortcodes (Events module):**
-- `[wecoza_event_tasks]` — Task management dashboard
-- `[wecoza_material_tracking]` — Material delivery tracking
-- `[wecoza_notification_dashboard]` — Notification timeline with unread filter
+**Shortcodes:**
+- Events: `[wecoza_event_tasks]`, `[wecoza_material_tracking]`, `[wecoza_notification_dashboard]`
+- Clients: `[wecoza_capture_clients]`, `[wecoza_display_clients]`, `[wecoza_locations_capture]`, `[wecoza_locations_list]`, `[wecoza_locations_edit]`, `[wecoza_client_update]`
 
 **Async jobs (Action Scheduler):**
 - `wecoza_process_notifications` — Batch notification processing
@@ -98,15 +99,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Known Issues
 
+- AJAX handler (wecoza_mark_material_delivered) needs event_index parameter support (v1.3 tech debt)
+- Controllers pass deprecated notification_type/days_range params to service (v1.3 tech debt)
 - Settings page may need admin menu entry for easier discovery
 - 2 test failures in AI summarization test suite (test format issues, not production bugs)
-- Minor tech debt: Some test sections replaced with skip notices
 
 ## Constraints
 
 - **Tech stack:** PostgreSQL (not MySQL), PHP 8.0+, WordPress 6.0+
 - **Architecture:** Must follow existing MVC patterns in wecoza-core
-- **Dependencies:** OpenAI API key required for AI summaries
+- **Dependencies:** OpenAI API key required for AI summaries, Google Maps API key for location autocomplete
 - **Compatibility:** Must not break existing Learners/Classes functionality
 
 ## Key Decisions
@@ -126,15 +128,12 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Event_dates as primary dashboard source | Cron records alone caused "0 records" bug | ✓ v1.3 |
 | Event-based status filtering | Events represent user intent, cron is supplementary | ✓ v1.3 |
 | Remove days_range filter | Events exist permanently in JSONB, not time-windowed | ✓ v1.3 |
-
-### Known Issues
-
-- AJAX handler (wecoza_mark_material_delivered) needs update to accept event_index parameter
-- Controllers still pass deprecated notification_type and days_range parameters to service
-- 2 test failures in AI summarization test suite (test format issues, not production bugs)
-- Settings page may need admin menu entry for easier discovery
-
-| Integrate clients plugin into core | Full integration with wecoza_db(), WeCoza\Clients\ namespace | — Pending |
+| Full client plugin integration | Unified codebase, consistent patterns, single dependency | ✓ v2.0 |
+| Models return arrays not instances | Callers (controllers, views) all expect arrays | ✓ v2.0 |
+| CRUD convenience methods on PostgresConnection | Models depend on these rather than raw PDO | ✓ v2.0 |
+| Soft-delete via deleted_at | Preserves data while hiding from queries | ✓ v2.0 |
+| Cache getTableColumns() per request | Eliminates ~16 redundant information_schema queries | ✓ v2.0 |
+| Inline script fixes over extraction | Inline scripts localized to view, don't need global config | ✓ v2.0 |
 
 ---
-*Last updated: 2026-02-11 after v2.0 milestone start*
+*Last updated: 2026-02-12 after v2.0 milestone*

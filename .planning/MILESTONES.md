@@ -1,5 +1,33 @@
 # Project Milestones: WeCoza Core
 
+## v2.0 Clients Integration (Shipped: 2026-02-12)
+
+**Delivered:** Integrated standalone wecoza-clients-plugin into wecoza-core as unified Clients module with client CRUD, location management, sites hierarchy, Google Maps integration, and CSV export.
+
+**Phases completed:** 21-25 (10 plans total)
+
+**Key accomplishments:**
+
+- Migrated standalone clients plugin (4,581 LOC) into wecoza-core with WeCoza\Clients\ namespace and PSR-4 autoloading
+- Full client CRUD with main/sub-client hierarchy, search/filter, soft-delete, CSV export, statistics
+- Location management with Google Maps Places autocomplete, geocoordinates, duplicate detection
+- Sites hierarchy with auto-created head sites, sub-sites, parent-child relationships, location hydration
+- 44-check automated feature parity test, 100% pass rate, standalone plugin cleanly deactivated
+- Repository cleanup — .integrate/ staging removed, all standalone artifacts eliminated
+
+**Stats:**
+
+- 59 files modified, 15,583 lines added
+- 4,581 lines of PHP in Clients module
+- 5 phases, 10 plans, 35 requirements
+- 2 days from start to ship (2026-02-11 → 2026-02-12)
+
+**Git range:** `474f674` → `d718045`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+
 ## v1.3 Fix Material Tracking Dashboard (Shipped: 2026-02-06)
 
 **Delivered:** Rewired Material Tracking Dashboard to show classes with Deliveries events from event_dates JSONB instead of only cron-created records.

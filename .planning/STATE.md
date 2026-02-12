@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-11)
+See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v2.0 Clients Integration - COMPLETE (all 25 phases shipped)
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 25 of 25 (Integration Testing & Cleanup) — COMPLETE
-Plan: 2/2 complete
-Status: All cleanup complete — feature parity tests created, archived plugin removed, repository hygiene restored
-Last activity: 2026-02-12 — Completed Phase 25 execution
+Phase: 25 of 25 (all milestones complete)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-02-12 — v2.0 milestone complete
 
 Progress: [█████████████████████████] 100.0% (25 phases complete, 0 phases remaining)
 
@@ -20,6 +20,7 @@ Progress: [███████████████████████
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v2.0 | Clients Integration | 2026-02-12 | 21-25 | 10 |
 | v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19-20 | 3 |
 | v1.2 | Event Tasks Refactor | 2026-02-05 | 13-18 | 16 |
 | v1.1 | Quality & Performance | 2026-02-02 | 8-12 | 13 |
@@ -30,38 +31,6 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
-
-Decisions from v2.0 milestone:
-- Integrate clients plugin into core: Full integration with wecoza_db(), WeCoza\Clients\ namespace (COMPLETE - all phases shipped)
-
-Decisions from Phase 21:
-- Convert SETA/province options to associative arrays for ViewHelpers consistency (21-01)
-- Preserve all column mapping and caching logic from source Models (21-01)
-- Add protected table/primaryKey properties to Models for BaseModel compatibility (21-01)
-- Extract AJAX handlers from Controllers into separate Ajax/ class (21-02)
-- Use AjaxSecurity helper for all AJAX endpoints with consistent nonce (21-02)
-- Conditional asset enqueuing: only load JS when shortcode present on page (21-02)
-- Preserve ViewHelpers fully-qualified namespace in views (21-02)
-
-Decisions from Phase 22:
-- Clients models getById() returns arrays, not model instances — changed return type from ?static to array|null (22-01)
-- Added CRUD convenience methods to PostgresConnection — models depend on these rather than raw PDO (22-02)
-- Soft-delete uses deleted_at timestamp column, all queries filter WHERE deleted_at IS NULL (22-02)
-- JS localization uses camelCase keys (ajaxUrl, nonce) matching existing JS conventions (22-02)
-
-Decisions from Phase 23:
-- AJAX action names must match wp_ajax_{action} suffix exactly (23-02)
-- List page uses server-side ILIKE search, no Google Maps API needed (23-02)
-- Show submit button on AJAX error so users can still proceed (23-02)
-
-Decisions from Phase 24:
-- Fix inline scripts rather than extract to separate JS files — inline scripts localized to view, don't need global config (24-01)
-- Cache getTableColumns() results per table per request — eliminates ~16 redundant information_schema queries in ClientsModel constructor (24-02)
-- Remove redundant getHeadSite() in getClientDetails — site_name already hydrated by getById() (24-02)
-
-Decisions from Phase 25:
-- JavaScript namespace pattern (window.WeCozaClients) is part of integrated code, not a reference to old plugin — preserved as-is (25-02)
-- .integrate/ directory properly ignored by git — integration workspace never tracked in repository (25-02)
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -94,7 +63,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 25 complete — all integration testing and cleanup verified
+Stopped at: v2.0 milestone archived
 Resume file: —
 
-**Next action:** v2.0 milestone complete! Ready for UAT or next milestone planning.
+**Next action:** Start next milestone with `/gsd:new-milestone`
