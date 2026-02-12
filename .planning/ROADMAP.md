@@ -72,9 +72,9 @@
 **Target:** wecoza-core `src/Agents/`
 **Scope:** 13 classes, 6 templates, 5 JS files, 2 AJAX endpoints, 3 shortcodes, 4 DB tables (already exist)
 
-- [ ] Phase 26: Foundation Architecture — namespace, DB migration, model, repository, helpers — **Plans:** 2 plans
-  - [ ] 26-01-PLAN.md — Namespace registration, PostgresConnection fix, helpers migration
-  - [ ] 26-02-PLAN.md — AgentRepository + AgentModel creation
+- [x] Phase 26: Foundation Architecture — namespace, DB migration, model, repository, helpers — **Plans:** 2 plans — completed 2026-02-12
+  - [x] 26-01-PLAN.md — Namespace registration, PostgresConnection fix, helpers migration
+  - [x] 26-02-PLAN.md — AgentRepository + AgentModel creation
 - [ ] Phase 27: Controllers, Views, JS, AJAX — controller, AJAX handlers, views, JS, wiring
 - [ ] Phase 28: Wiring Verification & Fixes — shortcode rendering, integration bugs
 - [ ] Phase 29: Feature Verification & Performance — CRUD testing, file uploads, statistics
@@ -87,13 +87,13 @@
 **Requirements:** ARCH-01, ARCH-03, ARCH-04, ARCH-05
 
 **Success Criteria:**
-- [ ] `WeCoza\Agents\` namespace registered in wecoza-core.php autoloader
-- [ ] Zero `DatabaseService` references in any migrated PHP file
-- [ ] Zero `WECOZA_AGENTS_*` constant references in any migrated PHP file
-- [ ] All models use `wecoza_db()` exclusively
-- [ ] AgentRepository extends BaseRepository with column whitelisting
-- [ ] All PHP files pass `php -l` syntax check
-- [ ] Helpers migrated: ValidationHelper, FormHelpers, WorkingAreasService
+- [x] `WeCoza\Agents\` namespace registered in wecoza-core.php autoloader
+- [x] Zero `DatabaseService` references in any migrated PHP file
+- [x] Zero `WECOZA_AGENTS_*` constant references in any migrated PHP file
+- [x] All models use `wecoza_db()` exclusively
+- [x] AgentRepository extends BaseRepository with column whitelisting
+- [x] All PHP files pass `php -l` syntax check
+- [x] Helpers migrated: ValidationHelper, FormHelpers, WorkingAreasService
 
 **Migration Context:**
 
@@ -299,7 +299,7 @@ Phases execute in numeric order.
 | 23. Location Management | v2.0 | 2/2 | Complete | 2026-02-12 |
 | 24. Sites Hierarchy | v2.0 | 2/2 | Complete | 2026-02-12 |
 | 25. Integration Testing & Cleanup | v2.0 | 2/2 | Complete | 2026-02-12 |
-| 26. Foundation Architecture | v3.0 | 0/? | Not started | — |
+| 26. Foundation Architecture | v3.0 | 2/2 | Complete | 2026-02-12 |
 | 27. Controllers, Views, JS, AJAX | v3.0 | 0/? | Not started | — |
 | 28. Wiring Verification & Fixes | v3.0 | 0/? | Not started | — |
 | 29. Feature Verification & Performance | v3.0 | 0/? | Not started | — |
