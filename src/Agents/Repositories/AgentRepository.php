@@ -572,4 +572,273 @@ class AgentRepository extends BaseRepository
         }
         return absint($value);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Agent Meta Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Add agent meta
+     *
+     * @param int $agentId Agent ID
+     * @param string $metaKey Meta key
+     * @param mixed $metaValue Meta value
+     * @return int|false Meta ID on success, false on failure
+     */
+    public function addAgentMeta(int $agentId, string $metaKey, $metaValue)
+    {
+        // Check if meta already exists
+        $existing = $this->getAgentMeta($agentId, $metaKey, true);
+
+        if ($existing !== null) {
+            // Update existing
+            return $this->updateAgentMeta($agentId, $metaKey, $metaValue);
+        }
+
+        // Insert new meta
+        return wecoza_db()->insert('agent_meta', [
+            'agent_id' => $agentId,
+            'meta_key' => $metaKey,
+            'meta_value' => maybe_serialize($metaValue),
+            'created_at' => current_time('mysql')
+        ]);
+    }
+
+    /**
+     * Get agent meta
+     *
+     * @param int $agentId Agent ID
+     * @param string $metaKey Meta key (optional)
+     * @param bool $single Return single value
+     * @return mixed Meta value(s)
+     */
+    public function getAgentMeta(int $agentId, string $metaKey = '', bool $single = false)
+    {
+        $sql = "SELECT * FROM agent_meta WHERE agent_id = :agent_id";
+        $params = [':agent_id' => $agentId];
+
+        if (!empty($metaKey)) {
+            $sql .= " AND meta_key = :meta_key";
+            $params[':meta_key'] = $metaKey;
+        }
+
+        $sql .= " ORDER BY id ASC";
+
+        $rows = wecoza_db()->getAll($sql, $params) ?: [];
+
+        if (empty($rows)) {
+            return $single ? null : [];
+        }
+
+        if ($single) {
+            return maybe_unserialize($rows[0]['meta_value']);
+        }
+
+        $meta = [];
+        foreach ($rows as $row) {
+            $meta[$row['meta_key']][] = maybe_unserialize($row['meta_value']);
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Update agent meta
+     *
+     * @param int $agentId Agent ID
+     * @param string $metaKey Meta key
+     * @param mixed $metaValue Meta value
+     * @return bool Success status
+     */
+    public function updateAgentMeta(int $agentId, string $metaKey, $metaValue): bool
+    {
+        $result = wecoza_db()->update(
+            'agent_meta',
+            ['meta_value' => maybe_serialize($metaValue)],
+            'agent_id = :agent_id AND meta_key = :meta_key',
+            [':agent_id' => $agentId, ':meta_key' => $metaKey]
+        );
+
+        return $result !== false;
+    }
+
+    /**
+     * Delete agent meta
+     *
+     * @param int $agentId Agent ID
+     * @param string $metaKey Meta key (optional)
+     * @return bool Success status
+     */
+    public function deleteAgentMeta(int $agentId, string $metaKey = ''): bool
+    {
+        $where = 'agent_id = :agent_id';
+        $params = [':agent_id' => $agentId];
+
+        if (!empty($metaKey)) {
+            $where .= ' AND meta_key = :meta_key';
+            $params[':meta_key'] = $metaKey;
+        }
+
+        $result = wecoza_db()->delete('agent_meta', $where, $params);
+
+        return $result !== false;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Agent Notes Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Add agent note
+     *
+     * @param int $agentId Agent ID
+     * @param string $note Note content
+     * @param string $noteType Note type
+     * @return int|false Note ID on success, false on failure
+     */
+    public function addAgentNote(int $agentId, string $note, string $noteType = 'general')
+    {
+        return wecoza_db()->insert('agent_notes', [
+            'agent_id' => $agentId,
+            'note' => $note,
+            'note_type' => $noteType,
+            'created_by' => get_current_user_id(),
+            'created_at' => current_time('mysql')
+        ]);
+    }
+
+    /**
+     * Get agent notes
+     *
+     * @param int $agentId Agent ID
+     * @param array $args Query arguments
+     * @return array Array of notes
+     */
+    public function getAgentNotes(int $agentId, array $args = []): array
+    {
+        $defaults = [
+            'note_type' => '',
+            'orderby' => 'created_at',
+            'order' => 'DESC',
+            'limit' => 0,
+        ];
+
+        $args = wp_parse_args($args, $defaults);
+
+        $sql = "SELECT * FROM agent_notes WHERE agent_id = :agent_id";
+        $params = [':agent_id' => $agentId];
+
+        if (!empty($args['note_type'])) {
+            $sql .= " AND note_type = :note_type";
+            $params[':note_type'] = $args['note_type'];
+        }
+
+        $sql .= " ORDER BY {$args['orderby']} {$args['order']}";
+
+        if ($args['limit'] > 0) {
+            $sql .= " LIMIT :limit";
+            $params[':limit'] = (int) $args['limit'];
+        }
+
+        return wecoza_db()->getAll($sql, $params) ?: [];
+    }
+
+    /**
+     * Delete agent notes
+     *
+     * @param int $agentId Agent ID
+     * @return bool Success status
+     */
+    public function deleteAgentNotes(int $agentId): bool
+    {
+        $result = wecoza_db()->delete(
+            'agent_notes',
+            'agent_id = :agent_id',
+            [':agent_id' => $agentId]
+        );
+
+        return $result !== false;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Agent Absences Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Add agent absence
+     *
+     * @param int $agentId Agent ID
+     * @param string $absenceDate Absence date
+     * @param string $reason Reason for absence
+     * @return int|false Absence ID on success, false on failure
+     */
+    public function addAgentAbsence(int $agentId, string $absenceDate, string $reason = '')
+    {
+        return wecoza_db()->insert('agent_absences', [
+            'agent_id' => $agentId,
+            'absence_date' => $absenceDate,
+            'reason' => $reason,
+            'created_by' => get_current_user_id(),
+            'created_at' => current_time('mysql')
+        ]);
+    }
+
+    /**
+     * Get agent absences
+     *
+     * @param int $agentId Agent ID
+     * @param array $args Query arguments
+     * @return array Array of absences
+     */
+    public function getAgentAbsences(int $agentId, array $args = []): array
+    {
+        $defaults = [
+            'from_date' => '',
+            'to_date' => '',
+            'orderby' => 'absence_date',
+            'order' => 'DESC',
+        ];
+
+        $args = wp_parse_args($args, $defaults);
+
+        $sql = "SELECT * FROM agent_absences WHERE agent_id = :agent_id";
+        $params = [':agent_id' => $agentId];
+
+        if (!empty($args['from_date'])) {
+            $sql .= " AND absence_date >= :from_date";
+            $params[':from_date'] = $args['from_date'];
+        }
+
+        if (!empty($args['to_date'])) {
+            $sql .= " AND absence_date <= :to_date";
+            $params[':to_date'] = $args['to_date'];
+        }
+
+        $sql .= " ORDER BY {$args['orderby']} {$args['order']}";
+
+        return wecoza_db()->getAll($sql, $params) ?: [];
+    }
+
+    /**
+     * Delete agent absences
+     *
+     * @param int $agentId Agent ID
+     * @return bool Success status
+     */
+    public function deleteAgentAbsences(int $agentId): bool
+    {
+        $result = wecoza_db()->delete(
+            'agent_absences',
+            'agent_id = :agent_id',
+            [':agent_id' => $agentId]
+        );
+
+        return $result !== false;
+    }
 }
