@@ -221,13 +221,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // AJAX call to check duplicates
             var formData = new FormData();
-            formData.append('action', 'check_location_duplicates');
+            formData.append('action', 'wecoza_check_location_duplicates');
             formData.append('nonce', document.querySelector('#wecoza_locations_form_nonce').value);
             formData.append('street_address', streetAddress);
             formData.append('suburb', suburb);
             formData.append('town', town);
             
-            fetch(wecoza_ajax.ajax_url, {
+            fetch(wecoza_ajax.ajaxUrl, {
                 method: 'POST',
                 body: formData
             }).then(function(response) {
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showSubmit();
             }).catch(function(error) {
                 showDuplicateAlert('Error checking duplicates: ' + error.message, 'danger');
-                hideSubmit();
+                showSubmit();
             }).finally(function() {
                 // Reset button state
                 checkDuplicateBtn.disabled = false;

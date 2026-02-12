@@ -94,7 +94,7 @@ class LocationsController extends BaseController {
                 'wecoza-location-capture',
                 'wecoza_ajax',
                 array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'ajaxUrl' => admin_url('admin-ajax.php'),
                 )
             );
         }

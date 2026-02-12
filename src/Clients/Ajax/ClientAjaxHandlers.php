@@ -42,7 +42,6 @@ class ClientAjaxHandlers {
         add_action('wp_ajax_wecoza_get_locations', array($this, 'getLocations'));
         add_action('wp_ajax_wecoza_save_location', array($this, 'saveLocation'));
         add_action('wp_ajax_wecoza_check_location_duplicates', array($this, 'checkLocationDuplicates'));
-        add_action('wp_ajax_nopriv_wecoza_check_location_duplicates', array($this, 'checkLocationDuplicates'));
 
         // Site management AJAX handlers
         add_action('wp_ajax_wecoza_save_sub_site', array($this, 'saveSubSite'));
