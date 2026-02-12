@@ -241,6 +241,14 @@ add_action('plugins_loaded', function () {
         new \WeCoza\Clients\Ajax\ClientAjaxHandlers();
     }
 
+    // Initialize Agents Module
+    if (class_exists(\WeCoza\Agents\Controllers\AgentsController::class)) {
+        new \WeCoza\Agents\Controllers\AgentsController();
+    }
+    if (class_exists(\WeCoza\Agents\Ajax\AgentsAjaxHandlers::class)) {
+        new \WeCoza\Agents\Ajax\AgentsAjaxHandlers();
+    }
+
     // Action Scheduler Performance Tuning
     add_filter('action_scheduler_queue_runner_time_limit', function () {
         return 60;  // 60 seconds (default is 30)
