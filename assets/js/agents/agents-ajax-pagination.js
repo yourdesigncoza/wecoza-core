@@ -155,7 +155,7 @@
         // Prepare data
         const data = {
             action: 'wecoza_agents_paginate',
-            nonce: wecozaAgents.paginationNonce,
+            nonce: wecozaAgents.nonce,
             page: currentState.page,
             per_page: currentState.per_page,
             search: currentState.search,

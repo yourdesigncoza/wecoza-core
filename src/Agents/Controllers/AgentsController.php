@@ -371,8 +371,6 @@ class AgentsController extends BaseController
         wp_localize_script('wecoza-agents-app', 'wecozaAgents', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('agents_nonce_action'),
-            'deleteNonce' => wp_create_nonce('wecoza_delete_agent'),
-            'paginationNonce' => wp_create_nonce('wecoza_agents_pagination'),
             'debug' => defined('WP_DEBUG') && WP_DEBUG,
             'loadingText' => __('Loading...', 'wecoza-core'),
             'errorText' => __('Error loading agents. Please try again.', 'wecoza-core'),
