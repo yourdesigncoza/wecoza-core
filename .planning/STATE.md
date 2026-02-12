@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 
 ## Current Position
 
-Phase: 28 of 30 (Wiring Verification & Fixes)
-Plan: 2 of 2 complete
-Status: Complete
-Last activity: 2026-02-12 — Phase 28 complete (Wiring Verification & Fixes)
+Phase: 29 of 30 (Feature Verification & Performance)
+Plan: 1 of 2 complete
+Status: In progress
+Last activity: 2026-02-12 — Completed 29-01-PLAN.md (Agents Feature Parity Test)
 
-Progress: [████████████████████████████░░] 93% (28 phases complete, 2 phases remaining)
+Progress: [████████████████████████████▓░] 94% (28 phases complete, 1 plan complete in phase 29, 2 phases remaining)
 
 ## Milestone History
 
@@ -37,6 +37,8 @@ See: .planning/MILESTONES.md for full details
 |----|----------|------|-----------|
 | D26-02-01 | AgentModel is standalone (NOT extending BaseModel) | 2026-02-12 | Preserves FormHelpers integration, preferred_areas logic, get/set/validate cycle |
 | D28-02-01 | FormHelpers::get_field_value() accepts nullable array | 2026-02-12 | In add mode controller passes null agent — helper must handle gracefully |
+| D29-01-01 | agent_meta table missing is documented as expected failure | 2026-02-12 | FEAT-02 not implemented yet — test gracefully skips |
+| D29-01-02 | Repository aligned with actual schema rather than adding columns | 2026-02-12 | Less invasive fix — agent_notes uses note_date, agent_absences uses reported_at |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -54,6 +56,7 @@ None.
 | v3.0 migration | ~~2 nopriv AJAX handlers in source~~ | ~~Must remove during migration (Bug #12)~~ **RESOLVED in 27-01** |
 | v3.0 migration | ~~3 different localization objects with mixed casing~~ | ~~Must unify into wecozaAgents with camelCase (Bug #3)~~ **RESOLVED in 27-01, 27-03** |
 | v3.0 migration | Duplicate helper methods in controller/AJAX handler | Minor DRY violation - can refactor in Phase 28/29 |
+| v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet — documented in 29-01 test |
 
 ### Quick Tasks Completed
 
@@ -73,7 +76,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 28 complete (Wiring Verification & Fixes)
-Resume file: .planning/phases/28-wiring-verification/28-02-SUMMARY.md
+Stopped at: Phase 29 plan 1 complete (Agents Feature Parity Test)
+Resume file: .planning/phases/29-feature-verification/29-01-SUMMARY.md
 
-**Next action:** Plan Phase 29 (Feature Verification & Performance) — CRUD testing, file uploads, statistics, working areas, performance checks.
+**Next action:** Execute 29-02-PLAN.md (Clients Feature Parity Test) — verify clients module has full feature parity.
