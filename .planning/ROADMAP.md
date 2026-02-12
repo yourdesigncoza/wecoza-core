@@ -258,7 +258,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 24-01-PLAN.md -- Verify and fix site creation AJAX wiring, form-to-handler data flow, standalone site endpoints
+- [x] 24-01-PLAN.md -- Verify and fix site creation AJAX wiring, form-to-handler data flow, standalone site endpoints
 - [ ] 24-02-PLAN.md -- Verify client listing hydration, modal display, cache invalidation, E2E human verification
 
 #### Phase 25: Integration Testing & Cleanup

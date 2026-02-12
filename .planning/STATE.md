@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 ## Current Position
 
-Phase: 23 of 25 (Location Management) — COMPLETE
-Plan: 2/2 complete
-Status: All location CRUD working — create, edit, list, search, duplicate check
-Last activity: 2026-02-12 — Completed Phase 23 execution
+Phase: 24 of 25 (Sites Hierarchy) — IN PROGRESS
+Plan: 1/2 complete
+Status: Site creation wiring verified — found inline script bugs, all paths correct
+Last activity: 2026-02-12 — Completed 24-01-PLAN.md (Site Creation Wiring Verification)
 
 Progress: [███████████████████████░] 92.0% (23 phases complete, 2 phases remaining)
 
@@ -54,6 +54,9 @@ Decisions from Phase 23:
 - List page uses server-side ILIKE search, no Google Maps API needed (23-02)
 - Show submit button on AJAX error so users can still proceed (23-02)
 
+Decisions from Phase 24:
+- Fix inline scripts rather than extract to separate JS files — inline scripts localized to view, don't need global config (24-01)
+
 Full decision log in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -85,7 +88,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 23 complete — all location CRUD verified
-Resume file: —
+Stopped at: Phase 24 Plan 01 complete — site creation wiring verified
+Resume file: .planning/phases/24-sites-hierarchy/24-02-PLAN.md
 
-**Next action:** `/gsd:plan-phase 24` or `/gsd:discuss-phase 24` — Sites Hierarchy (head sites, sub-sites, location hydration)
+**Next action:** `/gsd:execute-plan 24-02` — Head Site Location Hydration (verify location data flows to client responses)
