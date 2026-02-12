@@ -697,17 +697,16 @@ class AgentRepository extends BaseRepository
      *
      * @param int $agentId Agent ID
      * @param string $note Note content
-     * @param string $noteType Note type
+     * @param string $noteType Note type (unused - kept for API compatibility)
      * @return int|false Note ID on success, false on failure
      */
     public function addAgentNote(int $agentId, string $note, string $noteType = 'general')
     {
+        // Actual schema: note_id, agent_id, note, note_date
         return wecoza_db()->insert('agent_notes', [
             'agent_id' => $agentId,
             'note' => $note,
-            'note_type' => $noteType,
-            'created_by' => get_current_user_id(),
-            'created_at' => current_time('mysql')
+            'note_date' => current_time('mysql')
         ]);
     }
 
@@ -721,21 +720,19 @@ class AgentRepository extends BaseRepository
     public function getAgentNotes(int $agentId, array $args = []): array
     {
         $defaults = [
-            'note_type' => '',
-            'orderby' => 'created_at',
+            'note_type' => '', // Unused - kept for API compatibility
+            'orderby' => 'note_date', // Actual column name
             'order' => 'DESC',
             'limit' => 0,
         ];
 
         $args = wp_parse_args($args, $defaults);
 
+        // Actual schema: note_id, agent_id, note, note_date
         $sql = "SELECT * FROM agent_notes WHERE agent_id = :agent_id";
         $params = [':agent_id' => $agentId];
 
-        if (!empty($args['note_type'])) {
-            $sql .= " AND note_type = :note_type";
-            $params[':note_type'] = $args['note_type'];
-        }
+        // note_type column doesn't exist in actual schema, skip filter
 
         $sql .= " ORDER BY {$args['orderby']} {$args['order']}";
 
@@ -780,12 +777,13 @@ class AgentRepository extends BaseRepository
      */
     public function addAgentAbsence(int $agentId, string $absenceDate, string $reason = '')
     {
+        // Actual schema: absence_id, agent_id, class_id, absence_date, reason, reported_at
         return wecoza_db()->insert('agent_absences', [
             'agent_id' => $agentId,
+            'class_id' => null, // Optional field
             'absence_date' => $absenceDate,
             'reason' => $reason,
-            'created_by' => get_current_user_id(),
-            'created_at' => current_time('mysql')
+            'reported_at' => current_time('mysql')
         ]);
     }
 
