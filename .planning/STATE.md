@@ -5,21 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Planning next milestone
+**Current focus:** v3.0 Agents Integration
 
 ## Current Position
 
-Phase: 25 of 25 (all milestones complete)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-02-12 — v2.0 milestone complete
+Phase: 26 of 30 (Foundation Architecture)
+Plan: 1 of 5 complete
+Status: In progress
+Last activity: 2026-02-12 — Completed 26-01-PLAN.md (Foundation Architecture)
 
-Progress: [█████████████████████████] 100.0% (25 phases complete, 0 phases remaining)
+Progress: [█████████████████████████░░░░░] 83.3% (25 phases complete, 5 phases remaining)
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v3.0 | Agents Integration | — | 26-30 | 0 |
 | v2.0 | Clients Integration | 2026-02-12 | 21-25 | 10 |
 | v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19-20 | 3 |
 | v1.2 | Event Tasks Refactor | 2026-02-05 | 13-18 | 16 |
@@ -44,6 +45,9 @@ None.
 |--------|-------|--------|
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
+| v3.0 migration | DatabaseService.update/delete signatures differ from wecoza_db() | Must adapt array WHERE → string WHERE in repository |
+| v3.0 migration | 2 nopriv AJAX handlers in source | Must remove during migration (Bug #12) |
+| v3.0 migration | 3 different localization objects with mixed casing | Must unify into wecozaAgents with camelCase (Bug #3) |
 
 ### Quick Tasks Completed
 
@@ -63,7 +67,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: v2.0 milestone archived
-Resume file: —
+Stopped at: Plan 26-01 complete (Foundation Architecture)
+Resume file: .planning/phases/26-foundation-architecture/26-01-SUMMARY.md
 
-**Next action:** Start next milestone with `/gsd:new-milestone`
+**Next action:** Execute Plan 26-02 (Repository + Model) to build AgentRepository and Agent model.
