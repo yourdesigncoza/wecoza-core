@@ -99,38 +99,7 @@ class LocationsController extends BaseController {
             );
         }
 
-        // Enqueue for list (search with Google Places)
-        if ($hasList) {
-            $depsList = array('jquery');
-            if ($googleMapsKey) {
-                if (!wp_script_is($googleHandle, 'enqueued')) {
-                    wp_enqueue_script(
-                        $googleHandle,
-                        'https://maps.googleapis.com/maps/api/js?key=' . esc_attr($googleMapsKey) . '&libraries=places&loading=async&v=weekly',
-                        array(),
-                        null,
-                        true
-                    );
-                }
-                $depsList[] = $googleHandle;
-            }
-
-            wp_enqueue_script(
-                'wecoza-locations-list',
-                wecoza_js_url('clients/locations-list.js'),
-                $depsList,
-                WECOZA_CORE_VERSION,
-                true
-            );
-
-            wp_localize_script(
-                'wecoza-locations-list',
-                'wecoza_locations_list',
-                array(
-                    'googleMapsEnabled' => (bool) $googleMapsKey,
-                )
-            );
-        }
+        // List page uses server-side ILIKE search — no Google Maps needed
     }
 
     public function captureLocationShortcode($atts) {
