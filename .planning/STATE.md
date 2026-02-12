@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v2.0 Clients Integration - Phase 22 (Client Management)
+**Current focus:** v2.0 Clients Integration - Phase 23 complete, Phase 24 next
 
 ## Current Position
 
-Phase: 22 of 25 (Client Management) — COMPLETE
-Plan: 2 of 2 complete
-Status: Phase 22 complete — all client CRUD, hierarchy, export, statistics verified
-Last activity: 2026-02-11 — Completed 22-02-PLAN.md (AJAX endpoint testing & CRUD verification)
+Phase: 23 of 25 (Location Management) — COMPLETE
+Plan: 2/2 complete
+Status: All location CRUD working — create, edit, list, search, duplicate check
+Last activity: 2026-02-12 — Completed Phase 23 execution
 
-Progress: [██████████████████████] 88.0% (22 phases complete, 3 phases remaining)
+Progress: [███████████████████████░] 92.0% (23 phases complete, 2 phases remaining)
 
 ## Milestone History
 
@@ -49,6 +49,11 @@ Decisions from Phase 22:
 - Soft-delete uses deleted_at timestamp column, all queries filter WHERE deleted_at IS NULL (22-02)
 - JS localization uses camelCase keys (ajaxUrl, nonce) matching existing JS conventions (22-02)
 
+Decisions from Phase 23:
+- AJAX action names must match wp_ajax_{action} suffix exactly (23-02)
+- List page uses server-side ILIKE search, no Google Maps API needed (23-02)
+- Show submit button on AJAX error so users can still proceed (23-02)
+
 Full decision log in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -79,8 +84,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-11
-Stopped at: Completed Phase 22 — all plans done, verification pending
+Last session: 2026-02-12
+Stopped at: Phase 23 complete — all location CRUD verified
 Resume file: —
 
-**Next action:** Plan Phase 23 (Location Management) or verify Phase 22 work.
+**Next action:** `/gsd:plan-phase 24` or `/gsd:discuss-phase 24` — Sites Hierarchy (head sites, sub-sites, location hydration)
