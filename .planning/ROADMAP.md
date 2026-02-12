@@ -85,7 +85,9 @@
 - [x] Phase 29: Feature Verification & Performance — CRUD testing, file uploads, statistics — **Plans:** 2 plans — completed 2026-02-12
   - [x] 29-01-PLAN.md — CLI feature parity test script (shortcodes, AJAX, classes, DB, views, statistics, working areas)
   - [x] 29-02-PLAN.md — Code audit, manual browser testing (CRUD, file uploads, statistics badges, performance)
-- [ ] Phase 30: Integration Testing & Cleanup — parity test, plugin deactivation, source removal
+- [ ] Phase 30: Integration Testing & Cleanup — parity test, plugin deactivation, source removal — **Plans:** 2 plans
+  - [ ] 30-01-PLAN.md — Pre-deactivation safety checks + standalone plugin deactivation (checkpoint)
+  - [ ] 30-02-PLAN.md — Dangling reference detection, source removal, project state update
 
 #### Phase 26: Foundation Architecture
 
