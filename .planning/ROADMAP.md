@@ -79,9 +79,9 @@
   - [x] 27-01-PLAN.md — AgentsController, AgentsAjaxHandlers, wecoza-core.php wiring
   - [x] 27-02-PLAN.md — View template migration (6 templates)
   - [x] 27-03-PLAN.md — JS asset migration (5 files) with unified localization
-- [ ] Phase 28: Wiring Verification & Fixes — shortcode rendering, integration bugs — **Plans:** 2 plans
-  - [ ] 28-01-PLAN.md — Fix nonce mismatch, inline script duplication, missing DOM elements
-  - [ ] 28-02-PLAN.md — WP-CLI verification, debug log review, browser smoke test
+- [x] Phase 28: Wiring Verification & Fixes — shortcode rendering, integration bugs — **Plans:** 2 plans — completed 2026-02-12
+  - [x] 28-01-PLAN.md — Fix nonce mismatch, inline script duplication, missing DOM elements
+  - [x] 28-02-PLAN.md — WP-CLI verification, debug log review, browser smoke test
 - [ ] Phase 29: Feature Verification & Performance — CRUD testing, file uploads, statistics
 - [ ] Phase 30: Integration Testing & Cleanup — parity test, plugin deactivation, source removal
 
@@ -306,6 +306,6 @@ Phases execute in numeric order.
 | 25. Integration Testing & Cleanup | v2.0 | 2/2 | Complete | 2026-02-12 |
 | 26. Foundation Architecture | v3.0 | 2/2 | Complete | 2026-02-12 |
 | 27. Controllers, Views, JS, AJAX | v3.0 | 3/3 | Complete | 2026-02-12 |
-| 28. Wiring Verification & Fixes | v3.0 | 0/2 | Not started | — |
+| 28. Wiring Verification & Fixes | v3.0 | 2/2 | Complete | 2026-02-12 |
 | 29. Feature Verification & Performance | v3.0 | 0/? | Not started | — |
 | 30. Integration Testing & Cleanup | v3.0 | 0/? | Not started | — |

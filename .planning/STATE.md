@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 28 of 30 (Wiring Verification & Fixes)
-Plan: 1 of 2 complete
-Status: In progress
-Last activity: 2026-02-12 — Completed 28-01-PLAN.md (Wiring Fixes)
+Plan: 2 of 2 complete
+Status: Complete
+Last activity: 2026-02-12 — Phase 28 complete (Wiring Verification & Fixes)
 
-Progress: [███████████████████████████░░░] 90% (27 phases complete, 3 phases remaining)
+Progress: [████████████████████████████░░] 93% (28 phases complete, 2 phases remaining)
 
 ## Milestone History
 
@@ -36,6 +36,7 @@ See: .planning/MILESTONES.md for full details
 | ID | Decision | Date | Rationale |
 |----|----------|------|-----------|
 | D26-02-01 | AgentModel is standalone (NOT extending BaseModel) | 2026-02-12 | Preserves FormHelpers integration, preferred_areas logic, get/set/validate cycle |
+| D28-02-01 | FormHelpers::get_field_value() accepts nullable array | 2026-02-12 | In add mode controller passes null agent — helper must handle gracefully |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -72,7 +73,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 28 Plan 01 complete (Wiring Fixes)
-Resume file: .planning/phases/28-wiring-verification/28-02-PLAN.md
+Stopped at: Phase 28 complete (Wiring Verification & Fixes)
+Resume file: .planning/phases/28-wiring-verification/28-02-SUMMARY.md
 
-**Next action:** Execute Phase 28 Plan 02 (Manual Testing Protocol) — validate agents display, pagination, search, delete functionality.
+**Next action:** Plan Phase 29 (Feature Verification & Performance) — CRUD testing, file uploads, statistics, working areas, performance checks.
