@@ -269,10 +269,11 @@ Plans:
   1. All client/location/site functionality works identically to standalone plugin
   2. Standalone wecoza-clients-plugin can be deactivated without breaking functionality
   3. `.integrate/wecoza-clients-plugin/` folder removed from repository
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 25-01: TBD
+- [ ] 25-01-PLAN.md -- E2E feature parity testing, standalone plugin deactivation verification
+- [ ] 25-02-PLAN.md -- Repository cleanup (.integrate/done/wecoza-clients-plugin removal) and final verification
 
 ## Progress
 
