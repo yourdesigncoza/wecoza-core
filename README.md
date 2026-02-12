@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Required-336791.svg)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
-Core infrastructure plugin for WeCoza - providing PostgreSQL database connectivity, MVC architecture, and shared utilities for learner and class management.
+Unified WordPress plugin for the WeCoza learning management system. Provides PostgreSQL database connectivity, MVC architecture, and all domain modules: Agents, Clients, Classes, Events, and Learners.
 
 ## Table of Contents
 
@@ -15,28 +15,38 @@ Core infrastructure plugin for WeCoza - providing PostgreSQL database connectivi
 - [Configuration](#configuration)
 - [Architecture](#architecture)
 - [Modules](#modules)
-  - [Learners Module](#learners-module)
+  - [Agents Module](#agents-module)
+  - [Clients Module](#clients-module)
   - [Classes Module](#classes-module)
   - [Events Module](#events-module)
+  - [Learners Module](#learners-module)
+  - [Settings Module](#settings-module)
+  - [Shortcode Inspector](#shortcode-inspector)
 - [Shortcodes](#shortcodes)
+- [AJAX Endpoints](#ajax-endpoints)
 - [Helper Functions](#helper-functions)
 - [Security](#security)
 - [Hooks & Actions](#hooks--actions)
+- [Cron Jobs](#cron-jobs)
 - [WP-CLI Commands](#wp-cli-commands)
+- [Database Schema](#database-schema)
+- [Testing](#testing)
 - [Debugging](#debugging)
 - [Development](#development)
 - [License](#license)
 
 ## Overview
 
-WeCoza Core is a WordPress plugin that serves as the foundational infrastructure for the WeCoza learning management system. It provides:
+WeCoza Core is the single, unified WordPress plugin that powers the entire WeCoza learning management system. All domain modules (previously separate plugins) are consolidated here:
 
-- **PostgreSQL Database Layer** - Full PostgreSQL support with lazy-loaded connections
+- **PostgreSQL Database Layer** - Full PostgreSQL support via PDO with lazy-loaded singleton connection
 - **MVC Architecture** - Clean separation with BaseController, BaseModel, and BaseRepository abstractions
-- **Learner Management** - Complete CRUD operations for learner records with PII protection
-- **Class Management** - Training class scheduling, QA visits, and agent assignments
-- **Events Module** - Event task tracking, material management, and AI-powered summaries
-- **Security First** - Column whitelisting, capability checks, CSRF protection, and input sanitization
+- **Agents Module** - Agent (facilitator) management with metadata, notes, and absence tracking
+- **Clients Module** - Client organisation management with locations, sites, and hierarchical sub-sites
+- **Classes Module** - Training class scheduling, QA visits, public holidays, and agent assignments
+- **Events Module** - Event task tracking, material delivery management, AI-powered summaries, and email notifications
+- **Learners Module** - Learner records with LP progression tracking, portfolio uploads, and hours tracking
+- **Action Scheduler** - Async processing for email notifications and AI enrichment
 
 ## Requirements
 
@@ -51,7 +61,7 @@ WeCoza Core is a WordPress plugin that serves as the foundational infrastructure
 
 ### Manual Installation
 
-1. Download or clone the repository to your WordPress plugins directory:
+1. Clone the repository to your WordPress plugins directory:
 
 ```bash
 cd /path/to/wordpress/wp-content/plugins/
@@ -104,11 +114,14 @@ Database configuration is stored in `config/app.php`:
 ```php
 return [
     'database' => [
-        'host' => 'localhost',
-        'port' => 5432,
-        'name' => 'wecoza',
-        'user' => 'wecoza_user',
-        // Password retrieved from wp_options
+        'use_postgresql' => true,
+        'sslmode' => 'prefer',
+        'defaults' => [
+            'host' => 'your-host',
+            'port' => '5432',
+            'dbname' => 'wecoza_db',
+            'user' => 'your_user',
+        ],
     ],
 ];
 ```
@@ -127,50 +140,93 @@ define('WP_DEBUG_DISPLAY', false);
 
 ```
 wecoza-core/
-├── core/                      # Framework abstractions
-│   ├── Abstract/              # Base classes
+├── core/                          # Framework abstractions
+│   ├── Abstract/                  # Base classes
 │   │   ├── BaseController.php
 │   │   ├── BaseModel.php
 │   │   └── BaseRepository.php
-│   ├── Database/              # Database layer
-│   │   └── PostgresConnection.php
-│   └── Helpers/               # Utility functions
-│       ├── functions.php
-│       └── AjaxSecurity.php
-├── src/                       # Application modules
-│   ├── Learners/              # Learner management
-│   │   ├── Ajax/
-│   │   ├── Controllers/
-│   │   ├── Models/
-│   │   ├── Repositories/
-│   │   ├── Services/
-│   │   └── Shortcodes/
-│   ├── Classes/               # Class management
-│   │   ├── Controllers/
-│   │   ├── Models/
-│   │   ├── Repositories/
+│   ├── Database/                  # Database layer
+│   │   └── PostgresConnection.php # Singleton, lazy-loaded PDO
+│   └── Helpers/                   # Utility functions
+│       ├── functions.php          # Global helper functions
+│       └── AjaxSecurity.php       # CSRF, capability, sanitization
+├── src/                           # Application modules
+│   ├── Agents/                    # Agent (facilitator) management
+│   │   ├── Ajax/                  # AgentsAjaxHandlers
+│   │   ├── Controllers/           # AgentsController
+│   │   ├── Helpers/               # FormHelpers
+│   │   ├── Models/                # AgentModel (standalone)
+│   │   ├── Repositories/          # AgentRepository (4 tables)
 │   │   └── Services/
-│   └── Events/                # Event tracking
-│       ├── Admin/
-│       ├── CLI/
-│       ├── Controllers/
-│       ├── Models/
-│       ├── Services/
-│       └── Shortcodes/
-├── views/                     # PHP templates
-│   ├── components/            # Reusable partials
-│   ├── classes/               # Class-related views
-│   └── learners/              # Learner-related views
-├── assets/                    # Frontend assets
+│   ├── Clients/                   # Client organisation management
+│   │   ├── Ajax/                  # ClientAjaxHandlers
+│   │   ├── Controllers/           # ClientsController, LocationsController
+│   │   ├── Helpers/
+│   │   ├── Models/
+│   │   └── Repositories/
+│   ├── Classes/                   # Training class management
+│   │   ├── Controllers/           # ClassController, ClassAjaxController,
+│   │   │                          # QAController, PublicHolidaysController
+│   │   ├── Models/                # ClassModel, QAModel, QAVisitModel
+│   │   ├── Repositories/
+│   │   └── Services/              # ScheduleService, UploadService,
+│   │                              # FormDataProcessor
+│   ├── Events/                    # Event tracking & notifications
+│   │   ├── Admin/                 # SettingsPage (WP admin)
+│   │   ├── CLI/                   # AISummaryStatusCommand
+│   │   ├── Controllers/           # TaskController, MaterialTrackingController
+│   │   ├── DTOs/                  # Data transfer objects
+│   │   ├── Enums/                 # Status enumerations
+│   │   ├── Models/
+│   │   ├── Repositories/
+│   │   ├── Services/              # EventDispatcher, NotificationProcessor,
+│   │   │                          # NotificationEnricher, NotificationEmailer,
+│   │   │                          # NotificationDashboardService,
+│   │   │                          # MaterialNotificationService,
+│   │   │                          # AISummaryService,
+│   │   │                          # MaterialTrackingDashboardService
+│   │   ├── Shortcodes/            # EventTasksShortcode,
+│   │   │                          # MaterialTrackingShortcode,
+│   │   │                          # AISummaryShortcode
+│   │   ├── Support/
+│   │   └── Views/
+│   ├── Learners/                  # Learner management
+│   │   ├── Ajax/                  # LearnerAjaxHandlers
+│   │   ├── Controllers/           # LearnerController
+│   │   ├── Models/                # LearnerModel
+│   │   ├── Repositories/          # LearnerRepository
+│   │   ├── Services/              # ProgressionService, PortfolioUploadService
+│   │   └── Shortcodes/
+│   ├── Settings/                  # Plugin settings page
+│   │   └── SettingsPage.php
+│   └── ShortcodeInspector/        # Debug tool (Tools > WeCoza Shortcodes)
+│       └── ShortcodeInspector.php
+├── views/                         # PHP templates
+│   ├── agents/                    # Agent views (display, components)
+│   ├── classes/                   # Class views
+│   ├── clients/                   # Client views (display, components)
+│   ├── components/                # Shared reusable partials
+│   ├── events/                    # Event views (tasks, material, AI summary)
+│   └── learners/                  # Learner views
+├── assets/                        # Frontend assets
 │   ├── css/
 │   └── js/
-│       ├── classes/
-│       └── learners/
-├── config/                    # Configuration files
-│   └── app.php
-├── schema/                    # Database schemas
+│       ├── agents/                # Agent management JS
+│       ├── classes/               # 10+ JS files for class management
+│       ├── clients/               # Client management JS
+│       └── learners/              # 4 JS files for learner management
+├── config/                        # Configuration files
+│   └── app.php                    # Database, cache, path, AJAX config
+├── schema/                        # Database schema backups
 │   └── migrations/
-└── wecoza-core.php           # Plugin entry point
+├── tests/                         # Integration & security tests
+│   ├── integration/               # Feature parity tests
+│   ├── Events/                    # Event module tests
+│   └── security-test.php          # Security audit test
+├── vendor/                        # Composer dependencies
+│   └── woocommerce/
+│       └── action-scheduler/      # Async job processing
+└── wecoza-core.php                # Plugin entry point
 ```
 
 ### Namespaces (PSR-4)
@@ -178,95 +234,256 @@ wecoza-core/
 | Namespace | Directory |
 |-----------|-----------|
 | `WeCoza\Core\` | `core/` |
-| `WeCoza\Learners\` | `src/Learners/` |
+| `WeCoza\Agents\` | `src/Agents/` |
+| `WeCoza\Clients\` | `src/Clients/` |
 | `WeCoza\Classes\` | `src/Classes/` |
 | `WeCoza\Events\` | `src/Events/` |
+| `WeCoza\Learners\` | `src/Learners/` |
+| `WeCoza\Settings\` | `src/Settings/` |
+| `WeCoza\ShortcodeInspector\` | `src/ShortcodeInspector/` |
 
 ## Modules
 
+### Agents Module
+
+Manages agent (facilitator) records including personal details, banking, qualifications, and SACE registration.
+
+**Features:**
+- CRUD operations for agent records
+- Metadata key-value store (`agent_meta` table)
+- Agent notes tracking
+- Absence recording and reporting
+- Preferred working areas management
+
+**Key Classes:**
+- `AgentsController` - Shortcode registration, form rendering
+- `AgentModel` - Standalone data model (not extending BaseModel) with validation
+- `AgentRepository` - Database operations across 4 tables (agents, agent_meta, agent_notes, agent_absences)
+- `AgentsAjaxHandlers` - Pagination and delete endpoints
+- `FormHelpers` - Agent form field rendering utilities
+
+### Clients Module
+
+Manages client organisations with locations, head sites, and sub-site hierarchies.
+
+**Features:**
+- Client CRUD with branch/main client relationships
+- Location management with duplicate detection
+- Hierarchical site structure (head sites and sub-sites)
+- Client search and export
+- Main client grouping
+
+**Key Classes:**
+- `ClientsController` - Client shortcodes and form rendering
+- `LocationsController` - Location capture, listing, and editing
+- `ClientAjaxHandlers` - 15 AJAX endpoints for clients, locations, and sites
+
+### Classes Module
+
+Manages training classes, schedules, QA visits, and public holidays.
+
+**Features:**
+- Class creation and scheduling with agent assignment
+- Agent replacement tracking
+- QA visit recording and analytics
+- Public holiday awareness for schedule calculations
+- Class notes and file attachments
+- Calendar event integration
+- Stop/restart date management
+
+**Key Classes:**
+- `ClassController` - Class management and shortcodes
+- `ClassAjaxController` - Class CRUD, calendar, notes, attachments AJAX
+- `QAController` - QA visit CRUD, analytics, and reporting
+- `PublicHolidaysController` - Public holiday data provider
+- `ScheduleService` - Schedule calculations
+
+### Events Module
+
+Handles event-related tasks, material delivery tracking, AI-powered summaries, and email notifications.
+
+**Features:**
+- Event task management with status tracking
+- Material delivery monitoring with colour-coded urgency (green/orange/red)
+- AI-powered event summarisation via Action Scheduler
+- Email notifications with async processing pipeline
+- Notification dashboard with viewed/acknowledged states
+- Admin settings page for notification configuration
+- WP-CLI command for AI summary status
+
+**Notification Pipeline:**
+1. `EventDispatcher` captures class/learner changes as events
+2. `NotificationProcessor` (cron) batches pending events
+3. `NotificationEnricher` adds AI context per event
+4. `NotificationEmailer` delivers emails per recipient
+
+**Key Classes:**
+- `TaskController` - Event task AJAX handlers
+- `MaterialTrackingController` - Material delivery status
+- `MaterialNotificationService` - Automated material deadline notifications
+- `AISummaryService` - AI-generated event summaries
+- `NotificationDashboardService` - Dashboard data retrieval
+- `EventDispatcher` - Event capture and scheduling
+- `NotificationProcessor` - Batch processing engine
+
 ### Learners Module
 
-Manages learner records including personal information, qualifications, and employment details.
+Manages learner records including personal information, qualifications, employment, and LP progression.
 
 **Features:**
 - CRUD operations for learner records
 - LP (Learning Programme) progression tracking
 - Portfolio upload management
 - Hours tracking (trained, present, absent)
+- Progress calculation from hours vs product duration
+- Single active LP enforcement per learner
+
+**LP Progression Statuses:** `in_progress`, `completed`, `on_hold`
 
 **Key Classes:**
 - `LearnerController` - Request handling and shortcode registration
 - `LearnerModel` - Data model with validation
 - `LearnerRepository` - Database operations with column whitelisting
-- `ProgressionService` - LP progression and hours tracking
+- `ProgressionService` - `startLearnerProgression()`, `markLPComplete()`, `logHours()`
+- `PortfolioUploadService` - File upload handling for LP completion
 
-### Classes Module
+### Settings Module
 
-Manages training classes, schedules, and QA visits.
+Provides the WeCoza Settings page under the WordPress Settings menu.
 
-**Features:**
-- Class creation and scheduling
-- Agent assignment and replacements
-- QA visit tracking
-- Public holiday awareness
-- Stop/restart date management
+### Shortcode Inspector
 
-**Key Classes:**
-- `ClassController` - Class management endpoints
-- `ClassModel` - Class data model
-- `ClassRepository` - Secure database operations
-- `ScheduleService` - Schedule calculations
-- `QAController` - QA visit management
-
-### Events Module
-
-Handles event-related tasks, material tracking, and AI summaries.
-
-**Features:**
-- Event task management
-- Material tracking with notifications
-- AI-powered event summarization
-- Email notification system
-
-**Key Classes:**
-- `TaskController` - Event task AJAX handlers
-- `MaterialTrackingController` - Material status tracking
-- `MaterialNotificationService` - Automated notifications
-- `AISummaryService` - AI-generated summaries
+Debug utility available at **Tools > WeCoza Shortcodes** in WordPress admin. Lists all registered shortcodes and their handlers.
 
 ## Shortcodes
 
-### Learners Shortcodes
+### Agents
 
 | Shortcode | Description |
 |-----------|-------------|
-| `[wecoza_display_learners]` | Display paginated list of all learners |
-| `[wecoza_learners_form]` | Learner registration/creation form |
-| `[wecoza_single_learner_display]` | Display individual learner details |
-| `[wecoza_learners_update_form]` | Edit existing learner form |
+| `[wecoza_capture_agents]` | Agent create/edit form |
+| `[wecoza_display_agents]` | Paginated agent list |
+| `[wecoza_single_agent]` | Individual agent detail view |
 
-### Classes Shortcodes
+### Clients
 
 | Shortcode | Description |
 |-----------|-------------|
-| `[wecoza_capture_class]` | Create or edit a class |
-| `[wecoza_display_classes]` | Display list of classes |
-| `[wecoza_display_single_class]` | Display single class details |
+| `[wecoza_capture_clients]` | Client create form |
+| `[wecoza_display_clients]` | Client list view |
+| `[wecoza_update_clients]` | Client edit form |
+| `[wecoza_locations_capture]` | Location create form |
+| `[wecoza_locations_list]` | Location list view |
+| `[wecoza_locations_edit]` | Location edit form |
 
-### Events Shortcodes
+### Classes
+
+| Shortcode | Description |
+|-----------|-------------|
+| `[wecoza_capture_class]` | Class create/edit form |
+| `[wecoza_display_classes]` | Class list view |
+| `[wecoza_display_single_class]` | Single class detail view |
+
+### Events
 
 | Shortcode | Description |
 |-----------|-------------|
 | `[wecoza_event_tasks]` | Event task management interface |
-| `[wecoza_material_tracking]` | Material tracking dashboard |
-| `[wecoza_ai_summary]` | AI-generated event summary display |
+| `[wecoza_material_tracking]` | Material delivery tracking dashboard |
+| `[wecoza_insert_update_ai_summary]` | AI-generated event summary display |
+
+### Learners
+
+| Shortcode | Description |
+|-----------|-------------|
+| `[wecoza_display_learners]` | Paginated learner list |
+| `[wecoza_learners_form]` | Learner registration form |
+| `[wecoza_single_learner_display]` | Individual learner detail view |
+| `[wecoza_learners_update_form]` | Learner edit form |
+
+## AJAX Endpoints
+
+All endpoints require authentication (`wp_ajax_` prefix). Endpoints marked with `*` also have `nopriv` variants.
+
+### Agents
+| Action | Handler |
+|--------|---------|
+| `wecoza_agents_paginate` | Paginated agent list |
+| `wecoza_agents_delete` | Delete agent |
+
+### Clients
+| Action | Handler |
+|--------|---------|
+| `wecoza_save_client` | Create/update client |
+| `wecoza_get_client` | Get single client |
+| `wecoza_get_client_details` | Get client with full details |
+| `wecoza_delete_client` | Delete client |
+| `wecoza_search_clients` | Search clients |
+| `wecoza_get_branch_clients` | Get branch clients |
+| `wecoza_export_clients` | Export clients |
+| `wecoza_get_main_clients` | Get main/parent clients |
+| `wecoza_get_locations` | List locations |
+| `wecoza_save_location` | Create/update location |
+| `wecoza_check_location_duplicates` | Check for duplicate locations |
+| `wecoza_save_sub_site` | Create sub-site |
+| `wecoza_get_head_sites` | List head sites |
+| `wecoza_get_sub_sites` | List sub-sites |
+| `wecoza_delete_sub_site` | Delete sub-site |
+| `wecoza_get_sites_hierarchy` | Get full site hierarchy |
+
+### Classes
+| Action | Handler |
+|--------|---------|
+| `save_class` | Create/update class |
+| `delete_class` | Delete class |
+| `get_calendar_events` | Calendar event data |
+| `get_class_subjects` | Class subjects `*` |
+| `get_class_notes` | Get class notes |
+| `save_class_note` | Create class note |
+| `delete_class_note` | Delete class note |
+| `upload_attachment` | Upload file attachment |
+| `get_public_holidays` | Public holiday data `*` |
+
+### QA Visits
+| Action | Handler |
+|--------|---------|
+| `get_qa_analytics` | QA analytics data `*` |
+| `get_qa_summary` | QA summary `*` |
+| `get_qa_visits` | List QA visits `*` |
+| `create_qa_visit` | Create QA visit `*` |
+| `export_qa_reports` | Export QA reports `*` |
+| `delete_qa_report` | Delete QA report `*` |
+| `get_class_qa_data` | Class QA data `*` |
+| `submit_qa_question` | Submit QA question `*` |
+
+### Events
+| Action | Handler |
+|--------|---------|
+| `wecoza_events_task_update` | Update event task |
+| `wecoza_mark_material_delivered` | Mark material as delivered |
+| `wecoza_mark_notification_viewed` | Mark notification viewed |
+| `wecoza_mark_notification_acknowledged` | Mark notification acknowledged |
+| `wecoza_send_test_notification` | Send test notification (admin) |
+
+### Learners
+| Action | Handler |
+|--------|---------|
+| `wecoza_get_learner` | Get single learner |
+| `wecoza_get_learners` | List learners |
+| `wecoza_update_learner` | Update learner |
+| `wecoza_delete_learner` | Delete learner |
+| `fetch_learners_data` | DataTables-compatible learner data `*` |
+| `fetch_learners_dropdown_data` | Learner dropdown options `*` |
+| `update_learner` | Legacy update endpoint |
+| `delete_learner` | Legacy delete endpoint |
+| `delete_learner_portfolio` | Delete portfolio file |
 
 ## Helper Functions
 
 ### Database & Configuration
 
 ```php
-// Get PostgreSQL connection
+// Get PostgreSQL connection (lazy-loaded singleton)
 $db = wecoza_db();
 
 // Load configuration file (cached)
@@ -282,44 +499,31 @@ wecoza_view('learners/list', ['learners' => $data]);
 // Render with return instead of echo
 $html = wecoza_view('learners/list', ['learners' => $data], true);
 
-// Render a component
+// Render a reusable component
 wecoza_component('pagination', ['page' => 1, 'total' => 100]);
 ```
 
 ### Asset URLs
 
 ```php
-// Get asset URL
 $url = wecoza_asset_url('images/logo.png');
-
-// Get CSS URL
 $css = wecoza_css_url('learners-style.css');
-
-// Get JavaScript URL
 $js = wecoza_js_url('learners/learners-app.js');
 ```
 
 ### Paths
 
 ```php
-// Get plugin path
 $path = wecoza_plugin_path('views/learners/list.php');
-
-// Get core directory path
 $corePath = wecoza_core_path('Abstract/BaseModel.php');
 ```
 
 ### Environment Detection
 
 ```php
-// Check if in WordPress admin (excluding AJAX)
-if (wecoza_is_admin_area()) { ... }
-
-// Check if AJAX request
-if (wecoza_is_ajax()) { ... }
-
-// Check if REST API request
-if (wecoza_is_rest()) { ... }
+if (wecoza_is_admin_area()) { ... } // WP admin (excluding AJAX)
+if (wecoza_is_ajax()) { ... }       // AJAX request
+if (wecoza_is_rest()) { ... }       // REST API request
 ```
 
 ### Utilities
@@ -327,11 +531,14 @@ if (wecoza_is_rest()) { ... }
 ```php
 // Debug logging (only when WP_DEBUG is enabled)
 wecoza_log('Processing learner data', 'info');
+wecoza_log('Something went wrong', 'error');
 
 // Sanitize input values
 $email = wecoza_sanitize_value($input, 'email');
-$id = wecoza_sanitize_value($input, 'int');
-$date = wecoza_sanitize_value($input, 'date');
+$id    = wecoza_sanitize_value($input, 'int');
+$date  = wecoza_sanitize_value($input, 'date');
+$json  = wecoza_sanitize_value($input, 'json');
+$bool  = wecoza_sanitize_value($input, 'bool');
 
 // Dot notation array access
 $value = wecoza_array_get($array, 'nested.key.value', 'default');
@@ -349,14 +556,12 @@ The entire WeCoza application requires WordPress authentication. Unauthenticated
 
 ### Capability-Based Access Control
 
-```php
-// Custom capabilities registered on activation
-'manage_learners'         // Access to learner PII data
-'view_material_tracking'  // View material tracking
-'manage_material_tracking' // Modify material tracking
-```
-
-Only Administrators receive these capabilities by default.
+| Capability | Purpose | Default Role |
+|------------|---------|-------------|
+| `manage_learners` | Access to learner PII data | Administrator |
+| `view_material_tracking` | View material tracking dashboard | Administrator |
+| `manage_material_tracking` | Modify material delivery status | Administrator |
+| `manage_wecoza_clients` | Client and location management | Administrator |
 
 ### SQL Injection Prevention
 
@@ -375,15 +580,8 @@ class LearnerRepository extends BaseRepository
         return ['id', 'email_address', 'employer_id'];
     }
 
-    protected function getAllowedInsertColumns(): array
-    {
-        return ['first_name', 'surname', 'email_address', ...];
-    }
-
-    protected function getAllowedUpdateColumns(): array
-    {
-        return ['first_name', 'surname', 'email_address', ...];
-    }
+    protected function getAllowedInsertColumns(): array { ... }
+    protected function getAllowedUpdateColumns(): array { ... }
 }
 ```
 
@@ -392,34 +590,23 @@ class LearnerRepository extends BaseRepository
 All AJAX handlers require nonce verification:
 
 ```php
-// In controller
-$this->requireNonce('learners_nonce_action');
-
-// Or using AjaxSecurity helper
 AjaxSecurity::requireNonce('learners_nonce_action');
 ```
 
 ### Input Sanitization
 
-Use the `AjaxSecurity` helper for comprehensive input handling:
-
 ```php
 use WeCoza\Core\Helpers\AjaxSecurity;
 
-// Verify nonce
 AjaxSecurity::verifyNonce('action_name');
-
-// Check capability
 AjaxSecurity::checkCapability('manage_learners');
 
-// Sanitize array of inputs
 $clean = AjaxSecurity::sanitizeArray($_POST, [
-    'id' => 'int',
+    'id'    => 'int',
     'email' => 'email',
-    'name' => 'string',
+    'name'  => 'string',
 ]);
 
-// Validate file upload
 AjaxSecurity::validateUploadedFile($file, ['pdf', 'doc', 'docx']);
 ```
 
@@ -428,7 +615,7 @@ AjaxSecurity::validateUploadedFile($file, ['pdf', 'doc', 'docx']);
 ### Plugin Lifecycle
 
 ```php
-// Fired when plugin is fully loaded
+// Fired when plugin is fully loaded (priority 5 on plugins_loaded)
 do_action('wecoza_core_loaded');
 
 // Fired on plugin activation
@@ -440,19 +627,27 @@ do_action('wecoza_core_deactivated');
 
 ### Extending the Plugin
 
+Dependent code should hook into `wecoza_core_loaded` or use `plugins_loaded` at priority 10+:
+
 ```php
-// Wait for WeCoza Core before initializing dependent plugins
 add_action('wecoza_core_loaded', function() {
-    // Your plugin initialization code
+    // WeCoza Core classes and functions are now available
 }, 10);
 ```
 
-### Cron Events
+### Action Scheduler Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `wecoza_process_event` | AI enrichment per event (async) |
+| `wecoza_send_notification_email` | Email delivery per recipient (async) |
+
+## Cron Jobs
 
 | Hook | Frequency | Description |
 |------|-----------|-------------|
-| `wecoza_material_notifications_check` | Daily | Check and send material notifications |
-| `wecoza_email_notifications_process` | Hourly | Process queued email notifications |
+| `wecoza_material_notifications_check` | Daily | Check material delivery deadlines, send orange (7-day) and red (5-day) notifications |
+| `wecoza_process_notifications` | Hourly | Batch process pending notification events |
 
 ## WP-CLI Commands
 
@@ -464,7 +659,52 @@ wp wecoza test-db
 wp wecoza version
 
 # AI Summary status (Events module)
-wp wecoza-events ai-summary-status
+wp wecoza ai-summary status
+```
+
+## Database Schema
+
+All tables are in PostgreSQL. Connection via `wecoza_db()` singleton.
+
+### Agent Tables
+
+| Table | Purpose |
+|-------|---------|
+| `agents` | Core agent records (personal info, banking, SACE, qualifications) |
+| `agent_meta` | Key-value metadata store per agent |
+| `agent_notes` | Timestamped notes per agent |
+| `agent_absences` | Absence records with dates and reasons |
+
+### Events Tables
+
+| Table | Purpose |
+|-------|---------|
+| `class_events` | Event tracking for class/learner changes, notification state |
+
+### Other Tables
+
+Learner, class, client, and location tables are managed by the respective modules. See `schema/` for full backup schemas.
+
+## Testing
+
+Test files are in the `tests/` directory:
+
+```bash
+# Security audit
+wp eval-file tests/security-test.php
+
+# Feature parity tests (agents migration)
+wp eval-file tests/integration/agents-feature-parity.php
+
+# Feature parity tests (clients migration)
+wp eval-file tests/integration/clients-feature-parity.php
+
+# Events module tests
+wp eval-file tests/Events/MaterialTrackingTest.php
+wp eval-file tests/Events/EmailNotificationTest.php
+wp eval-file tests/Events/TaskManagementTest.php
+wp eval-file tests/Events/AISummarizationTest.php
+wp eval-file tests/Events/PIIDetectorTest.php
 ```
 
 ## Debugging
@@ -488,58 +728,70 @@ define('WP_DEBUG_DISPLAY', false);
 ### Using the Logger
 
 ```php
-// Log with different levels
 wecoza_log('Information message', 'info');
 wecoza_log('Warning message', 'warning');
 wecoza_log('Error message', 'error');
-
 // Only outputs when WP_DEBUG is true
 ```
 
-### Database Debugging
+### Database Connection Test
+
+```bash
+wp wecoza test-db
+```
 
 ```php
-// Test connection via WP-CLI
-wp wecoza test-db
-
-// Or programmatically
 $db = wecoza_db();
 if ($db->testConnection()) {
     echo 'Connected! Version: ' . $db->getVersion();
 }
 ```
 
+### Shortcode Inspector
+
+Navigate to **Tools > WeCoza Shortcodes** in WordPress admin to see all registered shortcodes and verify they are loading correctly.
+
 ## Development
 
 ### Plugin Loading Priority
 
-WeCoza Core loads at priority `5` on the `plugins_loaded` hook. Dependent plugins should use priority `10` or higher:
-
-```php
-add_action('plugins_loaded', function() {
-    // Dependent plugin code
-}, 10);
-```
+WeCoza Core loads at priority `5` on `plugins_loaded`. Dependent plugins should use priority `10` or higher.
 
 ### View File Extensions
 
 Views support both naming conventions:
-- `.view.php` (Classes module style)
-- `.php` (Learners module style)
+- `.view.php` (preferred for newer modules)
+- `.php` (legacy)
 
 ### Adding New Modules
 
 1. Create directory structure under `src/YourModule/`
-2. Add namespace to `composer.json` and main plugin file
-3. Create Controller, Model, Repository, and Service classes
-4. Register controllers in `wecoza-core.php`
+2. Add namespace mapping to `wecoza-core.php` autoloader
+3. Create Controller, Model, Repository, and Service classes extending the base abstractions
+4. Register controllers in the `plugins_loaded` callback in `wecoza-core.php`
+5. Add views to `views/yourmodule/`
+6. Add JS assets to `assets/js/yourmodule/`
 
 ### Code Standards
 
-- PHP 8.0+ features (typed properties, match expressions, named arguments)
-- PSR-4 autoloading
+- PHP 8.0+ features (typed properties, match expressions, named arguments, union types)
+- PSR-4 autoloading with custom `spl_autoload_register`
 - WordPress Coding Standards for hooks and filters
-- Column whitelisting for all database operations
+- Column whitelisting for all repository database operations
+- Nonce verification for all AJAX handlers
+
+### Action Scheduler
+
+The plugin bundles [Action Scheduler](https://actionscheduler.org/) for async processing:
+
+```php
+// Enqueue an async job
+as_enqueue_async_action('wecoza_process_event', ['event_id' => $id], 'wecoza-notifications');
+```
+
+Configuration tuning:
+- Queue runner time limit: 60 seconds (default 30)
+- Batch size: 50 items per run
 
 ## License
 

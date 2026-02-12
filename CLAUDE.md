@@ -10,6 +10,36 @@ core/                  # Framework abstractions
   Database/            # PostgresConnection (singleton)
   Helpers/             # functions.php, AjaxSecurity
 src/
+  Agents/              # Agents module (migrated from wecoza-agents-plugin)
+    Ajax/              # AJAX handlers
+    Controllers/
+    Helpers/           # FormHelpers
+    Models/            # AgentModel (standalone, not extending BaseModel)
+    Repositories/      # AgentRepository (agents, agent_meta, agent_notes, agent_absences)
+    Services/
+  Clients/             # Clients module (migrated from wecoza-clients-plugin)
+    Ajax/
+    Controllers/       # ClientsController, LocationsController
+    Helpers/
+    Models/
+    Repositories/
+  Classes/             # Classes module
+    Controllers/       # ClassController, QAController, PublicHolidaysController
+    Models/            # ClassModel, QAModel, QAVisitModel
+    Repositories/
+    Services/          # ScheduleService, UploadService, FormDataProcessor
+  Events/              # Events/Notifications module
+    Admin/             # Admin UI
+    CLI/               # WP-CLI commands
+    Controllers/
+    DTOs/              # Data transfer objects
+    Enums/
+    Models/
+    Repositories/
+    Services/          # EventDispatcher, NotificationDashboardService
+    Shortcodes/
+    Support/
+    Views/
   Learners/            # Learner module
     Ajax/              # AJAX handlers
     Controllers/
@@ -17,11 +47,8 @@ src/
     Repositories/
     Services/          # ProgressionService, PortfolioUploadService
     Shortcodes/
-  Classes/             # Classes module
-    Controllers/       # ClassController, QAController, PublicHolidaysController
-    Models/            # ClassModel, QAModel, QAVisitModel
-    Repositories/
-    Services/          # ScheduleService, UploadService, FormDataProcessor
+  Settings/            # Plugin settings
+  ShortcodeInspector/  # Shortcode debugging utility
 views/                 # PHP templates (.view.php or .php)
   components/          # Reusable partials
 config/                # Configuration files (app.php)
@@ -31,13 +58,17 @@ assets/
     classes/           # 10+ JS files for class management
     learners/          # 4 JS files for learner management
 schema/                # Database schema backups
+tests/                 # Integration tests
 ```
 
 ## Namespaces (PSR-4)
 
 - `WeCoza\Core\` → `core/`
-- `WeCoza\Learners\` → `src/Learners/`
+- `WeCoza\Agents\` → `src/Agents/`
+- `WeCoza\Clients\` → `src/Clients/`
 - `WeCoza\Classes\` → `src/Classes/`
+- `WeCoza\Events\` → `src/Events/`
+- `WeCoza\Learners\` → `src/Learners/`
 
 ## Key Functions
 
@@ -77,6 +108,19 @@ schema/                # Database schema backups
 - `[wecoza_single_learner_display]` - Individual learner view
 - `[wecoza_learners_update_form]` - Edit learner form
 
+**Agents:**
+- `[wecoza_capture_agents]` - Create/edit agent
+- `[wecoza_display_agents]` - List agents
+- `[wecoza_single_agent]` - Individual agent view
+
+**Clients:**
+- `[wecoza_capture_clients]` - Create client
+- `[wecoza_display_clients]` - List clients
+- `[wecoza_update_clients]` - Edit client
+- `[wecoza_locations_capture]` - Create location
+- `[wecoza_locations_list]` - List locations
+- `[wecoza_locations_edit]` - Edit location
+
 **Classes:**
 - `[wecoza_capture_class]` - Create/edit class
 - `[wecoza_display_classes]` - List classes
@@ -99,6 +143,9 @@ Key service: `ProgressionService` with `startLearnerProgression()`, `markLPCompl
 - Connection: `WeCoza\Core\Database\PostgresConnection::getInstance()`
 - Password stored in WP option: `wecoza_postgres_password`
 - Lazy-loaded: Connection defers until first query
+
+**Agent tables:** `agents`, `agent_meta`, `agent_notes`, `agent_absences`
+**Events tables:** `class_events`
 
 ## Security
 

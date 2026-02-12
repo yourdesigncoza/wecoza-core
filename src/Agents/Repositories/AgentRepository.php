@@ -624,7 +624,7 @@ class AgentRepository extends BaseRepository
             $params[':meta_key'] = $metaKey;
         }
 
-        $sql .= " ORDER BY id ASC";
+        $sql .= " ORDER BY meta_id ASC";
 
         $rows = wecoza_db()->getAll($sql, $params) ?: [];
 
