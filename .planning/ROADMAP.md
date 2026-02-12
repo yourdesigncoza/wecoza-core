@@ -6,7 +6,7 @@
 - ✅ **v1.1 Quality & Performance** - Phases 8-12 (shipped 2026-02-02)
 - ✅ **v1.2 Event Tasks Refactor** - Phases 13-18 (shipped 2026-02-05)
 - ✅ **v1.3 Fix Material Tracking Dashboard** - Phases 19-20 (shipped 2026-02-06)
-- 🚧 **v2.0 Clients Integration** - Phases 21-25 (in progress)
+- ✅ **v2.0 Clients Integration** - Phases 21-25 (shipped 2026-02-12)
 
 ## Phases
 
@@ -195,7 +195,7 @@ Plans:
 
 </details>
 
-### 🚧 v2.0 Clients Integration (In Progress)
+### ✅ v2.0 Clients Integration (Shipped 2026-02-12)
 
 **Milestone Goal:** Integrate standalone wecoza-clients-plugin into wecoza-core as unified Clients module with client CRUD, location management, sites hierarchy, and Google Maps integration.
 
@@ -272,8 +272,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 25-01-PLAN.md -- E2E feature parity testing, standalone plugin deactivation verification
-- [ ] 25-02-PLAN.md -- Repository cleanup (.integrate/done/wecoza-clients-plugin removal) and final verification
+- [x] 25-01-PLAN.md -- E2E feature parity testing, standalone plugin deactivation verification
+- [x] 25-02-PLAN.md -- Repository cleanup (.integrate/done/wecoza-clients-plugin removal) and final verification
 
 ## Progress
 
@@ -306,4 +306,4 @@ Phases execute in numeric order.
 | 22. Client Management | v2.0 | 2/2 | Complete | 2026-02-11 |
 | 23. Location Management | v2.0 | 2/2 | Complete | 2026-02-12 |
 | 24. Sites Hierarchy | v2.0 | 2/2 | Complete | 2026-02-12 |
-| 25. Integration Testing & Cleanup | v2.0 | 0/? | Not started | - |
+| 25. Integration Testing & Cleanup | v2.0 | 2/2 | Complete | 2026-02-12 |
