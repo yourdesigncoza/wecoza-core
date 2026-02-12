@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v2.0 Clients Integration - Phase 23 complete, Phase 24 next
+**Current focus:** v2.0 Clients Integration - Phase 24 complete, Phase 25 next
 
 ## Current Position
 
-Phase: 24 of 25 (Sites Hierarchy) — IN PROGRESS
-Plan: 1/2 complete
-Status: Site creation wiring verified — found inline script bugs, all paths correct
-Last activity: 2026-02-12 — Completed 24-01-PLAN.md (Site Creation Wiring Verification)
+Phase: 24 of 25 (Sites Hierarchy) — COMPLETE
+Plan: 2/2 complete
+Status: All sites hierarchy verified — head sites, sub-sites, hydration, modal, performance fix
+Last activity: 2026-02-12 — Completed Phase 24 execution
 
-Progress: [███████████████████████░] 92.0% (23 phases complete, 2 phases remaining)
+Progress: [████████████████████████░] 96.0% (24 phases complete, 1 phase remaining)
 
 ## Milestone History
 
@@ -56,6 +56,8 @@ Decisions from Phase 23:
 
 Decisions from Phase 24:
 - Fix inline scripts rather than extract to separate JS files — inline scripts localized to view, don't need global config (24-01)
+- Cache getTableColumns() results per table per request — eliminates ~16 redundant information_schema queries in ClientsModel constructor (24-02)
+- Remove redundant getHeadSite() in getClientDetails — site_name already hydrated by getById() (24-02)
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -88,7 +90,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 24 Plan 01 complete — site creation wiring verified
-Resume file: .planning/phases/24-sites-hierarchy/24-02-PLAN.md
+Stopped at: Phase 24 complete — all sites hierarchy verified
+Resume file: —
 
-**Next action:** `/gsd:execute-plan 24-02` — Head Site Location Hydration (verify location data flows to client responses)
+**Next action:** `/gsd:plan-phase 25` or `/gsd:execute-phase 25` — Integration Testing & Cleanup
