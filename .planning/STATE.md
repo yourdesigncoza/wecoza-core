@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 
 ## Current Position
 
-Phase: 26 of 30 (Foundation Architecture)
-Plan: 2 of 5 complete
+Phase: 27 of 30 (Controllers, Views, JS, AJAX)
+Plan: 1 of 3 complete
 Status: In progress
-Last activity: 2026-02-12 — Completed 26-02-PLAN.md (Repository + Model)
+Last activity: 2026-02-12 — Completed 27-01-PLAN.md (Controllers & AJAX Handlers)
 
 Progress: [█████████████████████████░░░░░] 83.3% (25 phases complete, 5 phases remaining)
 
@@ -50,8 +50,9 @@ None.
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
 | v3.0 migration | DatabaseService.update/delete signatures differ from wecoza_db() | Must adapt array WHERE → string WHERE in repository |
-| v3.0 migration | 2 nopriv AJAX handlers in source | Must remove during migration (Bug #12) |
-| v3.0 migration | 3 different localization objects with mixed casing | Must unify into wecozaAgents with camelCase (Bug #3) |
+| v3.0 migration | ~~2 nopriv AJAX handlers in source~~ | ~~Must remove during migration (Bug #12)~~ **RESOLVED in 27-01** |
+| v3.0 migration | ~~3 different localization objects with mixed casing~~ | ~~Must unify into wecozaAgents with camelCase (Bug #3)~~ **RESOLVED in 27-01** |
+| v3.0 migration | Duplicate helper methods in controller/AJAX handler | Minor DRY violation - can refactor in Phase 28/29 |
 
 ### Quick Tasks Completed
 
@@ -71,7 +72,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Plan 26-02 complete (Repository + Model)
-Resume file: .planning/phases/26-foundation-architecture/26-02-SUMMARY.md
+Stopped at: Plan 27-01 complete (Controllers & AJAX Handlers)
+Resume file: .planning/phases/27-controllers-views-ajax/27-01-SUMMARY.md
 
-**Next action:** Execute Plan 26-03 (Services Layer) to migrate ScheduleService, AssignmentService, PaymentService.
+**Next action:** Execute Plan 27-02 (Views) to migrate agent-capture-form, agent-display-table, agent-single-display views.
