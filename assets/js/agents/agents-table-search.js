@@ -288,7 +288,7 @@
      * Export agents table to CSV
      * This function is called by the Export button onclick handler
      */
-    function exportClasses() {
+    function exportAgents() {
         try {
             // Get the table element
             const table = document.querySelector('#agents-display-data');
@@ -406,9 +406,9 @@
     }
 
     /**
-     * Make exportClasses globally available for onclick handler
+     * Make exportAgents globally available for onclick handler
      */
-    window.exportClasses = exportClasses;
+    window.exportAgents = exportAgents;
 
     /**
      * Public API for external access
@@ -418,7 +418,7 @@
         reset: agents_reset_search,
         getStats: agents_get_search_stats,
         forceReinit: agents_force_reinit,
-        export: exportClasses
+        export: exportAgents
     };
 
     /**

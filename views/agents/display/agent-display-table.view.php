@@ -31,6 +31,11 @@
 <div id="alert-container" class="alert-container"></div>
 <!-- Main Content Container -->
 <div id="agents-container">
+<div id="wecoza-agents-loader-container" class="text-center py-3 d-none">
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
    <div class="table-responsive">
       <div class="bootstrap-table bootstrap5">
          <!-- Toolbar -->
@@ -59,7 +64,7 @@
                            Refresh
                            <i class="bi bi-arrow-clockwise ms-1"></i>
                            </button>
-                           <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportClasses()">
+                           <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportAgents()">
                            Export
                            <i class="bi bi-download ms-1"></i>
                            </button>
@@ -227,123 +232,3 @@
       <div class="clearfix"></div>
    </div>
 </div>
-
-<script>
-/**
- * Export agents table to CSV
- * Inline script to ensure exportClasses() function is always available
- */
-function exportClasses() {
-    try {
-        // Get the table element
-        const table = document.querySelector('#agents-display-data');
-        if (!table) {
-            console.error('Table not found for export');
-            return;
-        }
-
-        // Get table headers
-        const headers = [];
-        const headerCells = table.querySelectorAll('thead th');
-        headerCells.forEach(cell => {
-            const headerText = cell.textContent.trim();
-            if (headerText && headerText !== 'Actions') { // Skip Actions column
-                headers.push(headerText);
-            }
-        });
-
-        // Get visible table rows (respecting search filter)
-        const rows = [];
-        const visibleRows = table.querySelectorAll('tbody tr:not([style*="display: none"])');
-
-        visibleRows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            const rowData = [];
-
-            cells.forEach((cell, index) => {
-                // Skip the actions column (last column)
-                if (index < cells.length - 1) {
-                    let cellText = cell.textContent.trim();
-                    // Clean up any extra whitespace
-                    cellText = cellText.replace(/\s+/g, ' ');
-                    rowData.push(cellText);
-                }
-            });
-
-            if (rowData.length > 0) {
-                rows.push(rowData);
-            }
-        });
-
-        if (rows.length === 0) {
-            console.warn('No data to export');
-            return;
-        }
-
-        // Create CSV content
-        let csvContent = '';
-
-        // Add headers
-        csvContent += headers.map(header => escapeCSVField(header)).join(',') + '\n';
-
-        // Add data rows
-        rows.forEach(row => {
-            csvContent += row.map(field => escapeCSVField(field)).join(',') + '\n';
-        });
-
-        // Create filename with timestamp
-        const now = new Date();
-        const timestamp = now.getFullYear() +
-                         String(now.getMonth() + 1).padStart(2, '0') +
-                         String(now.getDate()).padStart(2, '0') + '-' +
-                         String(now.getHours()).padStart(2, '0') +
-                         String(now.getMinutes()).padStart(2, '0') +
-                         String(now.getSeconds()).padStart(2, '0');
-
-        const filename = `agents-export-${timestamp}.csv`;
-
-        // Create and trigger download
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-
-        if (link.download !== undefined) {
-            // Use download attribute if supported
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            // Fallback for older browsers
-            navigator.msSaveBlob(blob, filename);
-        }
-
-        // Show success message (silent - no popup)
-        console.log(`Successfully exported ${rows.length} agent(s) to ${filename}`);
-
-    } catch (error) {
-        console.error('Export error:', error);
-    }
-}
-
-/**
- * Escape CSV field by wrapping in quotes if needed
- */
-function escapeCSVField(field) {
-    if (field == null) {
-        return '';
-    }
-
-    // Convert to string and trim
-    const stringField = String(field).trim();
-
-    // If field contains comma, newline, or quotes, wrap in quotes and escape internal quotes
-    if (stringField.includes(',') || stringField.includes('\n') || stringField.includes('"')) {
-        return '"' + stringField.replace(/"/g, '""') + '"';
-    }
-
-    return stringField;
-}
-</script>
