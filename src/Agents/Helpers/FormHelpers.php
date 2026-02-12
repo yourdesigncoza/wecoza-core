@@ -101,10 +101,14 @@ class FormHelpers {
      * @param string $default Default value if field not found
      * @return string Field value or default
      */
-    public static function get_field_value(array $agent, string $field, string $default = ''): string {
+    public static function get_field_value(?array $agent, string $field, string $default = ''): string {
+        if ($agent === null) {
+            return $default;
+        }
+
         // Get the database column name for this form field
         $db_field = self::get_database_field_name($field);
-        
+
         // Check if the field exists in the agent data
         if (isset($agent[$db_field])) {
             return esc_attr($agent[$db_field]);
