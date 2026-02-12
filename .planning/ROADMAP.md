@@ -255,10 +255,11 @@ Plans:
   1. User can create head sites (main client locations) and sub-sites linked to head site
   2. User can view parent-child site relationships in site listing
   3. System hydrates site data with location details from locations table (suburb, town, province)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 24-01: TBD
+- [ ] 24-01-PLAN.md -- Verify and fix site creation AJAX wiring, form-to-handler data flow, standalone site endpoints
+- [ ] 24-02-PLAN.md -- Verify client listing hydration, modal display, cache invalidation, E2E human verification
 
 #### Phase 25: Integration Testing & Cleanup
 **Goal**: Verify full integration and remove standalone plugin artifacts
