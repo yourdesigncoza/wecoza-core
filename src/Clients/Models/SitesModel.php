@@ -731,6 +731,9 @@ class SitesModel {
                 return false;
             }
 
+            // Refresh head site cache for the client
+            $this->refreshHeadSiteCache(array($clientId));
+
             return array(
                 'site_id' => $siteId,
                 'mode' => 'sub',
@@ -742,6 +745,9 @@ class SitesModel {
         if (!$insert) {
             return false;
         }
+
+        // Refresh head site cache for the client
+        $this->refreshHeadSiteCache(array($clientId));
 
         return array(
             'site_id' => (int) $insert,
