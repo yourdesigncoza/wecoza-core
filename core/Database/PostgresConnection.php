@@ -329,7 +329,7 @@ class PostgresConnection
 
             // Detect primary key column for RETURNING clause
             $returningColumn = null;
-            foreach (['id', 'client_id', 'location_id', 'site_id', 'communication_id'] as $candidate) {
+            foreach (['id', 'agent_id', 'client_id', 'location_id', 'site_id', 'communication_id'] as $candidate) {
                 if ($this->tableHasColumn($table, $candidate)) {
                     $returningColumn = $candidate;
                     break;

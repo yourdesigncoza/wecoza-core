@@ -51,6 +51,7 @@ spl_autoload_register(function (string $class) {
         'WeCoza\\Classes\\' => WECOZA_CORE_PATH . 'src/Classes/',
         'WeCoza\\Events\\' => WECOZA_CORE_PATH . 'src/Events/',
         'WeCoza\\Clients\\' => WECOZA_CORE_PATH . 'src/Clients/',
+        'WeCoza\\Agents\\' => WECOZA_CORE_PATH . 'src/Agents/',
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
