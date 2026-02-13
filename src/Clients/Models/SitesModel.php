@@ -306,7 +306,7 @@ class SitesModel {
         $indexed = array();
         foreach ($rows as $row) {
             $clientId = isset($row['client_id']) ? (int) $row['client_id'] : 0;
-            if ($clientId > 0) {
+            if ($clientId > 0 && !isset($indexed[$clientId])) {
                 $indexed[$clientId] = $row;
             }
         }

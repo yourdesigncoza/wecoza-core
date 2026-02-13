@@ -754,6 +754,9 @@ class ClientsController extends BaseController {
             'created_at', 'updated_at',
             'contact_person', 'contact_person_email', 'contact_person_cellphone',
             'contact_person_tel', 'contact_person_position',
+            // Hydrated address display fields (populated by SitesModel::hydrateClients)
+            'client_street_address', 'client_suburb', 'client_postal_code',
+            'client_province', 'client_town',
         );
 
         foreach ($scalarFields as $field) {
