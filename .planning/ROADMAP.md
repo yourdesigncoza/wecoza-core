@@ -8,7 +8,7 @@
 - ✅ **v1.3 Fix Material Tracking Dashboard** — Phases 19-20 (shipped 2026-02-06)
 - ✅ **v2.0 Clients Integration** — Phases 21-25 (shipped 2026-02-12)
 - ✅ **v3.0 Agents Integration** — Phases 26-30 (shipped 2026-02-12)
-- 🔄 **v3.1 Form Field Wiring Fixes** — Phases 31-35
+- ✅ **v3.1 Form Field Wiring Fixes** — Phases 31-35 (shipped 2026-02-13)
 
 ---
 
@@ -154,7 +154,7 @@ Plans:
 
 ---
 
-### Phase 35: Events Module Fixes
+### Phase 35: Events Module Fixes ✅ Complete (2026-02-13)
 
 **Goal:** Add late escaping for presenter-generated HTML and sync tracking table with JSONB.
 
@@ -163,21 +163,21 @@ Plans:
 **Dependencies:** None
 
 **Requirements:**
-- EVT-01: Add late escaping for `summary_html` output
-- EVT-02: Add late escaping for `notification_badge_html`/`status_badge_html`
-- EVT-03: Update `markDelivered()` to set `materials_delivered_at` and `delivery_status`
-- EVT-04: Remove duplicate test notification JS
+- ✅ EVT-01: Add late escaping for `summary_html` output
+- ✅ EVT-02: Add late escaping for `notification_badge_html`/`status_badge_html`
+- ✅ EVT-03: Update `markDelivered()` to set `materials_delivered_at` and `delivery_status`
+- ✅ EVT-04: Remove duplicate test notification JS
 
 **Success Criteria:**
-1. Late escaping enforced - all presenter-generated HTML explicitly escaped at output point
-2. Material tracking table synced - `materials_delivered_at` and `delivery_status = 'delivered'` set when materials marked delivered
-3. Duplicate JS removed - test notification handler consolidated to single location
-4. WordPress escaping best practices followed - no pre-built HTML output without escaping
+1. ✅ Late escaping enforced - all presenter-generated HTML explicitly escaped at output point
+2. ✅ Material tracking table synced - `materials_delivered_at` and `delivery_status = 'delivered'` set when materials marked delivered
+3. ✅ Duplicate JS removed - test notification handler consolidated to single location
+4. ✅ WordPress escaping best practices followed - no pre-built HTML output without escaping
 
 **Plans:** 1 plan
 
 Plans:
-- [ ] 35-01-PLAN.md — Late escaping for presenter HTML, tracking table sync in markDelivered(), remove duplicate JS file
+- [x] 35-01-PLAN.md — Late escaping for presenter HTML, tracking table sync in markDelivered(), remove duplicate JS file
 
 ---
 
@@ -192,9 +192,9 @@ Phases execute in numeric order.
 | 32 | v3.1 | 9 | Complete | 100% |
 | 33 | v3.1 | 6 | Complete | 100% |
 | 34 | v3.1 | 5 | Complete | 100% |
-| 35 | v3.1 | 4 | Not started | 0% |
+| 35 | v3.1 | 4 | Complete | 100% |
 
-**Overall v3.1:** 30/34 requirements complete (88%)
+**Overall v3.1:** 34/34 requirements complete (100%)
 
 ---
 
@@ -282,4 +282,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after phase 35 planning*
+*Last updated: 2026-02-13 after phase 35 execution — v3.1 milestone complete*
