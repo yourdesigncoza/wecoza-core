@@ -185,11 +185,11 @@ Phases execute in numeric order.
 |-------|-----------|--------------|--------|------------|
 | 31 | v3.1 | 10 | Complete | 100% |
 | 32 | v3.1 | 9 | Complete | 100% |
-| 33 | v3.1 | 6 | In progress | 67% |
+| 33 | v3.1 | 6 | Complete | 100% |
 | 34 | v3.1 | 5 | Complete | 100% |
 | 35 | v3.1 | 4 | Not started | 0% |
 
-**Overall v3.1:** 24/34 requirements complete (71%)
+**Overall v3.1:** 30/34 requirements complete (88%)
 
 ---
 
