@@ -60,7 +60,7 @@ Plans:
 
 ---
 
-### Phase 32: Classes Module Fixes
+### Phase 32: Classes Module Fixes ✅ Complete (2026-02-13)
 
 **Goal:** Fix critical reverse path bugs and security issues in Classes module forms.
 
@@ -90,7 +90,7 @@ Plans:
 
 Plans:
 - [x] 32-01-PLAN.md — Surgical fixes: data integrity, security, sanitization, view pre-selection (CLS-01 to CLS-07, CLS-09)
-- [ ] 32-02-PLAN.md — DB migration: agents/supervisors from static arrays to DB queries with caching (CLS-08)
+- [x] 32-02-PLAN.md — DB migration: agents/supervisors from static arrays to DB queries with caching (CLS-08)
 
 ---
 
@@ -184,12 +184,12 @@ Phases execute in numeric order.
 | Phase | Milestone | Requirements | Status | Completion |
 |-------|-----------|--------------|--------|------------|
 | 31 | v3.1 | 10 | Complete | 100% |
-| 32 | v3.1 | 9 | In progress | 89% |
+| 32 | v3.1 | 9 | Complete | 100% |
 | 33 | v3.1 | 6 | In progress | 67% |
 | 34 | v3.1 | 5 | Not started | 0% |
 | 35 | v3.1 | 4 | Not started | 0% |
 
-**Overall v3.1:** 18/34 requirements complete (53%)
+**Overall v3.1:** 19/34 requirements complete (56%)
 
 ---
 
@@ -277,4 +277,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after phase 34 planning*
+*Last updated: 2026-02-13 after phase 32 completion*

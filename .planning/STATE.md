@@ -11,10 +11,10 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 Phase: 33 - Agents Module Fixes
 Plan: 01 of 2 complete
-Status: In progress — validation hardening and whitelist cleanup done, plan 02 pending
-Last activity: 2026-02-13 — Completed 33-01-PLAN.md (validation hardening)
+Status: In progress — Phase 32 fully complete, Phase 33 plan 02 pending
+Last activity: 2026-02-13 — Completed 32-02-PLAN.md (DB migration for agents/supervisors)
 
-Progress: ████░░░░░░░░░░░░░░░░ 12% (4/34 plans)
+Progress: █████░░░░░░░░░░░░░░░ 15% (5/34 plans)
 
 ## Milestone History
 
@@ -48,6 +48,7 @@ See: .planning/MILESTONES.md for full details
 | D32-01-01 | Keep nopriv on read-only QA endpoints | 2026-02-13 | Site requires auth for all pages; read endpoints safe as nopriv |
 | D33-01-01 | Use !isset or === '' for quantum score validation | 2026-02-13 | empty(0) returns true but 0 is a valid score value |
 | D33-01-02 | absint(0) safe for working areas due to sanitizeWorkingArea() | 2026-02-13 | Repository converts 0 to null for FK safety |
+| D32-02-01 | Supervisors drawn from same agents pool (no supervisor column) | 2026-02-13 | agents table has no role/is_supervisor column; both methods query active agents |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -86,7 +87,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 33-01-PLAN.md execution
-Resume file: .planning/phases/33-agents-module-fixes/33-01-SUMMARY.md
+Stopped at: Completed 32-02-PLAN.md execution (Phase 32 fully done)
+Resume file: .planning/phases/32-classes-module-fixes/32-02-SUMMARY.md
 
 **Next action:** Execute 33-02-PLAN.md (client-side form field wiring fixes for agents module).
