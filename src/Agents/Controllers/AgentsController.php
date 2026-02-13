@@ -449,9 +449,9 @@ class AgentsController extends BaseController
             'residential_postal_code' => preg_replace('/[^0-9]/', '', $_POST['postal_code'] ?? ''),
 
             // Working Areas
-            'preferred_working_area_1' => $_POST['preferred_working_area_1'] ?? '',
-            'preferred_working_area_2' => $_POST['preferred_working_area_2'] ?? '',
-            'preferred_working_area_3' => $_POST['preferred_working_area_3'] ?? '',
+            'preferred_working_area_1' => absint($_POST['preferred_working_area_1'] ?? 0),
+            'preferred_working_area_2' => absint($_POST['preferred_working_area_2'] ?? 0),
+            'preferred_working_area_3' => absint($_POST['preferred_working_area_3'] ?? 0),
 
             // SACE Registration
             'sace_number' => sanitize_text_field($_POST['sace_number'] ?? ''),
@@ -616,6 +616,62 @@ class AgentsController extends BaseController
 
         if (empty($data['preferred_working_area_1'])) {
             $errors['preferred_working_area_1'] = __('At least one preferred working area is required.', 'wecoza-core');
+        }
+
+        if (empty($data['title'])) {
+            $errors['title'] = __('Title is required.', 'wecoza-core');
+        }
+
+        if (empty($data['residential_suburb'])) {
+            $errors['residential_suburb'] = __('Suburb is required.', 'wecoza-core');
+        }
+
+        if (empty($data['subjects_registered'])) {
+            $errors['subjects_registered'] = __('Subjects registered is required.', 'wecoza-core');
+        }
+
+        if (empty($data['highest_qualification'])) {
+            $errors['highest_qualification'] = __('Highest qualification is required.', 'wecoza-core');
+        }
+
+        if (empty($data['agent_training_date'])) {
+            $errors['agent_training_date'] = __('Agent training date is required.', 'wecoza-core');
+        }
+
+        if (!isset($data['quantum_assessment']) || $data['quantum_assessment'] === '') {
+            $errors['quantum_assessment'] = __('Quantum assessment is required.', 'wecoza-core');
+        }
+
+        if (!isset($data['quantum_maths_score']) || $data['quantum_maths_score'] === '') {
+            $errors['quantum_maths_score'] = __('Quantum maths score is required.', 'wecoza-core');
+        }
+
+        if (!isset($data['quantum_science_score']) || $data['quantum_science_score'] === '') {
+            $errors['quantum_science_score'] = __('Quantum science score is required.', 'wecoza-core');
+        }
+
+        if (empty($data['signed_agreement_date'])) {
+            $errors['signed_agreement_date'] = __('Signed agreement date is required.', 'wecoza-core');
+        }
+
+        if (empty($data['bank_name'])) {
+            $errors['bank_name'] = __('Bank name is required.', 'wecoza-core');
+        }
+
+        if (empty($data['account_holder'])) {
+            $errors['account_holder'] = __('Account holder is required.', 'wecoza-core');
+        }
+
+        if (empty($data['bank_account_number'])) {
+            $errors['bank_account_number'] = __('Account number is required.', 'wecoza-core');
+        }
+
+        if (empty($data['bank_branch_code'])) {
+            $errors['bank_branch_code'] = __('Branch code is required.', 'wecoza-core');
+        }
+
+        if (empty($data['account_type'])) {
+            $errors['account_type'] = __('Account type is required.', 'wecoza-core');
         }
 
         // Validate ID based on type
