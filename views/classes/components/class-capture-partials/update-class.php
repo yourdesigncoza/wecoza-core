@@ -1506,7 +1506,7 @@ if (isset($data['class_data']) && $data['class_data']):
                   <select id="initial_class_agent" name="initial_class_agent" class="form-select form-select-sm" required>
                      <option value="">Select</option>
                      <?php foreach ($data['agents'] as $agent): ?>
-                        <option value="<?php echo $agent['id']; ?>" <?php echo (isset($data['class_data']['class_agent']) && $data['class_data']['class_agent'] == $agent['id']) ? 'selected' : ''; ?>><?php echo $agent['name']; ?></option>
+                        <option value="<?php echo $agent['id']; ?>" <?php echo (isset($data['class_data']['initial_class_agent']) && $data['class_data']['initial_class_agent'] == $agent['id']) ? 'selected' : ''; ?>><?php echo $agent['name']; ?></option>
                      <?php endforeach; ?>
                   </select>
                   <div class="invalid-feedback">Please select the initial class agent.</div>

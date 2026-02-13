@@ -39,17 +39,13 @@ class QAController extends BaseController
         add_action('wp_ajax_get_qa_visits', [$this, 'getQAVisits']);
         add_action('wp_ajax_nopriv_get_qa_visits', [$this, 'getQAVisits']);
         add_action('wp_ajax_create_qa_visit', [$this, 'createQAVisit']);
-        add_action('wp_ajax_nopriv_create_qa_visit', [$this, 'createQAVisit']);
         add_action('wp_ajax_export_qa_reports', [$this, 'exportQAReports']);
-        add_action('wp_ajax_nopriv_export_qa_reports', [$this, 'exportQAReports']);
 
         // QA Operations AJAX handlers
         add_action('wp_ajax_delete_qa_report', [$this, 'deleteQAReport']);
-        add_action('wp_ajax_nopriv_delete_qa_report', [$this, 'deleteQAReport']);
         add_action('wp_ajax_get_class_qa_data', [$this, 'getClassQAData']);
         add_action('wp_ajax_nopriv_get_class_qa_data', [$this, 'getClassQAData']);
         add_action('wp_ajax_submit_qa_question', [$this, 'submitQAQuestion']);
-        add_action('wp_ajax_nopriv_submit_qa_question', [$this, 'submitQAQuestion']);
 
         add_action('admin_menu', [$this, 'addQADashboardMenu']);
     }

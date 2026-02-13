@@ -622,6 +622,7 @@ class ClassRepository extends BaseRepository
                 'class_notes_data' => $classModel->getClassNotesData(),
                 'created_at' => $classModel->getCreatedAt(),
                 'updated_at' => $classModel->getUpdatedAt(),
+                'order_nr' => $classModel->getOrderNr(),
             ];
 
             // Add client name
