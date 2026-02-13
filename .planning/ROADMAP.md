@@ -147,6 +147,11 @@ Plans:
 4. Nonce actions consistent - all forms and controllers use `clients_nonce_action`
 5. Attack surface reduced - 7 unused AJAX endpoints removed, verified by grep
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 34-01-PLAN.md — Fix all 5 CLT requirements: remove inline handler, add nonce field, clean whitelists, unify nonces, remove unused endpoints
+
 ---
 
 ### Phase 35: Events Module Fixes
@@ -272,4 +277,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after phase 33 planning*
+*Last updated: 2026-02-13 after phase 34 planning*
