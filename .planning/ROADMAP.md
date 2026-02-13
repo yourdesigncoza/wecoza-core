@@ -94,7 +94,7 @@ Plans:
 
 ---
 
-### Phase 33: Agents Module Fixes
+### Phase 33: Agents Module Fixes ✅ Complete (2026-02-13)
 
 **Goal:** Fix postal code reverse path bug and add missing server-side validation.
 
@@ -121,7 +121,7 @@ Plans:
 
 Plans:
 - [x] 33-01-PLAN.md — Validation hardening + whitelist cleanup (AGT-02, AGT-03, AGT-04, AGT-05)
-- [ ] 33-02-PLAN.md — DRY refactor: extract shared display methods into AgentDisplayService (AGT-06)
+- [x] 33-02-PLAN.md — DRY refactor: extract shared display methods into AgentDisplayService (AGT-06)
 
 ---
 
