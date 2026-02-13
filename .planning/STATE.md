@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 31 - Learners Module Fixes
-Plan: Not started
-Status: Roadmap created, ready for phase planning
-Last activity: 2026-02-13 — Roadmap created for v3.1
+Plan: 01 of 2 complete
+Status: In progress — verification complete, scoped fixes ready
+Last activity: 2026-02-13 — Completed 31-01-PLAN.md (verify LRNR requirements)
 
-Progress: █░░░░░░░░░░░░░░░░░░░ 0% (0/34 requirements)
+Progress: █░░░░░░░░░░░░░░░░░░░ 3% (1/34 requirements)
 
 ## Milestone History
 
@@ -42,6 +42,9 @@ See: .planning/MILESTONES.md for full details
 | D29-01-02 | Repository aligned with actual schema rather than adding columns | 2026-02-12 | Less invasive fix — agent_notes uses note_date, agent_absences uses reported_at |
 | D13-02-01 | Form field wiring audit before fixes | 2026-02-13 | Comprehensive audit identifies all issues before coding, prevents scope creep |
 | D13-02-02 | Module-by-module fix approach (5 phases) | 2026-02-13 | Independent scopes, testable per module, ordered by severity |
+| D13-02-03 | Safe to delete .integrate/wecoza-learners-plugin/views/learner-form.view.php | 2026-02-13 | Dead code confirmed — zero references in codebase, legacy migration artifact |
+| D13-02-04 | XSS vulnerability in learners-app.js showAlert() using .html() | 2026-02-13 | Security risk — server data in ${message} needs .text() instead |
+| D13-02-05 | Sponsors feature is fully implemented, not orphaned | 2026-02-13 | LRNR-02 audit claim was incorrect — schema, repo methods, form wiring all exist |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -56,6 +59,15 @@ None.
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
 | v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet |
+
+### Next Phase Readiness
+
+**Phase 31 Plan 02:** Ready to proceed with 3 focused fixes:
+1. XSS vulnerability in learners-app.js showAlert() (security)
+2. Documentation cleanup in FORM-FIELDS-REFERENCE.md (accuracy)
+3. Delete dead code at .integrate/wecoza-learners-plugin/views/learner-form.view.php (maintenance)
+
+Verification audit completed — 7 of 10 LRNR issues already resolved in previous commits.
 
 ### Quick Tasks Completed
 
@@ -75,7 +87,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Roadmap created for v3.1 milestone
-Resume file: .planning/ROADMAP.md
+Stopped at: Completed 31-01-PLAN.md verification
+Resume file: .planning/phases/31-learners-module-fixes/31-01-SUMMARY.md
 
-**Next action:** `/gsd:plan-phase 31` to create execution plan for Learners module fixes.
+**Next action:** `/gsd:plan-phase 31-02` to create implementation plan for 3 remaining LRNR fixes (XSS, docs, dead code).
