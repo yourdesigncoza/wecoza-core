@@ -2,25 +2,24 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-12)
+See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v3.0 Agents Integration
+**Current focus:** v3.1 Form Field Wiring Fixes
 
 ## Current Position
 
-Phase: 29 of 30 (Feature Verification & Performance)
-Plan: 2 of 2 complete
-Status: Complete
-Last activity: 2026-02-12 — Phase 29 complete (Feature Verification & Performance)
-
-Progress: [█████████████████████████████░] 97% (29 phases complete, 1 phase remaining)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-13 — Milestone v3.1 started
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
-| v3.0 | Agents Integration | — | 26-30 | 0 |
+| v3.1 | Form Field Wiring Fixes | — | 31-35 | 0 |
+| v3.0 | Agents Integration | 2026-02-12 | 26-30 | 8 |
 | v2.0 | Clients Integration | 2026-02-12 | 21-25 | 10 |
 | v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19-20 | 3 |
 | v1.2 | Event Tasks Refactor | 2026-02-05 | 13-18 | 16 |
@@ -52,11 +51,7 @@ None.
 |--------|-------|--------|
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
-| v3.0 migration | DatabaseService.update/delete signatures differ from wecoza_db() | Must adapt array WHERE → string WHERE in repository |
-| v3.0 migration | ~~2 nopriv AJAX handlers in source~~ | ~~Must remove during migration (Bug #12)~~ **RESOLVED in 27-01** |
-| v3.0 migration | ~~3 different localization objects with mixed casing~~ | ~~Must unify into wecozaAgents with camelCase (Bug #3)~~ **RESOLVED in 27-01, 27-03** |
-| v3.0 migration | Duplicate helper methods in controller/AJAX handler | Minor DRY violation - can refactor in Phase 28/29 |
-| v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet — documented in 29-01 test |
+| v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet |
 
 ### Quick Tasks Completed
 
@@ -75,8 +70,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-12
-Stopped at: Phase 29 complete (Feature Verification & Performance)
-Resume file: .planning/phases/29-feature-verification/29-02-SUMMARY.md
+Last session: 2026-02-13
+Stopped at: Milestone v3.1 started — defining requirements
+Resume file: .planning/REQUIREMENTS.md
 
-**Next action:** Plan Phase 30 (Integration Testing & Cleanup) — automated feature parity test, standalone plugin deactivation, source removal.
+**Next action:** Define requirements from form field wiring audits, create roadmap.
