@@ -25,7 +25,7 @@ Fix all critical, warning, and cleanup issues from comprehensive form field wiri
 
 ---
 
-### Phase 31: Learners Module Fixes
+### Phase 31: Learners Module Fixes ✅ Complete (2026-02-13)
 
 **Goal:** Fix all critical data loss bugs and security warnings in Learners module forms.
 
@@ -34,29 +34,29 @@ Fix all critical, warning, and cleanup issues from comprehensive form field wiri
 **Dependencies:** None
 
 **Requirements:**
-- LRNR-01: Fix `numeracy_level` missing from update shortcode POST processing
-- LRNR-02: Resolve `sponsors[]` orphaned field
-- LRNR-03: Clean up phantom fields (`date_of_birth`, `suburb`)
-- LRNR-04: Remove duplicate `placement_assessment_date` field
-- LRNR-05: Remove `nopriv` AJAX registrations
-- LRNR-06: Fix `employment_status` initial visibility bug
-- LRNR-07: Use `intval()` for `highest_qualification` FK ID
-- LRNR-08: Add date format validation for `placement_assessment_date`
-- LRNR-09: Fix template literal XSS risk
-- LRNR-10: Clean up dead code
+- ✅ LRNR-01: Fix `numeracy_level` missing from update shortcode POST processing (already fixed)
+- ✅ LRNR-02: Resolve `sponsors[]` orphaned field (fully implemented, not orphaned)
+- ✅ LRNR-03: Clean up phantom fields (`date_of_birth`, `suburb`) (already correct)
+- ✅ LRNR-04: Remove duplicate `placement_assessment_date` field (already fixed)
+- ✅ LRNR-05: Remove `nopriv` AJAX registrations (already fixed)
+- ✅ LRNR-06: Fix `employment_status` initial visibility bug (already fixed)
+- ✅ LRNR-07: Use `intval()` for `highest_qualification` FK ID (already fixed)
+- ✅ LRNR-08: Add date format validation for `placement_assessment_date` (already fixed)
+- ✅ LRNR-09: Fix template literal XSS risk (FIXED in 31-02)
+- ✅ LRNR-10: Clean up dead code (FIXED in 31-02)
 
 **Success Criteria:**
-1. No data loss on learner update - `numeracy_level` persists correctly across updates
-2. Sponsors feature resolved - either fully implemented with DB persistence or UI removed from both forms
-3. Security hardened - all `nopriv` endpoints removed, verified by grep
-4. Dead code eliminated - unused AJAX endpoints removed, orphaned form fields cleaned up
-5. All fields properly sanitized - FK IDs use `intval()`, dates validated, XSS risks patched
+1. ✅ No data loss on learner update - `numeracy_level` persists correctly across updates
+2. ✅ Sponsors feature resolved - fully implemented with DB persistence
+3. ✅ Security hardened - all `nopriv` endpoints removed, XSS vulnerability patched
+4. ✅ Dead code eliminated - legacy template removed
+5. ✅ All fields properly sanitized - FK IDs use `intval()`, dates validated, XSS risks patched
 
 **Plans:** 2 plans
 
 Plans:
-- [ ] 31-01-PLAN.md — Verify all 10 LRNR requirements against current code (safety-first)
-- [ ] 31-02-PLAN.md — Implement remaining fixes (XSS patch, doc cleanup, dead code removal)
+- [x] 31-01-PLAN.md — Verify all 10 LRNR requirements against current code (safety-first)
+- [x] 31-02-PLAN.md — Implement remaining fixes (XSS patch, doc cleanup, dead code removal)
 
 ---
 
