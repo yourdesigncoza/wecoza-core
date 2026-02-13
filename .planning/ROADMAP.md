@@ -86,6 +86,12 @@ Plans:
 4. All date arrays validated - stop dates, restart dates, backup agent dates sanitized with format checks
 5. Agents/supervisors dynamic - dropdown data reflects current agents table, not hardcoded static lists
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 32-01-PLAN.md — Surgical fixes: data integrity, security, sanitization, view pre-selection (CLS-01 to CLS-07, CLS-09)
+- [ ] 32-02-PLAN.md — DB migration: agents/supervisors from static arrays to DB queries with caching (CLS-08)
+
 ---
 
 ### Phase 33: Agents Module Fixes
@@ -260,4 +266,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after v3.1 roadmap created*
+*Last updated: 2026-02-13 after phase 32 planning*
