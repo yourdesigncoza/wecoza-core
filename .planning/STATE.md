@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 34 - Clients Module Fixes
+Phase: 35 - Events Module Fixes
 Plan: 01 of 1 complete
-Status: Phases 33 and 34 fully complete
-Last activity: 2026-02-13 — Completed 33-02-PLAN.md (agent display DRY refactor)
+Status: Phase 35 fully complete
+Last activity: 2026-02-13 — Completed 35-01-PLAN.md (Events module security & tracking fixes)
 
-Progress: ███████░░░░░░░░░░░░░ 21% (7/34 plans)
+Progress: ████████░░░░░░░░░░░░ 24% (8/34 plans)
 
 ## Milestone History
 
@@ -50,6 +50,9 @@ See: .planning/MILESTONES.md for full details
 | D33-01-02 | absint(0) safe for working areas due to sanitizeWorkingArea() | 2026-02-13 | Repository converts 0 to null for FK safety |
 | D32-02-01 | Supervisors drawn from same agents pool (no supervisor column) | 2026-02-13 | agents table has no role/is_supervisor column; both methods query active agents |
 | D34-01-01 | Removed entire 208-line inline script from update form | 2026-02-13 | All functionality (submit, sub-client toggle, location cascade) already in client-capture.js |
+| D35-01-01 | Use wp_kses_post() instead of esc_html() for presenter-generated HTML | 2026-02-13 | HTML contains intentional markup (badges, formatted paragraphs). wp_kses_post() allows standard WordPress post HTML while stripping dangerous tags. |
+| D35-01-02 | Do NOT wrap tracking table sync in transaction with JSONB update | 2026-02-13 | JSONB is source of truth. Tracking table is secondary concern. Failed sync is low-impact (dashboard JOIN still shows correct status from JSONB). |
+| D35-01-03 | Delete notification-settings.php instead of removing duplicate code | 2026-02-13 | File is never loaded by any PHP code. Zero references across codebase. Full deletion is cleaner than partial modification. |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -69,7 +72,9 @@ None.
 
 **Phase 33:** Fully complete (plans 01 and 02).
 **Phase 34:** Fully complete (plan 01).
-**Phase 35:** Events Module Fixes — ready for planning/execution.
+**Phase 35:** Fully complete (plan 01).
+
+**Next:** Phase 36+ (if planned) or milestone v3.1 verification.
 
 ### Quick Tasks Completed
 
@@ -89,7 +94,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 33-02-PLAN.md execution (DRY refactor for agents display)
-Resume file: .planning/phases/33-agents-module-fixes/33-02-SUMMARY.md
+Stopped at: Completed 35-01-PLAN.md execution (Events module security & tracking fixes)
+Resume file: .planning/phases/35-events-module-fixes/35-01-SUMMARY.md
 
-**Next action:** Execute phase 35 (Events Module Fixes).
+**Next action:** Phase 36+ or v3.1 milestone verification.
