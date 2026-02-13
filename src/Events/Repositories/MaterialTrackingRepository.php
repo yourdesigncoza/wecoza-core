@@ -132,6 +132,20 @@ final class MaterialTrackingRepository extends BaseRepository
                 sprintf('Failed to mark delivery as completed for class %d, event index %d', $classId, $eventIndex)
             );
         }
+
+        // Sync class_material_tracking table with JSONB state
+        // Updates both notification types (orange and red) for this class
+        $syncSql = 'UPDATE class_material_tracking
+                    SET materials_delivered_at = NOW(),
+                        delivery_status = \'delivered\',
+                        updated_at = NOW()
+                    WHERE class_id = :class_id
+                      AND delivery_status != \'delivered\'';
+
+        $syncStmt = $this->db->getPdo()->prepare($syncSql);
+        if ($syncStmt) {
+            $syncStmt->execute([':class_id' => $classId]);
+        }
     }
 
     /**
