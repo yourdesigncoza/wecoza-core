@@ -52,6 +52,12 @@ Fix all critical, warning, and cleanup issues from comprehensive form field wiri
 4. Dead code eliminated - unused AJAX endpoints removed, orphaned form fields cleaned up
 5. All fields properly sanitized - FK IDs use `intval()`, dates validated, XSS risks patched
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 31-01-PLAN.md — Verify all 10 LRNR requirements against current code (safety-first)
+- [ ] 31-02-PLAN.md — Implement remaining fixes (XSS patch, doc cleanup, dead code removal)
+
 ---
 
 ### Phase 32: Classes Module Fixes
