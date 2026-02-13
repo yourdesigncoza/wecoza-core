@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 32 - Classes Module Fixes
+Phase: 33 - Agents Module Fixes
 Plan: 01 of 2 complete
-Status: In progress — 8 CLS requirements resolved in plan 01, plan 02 (DB migration) pending
-Last activity: 2026-02-13 — Completed 32-01-PLAN.md (surgical fixes)
+Status: In progress — validation hardening and whitelist cleanup done, plan 02 pending
+Last activity: 2026-02-13 — Completed 33-01-PLAN.md (validation hardening)
 
-Progress: ███░░░░░░░░░░░░░░░░░ 9% (3/34 plans)
+Progress: ████░░░░░░░░░░░░░░░░ 12% (4/34 plans)
 
 ## Milestone History
 
@@ -46,6 +46,8 @@ See: .planning/MILESTONES.md for full details
 | D13-02-04 | XSS vulnerability in learners-app.js showAlert() using .html() | 2026-02-13 | Security risk — server data in ${message} needs .text() instead |
 | D13-02-05 | Sponsors feature is fully implemented, not orphaned | 2026-02-13 | LRNR-02 audit claim was incorrect — schema, repo methods, form wiring all exist |
 | D32-01-01 | Keep nopriv on read-only QA endpoints | 2026-02-13 | Site requires auth for all pages; read endpoints safe as nopriv |
+| D33-01-01 | Use !isset or === '' for quantum score validation | 2026-02-13 | empty(0) returns true but 0 is a valid score value |
+| D33-01-02 | absint(0) safe for working areas due to sanitizeWorkingArea() | 2026-02-13 | Repository converts 0 to null for FK safety |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -63,8 +65,8 @@ None.
 
 ### Next Phase Readiness
 
-**Phase 32 Plan 02:** DB migration for agents/supervisors (CLS-08) — requires user to run SQL.
-**Phase 33:** Agents Module Fixes — plan created, ready for execution.
+**Phase 33 Plan 02:** Client-side form field wiring fixes for agents module — ready for execution.
+**Phase 34:** Clients Module Fixes — plan created, ready for execution.
 
 ### Quick Tasks Completed
 
@@ -84,7 +86,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 32-01-PLAN.md execution
-Resume file: .planning/phases/32-classes-module-fixes/32-01-SUMMARY.md
+Stopped at: Completed 33-01-PLAN.md execution
+Resume file: .planning/phases/33-agents-module-fixes/33-01-SUMMARY.md
 
-**Next action:** Execute 32-02-PLAN.md (DB migration for agents/supervisors CLS-08).
+**Next action:** Execute 33-02-PLAN.md (client-side form field wiring fixes for agents module).

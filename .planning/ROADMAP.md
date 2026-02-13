@@ -120,7 +120,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 33-01-PLAN.md — Validation hardening + whitelist cleanup (AGT-02, AGT-03, AGT-04, AGT-05)
+- [x] 33-01-PLAN.md — Validation hardening + whitelist cleanup (AGT-02, AGT-03, AGT-04, AGT-05)
 - [ ] 33-02-PLAN.md — DRY refactor: extract shared display methods into AgentDisplayService (AGT-06)
 
 ---
@@ -185,7 +185,7 @@ Phases execute in numeric order.
 |-------|-----------|--------------|--------|------------|
 | 31 | v3.1 | 10 | Complete | 100% |
 | 32 | v3.1 | 9 | In progress | 89% |
-| 33 | v3.1 | 6 | Not started | 0% |
+| 33 | v3.1 | 6 | In progress | 67% |
 | 34 | v3.1 | 5 | Not started | 0% |
 | 35 | v3.1 | 4 | Not started | 0% |
 
