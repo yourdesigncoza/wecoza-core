@@ -117,10 +117,8 @@ class AgentRepository extends BaseRepository
             'bank_branch_code',
             'account_type',
             'agent_training_date',
-            'agent_notes',
             'status',
             'residential_suburb',
-            'residential_town_id',
             'created_at',
             'updated_at',
             'created_by',
@@ -535,7 +533,6 @@ class AgentRepository extends BaseRepository
             'agent_training_date' => 'sanitize_text_field',
 
             // Metadata (database column names)
-            'agent_notes' => 'sanitize_textarea_field',
             'status' => 'sanitize_text_field',
             'created_at' => 'sanitize_text_field',
             'updated_at' => 'sanitize_text_field',
@@ -544,7 +541,6 @@ class AgentRepository extends BaseRepository
 
             // Legacy fields
             'residential_suburb' => 'sanitize_text_field',
-            'residential_town_id' => 'absint',
         ];
 
         $cleanData = [];
