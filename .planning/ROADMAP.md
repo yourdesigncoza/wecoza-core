@@ -117,6 +117,12 @@ Plans:
 4. Dead columns removed from whitelists - `agent_notes` and `residential_town_id` cleaned up
 5. Code duplication eliminated - shared display methods extracted to service, used by controller and AJAX handler
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 33-01-PLAN.md — Validation hardening + whitelist cleanup (AGT-02, AGT-03, AGT-04, AGT-05)
+- [ ] 33-02-PLAN.md — DRY refactor: extract shared display methods into AgentDisplayService (AGT-06)
+
 ---
 
 ### Phase 34: Clients Module Fixes
@@ -266,4 +272,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after phase 32 planning*
+*Last updated: 2026-02-13 after phase 33 planning*
