@@ -600,7 +600,7 @@ function wecoza_learners_update_form_shortcode($atts) {
 
     document.addEventListener('DOMContentLoaded', function() {
         // Fetch dropdown data via AJAX
-        fetch('<?php echo admin_url('admin-ajax.php'); ?>?action=fetch_learners_dropdown_data')
+        fetch('<?php echo admin_url('admin-ajax.php'); ?>?action=fetch_learners_dropdown_data&nonce=<?php echo wp_create_nonce('learners_nonce'); ?>')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

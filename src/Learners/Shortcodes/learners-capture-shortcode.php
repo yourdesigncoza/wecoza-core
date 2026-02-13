@@ -471,7 +471,7 @@ function wecoza_learners_form_shortcode($atts) {
             $.ajax({
                 url: "<?php echo admin_url('admin-ajax.php'); ?>",
                 type: "POST",
-                data: { action: "fetch_learners_dropdown_data" },
+                data: { action: "fetch_learners_dropdown_data", nonce: "<?php echo wp_create_nonce('learners_nonce'); ?>" },
                 success: function (response) {
                     if (response.success) {
                         console.log(response);
