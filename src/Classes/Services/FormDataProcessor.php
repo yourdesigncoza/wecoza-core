@@ -31,7 +31,7 @@ class FormDataProcessor
             // Basic fields
             $processed['id'] = isset($data['class_id']) && $data['class_id'] !== 'auto-generated' ? intval($data['class_id']) : null;
             $processed['client_id'] = isset($data['client_id']) && !empty($data['client_id']) ? intval($data['client_id']) : null;
-            $processed['site_id'] = isset($data['site_id']) && !is_array($data['site_id']) ? $data['site_id'] : null;
+            $processed['site_id'] = isset($data['site_id']) && !empty($data['site_id']) ? intval($data['site_id']) : null;
             $processed['site_address'] = isset($data['site_address']) && !is_array($data['site_address']) ? self::sanitizeText($data['site_address']) : null;
             $processed['class_type'] = isset($data['class_type']) && !is_array($data['class_type']) ? self::sanitizeText($data['class_type']) : null;
             $processed['class_subject'] = isset($data['class_subject']) && !is_array($data['class_subject']) ? self::sanitizeText($data['class_subject']) : null;
@@ -65,6 +65,12 @@ class FormDataProcessor
             $processed['exam_type'] = isset($data['exam_type']) && !is_array($data['exam_type']) ? self::sanitizeText($data['exam_type']) : null;
             $processed['class_agent'] = isset($data['class_agent']) && !empty($data['class_agent']) ? intval($data['class_agent']) : null;
             $processed['initial_class_agent'] = isset($data['initial_class_agent']) && !empty($data['initial_class_agent']) ? intval($data['initial_class_agent']) : null;
+
+            // CLS-02: Initialize class_agent from initial_class_agent on create
+            if (empty($processed['class_agent']) && !empty($processed['initial_class_agent'])) {
+                $processed['class_agent'] = $processed['initial_class_agent'];
+            }
+
             $processed['initial_agent_start_date'] = isset($data['initial_agent_start_date']) && !is_array($data['initial_agent_start_date']) ? self::sanitizeText($data['initial_agent_start_date']) : null;
             $processed['project_supervisor'] = isset($data['project_supervisor']) && !empty($data['project_supervisor']) ? intval($data['project_supervisor']) : null;
 
@@ -79,7 +85,7 @@ class FormDataProcessor
             if (isset($data['class_learners_data']) && is_string($data['class_learners_data']) && !empty($data['class_learners_data'])) {
                 $learnerData = json_decode(stripslashes($data['class_learners_data']), true);
                 if (is_array($learnerData)) {
-                    $learnerIds = $learnerData;
+                    $learnerIds = array_filter(array_map('intval', $learnerData), fn($id) => $id > 0);
                 }
             }
             $processed['learner_ids'] = $learnerIds;
@@ -89,7 +95,7 @@ class FormDataProcessor
             if (isset($data['exam_learners']) && is_string($data['exam_learners']) && !empty($data['exam_learners'])) {
                 $examLearnerData = json_decode(stripslashes($data['exam_learners']), true);
                 if (is_array($examLearnerData)) {
-                    $examLearners = $examLearnerData;
+                    $examLearners = array_filter(array_map('intval', $examLearnerData), fn($id) => $id > 0);
                 }
             }
             $processed['exam_learners'] = $examLearners;
@@ -104,7 +110,7 @@ class FormDataProcessor
                     if (!empty($agentIds[$i])) {
                         $backupAgents[] = [
                             'agent_id' => intval($agentIds[$i]),
-                            'date' => isset($agentDates[$i]) ? $agentDates[$i] : ''
+                            'date' => isset($agentDates[$i]) && self::isValidDate(self::sanitizeText($agentDates[$i])) ? self::sanitizeText($agentDates[$i]) : ''
                         ];
                     }
                 }
@@ -139,10 +145,14 @@ class FormDataProcessor
 
                 for ($i = 0; $i < count($stopDates); $i++) {
                     if (!empty($stopDates[$i]) && isset($restartDates[$i]) && !empty($restartDates[$i])) {
-                        $stopRestartDates[] = [
-                            'stop_date' => $stopDates[$i],
-                            'restart_date' => $restartDates[$i]
-                        ];
+                        $stopDate = self::sanitizeText($stopDates[$i]);
+                        $restartDate = self::sanitizeText($restartDates[$i]);
+                        if (self::isValidDate($stopDate) && self::isValidDate($restartDate)) {
+                            $stopRestartDates[] = [
+                                'stop_date' => $stopDate,
+                                'restart_date' => $restartDate
+                            ];
+                        }
                     }
                 }
             }
