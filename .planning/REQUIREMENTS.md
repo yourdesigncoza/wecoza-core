@@ -1,206 +1,124 @@
-# v3.0 Agents Integration Requirements
+# Requirements: WeCoza Core v3.1 — Form Field Wiring Fixes
 
-## Architecture Requirements
+**Defined:** 2026-02-13
+**Core Value:** Single source of truth for all WeCoza functionality — unified plugin architecture
+**Source:** `docs/formfieldanalysis/*.md` (comprehensive form field wiring audits)
 
-### ARCH-01: PSR-4 Namespace Registration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] `WeCoza\Agents\` namespace registered in wecoza-core.php autoloader mapping to `src/Agents/`
-- [ ] All migrated classes use `WeCoza\Agents\{SubNamespace}\` namespace
-- [ ] Zero references to standalone plugin constants (WECOZA_AGENTS_*)
+## v3.1 Requirements
 
-### ARCH-03: Database Migration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] All `DatabaseService::getInstance()` calls replaced with `wecoza_db()`
-- [ ] All `DatabaseService` method calls adapted to PostgresConnection API signatures
-- [ ] `update()` calls adapted: array WHERE → string WHERE + whereParams
-- [ ] `delete()` calls adapted: array WHERE → string WHERE + params
-- [ ] `insert()` calls use generic RETURNING (not hardcoded `RETURNING agent_id`)
-- [ ] `query()` + `fetchAll()` chains replaced with `wecoza_db()->getAll()`
-- [ ] `query()` + `fetch()` chains replaced with `wecoza_db()->getRow()`
-- [ ] Zero `DatabaseService` references in migrated code
-- [ ] Zero `DatabaseLogger` references in migrated code
+### Learners Module (LRNR)
 
-### ARCH-04: Model Migration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Agent model migrated as standalone class (NOT extending BaseModel)
-- [ ] Model uses `wecoza_db()` for all database operations
-- [ ] Model delegates queries to AgentRepository
-- [ ] Validation logic preserved from source
+- [ ] **LRNR-01**: Fix `numeracy_level` missing from update shortcode POST processing — data silently lost on every learner update
+- [ ] **LRNR-02**: Resolve `sponsors[]` orphaned field — either implement sponsor persistence or remove UI from both forms
+- [ ] **LRNR-03**: Clean up phantom fields — remove `date_of_birth` and `suburb` from baseline doc, remove `suburb` from repo insert whitelist
+- [ ] **LRNR-04**: Remove duplicate `placement_assessment_date` field from create form (lines 414-422)
+- [ ] **LRNR-05**: Remove `nopriv` AJAX registrations for `fetch_learners_data` and `fetch_learners_dropdown_data`
+- [ ] **LRNR-06**: Fix `employment_status` initial visibility bug in update form — employer div always visible regardless of status
+- [ ] **LRNR-07**: Use `intval()` instead of `sanitize_text_field()` for `highest_qualification` FK ID in both shortcodes
+- [ ] **LRNR-08**: Add date format validation for `placement_assessment_date` in both shortcodes
+- [ ] **LRNR-09**: Fix template literal XSS risk — use `.text()` instead of `.html()` for dynamic content in `learners-app.js`
+- [ ] **LRNR-10**: Clean up dead code — remove unused controller AJAX registrations, legacy `#editLearnerForm` handler, `populateEditForm()`, and unused `learner-form.view.php`
 
-### ARCH-05: Repository Creation
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] AgentRepository extends BaseRepository
-- [ ] Column whitelisting via `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, `getAllowedInsertColumns()`, `getAllowedUpdateColumns()`
-- [ ] All AgentQueries methods migrated to repository pattern
-- [ ] CRUD operations use wecoza_db() with correct PostgresConnection signatures
-- [ ] Sanitization preserved from source AgentQueries
+### Classes Module (CLS)
 
-### ARCH-06: View Migration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] All 6 templates migrated to `views/agents/` using `.view.php` extension
-- [ ] All template includes use `wecoza_view('agents/path', $data, true)` pattern
-- [ ] All template includes use `wecoza_component('agents/component', $data, true)` for partials
-- [ ] Template path references updated from WECOZA_AGENTS_TEMPLATES_DIR to wecoza_view()
+- [ ] **CLS-01**: Fix `order_nr` reverse path — add to `getSingleClass()` result array so value isn't overwritten with null on update
+- [ ] **CLS-02**: Set `class_agent` from `initial_class_agent` on create so new classes don't start with null
+- [ ] **CLS-03**: Remove `nopriv` from QA write endpoints (`create_qa_visit`, `delete_qa_report`, `export_qa_reports`, `submit_qa_question`)
+- [ ] **CLS-04**: Sanitize `stop_dates[]`/`restart_dates[]` with `sanitizeText()` and date format validation in FormDataProcessor
+- [ ] **CLS-05**: Type-cast `site_id` with `intval()` in FormDataProcessor
+- [ ] **CLS-06**: Sanitize `learner_ids`/`exam_learners` per-entry after JSON decode — filter with `array_map('intval', ...)`
+- [ ] **CLS-07**: Fix `initial_class_agent` pre-selection — use `initial_class_agent` value instead of `class_agent` in update view
+- [ ] **CLS-08**: Migrate agents/supervisors from hardcoded static arrays to DB queries in ClassRepository
+- [ ] **CLS-09**: Validate `backup_agent_dates[]` as valid date format in FormDataProcessor
 
-### ARCH-07: Controller Migration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] AgentsController extends BaseController with `registerHooks()`
-- [ ] All 3 shortcodes registered in controller
-- [ ] Assets enqueued conditionally (only when shortcode present on page)
-- [ ] Controller uses AgentRepository (not AgentQueries directly)
-- [ ] AbstractShortcode functionality replaced by BaseController patterns
+### Agents Module (AGT)
 
-### ARCH-08: AJAX Handler Migration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] AgentsAjaxHandlers class created with AjaxSecurity pattern
-- [ ] All AJAX handlers use `AjaxSecurity::requireNonce('agents_nonce_action')`
-- [ ] All responses use `AjaxSecurity::sendSuccess()` / `AjaxSecurity::sendError()`
-- [ ] Zero `wp_ajax_nopriv_*` handlers registered
-- [ ] All AJAX action names have `wecoza_` prefix
+- [ ] **AGT-01**: Fix `postal_code` → `residential_postal_code` mapping in `FormHelpers::$field_mapping` for edit mode pre-population
+- [ ] **AGT-02**: Add server-side validation for 14 HTML-required fields missing from `validateFormData()`
+- [ ] **AGT-03**: Sanitize `preferred_working_area_1/2/3` with `absint()` in controller `collectFormData()`
+- [ ] **AGT-04**: Remove `agent_notes` from agents table insert/update whitelist (notes managed via separate table)
+- [ ] **AGT-05**: Remove `residential_town_id` from insert whitelist (no form field populates it)
+- [ ] **AGT-06**: Extract shared display methods (`getAgentStatistics`, `mapAgentFields`, `mapSortColumn`, `getDisplayColumns`) into shared service — DRY
 
-### ARCH-09: JS Asset Migration
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] All 5 JS files moved to `assets/js/agents/`
-- [ ] Localization object unified: `wecozaAgents` with camelCase keys
-- [ ] All JS reads `response.data.*` not `response.*` directly
-- [ ] All AJAX action references use `wecoza_` prefix
-- [ ] All nonce references consistent with PHP-side nonce action name
+### Clients Module (CLT)
 
-### ARCH-10: Core Wiring
-**Category:** ARCH
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Namespace registered in wecoza-core.php autoloader
-- [ ] AgentsController initialized in wecoza-core.php module init section
-- [ ] AgentsAjaxHandlers initialized in wecoza-core.php module init section
-- [ ] Plugin loads without PHP errors
+- [ ] **CLT-01**: Remove inline submit handler from `client-update-form.view.php` — eliminates duplicate AJAX call on every update
+- [ ] **CLT-02**: Add `wp_nonce_field()` to `client-capture-form.view.php` for non-AJAX fallback compatibility
+- [ ] **CLT-03**: Remove `client_town_id` from `ClientRepository` insert/update whitelists (column doesn't exist, dead code)
+- [ ] **CLT-04**: Unify nonce action strings across all client forms and controllers to `clients_nonce_action`
+- [ ] **CLT-05**: Remove 7 unused AJAX endpoints from `ClientAjaxHandlers` (save_location, sub-site management, etc.)
 
-## Shortcode Requirements
+### Events Module (EVT)
 
-### SC-01: wecoza_capture_agents Shortcode
-**Category:** SC
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Shortcode renders agent capture form (add mode)
-- [ ] Shortcode renders agent edit form (edit mode via URL params)
-- [ ] Form submission creates/updates agent in database
-- [ ] File uploads work for signed agreement and criminal record
-- [ ] Validation errors display correctly
-- [ ] SA ID and passport validation work
-- [ ] Working areas dropdown populates correctly
-- [ ] Google Maps address autocomplete loads (when API key configured)
+- [ ] **EVT-01**: Add late escaping for `summary_html` output in `card.php`, `timeline.php`, `item.php` views
+- [ ] **EVT-02**: Add late escaping for `notification_badge_html`/`status_badge_html` in `list-item.php`
+- [ ] **EVT-03**: Update `MaterialTrackingRepository::markDelivered()` to also set `materials_delivered_at` and `delivery_status = 'delivered'` on tracking table
+- [ ] **EVT-04**: Remove duplicate test notification JS (consolidate from `SettingsPage.php` and `notification-settings.php`)
 
-### SC-02: wecoza_display_agents Shortcode
-**Category:** SC
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Shortcode renders agent table with pagination
-- [ ] AJAX pagination loads next/prev pages without full reload
-- [ ] Search filters agents by name, email, phone, ID number
-- [ ] Sort columns work (first name, surname, email, created date)
-- [ ] Agent statistics badges display above table
-- [ ] View/Edit/Delete action buttons functional
-- [ ] Delete performs soft-delete via AJAX
+## Future Requirements
 
-### SC-03: wecoza_single_agent Shortcode
-**Category:** SC
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Shortcode renders single agent detail view
-- [ ] URL parameter `agent_id` loads correct agent
-- [ ] All agent fields display correctly
-- [ ] Back button returns to agent list
-- [ ] Edit link navigates to capture form in edit mode
+### Learners
+- **LRNR-F01**: Implement sponsor persistence (new `learner_sponsors` table + POST processing) — if sponsors feature is desired
+- **LRNR-F02**: Province → city → suburb cascade (like Clients module) — currently independent dropdowns
 
-## Feature Requirements
+### Classes
+- **CLS-F01**: Investigate `order_nr_metadata` orphaned JSONB column — drop or wire into form
+- **CLS-F02**: Implement `class_agent` update mechanism when agent replacements are processed
 
-### FEAT-01: Agent CRUD Operations
-**Category:** FEAT
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Create agent with all fields persists to `agents` table
-- [ ] Read agent by ID returns all fields
-- [ ] Update agent modifies only changed fields + updated_at/updated_by
-- [ ] Soft-delete sets status to 'deleted'
-- [ ] Duplicate email check prevents duplicate agents
-- [ ] Duplicate SA ID check prevents duplicate agents
+## Out of Scope
 
-### FEAT-02: Agent Metadata
-**Category:** FEAT
-**Priority:** Should
-**Acceptance Criteria:**
-- [ ] Agent meta CRUD operations (add/get/update/delete) work
-- [ ] Agent notes CRUD operations work
-- [ ] Agent absences CRUD operations work
+| Feature | Reason |
+|---------|--------|
+| Info-level audit observations | Observations from audits that don't require code changes |
+| New features or UI additions | This milestone is strictly bugfix/hardening |
+| Database schema changes (DDL) | All fixes are application-level; no ALTER TABLE needed |
+| Refactoring beyond identified issues | Only fix what audits identified |
+| v3.0 requirements (ARCH/SC/FEAT/CLN) | Completed in previous milestone |
 
-### FEAT-03: File Upload Management
-**Category:** FEAT
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Signed agreement file upload works
-- [ ] Criminal record file upload works
-- [ ] File type validation (PDF, DOC, DOCX only)
-- [ ] Old files deleted when replaced
-- [ ] Upload directory created with security (.htaccess)
+## Traceability
 
-### FEAT-04: Agent Statistics
-**Category:** FEAT
-**Priority:** Should
-**Acceptance Criteria:**
-- [ ] Total agents count displays
-- [ ] Active agents count displays
-- [ ] SACE registered count displays
-- [ ] Quantum qualified count displays
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| LRNR-01 | Phase 31 | Pending |
+| LRNR-02 | Phase 31 | Pending |
+| LRNR-03 | Phase 31 | Pending |
+| LRNR-04 | Phase 31 | Pending |
+| LRNR-05 | Phase 31 | Pending |
+| LRNR-06 | Phase 31 | Pending |
+| LRNR-07 | Phase 31 | Pending |
+| LRNR-08 | Phase 31 | Pending |
+| LRNR-09 | Phase 31 | Pending |
+| LRNR-10 | Phase 31 | Pending |
+| CLS-01 | Phase 32 | Pending |
+| CLS-02 | Phase 32 | Pending |
+| CLS-03 | Phase 32 | Pending |
+| CLS-04 | Phase 32 | Pending |
+| CLS-05 | Phase 32 | Pending |
+| CLS-06 | Phase 32 | Pending |
+| CLS-07 | Phase 32 | Pending |
+| CLS-08 | Phase 32 | Pending |
+| CLS-09 | Phase 32 | Pending |
+| AGT-01 | Phase 33 | Pending |
+| AGT-02 | Phase 33 | Pending |
+| AGT-03 | Phase 33 | Pending |
+| AGT-04 | Phase 33 | Pending |
+| AGT-05 | Phase 33 | Pending |
+| AGT-06 | Phase 33 | Pending |
+| CLT-01 | Phase 34 | Pending |
+| CLT-02 | Phase 34 | Pending |
+| CLT-03 | Phase 34 | Pending |
+| CLT-04 | Phase 34 | Pending |
+| CLT-05 | Phase 34 | Pending |
+| EVT-01 | Phase 35 | Pending |
+| EVT-02 | Phase 35 | Pending |
+| EVT-03 | Phase 35 | Pending |
+| EVT-04 | Phase 35 | Pending |
 
-### FEAT-05: Working Areas Service
-**Category:** FEAT
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] Working areas dropdown populates from database/config
-- [ ] Up to 3 preferred areas selectable per agent
-- [ ] NULL handling for empty area selections (foreign key safe)
+**Coverage:**
+- v3.1 requirements: 34 total
+- Mapped to phases: 34
+- Unmapped: 0 ✓
 
-## Cleanup Requirements
-
-### CLN-01: Standalone Plugin Deactivation
-**Category:** CLN
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] wecoza-agents-plugin can be deactivated without breaking agents functionality
-- [ ] All pages with agent shortcodes render correctly after deactivation
-- [ ] All AJAX endpoints respond correctly after deactivation
-- [ ] No PHP errors in debug.log after deactivation
-
-### CLN-02: Source Directory Removal
-**Category:** CLN
-**Priority:** Must
-**Acceptance Criteria:**
-- [ ] `.integrate/wecoza-agents-plugin/` moved to `.integrate/done/wecoza-agents-plugin/`
-- [ ] Zero `WeCoza\Agents\Database\DatabaseService` references in wecoza-core
-- [ ] Zero `WECOZA_AGENTS_*` constant references in wecoza-core
-
-## Traceability: Requirements > Phases
-
-| Requirement | Phase |
-|-------------|-------|
-| ARCH-01, ARCH-03, ARCH-04, ARCH-05 | 26: Foundation Architecture |
-| ARCH-06, ARCH-07, ARCH-08, ARCH-09, ARCH-10 | 27: Controllers, Views, JS, AJAX |
-| SC-01, SC-02, SC-03 | 28: Wiring Verification & Fixes |
-| FEAT-01, FEAT-02, FEAT-03, FEAT-04, FEAT-05 | 29: Feature Verification & Performance |
-| CLN-01, CLN-02 | 30: Integration Testing & Cleanup |
+---
+*Requirements defined: 2026-02-13*
+*Last updated: 2026-02-13 after initial definition*
