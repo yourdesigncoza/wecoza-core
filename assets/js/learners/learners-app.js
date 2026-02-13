@@ -546,27 +546,23 @@ jQuery(document).ready(function ($) {
     // Universal alert function
     function showAlert(type, message) {
         const alertClass = type === 'success' ? 'alert-subtle-success' : 'alert-subtle-danger';
-        const alertHtml = `
-            <div class="alert ${alertClass} alert-dismissible fade show mb-3" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-        
+        const $alert = $('<div class="alert alert-dismissible fade show mb-3" role="alert"></div>')
+            .addClass(alertClass)
+            .text(message);
+        $alert.append('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+
         // Try different alert container locations
         if ($('#alert-container').length) {
-            $('#alert-container').html(alertHtml);
+            $('#alert-container').html('').append($alert);
         } else if ($('.wecoza-single-learner-display > .d-flex').length) {
-            $('.wecoza-single-learner-display > .d-flex').after(alertHtml);
+            $('.wecoza-single-learner-display > .d-flex').after($alert);
         } else {
-            $('body').prepend('<div class="container mt-3">' + alertHtml + '</div>');
+            $('body').prepend($('<div class="container mt-3"></div>').append($alert));
         }
-        
+
         // Auto-dismiss after 5 seconds for error messages
         if (type !== 'success') {
-            setTimeout(() => {
-                $('.alert').fadeOut();
-            }, 5000);
+            setTimeout(() => { $alert.fadeOut(); }, 5000);
         }
     }
 
