@@ -36,19 +36,10 @@ class ClientAjaxHandlers {
         add_action('wp_ajax_wecoza_search_clients', array($this, 'searchClients'));
         add_action('wp_ajax_wecoza_get_branch_clients', array($this, 'getBranchClients'));
         add_action('wp_ajax_wecoza_export_clients', array($this, 'exportClients'));
-        add_action('wp_ajax_wecoza_get_main_clients', array($this, 'getMainClients'));
 
         // Location AJAX handlers
         add_action('wp_ajax_wecoza_get_locations', array($this, 'getLocations'));
-        add_action('wp_ajax_wecoza_save_location', array($this, 'saveLocation'));
         add_action('wp_ajax_wecoza_check_location_duplicates', array($this, 'checkLocationDuplicates'));
-
-        // Site management AJAX handlers
-        add_action('wp_ajax_wecoza_save_sub_site', array($this, 'saveSubSite'));
-        add_action('wp_ajax_wecoza_get_head_sites', array($this, 'getHeadSites'));
-        add_action('wp_ajax_wecoza_get_sub_sites', array($this, 'getSubSites'));
-        add_action('wp_ajax_wecoza_delete_sub_site', array($this, 'deleteSubSite'));
-        add_action('wp_ajax_wecoza_get_sites_hierarchy', array($this, 'getSitesHierarchy'));
     }
 
     /**
@@ -366,22 +357,6 @@ class ClientAjaxHandlers {
     }
 
     /**
-     * AJAX handler to get main clients
-     */
-    public function getMainClients() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        $model = new ClientsModel();
-        $main_clients = $model->getMainClients();
-
-        AjaxSecurity::sendSuccess(array('data' => $main_clients));
-    }
-
-    /**
      * AJAX handler to fetch locations lazily
      */
     public function getLocations() {
@@ -395,20 +370,6 @@ class ClientAjaxHandlers {
         }
 
         AjaxSecurity::sendSuccess(array('hierarchy' => $hierarchy));
-    }
-
-    /**
-     * AJAX handler to save a location
-     */
-    public function saveLocation() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('manage_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        // Implementation would use LocationRepository
-        AjaxSecurity::sendError('Not implemented yet.');
     }
 
     /**
@@ -438,136 +399,6 @@ class ClientAjaxHandlers {
         $duplicates = $locationsModel->checkDuplicates($streetAddress, $suburb, $town);
 
         AjaxSecurity::sendSuccess(array('duplicates' => $duplicates));
-    }
-
-    /**
-     * AJAX handler to save a sub-site
-     */
-    public function saveSubSite() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('edit_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        $clientId = isset($_POST['client_id']) ? (int) $_POST['client_id'] : 0;
-        $parentSiteId = isset($_POST['parent_site_id']) ? (int) $_POST['parent_site_id'] : 0;
-        $siteData = isset($_POST['site_data']) ? json_decode(stripslashes($_POST['site_data']), true) : array();
-
-        if ($clientId <= 0 || $parentSiteId <= 0 || empty($siteData)) {
-            AjaxSecurity::sendError('Invalid request parameters.');
-        }
-
-        $sitesModel = new SitesModel();
-        $errors = $sitesModel->validateSubSite($clientId, $parentSiteId, $siteData, $clientId);
-        if (!empty($errors)) {
-            AjaxSecurity::sendError('Validation errors', array('errors' => $errors));
-        }
-
-        $saveResult = $sitesModel->saveSubSite($clientId, $parentSiteId, $siteData);
-        if (!$saveResult) {
-            AjaxSecurity::sendError('Failed to save sub-site. Please try again.');
-        }
-
-        $siteId = is_array($saveResult) ? (int) ($saveResult['site_id'] ?? 0) : (int) $saveResult;
-        if ($siteId <= 0) {
-            AjaxSecurity::sendError('Failed to save sub-site. Please try again.');
-        }
-
-        AjaxSecurity::sendSuccess(array(
-            'message' => 'Sub-site saved successfully!',
-            'data' => array('site_id' => $siteId)
-        ));
-    }
-
-    /**
-     * AJAX handler to get head sites for a client
-     */
-    public function getHeadSites() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        $clientId = isset($_GET['client_id']) ? (int) $_GET['client_id'] : 0;
-        if ($clientId <= 0) {
-            AjaxSecurity::sendError('Invalid client ID.');
-        }
-
-        $sitesModel = new SitesModel();
-        $headSites = $sitesModel->getHeadSitesForClient($clientId);
-
-        AjaxSecurity::sendSuccess(array('data' => $headSites));
-    }
-
-    /**
-     * AJAX handler to get sub-sites for a parent site
-     */
-    public function getSubSites() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        $parentSiteId = isset($_GET['parent_site_id']) ? (int) $_GET['parent_site_id'] : 0;
-        if ($parentSiteId <= 0) {
-            AjaxSecurity::sendError('Invalid parent site ID.');
-        }
-
-        $sitesModel = new SitesModel();
-        $subSites = $sitesModel->getSubSites($parentSiteId);
-
-        AjaxSecurity::sendSuccess(array('data' => $subSites));
-    }
-
-    /**
-     * AJAX handler to delete a sub-site
-     */
-    public function deleteSubSite() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('delete_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        $siteId = isset($_POST['site_id']) ? (int) $_POST['site_id'] : 0;
-        $clientId = isset($_POST['client_id']) ? (int) $_POST['client_id'] : 0;
-
-        if ($siteId <= 0 || $clientId <= 0) {
-            AjaxSecurity::sendError('Invalid request parameters.');
-        }
-
-        $sitesModel = new SitesModel();
-        $deleted = $sitesModel->deleteSubSite($siteId, $clientId);
-
-        if (!$deleted) {
-            AjaxSecurity::sendError('Failed to delete sub-site. Please try again.');
-        }
-
-        AjaxSecurity::sendSuccess('Sub-site deleted successfully!');
-    }
-
-    /**
-     * AJAX handler to get all sites with hierarchy for a client
-     */
-    public function getSitesHierarchy() {
-        AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
-        }
-
-        $clientId = isset($_GET['client_id']) ? (int) $_GET['client_id'] : 0;
-        if ($clientId <= 0) {
-            AjaxSecurity::sendError('Invalid client ID.');
-        }
-
-        $sitesModel = new SitesModel();
-        $sites = $sitesModel->getAllSitesWithHierarchy($clientId);
-
-        AjaxSecurity::sendSuccess(array('data' => $sites));
     }
 
     /**
