@@ -46,7 +46,8 @@ function wecoza_learners_update_form_shortcode($atts) {
     }
 
     // Convert model to stdClass for backward compatibility with form template
-    $learner = (object) $learnerModel->toDbArray();
+    // Pass true to include NULL values - prevents "Undefined property" warnings for optional fields
+    $learner = (object) $learnerModel->toDbArray(true);
     // Add joined field names that the form expects
     $learner->highest_qualification = $learnerModel->getHighestQualificationName() ?? $learnerModel->getHighestQualification();
 

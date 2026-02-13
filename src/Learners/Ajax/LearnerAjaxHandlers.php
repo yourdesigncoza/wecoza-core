@@ -191,8 +191,9 @@ function handle_fetch_learners_data(): void {
         }
 
         // Convert models to stdClass for backward compatibility
+        // Pass true to include NULL values - prevents "Undefined property" warnings
         $learners = array_map(function($model) {
-            $obj = (object) $model->toDbArray();
+            $obj = (object) $model->toDbArray(true);
             $obj->city_town_name = $model->getCityTownName();
             return $obj;
         }, $learnerModels);

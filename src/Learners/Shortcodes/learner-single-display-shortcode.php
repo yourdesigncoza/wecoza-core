@@ -37,7 +37,8 @@ function wecoza_single_learner_display_shortcode() {
     }
 
     // Convert model to stdClass for backward compatibility with template
-    $learner = (object) $learnerModel->toDbArray();
+    // Pass true to include NULL values - prevents "Undefined property" warnings for optional fields
+    $learner = (object) $learnerModel->toDbArray(true);
 
     // Add formatted full name from model method (DRY)
     $learner->formatted_full_name = $learnerModel->getFormattedFullName();
