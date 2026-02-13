@@ -414,41 +414,76 @@ class ClassRepository extends BaseRepository
     }
 
     /**
-     * Get all agents (static data)
+     * Get all active agents from the database (cached)
      */
     public static function getAgents(): array
     {
-        return [
-            ['id' => 1, 'name' => 'Michael M. van der Berg'],
-            ['id' => 2, 'name' => 'Thandi T. Nkosi'],
-            ['id' => 3, 'name' => 'Rajesh R. Patel'],
-            ['id' => 4, 'name' => 'Lerato L. Moloi'],
-            ['id' => 5, 'name' => 'Johannes J. Pretorius'],
-            ['id' => 6, 'name' => 'Nomvula N. Dlamini'],
-            ['id' => 7, 'name' => 'David D. O\'Connor'],
-            ['id' => 8, 'name' => 'Zanele Z. Mthembu'],
-            ['id' => 9, 'name' => 'Pieter P. van Zyl'],
-            ['id' => 10, 'name' => 'Fatima F. Ismail'],
-            ['id' => 11, 'name' => 'Sipho S. Ndlovu'],
-            ['id' => 12, 'name' => 'Anita A. van Rensburg'],
-            ['id' => 13, 'name' => 'Kobus K. Steyn'],
-            ['id' => 14, 'name' => 'Nalini N. Reddy'],
-            ['id' => 15, 'name' => 'Willem W. Botha']
-        ];
+        $cache_key = 'wecoza_class_agents';
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+
+        try {
+            $db = wecoza_db();
+            $sql = "SELECT agent_id, first_name, surname
+                    FROM agents
+                    WHERE status = 'active'
+                    ORDER BY surname, first_name";
+            $stmt = $db->query($sql);
+
+            $agents = [];
+            while ($row = $stmt->fetch()) {
+                $agents[] = [
+                    'id' => (int)$row['agent_id'],
+                    'name' => sanitize_text_field($row['first_name'] . ' ' . $row['surname'])
+                ];
+            }
+
+            set_transient($cache_key, $agents, self::CACHE_DURATION);
+            return $agents;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error fetching agents for class form: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
-     * Get all supervisors (static data)
+     * Get all active supervisors from the database (cached)
+     *
+     * Supervisors are drawn from the same agents pool — no dedicated
+     * supervisor role/flag exists in the agents table schema.
      */
     public static function getSupervisors(): array
     {
-        return [
-            ['id' => 1, 'name' => 'Dr. Sarah Johnson'],
-            ['id' => 2, 'name' => 'Prof. Michael Smith'],
-            ['id' => 3, 'name' => 'Ms. Jennifer Brown'],
-            ['id' => 4, 'name' => 'Mr. David Wilson'],
-            ['id' => 5, 'name' => 'Dr. Lisa Anderson']
-        ];
+        $cache_key = 'wecoza_class_supervisors';
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+
+        try {
+            $db = wecoza_db();
+            $sql = "SELECT agent_id, first_name, surname
+                    FROM agents
+                    WHERE status = 'active'
+                    ORDER BY surname, first_name";
+            $stmt = $db->query($sql);
+
+            $supervisors = [];
+            while ($row = $stmt->fetch()) {
+                $supervisors[] = [
+                    'id' => (int)$row['agent_id'],
+                    'name' => sanitize_text_field($row['first_name'] . ' ' . $row['surname'])
+                ];
+            }
+
+            set_transient($cache_key, $supervisors, self::CACHE_DURATION);
+            return $supervisors;
+        } catch (Exception $e) {
+            error_log('WeCoza Core: Error fetching supervisors for class form: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
