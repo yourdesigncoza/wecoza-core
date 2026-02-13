@@ -9,10 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-13 — Milestone v3.1 started
+Phase: 31 - Learners Module Fixes
+Plan: Not started
+Status: Roadmap created, ready for phase planning
+Last activity: 2026-02-13 — Roadmap created for v3.1
+
+Progress: █░░░░░░░░░░░░░░░░░░░ 0% (0/34 requirements)
 
 ## Milestone History
 
@@ -38,6 +40,8 @@ See: .planning/MILESTONES.md for full details
 | D28-02-01 | FormHelpers::get_field_value() accepts nullable array | 2026-02-12 | In add mode controller passes null agent — helper must handle gracefully |
 | D29-01-01 | agent_meta table missing is documented as expected failure | 2026-02-12 | FEAT-02 not implemented yet — test gracefully skips |
 | D29-01-02 | Repository aligned with actual schema rather than adding columns | 2026-02-12 | Less invasive fix — agent_notes uses note_date, agent_absences uses reported_at |
+| D13-02-01 | Form field wiring audit before fixes | 2026-02-13 | Comprehensive audit identifies all issues before coding, prevents scope creep |
+| D13-02-02 | Module-by-module fix approach (5 phases) | 2026-02-13 | Independent scopes, testable per module, ordered by severity |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -71,7 +75,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Milestone v3.1 started — defining requirements
-Resume file: .planning/REQUIREMENTS.md
+Stopped at: Roadmap created for v3.1 milestone
+Resume file: .planning/ROADMAP.md
 
-**Next action:** Define requirements from form field wiring audits, create roadmap.
+**Next action:** `/gsd:plan-phase 31` to create execution plan for Learners module fixes.
