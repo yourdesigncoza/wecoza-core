@@ -59,9 +59,9 @@ function wecoza_learners_form_shortcode($atts) {
             'city_town_id' => intval($_POST['city_town_id']),
             'province_region_id' => intval($_POST['province_region_id']),
             'postal_code' => sanitize_text_field($_POST['postal_code']),
-            'highest_qualification' => sanitize_text_field($_POST['highest_qualification']),
+            'highest_qualification' => intval($_POST['highest_qualification']),
             'assessment_status' => sanitize_text_field($_POST['assessment_status']),
-            'placement_assessment_date' => sanitize_text_field($_POST['placement_assessment_date']),
+            'placement_assessment_date' => (($d = \DateTime::createFromFormat('Y-m-d', $_POST['placement_assessment_date'] ?? '')) && $d->format('Y-m-d') === $_POST['placement_assessment_date']) ? $d->format('Y-m-d') : null,
             'numeracy_level' => intval($_POST['numeracy_level']),
             'communication_level' => intval($_POST['communication_level']),
             'employment_status' => isset($_POST['employment_status']) && $_POST['employment_status'] !== '' ? (int) filter_var($_POST['employment_status'], FILTER_VALIDATE_BOOLEAN) : 0,
@@ -104,6 +104,12 @@ function wecoza_learners_form_shortcode($atts) {
                     if (!$upload_result['success']) {
                         echo '<div class="alert alert-subtle-danger alert-dismissible fade show ydcoza-notification" role="alert"><button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button><div class="d-flex gap-4"><span><i class="fa-solid fa-circle-exclamation icon-danger"></i></span><div class="d-flex flex-column gap-2"><h6 class="mb-0">ERROR !</h6><p class="mb-0">Some files could not be uploaded: ' . esc_html($upload_result['message']) . '</p></div></div></div>';
                     }
+                }
+
+                // Save sponsors if any were selected
+                if (!empty($_POST['sponsors']) && is_array($_POST['sponsors'])) {
+                    $sponsor_ids = array_map('intval', $_POST['sponsors']);
+                    $controller->saveSponsors($learner_id, $sponsor_ids);
                 }
             } else {
                 echo '<div class="alert alert-subtle-danger alert-dismissible fade show ydcoza-notification" role="alert"><button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button><div class="d-flex gap-4"><span><i class="fa-solid fa-circle-exclamation icon-danger"></i></span><div class="d-flex flex-column gap-2"><h6 class="mb-0">ERROR !</h6><p class="mb-0">There was an error inserting the learner. Please try again.</p></div></div></div>';
@@ -411,16 +417,6 @@ function wecoza_learners_form_shortcode($atts) {
             </div>
         </div>
         <div class="border-top border-opacity-25 border-3 border-discovery my-5 mx-1"></div>
-        <div class="row">
-            <div class="col-md-3">
-                <!-- Placement Assessment Date (initially hidden) -->
-                <div class="mb-3 placement_date_outerdiv d-none">
-                    <label for="placement_assessment_date" class="form-label">Assessment Date.<span class="text-danger">*</span></label>
-                    <input type="date" id="placement_assessment_date" name="placement_assessment_date" class="form-control form-control-sm">
-                    <div class="invalid-feedback">Please select the placement assessment date.</div>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <h6 class="mb-2">Employment Details</h6>
             <div class="col-md-2">

@@ -65,123 +65,6 @@
     });
 
 
-/*------------------YDCOZA-----------------------*/
-/* Populate Edit Modal Form                       */
-/* Populates the edit modal with learner data     */
-/* received from the AJAX response                */
-/*-----------------------------------------------*/
-function populateEditForm(learner) {
-    console.group('Form Population Debug');
-    console.log('Raw learner data:', learner);
-    
-    // Check the structure we're receiving
-    console.log('Data type:', typeof learner);
-    console.log('Is Array?', Array.isArray(learner));
-    console.log('Available properties:', Object.keys(learner));
-    
-    // Log specific fields we're interested in
-    console.log('Field Values:', {
-        qualification_name: learner.highest_qualification_name,
-        employer_name: learner.employer_name,
-        province_name: learner.province_region_name,
-        // Log raw IDs for comparison
-        qualification_id: learner.highest_qualification,
-        employer_id: learner.employer_id,
-        province_id: learner.province_region_id
-    });
-
-
-
-    // Personal Information
-    $('#edit-learner-id').val(learner.id || '');
-    $('#edit-first-name').val(learner.first_name || '');
-    $('#edit-second-name').val(learner.second_name || '');
-    $('#edit-last-name').val(learner.surname || ''); // Note: using surname as per your DB structure
-    $('#edit-initials').val(learner.initials || '');
-
-    // Contact Information
-    $('#edit-email').val(learner.email_address || ''); // Note: using email_address as per your DB
-    $('#edit-phone').val(learner.tel_number || ''); // Note: using tel_number as per your DB
-    $('#edit-alternative-tel').val(learner.alternative_tel_number || '');
-
-    // ID Information
-    $('#edit-sa-id').val(learner.sa_id_no || '');
-    $('#edit-passport').val(learner.passport_number || '');
-
-    // Address Information
-    $('#edit-address-1').val(learner.address_line_1 || '');
-    $('#edit-address-2').val(learner.address_line_2 || '');
-    $('#edit-suburb').val(learner.suburb || '');
-    $('#edit-province').val(learner.province_region_name || '');
-    $('#edit-postal-code').val(learner.postal_code || '');
-
-    // Assessment Information
-    $('#edit-assessment-status').val(learner.assessment_status || '');
-    $('#edit-placement-level').val(learner.numeracy_level || '');
-    
-    // Handle date format for assessment date
-    if (learner.placement_assessment_date) {
-        try {
-            const date = new Date(learner.placement_assessment_date);
-            const formattedDate = date.toISOString().split('T')[0];
-            $('#edit-assessment-date').val(formattedDate);
-        } catch (e) {
-            console.error('Error formatting date:', e);
-            $('#edit-assessment-date').val('');
-        }
-    }
-
-    // Additional Information
-    $('#edit-qualification').val(learner.highest_qualification || '');
-    $('#edit-employer').val(learner.employer_name || '');
-
-    console.log('Form populated successfully');
-    console.groupEnd();
-}
-
-// Add form submission handler
-$('#editLearnerForm').on('submit', function(e) {
-    e.preventDefault();
-    console.log('Form submission started');
-
-    var formData = $(this).serializeArray();
-    var data = {
-        action: 'update_learner_data',
-        nonce: WeCozaLearners.nonce,  // Use correct nonce
-    };
-
-    // Convert form data to object
-    $.each(formData, function(i, field) {
-        data[field.name] = field.value.trim();
-    });
-
-    console.log('Submitting data:', data);
-
-    $.ajax({
-        url: WeCozaLearners.ajax_url,  // Correct URL for AJAX
-        type: 'POST',
-        data: data,
-        success: function(response) {
-            if (response.success) {
-                alert('Learner updated successfully');
-                // Optionally redirect or refresh page
-                location.reload();
-            } else {
-                console.error('Update failed:', response.data);
-                alert('Failed to update learner: ' + (response.data || 'Unknown error'));
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', error);
-            alert('An error occurred while updating the learner.');
-        }
-    });
-});
-
-
-
-
-
     /*------------------YDCOZA-----------------------*/
     /* Client-side form validation using Bootstrap 5  */
     /* with visual feedback for learners-form only.   */
@@ -491,13 +374,11 @@ jQuery(document).ready(function($) {
                             $('#alert-container').html(alert);
                         });
                     } else {
-                        // Show error message
-                        const alert = `
-                            <div class="alert alert-subtle-danger alert-dismissible fade show" role="alert">
-                                Failed to delete portfolio file: ${response.data}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>`;
-                        $('#alert-container').html(alert);
+                        // Show error message (use text() for dynamic content to prevent XSS)
+                        const $alert = $('<div class="alert alert-subtle-danger alert-dismissible fade show" role="alert"></div>');
+                        $alert.text('Failed to delete portfolio file: ' + response.data);
+                        $alert.append('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                        $('#alert-container').html($alert);
                     }
                 },
                 error: function() {

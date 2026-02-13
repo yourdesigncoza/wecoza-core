@@ -285,7 +285,7 @@ Complete inventory of all form fields across every module in the WeCoza Core plu
 ## Learners Module
 
 **Forms:** Registration (add), Update (edit), LP Progression, Portfolio Upload
-**Main views:** `views/learners/learner-form.view.php`, `views/learners/components/learner-progressions.php`
+**Main views:** `src/Learners/Shortcodes/learners-capture-shortcode.php`, `src/Learners/Shortcodes/learners-update-shortcode.php`, `views/learners/components/learner-progressions.php`
 **Model:** `src/Learners/Models/LearnerModel.php`
 **Repository:** `src/Learners/Repositories/LearnerRepository.php`
 
@@ -311,7 +311,6 @@ Complete inventory of all form fields across every module in the WeCoza Core plu
 | `tel_number` | tel_number | tel | Telephone Number | No | - |
 | `alternative_tel_number` | alternative_tel_number | tel | Alternative Tel Number | No | - |
 | `email_address` | email_address | email | Email Address | No | Valid email |
-| `date_of_birth` | date_of_birth | date | Date of Birth | No | - |
 
 ### Address
 
@@ -319,7 +318,6 @@ Complete inventory of all form fields across every module in the WeCoza Core plu
 |---|---|---|---|---|---|
 | `address_line_1` | address_line_1 | text | Address Line 1 | No | - |
 | `address_line_2` | address_line_2 | text | Address Line 2 | No | - |
-| `suburb` | suburb | text | Suburb | No | - |
 | `city_town_id` | city_town_id | select | City/Town | No | FK to locations |
 | `province_region_id` | province_region_id | select | Province/Region | No | FK to locations |
 | `postal_code` | postal_code | text | Postal Code | No | - |

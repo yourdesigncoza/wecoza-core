@@ -69,7 +69,7 @@ class LearnerRepository extends BaseRepository
             'title', 'first_name', 'second_name', 'initials', 'surname',
             'gender', 'race', 'sa_id_no', 'passport_number',
             'tel_number', 'alternative_tel_number', 'email_address',
-            'address_line_1', 'address_line_2', 'suburb',
+            'address_line_1', 'address_line_2',
             'city_town_id', 'province_region_id', 'postal_code',
             'highest_qualification', 'assessment_status',
             'placement_assessment_date', 'numeracy_level', 'communication_level',
@@ -784,6 +784,84 @@ class LearnerRepository extends BaseRepository
                 $pdo->rollBack();
             }
             error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::deletePortfolio'));
+            return false;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sponsor Operations
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get sponsor employer_ids for a learner
+     *
+     * @param int $learnerId
+     * @return array Array of employer_id integers
+     */
+    public function getSponsors(int $learnerId): array
+    {
+        try {
+            $pdo = $this->db->getPdo();
+            $stmt = $pdo->prepare("
+                SELECT employer_id
+                FROM learner_sponsors
+                WHERE learner_id = :learner_id
+                ORDER BY employer_id
+            ");
+            $stmt->execute(['learner_id' => $learnerId]);
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (Exception $e) {
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::getSponsors'));
+            return [];
+        }
+    }
+
+    /**
+     * Save sponsors for a learner (replace all existing)
+     *
+     * @param int $learnerId
+     * @param array $employerIds Array of employer_id integers
+     * @return bool
+     */
+    public function saveSponsors(int $learnerId, array $employerIds): bool
+    {
+        $pdo = null;
+        try {
+            $pdo = $this->db->getPdo();
+            $pdo->beginTransaction();
+
+            // Remove existing sponsors
+            $pdo->prepare("DELETE FROM learner_sponsors WHERE learner_id = :learner_id")
+                ->execute(['learner_id' => $learnerId]);
+
+            // Insert new sponsors (deduplicate)
+            if (!empty($employerIds)) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO learner_sponsors (learner_id, employer_id)
+                    VALUES (:learner_id, :employer_id)
+                ");
+                $seen = [];
+                foreach ($employerIds as $employerId) {
+                    $employerId = (int) $employerId;
+                    if ($employerId > 0 && !isset($seen[$employerId])) {
+                        $stmt->execute([
+                            'learner_id' => $learnerId,
+                            'employer_id' => $employerId,
+                        ]);
+                        $seen[$employerId] = true;
+                    }
+                }
+            }
+
+            $pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            if ($pdo !== null && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::saveSponsors'));
             return false;
         }
     }

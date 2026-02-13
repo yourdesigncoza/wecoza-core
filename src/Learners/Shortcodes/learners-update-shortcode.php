@@ -59,6 +59,7 @@ function wecoza_learners_update_form_shortcode($atts) {
     $employers = $dropdownData['employers'];
     $qualifications = $dropdownData['qualifications'];
     $portfolios = $learnerModel->getPortfolios();
+    $existing_sponsor_ids = $controller->getSponsors($learner_id);
 
     // Check if form is submitted
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wecoza_learners_update_form_nonce']) &&
@@ -92,9 +93,10 @@ function wecoza_learners_update_form_shortcode($atts) {
             'city_town_id' => intval($_POST['city_town_id']),
             'province_region_id' => intval($_POST['province_region_id']),
             'postal_code' => sanitize_text_field($_POST['postal_code']),
-            'highest_qualification' => sanitize_text_field($_POST['highest_qualification']),
+            'highest_qualification' => intval($_POST['highest_qualification']),
             'assessment_status' => sanitize_text_field($_POST['assessment_status']),
-            'placement_assessment_date' => sanitize_text_field($_POST['placement_assessment_date']),
+            'placement_assessment_date' => (($d = \DateTime::createFromFormat('Y-m-d', $_POST['placement_assessment_date'] ?? '')) && $d->format('Y-m-d') === $_POST['placement_assessment_date']) ? $d->format('Y-m-d') : null,
+            'numeracy_level' => intval($_POST['numeracy_level']),
             'communication_level' => intval($_POST['communication_level']),
             'employment_status' => isset($_POST['employment_status']) ? (int)filter_var($_POST['employment_status'], FILTER_VALIDATE_BOOLEAN) : 0,
             'employer_id' => intval($_POST['employer_id']),
@@ -107,6 +109,12 @@ function wecoza_learners_update_form_shortcode($atts) {
         if (!$form_error) {
             // Update learner data via controller (MVC pattern)
             if ($controller->updateLearner($learner_id, $data)) {
+                // Save sponsors (replace all existing with submitted values)
+                $sponsor_ids = !empty($_POST['sponsors']) && is_array($_POST['sponsors'])
+                    ? array_map('intval', $_POST['sponsors'])
+                    : [];
+                $controller->saveSponsors($learner_id, $sponsor_ids);
+
                 // Handle new file uploads if present
                 if (isset($_FILES['scanned_portfolio']) && !empty($_FILES['scanned_portfolio']['name'][0])) {
                     $upload_result = $controller->savePortfolios($learner_id, $_FILES['scanned_portfolio']);
@@ -511,7 +519,7 @@ function wecoza_learners_update_form_shortcode($atts) {
                 </div>
             </div>
             <div class="col-md-3">
-                <div id="employer_field" class="mb-1" <?php echo !$learner->employment_status ? 'style="display:none;"' : ''; ?>>
+                <div id="employer_field" class="mb-1" <?php echo $learner->employment_status !== 'Employed' ? 'style="display:none;"' : ''; ?>>
                     <label for="employer_id" class="form-label">Employer <span class="text-danger">*</span></label>
                     <select id="employer_id" name="employer_id" class="form-select form-select-sm">
                         <option value="">Select Employer</option>
@@ -607,6 +615,19 @@ function wecoza_learners_update_form_shortcode($atts) {
                             option.value = employer.id;
                             option.textContent = employer.name;
                             templateSelect.appendChild(option);
+                        });
+                    }
+
+                    // Pre-populate existing sponsors
+                    var existingSponsorIds = <?php echo json_encode(array_map('intval', $existing_sponsor_ids)); ?>;
+                    if (existingSponsorIds.length > 0 && employersData) {
+                        existingSponsorIds.forEach(function(sponsorId) {
+                            var $newSponsor = jQuery('#sponsor_template').clone().removeAttr('id').removeClass('d-none');
+                            $newSponsor.find('.sponsor-select').val(String(sponsorId));
+                            $newSponsor.find('.remove_sponsor_btn').click(function() {
+                                jQuery(this).closest('.sponsor-group').remove();
+                            });
+                            jQuery('#sponsor_container').append($newSponsor);
                         });
                     }
 

@@ -32,13 +32,6 @@ class LearnerController extends BaseController
     protected function registerHooks(): void
     {
         add_action('init', [$this, 'registerShortcodes']);
-
-        // Register AJAX handlers (authenticated users only)
-        // Note: nopriv hooks removed - learner data is private
-        add_action('wp_ajax_wecoza_get_learner', [$this, 'ajaxGetLearner']);
-        add_action('wp_ajax_wecoza_get_learners', [$this, 'ajaxGetLearners']);
-        add_action('wp_ajax_wecoza_update_learner', [$this, 'ajaxUpdateLearner']);
-        add_action('wp_ajax_wecoza_delete_learner', [$this, 'ajaxDeleteLearner']);
     }
 
     /**
@@ -198,6 +191,22 @@ class LearnerController extends BaseController
     public function deletePortfolio(int $portfolioId): bool
     {
         return $this->getRepository()->deletePortfolio($portfolioId);
+    }
+
+    /**
+     * Get sponsor employer_ids for a learner
+     */
+    public function getSponsors(int $learnerId): array
+    {
+        return $this->getRepository()->getSponsors($learnerId);
+    }
+
+    /**
+     * Save sponsors for a learner (replace all existing)
+     */
+    public function saveSponsors(int $learnerId, array $employerIds): bool
+    {
+        return $this->getRepository()->saveSponsors($learnerId, $employerIds);
     }
 
     /*

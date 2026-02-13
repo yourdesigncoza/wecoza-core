@@ -288,12 +288,9 @@ function handle_portfolio_deletion(): void {
  * Uses legacy action names for backward compatibility with existing JS files
  */
 function register_ajax_handlers(): void {
-    // Data fetching - allow for both logged-in and non-logged-in users
+    // Data fetching - require authentication (site requires login)
     add_action('wp_ajax_fetch_learners_data', __NAMESPACE__ . '\handle_fetch_learners_data');
-    add_action('wp_ajax_nopriv_fetch_learners_data', __NAMESPACE__ . '\handle_fetch_learners_data');
-
     add_action('wp_ajax_fetch_learners_dropdown_data', __NAMESPACE__ . '\handle_fetch_dropdown_data');
-    add_action('wp_ajax_nopriv_fetch_learners_dropdown_data', __NAMESPACE__ . '\handle_fetch_dropdown_data');
 
     // CRUD operations - require authentication
     add_action('wp_ajax_update_learner', __NAMESPACE__ . '\handle_update_learner');
