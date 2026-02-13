@@ -89,7 +89,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 32-01-PLAN.md — Surgical fixes: data integrity, security, sanitization, view pre-selection (CLS-01 to CLS-07, CLS-09)
+- [x] 32-01-PLAN.md — Surgical fixes: data integrity, security, sanitization, view pre-selection (CLS-01 to CLS-07, CLS-09)
 - [ ] 32-02-PLAN.md — DB migration: agents/supervisors from static arrays to DB queries with caching (CLS-08)
 
 ---
@@ -183,13 +183,13 @@ Phases execute in numeric order.
 
 | Phase | Milestone | Requirements | Status | Completion |
 |-------|-----------|--------------|--------|------------|
-| 31 | v3.1 | 10 | Not started | 0% |
-| 32 | v3.1 | 9 | Not started | 0% |
+| 31 | v3.1 | 10 | Complete | 100% |
+| 32 | v3.1 | 9 | In progress | 89% |
 | 33 | v3.1 | 6 | Not started | 0% |
 | 34 | v3.1 | 5 | Not started | 0% |
 | 35 | v3.1 | 4 | Not started | 0% |
 
-**Overall v3.1:** 0/34 requirements complete (0%)
+**Overall v3.1:** 18/34 requirements complete (53%)
 
 ---
 

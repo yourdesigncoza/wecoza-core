@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 31 - Learners Module Fixes
-Plan: 02 of 2 complete
-Status: Phase complete — all 10 LRNR requirements resolved
-Last activity: 2026-02-13 — Completed 31-02-PLAN.md (implement LRNR fixes)
+Phase: 32 - Classes Module Fixes
+Plan: 01 of 2 complete
+Status: In progress — 8 CLS requirements resolved in plan 01, plan 02 (DB migration) pending
+Last activity: 2026-02-13 — Completed 32-01-PLAN.md (surgical fixes)
 
-Progress: ██░░░░░░░░░░░░░░░░░░ 6% (2/34 requirements)
+Progress: ███░░░░░░░░░░░░░░░░░ 9% (3/34 plans)
 
 ## Milestone History
 
@@ -45,6 +45,7 @@ See: .planning/MILESTONES.md for full details
 | D13-02-03 | Safe to delete .integrate/wecoza-learners-plugin/views/learner-form.view.php | 2026-02-13 | Dead code confirmed — zero references in codebase, legacy migration artifact |
 | D13-02-04 | XSS vulnerability in learners-app.js showAlert() using .html() | 2026-02-13 | Security risk — server data in ${message} needs .text() instead |
 | D13-02-05 | Sponsors feature is fully implemented, not orphaned | 2026-02-13 | LRNR-02 audit claim was incorrect — schema, repo methods, form wiring all exist |
+| D32-01-01 | Keep nopriv on read-only QA endpoints | 2026-02-13 | Site requires auth for all pages; read endpoints safe as nopriv |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -62,12 +63,8 @@ None.
 
 ### Next Phase Readiness
 
-**Phase 31 Plan 02:** Ready to proceed with 3 focused fixes:
-1. XSS vulnerability in learners-app.js showAlert() (security)
-2. Documentation cleanup in FORM-FIELDS-REFERENCE.md (accuracy)
-3. Delete dead code at .integrate/wecoza-learners-plugin/views/learner-form.view.php (maintenance)
-
-Verification audit completed — 7 of 10 LRNR issues already resolved in previous commits.
+**Phase 32 Plan 02:** DB migration for agents/supervisors (CLS-08) — requires user to run SQL.
+**Phase 33:** Agents Module Fixes — plan created, ready for execution.
 
 ### Quick Tasks Completed
 
@@ -87,7 +84,7 @@ Verification audit completed — 7 of 10 LRNR issues already resolved in previou
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 31-01-PLAN.md verification
-Resume file: .planning/phases/31-learners-module-fixes/31-01-SUMMARY.md
+Stopped at: Completed 32-01-PLAN.md execution
+Resume file: .planning/phases/32-classes-module-fixes/32-01-SUMMARY.md
 
-**Next action:** `/gsd:plan-phase 31-02` to create implementation plan for 3 remaining LRNR fixes (XSS, docs, dead code).
+**Next action:** Execute 32-02-PLAN.md (DB migration for agents/supervisors CLS-08).
