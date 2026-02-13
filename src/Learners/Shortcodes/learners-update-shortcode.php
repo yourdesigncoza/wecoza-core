@@ -62,9 +62,20 @@ function wecoza_learners_update_form_shortcode($atts) {
     $portfolios = $learnerModel->getPortfolios();
     $existing_sponsor_ids = $controller->getSponsors($learner_id);
 
+    // Enqueue learners-app.js for field toggling and validation
+    wp_enqueue_script(
+        'learners-app',
+        wecoza_js_url('learners/learners-app.js'),
+        ['jquery'],
+        '1.0.0',
+        true
+    );
+
     // Check if form is submitted
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wecoza_learners_update_form_nonce']) &&
         wp_verify_nonce($_POST['wecoza_learners_update_form_nonce'], 'submit_learners_update_form')) {
+
+        wecoza_log('[learners-update-form] POST request received for learner_id: ' . $learner_id, 'debug');
 
         // Handle file upload if new file is provided
         $upload_dir = wp_upload_dir();
@@ -547,7 +558,7 @@ function wecoza_learners_update_form_shortcode($atts) {
         <!-- Sponsor Input Group Template -->
         <div id="sponsor_template" class="d-none">
             <div class="input-group mb-2 sponsor-group">
-                <select name="sponsors[]" class="form-select form-select-sm sponsor-select" required>
+                <select name="sponsors[]" class="form-select form-select-sm sponsor-select">
                     <option value="">Select Sponsor</option>
                     <!-- Populate dynamically -->
                 </select>
@@ -578,6 +589,14 @@ function wecoza_learners_update_form_shortcode($atts) {
                     if (!form.checkValidity()) {
                         event.preventDefault();
                         event.stopPropagation();
+                        console.log('[learners-update-form] Validation failed - form blocked from submitting');
+                        // Log which fields are invalid
+                        var invalidFields = form.querySelectorAll(':invalid');
+                        invalidFields.forEach(function(field) {
+                            console.log('[learners-update-form] Invalid field:', field.name || field.id, 'Type:', field.type, 'Hidden:', field.offsetParent === null);
+                        });
+                    } else {
+                        console.log('[learners-update-form] Validation passed - form submitting');
                     }
                     form.classList.add('was-validated');
                 }, false);

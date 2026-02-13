@@ -453,7 +453,7 @@ function wecoza_learners_form_shortcode($atts) {
         <!-- Sponsor Input Group Template -->
         <div id="sponsor_template" class="d-none">
             <div class="input-group mb-2 sponsor-group">
-                <select name="sponsors[]" id="sponsors" class="form-select form-select-sm sponsor-select" required>
+                <select name="sponsors[]" id="sponsors" class="form-select form-select-sm sponsor-select">
                     <option value="">Select Sponsor</option>
                     <!-- Populate dynamically -->
                 </select>

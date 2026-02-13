@@ -526,6 +526,9 @@
                     var message = data.message || config.messages.form.saved;
                     renderMessage('success', message);
 
+                    // Remove validation state to clear tick marks
+                    form.removeClass('was-validated');
+
                     // Check if this was a new client and form should be cleared
                     var isNewClient = !form.find('input[name="id"]').val();
                     if (data.client && data.client.id) {
@@ -551,6 +554,11 @@
                                     feedback.empty();
                                 }, 3000);
                             }, 1500); // Give user time to see success message
+                        } else if (!isNewClient) {
+                            // For updates, reload page after brief delay to show saved data
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1500);
                         }
                     }
 
