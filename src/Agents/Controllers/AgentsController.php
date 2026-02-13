@@ -381,7 +381,7 @@ class AgentsController extends BaseController
             'deleteSuccessText' => __('Agent deleted successfully.', 'wecoza-core'),
             'deleteErrorText' => __('Error deleting agent. Please try again.', 'wecoza-core'),
             'urls' => [
-                'displayAgents' => home_url('/app/agents/'),
+                'displayAgents' => home_url('/app/all-agents/'),
                 'viewAgent' => home_url('/app/agent-view/'),
                 'captureAgent' => home_url('/new-agents/'),
             ],
@@ -824,7 +824,7 @@ class AgentsController extends BaseController
      */
     private function getBackUrl(): string
     {
-        return home_url('/app/agents/');
+        return home_url('/app/all-agents/');
     }
 
     /**
