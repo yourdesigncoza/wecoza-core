@@ -47,15 +47,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Client shortcodes (SC-01..05) — 5 shortcodes for clients, locations, sites — v2.0
 - ✓ Standalone plugin cleanup (CLN-01..02) — plugin deactivated, .integrate/ removed — v2.0
 - ✓ Agents module integration (13 classes, 3 shortcodes, 6 templates, 5 JS files) — v3.0
+- ✓ Form field wiring fixes across 5 modules (34 issues: 6 critical, 28 warnings) — v3.1
+- ✓ XSS vulnerability fix in Learners showAlert() — v3.1
+- ✓ Classes data integrity (order_nr reverse path, class_agent init, DB-backed agent lists) — v3.1
+- ✓ Server-side validation for 14 agent required fields + AgentDisplayService DRY refactor — v3.1
+- ✓ Clients security (removed 7 unused AJAX endpoints, unified nonces, eliminated double submission) — v3.1
+- ✓ Events late escaping (wp_kses_post on presenter HTML) + tracking table sync — v3.1
 
 ### Active
 
-#### v3.1 — Form Field Wiring Fixes
-- Fix all critical, warning, and cleanup issues from form field wiring audits
-- 5 modules: Learners (10 issues), Classes (9), Agents (6), Clients (5), Events (4)
-- 6 critical (data loss, broken wiring), 28 warnings (security, sanitization, dead code)
-- Source: `docs/formfieldanalysis/*.md`
-- Phases 31-35
+(No active requirements — use `/gsd:new-milestone` to define next milestone)
 
 ### Out of Scope
 
@@ -69,16 +70,19 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v3.0 Shipped)
+### Current State (v3.1 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~30,000+ lines of PHP across 5 modules
-- **Agents module:** 13+ PHP files in `src/Agents/`
+- **Total:** ~46,000+ lines of PHP across 5 modules
+- **Agents module:** 14+ PHP files in `src/Agents/` (includes AgentDisplayService)
 - **Events module:** 40+ PHP files in `src/Events/`
-- **Clients module:** 15+ PHP files in `src/Clients/` (4,581 LOC)
+- **Clients module:** 15+ PHP files in `src/Clients/`
+- **Learners module:** `src/Learners/`
+- **Classes module:** `src/Classes/`
 - **View templates:** 22+ templates in `views/`
 - **JavaScript:** 21+ JS files across `assets/js/`
 - **Test coverage:** 4 test files in `tests/Events/`, 1 integration test in `tests/integration/`
+- **Form field audits:** `docs/formfieldanalysis/*.md` (5 modules audited)
 
 **Architecture:**
 - `core/` — Framework abstractions (Base classes, security helpers)
@@ -110,6 +114,7 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - Controllers pass deprecated notification_type/days_range params to service (v1.3 tech debt)
 - Settings page may need admin menu entry for easier discovery
 - 2 test failures in AI summarization test suite (test format issues, not production bugs)
+- agent_meta table doesn't exist (v3.0 FEAT-02 — metadata features not available yet)
 
 ## Constraints
 
@@ -143,7 +148,11 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Inline script fixes over extraction | Inline scripts localized to view, don't need global config | ✓ v2.0 |
 
 | Form field wiring audit before fixes | Comprehensive audit identifies all issues before coding | ✓ v3.1 |
-| Module-by-module fix approach | Independent scopes, testable per module | — Pending |
+| Module-by-module fix approach | Independent scopes, testable per module | ✓ v3.1 (34/34 requirements) |
+| wp_kses_post() for presenter HTML | Allows intended markup, strips dangerous tags | ✓ v3.1 |
+| Tracking table sync (no transaction) | JSONB is source of truth, tracking is secondary | ✓ v3.1 |
+| AgentDisplayService for shared methods | Eliminates ~200 lines of duplication | ✓ v3.1 |
+| DB-backed agent/supervisor dropdowns | Live queries replace hardcoded fake names | ✓ v3.1 |
 
 ---
-*Last updated: 2026-02-13 after v3.1 milestone start*
+*Last updated: 2026-02-13 after v3.1 milestone completion*

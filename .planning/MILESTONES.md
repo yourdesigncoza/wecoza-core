@@ -1,5 +1,58 @@
 # Project Milestones: WeCoza Core
 
+## v3.1 Form Field Wiring Fixes (Shipped: 2026-02-13)
+
+**Delivered:** Fixed all critical data loss bugs, XSS vulnerabilities, security gaps, and code duplication across 5 modules identified by comprehensive form field wiring audits.
+
+**Phases completed:** 31-35 (8 plans total)
+
+**Key accomplishments:**
+
+- Fixed XSS vulnerability in Learners showAlert() using DOM construction; verified all 10 LRNR requirements
+- Fixed Classes data integrity bugs (order_nr, class_agent), replaced hardcoded agent/supervisor arrays with DB queries + transient caching
+- Added server-side validation for 14 required agent fields; extracted 4 display methods into AgentDisplayService (~200 lines dedup)
+- Eliminated double AJAX submission in Clients (removed 208-line inline script), removed 7 unused endpoints, unified nonces
+- Added wp_kses_post() late escaping on all presenter HTML, synced tracking table in markDelivered()
+
+**Stats:**
+
+- 55 files modified, 7,069 insertions, 1,225 deletions
+- 46,467 lines of PHP total
+- 5 phases, 8 plans, 34 requirements
+- Same day from start to ship (2026-02-13)
+
+**Git range:** `c8258df` → `c2faacc`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+
+## v3.0 Agents Integration (Shipped: 2026-02-12)
+
+**Delivered:** Migrated standalone wecoza-agents-plugin into wecoza-core as unified Agents module with agent CRUD, file uploads, working areas, statistics, notes, and absences management.
+
+**Phases completed:** 26-30 (11 plans total)
+
+**Key accomplishments:**
+
+- Migrated 13 PHP classes into wecoza-core with WeCoza\Agents\ namespace and PSR-4 autoloading
+- Full agent CRUD with 3 shortcodes (capture, display, single), file uploads, working areas
+- AgentModel standalone (not extending BaseModel) preserving FormHelpers integration
+- 44+ verification checks, feature parity test script, standalone plugin cleanly deactivated
+- Agent statistics, notes, and absences management with AJAX handlers
+
+**Stats:**
+
+- 62 files modified, 19,508 insertions, 941 deletions
+- 5 phases, 11 plans
+- Same day as v2.0 ship (2026-02-12)
+
+**Git range:** `ce5c548` → `2c687f7`
+
+**What's next:** v3.1 Form Field Wiring Fixes
+
+---
+
 ## v2.0 Clients Integration (Shipped: 2026-02-12)
 
 **Delivered:** Integrated standalone wecoza-clients-plugin into wecoza-core as unified Clients module with client CRUD, location management, sites hierarchy, Google Maps integration, and CSV export.

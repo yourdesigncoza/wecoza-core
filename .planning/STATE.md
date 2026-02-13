@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v3.1 Form Field Wiring Fixes — COMPLETE
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 35 - Events Module Fixes
-Plan: 01 of 1 complete
-Status: Phase 35 fully complete
-Last activity: 2026-02-13 — Completed 35-01-PLAN.md (Events module security & tracking fixes)
+Phase: N/A — between milestones
+Plan: N/A
+Status: Ready to plan
+Last activity: 2026-02-13 — v3.1 milestone complete
 
-Progress: ████████████████████ 100% (8/8 plans)
+Progress: N/A (no active milestone)
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
 | v3.1 | Form Field Wiring Fixes | 2026-02-13 | 31-35 | 8 |
-| v3.0 | Agents Integration | 2026-02-12 | 26-30 | 8 |
+| v3.0 | Agents Integration | 2026-02-12 | 26-30 | 11 |
 | v2.0 | Clients Integration | 2026-02-12 | 21-25 | 10 |
 | v1.3 | Fix Material Tracking Dashboard | 2026-02-06 | 19-20 | 3 |
 | v1.2 | Event Tasks Refactor | 2026-02-05 | 13-18 | 16 |
@@ -33,26 +33,6 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
-
-| ID | Decision | Date | Rationale |
-|----|----------|------|-----------|
-| D26-02-01 | AgentModel is standalone (NOT extending BaseModel) | 2026-02-12 | Preserves FormHelpers integration, preferred_areas logic, get/set/validate cycle |
-| D28-02-01 | FormHelpers::get_field_value() accepts nullable array | 2026-02-12 | In add mode controller passes null agent — helper must handle gracefully |
-| D29-01-01 | agent_meta table missing is documented as expected failure | 2026-02-12 | FEAT-02 not implemented yet — test gracefully skips |
-| D29-01-02 | Repository aligned with actual schema rather than adding columns | 2026-02-12 | Less invasive fix — agent_notes uses note_date, agent_absences uses reported_at |
-| D13-02-01 | Form field wiring audit before fixes | 2026-02-13 | Comprehensive audit identifies all issues before coding, prevents scope creep |
-| D13-02-02 | Module-by-module fix approach (5 phases) | 2026-02-13 | Independent scopes, testable per module, ordered by severity |
-| D13-02-03 | Safe to delete .integrate/wecoza-learners-plugin/views/learner-form.view.php | 2026-02-13 | Dead code confirmed — zero references in codebase, legacy migration artifact |
-| D13-02-04 | XSS vulnerability in learners-app.js showAlert() using .html() | 2026-02-13 | Security risk — server data in ${message} needs .text() instead |
-| D13-02-05 | Sponsors feature is fully implemented, not orphaned | 2026-02-13 | LRNR-02 audit claim was incorrect — schema, repo methods, form wiring all exist |
-| D32-01-01 | Keep nopriv on read-only QA endpoints | 2026-02-13 | Site requires auth for all pages; read endpoints safe as nopriv |
-| D33-01-01 | Use !isset or === '' for quantum score validation | 2026-02-13 | empty(0) returns true but 0 is a valid score value |
-| D33-01-02 | absint(0) safe for working areas due to sanitizeWorkingArea() | 2026-02-13 | Repository converts 0 to null for FK safety |
-| D32-02-01 | Supervisors drawn from same agents pool (no supervisor column) | 2026-02-13 | agents table has no role/is_supervisor column; both methods query active agents |
-| D34-01-01 | Removed entire 208-line inline script from update form | 2026-02-13 | All functionality (submit, sub-client toggle, location cascade) already in client-capture.js |
-| D35-01-01 | Use wp_kses_post() instead of esc_html() for presenter-generated HTML | 2026-02-13 | HTML contains intentional markup (badges, formatted paragraphs). wp_kses_post() allows standard WordPress post HTML while stripping dangerous tags. |
-| D35-01-02 | Do NOT wrap tracking table sync in transaction with JSONB update | 2026-02-13 | JSONB is source of truth. Tracking table is secondary concern. Failed sync is low-impact (dashboard JOIN still shows correct status from JSONB). |
-| D35-01-03 | Delete notification-settings.php instead of removing duplicate code | 2026-02-13 | File is never loaded by any PHP code. Zero references across codebase. Full deletion is cleaner than partial modification. |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -67,14 +47,6 @@ None.
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
 | v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet |
-
-### Next Phase Readiness
-
-**Phase 33:** Fully complete (plans 01 and 02).
-**Phase 34:** Fully complete (plan 01).
-**Phase 35:** Fully complete (plan 01).
-
-**Milestone v3.1 complete.** All 5 phases (31-35) executed and verified.
 
 ### Quick Tasks Completed
 
@@ -94,7 +66,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 35-01-PLAN.md execution (Events module security & tracking fixes)
-Resume file: .planning/phases/35-events-module-fixes/35-01-SUMMARY.md
+Stopped at: Completed v3.1 milestone archival
+Resume file: N/A
 
-**Next action:** `/gsd:complete-milestone` to archive v3.1.
+**Next action:** `/gsd:new-milestone` to define next milestone.
