@@ -125,7 +125,7 @@ Plans:
 
 ---
 
-### Phase 34: Clients Module Fixes
+### Phase 34: Clients Module Fixes ✅ Complete (2026-02-13)
 
 **Goal:** Remove duplicate AJAX submission and unify nonce handling across client forms.
 
@@ -134,23 +134,23 @@ Plans:
 **Dependencies:** None
 
 **Requirements:**
-- CLT-01: Remove inline submit handler from update form
-- CLT-02: Add `wp_nonce_field()` to capture form
-- CLT-03: Remove `client_town_id` from repository whitelists
-- CLT-04: Unify nonce action strings to `clients_nonce_action`
-- CLT-05: Remove 7 unused AJAX endpoints
+- ✅ CLT-01: Remove inline submit handler from update form
+- ✅ CLT-02: Add `wp_nonce_field()` to capture form
+- ✅ CLT-03: Remove `client_town_id` from repository whitelists
+- ✅ CLT-04: Unify nonce action strings to `clients_nonce_action`
+- ✅ CLT-05: Remove 7 unused AJAX endpoints
 
 **Success Criteria:**
-1. Single AJAX submission per update - inline duplicate handler removed, verified by testing
-2. Non-AJAX fallback functional - capture form includes nonce field, works without JavaScript
-3. Dead code removed - `client_town_id` removed from whitelists, unused endpoints removed
-4. Nonce actions consistent - all forms and controllers use `clients_nonce_action`
-5. Attack surface reduced - 7 unused AJAX endpoints removed, verified by grep
+1. ✅ Single AJAX submission per update - inline duplicate handler removed, verified by testing
+2. ✅ Non-AJAX fallback functional - capture form includes nonce field, works without JavaScript
+3. ✅ Dead code removed - `client_town_id` removed from whitelists, unused endpoints removed
+4. ✅ Nonce actions consistent - all forms and controllers use `clients_nonce_action`
+5. ✅ Attack surface reduced - 7 unused AJAX endpoints removed, verified by grep
 
 **Plans:** 1 plan
 
 Plans:
-- [ ] 34-01-PLAN.md — Fix all 5 CLT requirements: remove inline handler, add nonce field, clean whitelists, unify nonces, remove unused endpoints
+- [x] 34-01-PLAN.md — Fix all 5 CLT requirements: remove inline handler, add nonce field, clean whitelists, unify nonces, remove unused endpoints
 
 ---
 
@@ -186,10 +186,10 @@ Phases execute in numeric order.
 | 31 | v3.1 | 10 | Complete | 100% |
 | 32 | v3.1 | 9 | Complete | 100% |
 | 33 | v3.1 | 6 | In progress | 67% |
-| 34 | v3.1 | 5 | Not started | 0% |
+| 34 | v3.1 | 5 | Complete | 100% |
 | 35 | v3.1 | 4 | Not started | 0% |
 
-**Overall v3.1:** 19/34 requirements complete (56%)
+**Overall v3.1:** 24/34 requirements complete (71%)
 
 ---
 
@@ -277,4 +277,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after phase 32 completion*
+*Last updated: 2026-02-13 after phase 34 completion*

@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 33 - Agents Module Fixes
-Plan: 01 of 2 complete
-Status: In progress — Phase 32 fully complete, Phase 33 plan 02 pending
-Last activity: 2026-02-13 — Completed 32-02-PLAN.md (DB migration for agents/supervisors)
+Phase: 34 - Clients Module Fixes
+Plan: 01 of 1 complete
+Status: Phase 34 complete — all 5 CLT requirements fixed
+Last activity: 2026-02-13 — Completed 34-01-PLAN.md (clients module fixes)
 
-Progress: █████░░░░░░░░░░░░░░░ 15% (5/34 plans)
+Progress: ██████░░░░░░░░░░░░░░ 18% (6/34 plans)
 
 ## Milestone History
 
@@ -49,6 +49,7 @@ See: .planning/MILESTONES.md for full details
 | D33-01-01 | Use !isset or === '' for quantum score validation | 2026-02-13 | empty(0) returns true but 0 is a valid score value |
 | D33-01-02 | absint(0) safe for working areas due to sanitizeWorkingArea() | 2026-02-13 | Repository converts 0 to null for FK safety |
 | D32-02-01 | Supervisors drawn from same agents pool (no supervisor column) | 2026-02-13 | agents table has no role/is_supervisor column; both methods query active agents |
+| D34-01-01 | Removed entire 208-line inline script from update form | 2026-02-13 | All functionality (submit, sub-client toggle, location cascade) already in client-capture.js |
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -67,7 +68,7 @@ None.
 ### Next Phase Readiness
 
 **Phase 33 Plan 02:** Client-side form field wiring fixes for agents module — ready for execution.
-**Phase 34:** Clients Module Fixes — plan created, ready for execution.
+**Phase 35:** Events Module Fixes — ready for planning/execution.
 
 ### Quick Tasks Completed
 
@@ -87,7 +88,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 32-02-PLAN.md execution (Phase 32 fully done)
-Resume file: .planning/phases/32-classes-module-fixes/32-02-SUMMARY.md
+Stopped at: Completed 34-01-PLAN.md execution (Phase 34 fully done)
+Resume file: .planning/phases/34-clients-module-fixes/34-01-SUMMARY.md
 
-**Next action:** Execute 33-02-PLAN.md (client-side form field wiring fixes for agents module).
+**Next action:** Execute 33-02-PLAN.md (client-side form field wiring fixes for agents module) or 35-PLAN.md (events module fixes).
