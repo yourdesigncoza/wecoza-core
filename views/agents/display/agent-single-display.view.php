@@ -58,10 +58,24 @@ if (!defined('ABSPATH')) {
     <?php if ($agent && !$error && !$loading) : ?>
         <?php // Action Buttons ?>
         <div class="d-flex justify-content-end mb-4">
-            <div class="btn-group mt-2 me-2" role="group" aria-label="...">
-                <button class="btn btn-subtle-primary" type="button">Back To Agents</button>
-                <button class="btn btn-subtle-success" type="button">Edit</button>
-                <button class="btn btn-subtle-danger" type="button">Delete</button>
+            <div class="btn-group mt-2 me-2" role="group" aria-label="Agent Actions">
+                <a href="<?php echo esc_url($back_url); ?>" class="btn btn-subtle-primary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    <?php esc_html_e('Back To Agents', 'wecoza-core'); ?>
+                </a>
+                <?php if ($can_manage) : ?>
+                <a href="<?php echo esc_url($edit_url); ?>" class="btn btn-subtle-success">
+                    <i class="bi bi-pencil me-1"></i>
+                    <?php esc_html_e('Edit', 'wecoza-core'); ?>
+                </a>
+                <button type="button"
+                        class="btn btn-subtle-danger"
+                        data-agent-id="<?php echo esc_attr($agent_id); ?>"
+                        title="<?php esc_attr_e('Delete', 'wecoza-core'); ?>">
+                    <i class="bi bi-trash me-1"></i>
+                    <?php esc_html_e('Delete', 'wecoza-core'); ?>
+                </button>
+                <?php endif; ?>
             </div>
         </div>
 

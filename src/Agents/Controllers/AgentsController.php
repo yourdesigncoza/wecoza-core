@@ -295,6 +295,7 @@ class AgentsController extends BaseController
             'error' => $error,
             'loading' => false,
             'back_url' => $this->getBackUrl(),
+            'edit_url' => $agent ? $this->getEditUrl($agent_id) : '',
             'can_manage' => current_user_can('edit_others_posts'),
             'date_format' => get_option('date_format'),
         ], true);

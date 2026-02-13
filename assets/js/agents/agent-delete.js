@@ -47,16 +47,29 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    // Remove row with fade effect
-                    row.fadeOut(300, function() {
-                        $(this).remove();
+                    // Check if we're in a table context (agents list) or single view
+                    if (row.length && row.is('tr')) {
+                        // Table context - remove row with fade effect
+                        row.fadeOut(300, function() {
+                            $(this).remove();
 
-                        // Update statistics if they exist
-                        updateStatistics();
+                            // Update statistics if they exist
+                            updateStatistics();
 
-                        // Show success message
+                            // Show success message
+                            showMessage('success', response.data.message || wecozaAgents.deleteSuccessText);
+                        });
+                    } else {
+                        // Single agent view - redirect to agents list after short delay
                         showMessage('success', response.data.message || wecozaAgents.deleteSuccessText);
-                    });
+                        setTimeout(function() {
+                            if (wecozaAgents.urls && wecozaAgents.urls.displayAgents) {
+                                window.location.href = wecozaAgents.urls.displayAgents;
+                            } else {
+                                window.location.reload();
+                            }
+                        }, 1500);
+                    }
                 } else {
                     // Show error message
                     showMessage('error', response.data.message || wecozaAgents.deleteErrorText);
