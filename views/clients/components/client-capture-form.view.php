@@ -115,8 +115,8 @@ $is_edit = !empty($client['id']);
     <?php endif; ?>
     
     <form id="clients-form" class="needs-validation ydcoza-compact-form" novalidate method="POST" enctype="multipart/form-data">
-        
-        
+        <?php wp_nonce_field('clients_nonce_action', 'nonce'); ?>
+
         <?php if ($is_edit) : ?>
             <input type="hidden" name="id" value="<?php echo esc_attr($client['id']); ?>">
         <?php endif; ?>
