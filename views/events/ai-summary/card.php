@@ -51,7 +51,7 @@ if (!defined('ABSPATH')) {
                 <div class="card-body" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
                     <?php if ($summary['has_summary']): ?>
                         <div class="fs-9 text-body">
-                            <?php echo $summary['summary_html']; ?>
+                            <?php echo wp_kses_post($summary['summary_html']); ?>
                         </div>
                     <?php else: ?>
                         <p class="text-body-secondary fs-9 fst-italic mb-0">

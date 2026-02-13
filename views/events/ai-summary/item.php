@@ -76,7 +76,7 @@ $readStateClass = $item['read_state_class'] ?? ($isRead ? 'notification-read' : 
 
                 <?php if (!empty($item['has_summary']) && !empty($item['summary_html'])): ?>
                 <div class="ai-summary mt-2 p-2 bg-body-tertiary rounded fs-9">
-                    <?php echo $item['summary_html']; ?>
+                    <?php echo wp_kses_post($item['summary_html']); ?>
                 </div>
                 <?php elseif (empty($item['has_summary'])): ?>
                 <p class="text-body-secondary fs-9 fst-italic mt-2 mb-0">

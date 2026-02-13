@@ -117,7 +117,7 @@ if (!defined('ABSPATH')) {
                     <hr class="my-2">
                     <?php if ($summary['has_summary']): ?>
                         <div class="fs-9 text-body">
-                            <?php echo $summary['summary_html']; ?>
+                            <?php echo wp_kses_post($summary['summary_html']); ?>
                         </div>
                     <?php else: ?>
                         <p class="text-body-secondary fs-9 fst-italic mb-0">

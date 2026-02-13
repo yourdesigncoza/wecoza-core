@@ -52,12 +52,12 @@ if (!empty($record['site_name'])) {
 
     <!-- Notification -->
     <td class="py-2 align-middle">
-        <?php echo $record['notification_badge_html']; ?>
+        <?php echo wp_kses_post($record['notification_badge_html']); ?>
     </td>
-    
+
     <!-- Status -->
     <td class="py-2 align-middle delivery-status-badge">
-        <?php echo $record['status_badge_html']; ?>
+        <?php echo wp_kses_post($record['status_badge_html']); ?>
     </td>
     
     <!-- Actions -->
