@@ -174,6 +174,11 @@ Plans:
 3. Duplicate JS removed - test notification handler consolidated to single location
 4. WordPress escaping best practices followed - no pre-built HTML output without escaping
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 35-01-PLAN.md — Late escaping for presenter HTML, tracking table sync in markDelivered(), remove duplicate JS file
+
 ---
 
 ## Progress
@@ -277,4 +282,4 @@ Phases execute in numeric order.
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-13 after phase 34 completion*
+*Last updated: 2026-02-13 after phase 35 planning*
