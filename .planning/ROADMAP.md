@@ -12,7 +12,7 @@
 | 36 | Service Layer Extraction | Complete    | 2026-02-16 | 4 |
 | 37 | Model Architecture Unification | Complete    | 2026-02-16 | 4 |
 | 38 | Address Storage Normalization | Complete    | 2026-02-16 | 5 |
-| 39 | Repository Pattern Enforcement | All repositories use BaseRepository methods — manual SQL only for complex queries | REPO-01..06 | 4 |
+| 39 | Repository Pattern Enforcement | Complete    | 2026-02-16 | 4 |
 | 40 | Return Type Hints & Constants | All public methods typed, all magic numbers extracted to constants | TYPE-01..05, CONST-01..04 | 5 |
 | 41 | Architectural Verification | End-to-end validation — all refactored layers work together, no regressions | All 28 | 5 |
 
@@ -113,7 +113,7 @@ Plans:
 
 **Goal:** Replace manual SQL queries with BaseRepository findBy/updateBy/deleteBy methods where appropriate. Document justified bypasses for complex queries.
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 39-01-PLAN.md — SQL audit + refactor LearnerRepository and ClientRepository (REPO-01, REPO-02, REPO-04)
