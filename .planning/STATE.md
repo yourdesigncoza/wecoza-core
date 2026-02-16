@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 36 — Service Layer Extraction
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-16 — Milestone v4.0 started
+Status: Ready to plan
+Last activity: 2026-02-16 — Roadmap created (6 phases, 28 requirements)
 
-Progress: N/A (requirements phase)
+Progress: 0/6 phases complete
 
 ## Milestone History
 
@@ -67,7 +67,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Defining v4.0 milestone requirements
+Stopped at: Roadmap created, ready to plan Phase 36
 Resume file: N/A
 
-**Next action:** Define requirements and create roadmap for v4.0.
+**Next action:** `/gsd:plan-phase 36` to plan Service Layer Extraction.

@@ -77,40 +77,40 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SVC-01 | — | Pending |
-| SVC-02 | — | Pending |
-| SVC-03 | — | Pending |
-| SVC-04 | — | Pending |
-| MDL-01 | — | Pending |
-| MDL-02 | — | Pending |
-| MDL-03 | — | Pending |
-| MDL-04 | — | Pending |
-| ADDR-01 | — | Pending |
-| ADDR-02 | — | Pending |
-| ADDR-03 | — | Pending |
-| ADDR-04 | — | Pending |
-| ADDR-05 | — | Pending |
-| REPO-01 | — | Pending |
-| REPO-02 | — | Pending |
-| REPO-03 | — | Pending |
-| REPO-04 | — | Pending |
-| REPO-05 | — | Pending |
-| REPO-06 | — | Pending |
-| TYPE-01 | — | Pending |
-| TYPE-02 | — | Pending |
-| TYPE-03 | — | Pending |
-| TYPE-04 | — | Pending |
-| TYPE-05 | — | Pending |
-| CONST-01 | — | Pending |
-| CONST-02 | — | Pending |
-| CONST-03 | — | Pending |
-| CONST-04 | — | Pending |
+| SVC-01 | Phase 36 | Pending |
+| SVC-02 | Phase 36 | Pending |
+| SVC-03 | Phase 36 | Pending |
+| SVC-04 | Phase 36 | Pending |
+| MDL-01 | Phase 37 | Pending |
+| MDL-02 | Phase 37 | Pending |
+| MDL-03 | Phase 37 | Pending |
+| MDL-04 | Phase 37 | Pending |
+| ADDR-01 | Phase 38 | Pending |
+| ADDR-02 | Phase 38 | Pending |
+| ADDR-03 | Phase 38 | Pending |
+| ADDR-04 | Phase 38 | Pending |
+| ADDR-05 | Phase 38 | Pending |
+| REPO-01 | Phase 39 | Pending |
+| REPO-02 | Phase 39 | Pending |
+| REPO-03 | Phase 39 | Pending |
+| REPO-04 | Phase 39 | Pending |
+| REPO-05 | Phase 39 | Pending |
+| REPO-06 | Phase 39 | Pending |
+| TYPE-01 | Phase 40 | Pending |
+| TYPE-02 | Phase 40 | Pending |
+| TYPE-03 | Phase 40 | Pending |
+| TYPE-04 | Phase 40 | Pending |
+| TYPE-05 | Phase 40 | Pending |
+| CONST-01 | Phase 40 | Pending |
+| CONST-02 | Phase 40 | Pending |
+| CONST-03 | Phase 40 | Pending |
+| CONST-04 | Phase 40 | Pending |
 
 **Coverage:**
 - v4.0 requirements: 28 total
-- Mapped to phases: 0
-- Unmapped: 28 (awaiting roadmap)
+- Mapped to phases: 28
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-16*
-*Last updated: 2026-02-16 after initial definition*
+*Last updated: 2026-02-16 after roadmap creation*
