@@ -240,44 +240,40 @@ class LearnerRepository extends BaseRepository
         }
 
         try {
-            $pdo = $this->db->getPdo();
-            $pdo->beginTransaction();
+            $newId = $this->executeTransaction(function () use ($filteredData) {
+                $pdo = $this->db->getPdo();
 
-            // Validate highest_qualification if provided
-            if (!empty($filteredData['highest_qualification'])) {
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM learner_qualifications WHERE id = :id");
-                $stmt->execute(['id' => $filteredData['highest_qualification']]);
-                if ($stmt->fetchColumn() == 0) {
-                    throw new Exception("Invalid highest qualification ID: " . $filteredData['highest_qualification']);
+                // Validate highest_qualification if provided
+                if (!empty($filteredData['highest_qualification'])) {
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM learner_qualifications WHERE id = :id");
+                    $stmt->execute(['id' => $filteredData['highest_qualification']]);
+                    if ($stmt->fetchColumn() == 0) {
+                        throw new Exception("Invalid highest qualification ID: " . $filteredData['highest_qualification']);
+                    }
                 }
-            }
 
-            // Build insert SQL
-            $columns = array_keys($filteredData);
-            $placeholders = array_map(fn($c) => ":{$c}", $columns);
+                // Build insert SQL
+                $columns = array_keys($filteredData);
+                $placeholders = array_map(fn($c) => ":{$c}", $columns);
 
-            $sql = sprintf(
-                "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
-                static::$table,
-                implode(', ', $columns),
-                implode(', ', $placeholders),
-                static::$primaryKey
-            );
+                $sql = sprintf(
+                    "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
+                    static::$table,
+                    implode(', ', $columns),
+                    implode(', ', $placeholders),
+                    static::$primaryKey
+                );
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($filteredData);
-            $newId = (int) $stmt->fetchColumn();
-
-            $pdo->commit();
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($filteredData);
+                return (int) $stmt->fetchColumn();
+            });
 
             // Clear cache
             delete_transient('learner_db_get_learners_mappings');
 
             return $newId;
         } catch (Exception $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
             error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::insert'));
             return null;
         }
@@ -631,80 +627,79 @@ class LearnerRepository extends BaseRepository
      */
     public function savePortfolios(int $learnerId, array $files): array
     {
-        $pdo = null;  // Initialize to prevent catch block crash
         try {
-            $pdo = $this->db->getPdo();
             $uploadDir = wp_upload_dir();
             $portfolioDir = $uploadDir['basedir'] . '/portfolios/';
-            $portfolioPaths = [];
 
             if (!file_exists($portfolioDir)) {
                 wp_mkdir_p($portfolioDir);
             }
 
-            $pdo->beginTransaction();
-
-            // Fetch existing portfolios to append, not overwrite
-            $existingStmt = $pdo->prepare("SELECT scanned_portfolio FROM learners WHERE id = :id");
-            $existingStmt->execute(['id' => $learnerId]);
-            $existingPortfolios = $existingStmt->fetchColumn();
-            $currentPaths = $existingPortfolios ? array_map('trim', explode(',', $existingPortfolios)) : [];
-
-            if (!is_array($files['name']) || empty($files['name'][0])) {
-                throw new Exception('No files were uploaded.');
-            }
-
+            $portfolioPaths = [];
             $skippedCount = 0;
 
-            for ($i = 0; $i < count($files['name']); $i++) {
-                if ($files['error'][$i] === UPLOAD_ERR_OK) {
-                    $filename = $files['name'][$i];
-                    $fileExt = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $this->executeTransaction(function () use ($learnerId, $files, $portfolioDir, &$portfolioPaths, &$skippedCount) {
+                $pdo = $this->db->getPdo();
 
-                    if ($fileExt === 'pdf') {
-                        // Validate actual MIME type (SEC-04: prevent malicious files)
-                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                        $mimeType = finfo_file($finfo, $files['tmp_name'][$i]);
-                        finfo_close($finfo);
+                // Fetch existing portfolios to append, not overwrite
+                $existingStmt = $pdo->prepare("SELECT scanned_portfolio FROM learners WHERE id = :id");
+                $existingStmt->execute(['id' => $learnerId]);
+                $existingPortfolios = $existingStmt->fetchColumn();
+                $currentPaths = $existingPortfolios ? array_map('trim', explode(',', $existingPortfolios)) : [];
 
-                        if ($mimeType !== 'application/pdf') {
-                            // Generic error per CONTEXT.md decision - do NOT reveal detected MIME
+                if (!is_array($files['name']) || empty($files['name'][0])) {
+                    throw new Exception('No files were uploaded.');
+                }
+
+                for ($i = 0; $i < count($files['name']); $i++) {
+                    if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                        $filename = $files['name'][$i];
+                        $fileExt = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+                        if ($fileExt === 'pdf') {
+                            // Validate actual MIME type (SEC-04: prevent malicious files)
+                            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                            $mimeType = finfo_file($finfo, $files['tmp_name'][$i]);
+                            finfo_close($finfo);
+
+                            if ($mimeType !== 'application/pdf') {
+                                // Generic error per CONTEXT.md decision - do NOT reveal detected MIME
+                                $skippedCount++;
+                                continue; // Skip invalid file, process others
+                            }
+
+                            $newFilename = uniqid('portfolio_', true) . '.pdf';
+                            $filePath = $portfolioDir . $newFilename;
+                            $relativePath = 'portfolios/' . $newFilename;
+
+                            if (move_uploaded_file($files['tmp_name'][$i], $filePath)) {
+                                $portfolioPaths[] = $relativePath;
+
+                                $stmt = $pdo->prepare("
+                                    INSERT INTO learner_portfolios (learner_id, file_path)
+                                    VALUES (:learner_id, :file_path)
+                                ");
+                                $stmt->execute([
+                                    'learner_id' => $learnerId,
+                                    'file_path' => $relativePath,
+                                ]);
+                            }
+                        } else {
                             $skippedCount++;
-                            continue; // Skip invalid file, process others
                         }
-
-                        $newFilename = uniqid('portfolio_', true) . '.pdf';
-                        $filePath = $portfolioDir . $newFilename;
-                        $relativePath = 'portfolios/' . $newFilename;
-
-                        if (move_uploaded_file($files['tmp_name'][$i], $filePath)) {
-                            $portfolioPaths[] = $relativePath;
-
-                            $stmt = $pdo->prepare("
-                                INSERT INTO learner_portfolios (learner_id, file_path)
-                                VALUES (:learner_id, :file_path)
-                            ");
-                            $stmt->execute([
-                                'learner_id' => $learnerId,
-                                'file_path' => $relativePath,
-                            ]);
-                        }
-                    } else {
-                        $skippedCount++;
                     }
                 }
-            }
 
-            if (!empty($portfolioPaths)) {
-                // Merge existing and new paths, remove duplicates
-                $allPaths = array_merge($currentPaths, $portfolioPaths);
-                $uniquePaths = array_unique(array_filter($allPaths));
-                $portfolioList = implode(', ', $uniquePaths);
-                $stmt = $pdo->prepare("UPDATE learners SET scanned_portfolio = :paths WHERE id = :id");
-                $stmt->execute(['paths' => $portfolioList, 'id' => $learnerId]);
-            }
+                if (!empty($portfolioPaths)) {
+                    // Merge existing and new paths, remove duplicates
+                    $allPaths = array_merge($currentPaths, $portfolioPaths);
+                    $uniquePaths = array_unique(array_filter($allPaths));
+                    $portfolioList = implode(', ', $uniquePaths);
+                    $stmt = $pdo->prepare("UPDATE learners SET scanned_portfolio = :paths WHERE id = :id");
+                    $stmt->execute(['paths' => $portfolioList, 'id' => $learnerId]);
+                }
+            });
 
-            $pdo->commit();
             delete_transient('learner_db_get_learners_mappings');
 
             return [
@@ -716,9 +711,6 @@ class LearnerRepository extends BaseRepository
                 'skipped' => $skippedCount,
             ];
         } catch (Exception $e) {
-            if ($pdo !== null && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
             error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::savePortfolios'));
             return [
                 'success' => false,
@@ -732,57 +724,56 @@ class LearnerRepository extends BaseRepository
      */
     public function deletePortfolio(int $portfolioId): bool
     {
-        $pdo = null;  // Initialize to prevent catch block crash
         try {
-            $pdo = $this->db->getPdo();
-            $pdo->beginTransaction();
+            $result = $this->executeTransaction(function () use ($portfolioId) {
+                $pdo = $this->db->getPdo();
 
-            $stmt = $pdo->prepare("
-                SELECT file_path, learner_id
-                FROM learner_portfolios
-                WHERE portfolio_id = :portfolio_id
-            ");
-            $stmt->execute(['portfolio_id' => $portfolioId]);
-            $file = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt = $pdo->prepare("
+                    SELECT file_path, learner_id
+                    FROM learner_portfolios
+                    WHERE portfolio_id = :portfolio_id
+                ");
+                $stmt->execute(['portfolio_id' => $portfolioId]);
+                $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$file) {
-                $pdo->rollBack();
-                return false;
+                if (!$file) {
+                    return false;
+                }
+
+                $uploadDir = wp_upload_dir();
+                $filePath = $uploadDir['basedir'] . '/' . $file['file_path'];
+
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
+
+                $pdo->prepare("DELETE FROM learner_portfolios WHERE portfolio_id = :id")
+                    ->execute(['id' => $portfolioId]);
+
+                // Update learners table with remaining portfolios
+                $stmt = $pdo->prepare("
+                    SELECT file_path FROM learner_portfolios
+                    WHERE learner_id = :learner_id
+                    ORDER BY upload_date DESC
+                ");
+                $stmt->execute(['learner_id' => $file['learner_id']]);
+                $remaining = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                $pdo->prepare("UPDATE learners SET scanned_portfolio = :paths WHERE id = :id")
+                    ->execute([
+                        'paths' => !empty($remaining) ? implode(', ', $remaining) : null,
+                        'id' => $file['learner_id'],
+                    ]);
+
+                return true;
+            });
+
+            if ($result) {
+                delete_transient('learner_db_get_learners_mappings');
             }
 
-            $uploadDir = wp_upload_dir();
-            $filePath = $uploadDir['basedir'] . '/' . $file['file_path'];
-
-            if (file_exists($filePath)) {
-                @unlink($filePath);
-            }
-
-            $pdo->prepare("DELETE FROM learner_portfolios WHERE portfolio_id = :id")
-                ->execute(['id' => $portfolioId]);
-
-            // Update learners table with remaining portfolios
-            $stmt = $pdo->prepare("
-                SELECT file_path FROM learner_portfolios
-                WHERE learner_id = :learner_id
-                ORDER BY upload_date DESC
-            ");
-            $stmt->execute(['learner_id' => $file['learner_id']]);
-            $remaining = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            $pdo->prepare("UPDATE learners SET scanned_portfolio = :paths WHERE id = :id")
-                ->execute([
-                    'paths' => !empty($remaining) ? implode(', ', $remaining) : null,
-                    'id' => $file['learner_id'],
-                ]);
-
-            $pdo->commit();
-            delete_transient('learner_db_get_learners_mappings');
-
-            return true;
+            return $result;
         } catch (Exception $e) {
-            if ($pdo !== null && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
             error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::deletePortfolio'));
             return false;
         }
@@ -827,40 +818,36 @@ class LearnerRepository extends BaseRepository
      */
     public function saveSponsors(int $learnerId, array $employerIds): bool
     {
-        $pdo = null;
         try {
-            $pdo = $this->db->getPdo();
-            $pdo->beginTransaction();
+            $this->executeTransaction(function () use ($learnerId, $employerIds) {
+                $pdo = $this->db->getPdo();
 
-            // Remove existing sponsors
-            $pdo->prepare("DELETE FROM learner_sponsors WHERE learner_id = :learner_id")
-                ->execute(['learner_id' => $learnerId]);
+                // Remove existing sponsors
+                $pdo->prepare("DELETE FROM learner_sponsors WHERE learner_id = :learner_id")
+                    ->execute(['learner_id' => $learnerId]);
 
-            // Insert new sponsors (deduplicate)
-            if (!empty($employerIds)) {
-                $stmt = $pdo->prepare("
-                    INSERT INTO learner_sponsors (learner_id, employer_id)
-                    VALUES (:learner_id, :employer_id)
-                ");
-                $seen = [];
-                foreach ($employerIds as $employerId) {
-                    $employerId = (int) $employerId;
-                    if ($employerId > 0 && !isset($seen[$employerId])) {
-                        $stmt->execute([
-                            'learner_id' => $learnerId,
-                            'employer_id' => $employerId,
-                        ]);
-                        $seen[$employerId] = true;
+                // Insert new sponsors (deduplicate)
+                if (!empty($employerIds)) {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO learner_sponsors (learner_id, employer_id)
+                        VALUES (:learner_id, :employer_id)
+                    ");
+                    $seen = [];
+                    foreach ($employerIds as $employerId) {
+                        $employerId = (int) $employerId;
+                        if ($employerId > 0 && !isset($seen[$employerId])) {
+                            $stmt->execute([
+                                'learner_id' => $learnerId,
+                                'employer_id' => $employerId,
+                            ]);
+                            $seen[$employerId] = true;
+                        }
                     }
                 }
-            }
+            });
 
-            $pdo->commit();
             return true;
         } catch (Exception $e) {
-            if ($pdo !== null && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
             error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::saveSponsors'));
             return false;
         }
