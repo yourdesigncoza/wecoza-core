@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 38 — Address Storage Normalization
-Plan: 02 (completed)
-Status: Complete (2/2 plans complete)
-Last activity: 2026-02-16 — Completed 38-02: Agent Address Dual-Read/Dual-Write Implementation
+Phase: 39 — Repository Pattern Enforcement
+Plan: 01 (completed)
+Status: In Progress (1/4 plans complete)
+Last activity: 2026-02-16 — Completed 39-01: Repository Pattern Audit & Initial Refactoring
 
-Progress: 3/6 phases complete (7 plans executed)
+Progress: 3/6 phases complete (8 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,11 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+**Phase 39-01 (2026-02-16):**
+- FK validation runs before parent::insert (simple pre-check, no transaction needed)
+- parent::insert handles transaction internally
+- findBy supports null criteria (main_client_id IS NULL)
+
 **Phase 38-02 (2026-02-16):**
 - Use direct SQL via wecoza_db() instead of LocationsModel to bypass longitude/latitude validation
 - Concatenate address_line_2 into street_address when syncing to locations table
@@ -72,6 +77,9 @@ Full decision log in PROJECT.md Key Decisions table.
 - [Phase 38-02]: Use direct SQL via wecoza_db() instead of LocationsModel to bypass longitude/latitude validation
 - [Phase 38-02]: Concatenate address_line_2 into street_address when syncing to locations table
 - [Phase 38-02]: Graceful degradation: location sync failure doesn't block agent save
+- [Phase 39-01]: FK validation runs before parent::insert (simple pre-check, no transaction needed)
+- [Phase 39-01]: parent::insert handles transaction internally
+- [Phase 39-01]: findBy supports null criteria (main_client_id IS NULL)
 
 ### Pending Todos
 
@@ -104,7 +112,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 38-02-PLAN.md — Agent address dual-read/dual-write implementation
-Resume file: .planning/phases/38-address-storage-normalization/38-02-SUMMARY.md
+Stopped at: Completed 39-01-PLAN.md — Repository pattern audit and initial refactoring
+Resume file: .planning/phases/39-repository-pattern-enforcement/39-01-SUMMARY.md
 
-**Next action:** Phase 38 complete (2/2 plans). Agents now use shared locations table with dual-read/dual-write pattern.
+**Next action:** Phase 39-02: Refactor AgentRepository CRUD methods to use BaseRepository (createAgent, updateAgent, deleteAgent, deleteAgentPermanently)
