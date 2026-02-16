@@ -13,8 +13,7 @@ declare(strict_types=1);
 namespace WeCoza\Agents\Controllers;
 
 use WeCoza\Core\Abstract\BaseController;
-use WeCoza\Agents\Repositories\AgentRepository;
-use WeCoza\Agents\Models\AgentModel;
+use WeCoza\Agents\Services\AgentService;
 use WeCoza\Agents\Services\WorkingAreasService;
 use WeCoza\Agents\Helpers\FormHelpers;
 use WeCoza\Agents\Services\AgentDisplayService;
@@ -31,11 +30,11 @@ if (!defined('ABSPATH')) {
 class AgentsController extends BaseController
 {
     /**
-     * Repository instance (lazily loaded)
+     * Service instance (lazily loaded)
      *
-     * @var AgentRepository|null
+     * @var AgentService|null
      */
-    private ?AgentRepository $repository = null;
+    private ?AgentService $agentService = null;
 
     /**
      * Register WordPress hooks
@@ -49,16 +48,16 @@ class AgentsController extends BaseController
     }
 
     /**
-     * Get repository instance on-demand
+     * Get service instance on-demand
      *
-     * @return AgentRepository
+     * @return AgentService
      */
-    protected function getRepository(): AgentRepository
+    protected function getAgentService(): AgentService
     {
-        if ($this->repository === null) {
-            $this->repository = new AgentRepository();
+        if ($this->agentService === null) {
+            $this->agentService = new AgentService();
         }
-        return $this->repository;
+        return $this->agentService;
     }
 
     /**
@@ -103,60 +102,33 @@ class AgentsController extends BaseController
 
         // Load agent data if editing
         if ($mode === 'edit' && $agent_id > 0) {
-            $current_agent = $this->getRepository()->getAgent($agent_id);
+            $current_agent = $this->getAgentService()->getAgent($agent_id);
             if (!$current_agent) {
                 return '<div class="alert alert-subtle-danger">' . sprintf(__('Agent with ID %d not found.', 'wecoza-core'), $agent_id) . '</div>';
             }
             $agent = $current_agent;
         }
 
-        // Handle form submission (non-AJAX fallback)
+        // Handle form submission (non-AJAX fallback) via service
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wecoza_agents_form_nonce']) && !wp_doing_ajax()) {
             if (!wp_verify_nonce($_POST['wecoza_agents_form_nonce'], 'submit_agent_form')) {
                 $errors['general'] = __('Security check failed. Please try again.', 'wecoza-core');
             } else {
-                // Collect form data
-                $data = $this->collectFormData();
+                $result = $this->getAgentService()->handleAgentFormSubmission(
+                    $_POST, $_FILES, $agent_id > 0 ? $agent_id : null, $current_agent
+                );
 
-                // Validate via AgentModel (single source of truth)
-                $agentModel = new AgentModel($data);
-                $isValid = $agentModel->validate([
-                    'current_agent' => $current_agent,
-                    'repository'    => $this->getRepository(),
-                ]);
-
-                if (!$isValid) {
-                    $errors = $agentModel->get_errors();
-                    $agent = $data; // Preserve submitted data
+                if ($result['success']) {
+                    // Show success message or redirect
+                    if (!empty($atts['redirect_after_save'])) {
+                        wp_safe_redirect($atts['redirect_after_save']);
+                        exit;
+                    }
+                    $agent = $result['agent'];
+                    $current_agent = $agent;
                 } else {
-                    // Save agent
-                    if ($current_agent) {
-                        $success = $this->getRepository()->updateAgent($agent_id, $data);
-                        $saved_agent_id = $success ? $agent_id : false;
-                    } else {
-                        $saved_agent_id = $this->getRepository()->createAgent($data);
-                    }
-
-                    if ($saved_agent_id) {
-                        // Handle file uploads
-                        $file_data = $this->handleFileUploads($saved_agent_id, $current_agent);
-                        if (!empty($file_data)) {
-                            $this->getRepository()->updateAgent($saved_agent_id, $file_data);
-                        }
-
-                        // Show success message
-                        if (!empty($atts['redirect_after_save'])) {
-                            wp_safe_redirect($atts['redirect_after_save']);
-                            exit;
-                        }
-
-                        // Reload agent data
-                        $agent = $this->getRepository()->getAgent($saved_agent_id);
-                        $current_agent = $agent;
-                    } else {
-                        $errors['general'] = __('Failed to save agent. Please try again.', 'wecoza-core');
-                        $agent = $data; // Preserve submitted data
-                    }
+                    $errors = $result['errors'];
+                    $agent = $result['submitted_data'] ?? $agent;
                 }
             }
         }
@@ -204,56 +176,30 @@ class AgentsController extends BaseController
             $sort_order = 'ASC';
         }
 
-        // Map frontend column to database column
-        $sort_column = AgentDisplayService::mapSortColumn($sort_column);
-
-        // Build query args
-        $args = [
-            'status' => 'all',
-            'orderby' => $sort_column,
-            'order' => $sort_order,
-            'limit' => $per_page,
-            'offset' => ($current_page - 1) * $per_page,
-            'search' => $search_query,
-        ];
-
-        // Get agents
-        $agents_raw = $this->getRepository()->getAgents($args);
-        $agents = [];
-        foreach ($agents_raw as $agent) {
-            $agents[] = AgentDisplayService::mapAgentFields($agent);
-        }
-
-        // Get total count
-        $total_agents = $this->getRepository()->countAgents(['status' => 'all', 'search' => $search_query]);
-
-        // Calculate pagination
-        $total_pages = ceil($total_agents / $per_page);
-        $start_index = ($current_page - 1) * $per_page + 1;
-        $end_index = min($start_index + $per_page - 1, $total_agents);
-
-        // Get statistics
-        $statistics = AgentDisplayService::getAgentStatistics();
+        // Get pagination data from service
+        $paginationData = $this->getAgentService()->getPaginatedAgents(
+            $current_page, $per_page, $search_query, $sort_column, $sort_order
+        );
 
         // Determine display columns
         $columns = AgentDisplayService::getDisplayColumns($atts['columns']);
 
         // Render view
         return $this->render('agents/display/agent-display-table', [
-            'agents' => $agents,
-            'total_agents' => $total_agents,
+            'agents' => $paginationData['agents'],
+            'total_agents' => $paginationData['total_agents'],
             'current_page' => $current_page,
             'per_page' => $per_page,
-            'total_pages' => $total_pages,
-            'start_index' => $start_index,
-            'end_index' => $end_index,
+            'total_pages' => $paginationData['total_pages'],
+            'start_index' => $paginationData['start_index'],
+            'end_index' => $paginationData['end_index'],
             'search_query' => $search_query,
-            'sort_column' => $sort_column,
+            'sort_column' => AgentDisplayService::mapSortColumn($sort_column),
             'sort_order' => $sort_order,
             'columns' => $columns,
             'atts' => $atts,
             'can_manage' => current_user_can('edit_others_posts'),
-            'statistics' => $statistics,
+            'statistics' => $paginationData['statistics'],
         ], true);
     }
 
@@ -284,8 +230,8 @@ class AgentsController extends BaseController
         if ($agent_id <= 0) {
             $error = __('Invalid agent ID provided.', 'wecoza-core');
         } else {
-            // Load agent data
-            $agent_data = $this->getRepository()->getAgent($agent_id);
+            // Load agent data via service
+            $agent_data = $this->getAgentService()->getAgent($agent_id);
             if ($agent_data) {
                 // Transform database fields to form fields
                 $agent = FormHelpers::map_database_to_form($agent_data);
@@ -418,227 +364,9 @@ class AgentsController extends BaseController
 
     /*
     |--------------------------------------------------------------------------
-    | Private Helper Methods (Stubs - to be filled in Task 1b)
+    | URL Helper Methods (Presentation/Routing)
     |--------------------------------------------------------------------------
     */
-
-    /**
-     * Collect form data from POST
-     *
-     * @return array
-     */
-    private function collectFormData(): array
-    {
-        $data = [
-            // Personal Information
-            'title' => sanitize_text_field($_POST['title'] ?? ''),
-            'first_name' => sanitize_text_field($_POST['first_name'] ?? ''),
-            'second_name' => $this->processTextField($_POST['second_name'] ?? ''),
-            'surname' => sanitize_text_field($_POST['surname'] ?? ''),
-            'initials' => sanitize_text_field($_POST['initials'] ?? ''),
-            'gender' => sanitize_text_field($_POST['gender'] ?? ''),
-            'race' => sanitize_text_field($_POST['race'] ?? ''),
-
-            // Identification
-            'id_type' => sanitize_text_field($_POST['id_type'] ?? 'sa_id'),
-            'sa_id_no' => preg_replace('/[^0-9]/', '', $_POST['sa_id_no'] ?? ''),
-            'passport_number' => sanitize_text_field($_POST['passport_number'] ?? ''),
-
-            // Contact Information
-            'tel_number' => preg_replace('/[^0-9+\-\(\)\s]/', '', $_POST['tel_number'] ?? ''),
-            'email_address' => sanitize_email($_POST['email_address'] ?? ''),
-
-            // Address Information
-            'residential_address_line' => sanitize_text_field($_POST['address_line_1'] ?? ''),
-            'address_line_2' => sanitize_text_field($_POST['address_line_2'] ?? ''),
-            'residential_suburb' => sanitize_text_field($_POST['residential_suburb'] ?? ''),
-            'city' => sanitize_text_field($_POST['city_town'] ?? ''),
-            'province' => sanitize_text_field($_POST['province_region'] ?? ''),
-            'residential_postal_code' => preg_replace('/[^0-9]/', '', $_POST['postal_code'] ?? ''),
-
-            // Working Areas
-            'preferred_working_area_1' => absint($_POST['preferred_working_area_1'] ?? 0),
-            'preferred_working_area_2' => absint($_POST['preferred_working_area_2'] ?? 0),
-            'preferred_working_area_3' => absint($_POST['preferred_working_area_3'] ?? 0),
-
-            // SACE Registration
-            'sace_number' => sanitize_text_field($_POST['sace_number'] ?? ''),
-            'sace_registration_date' => $this->processDateField($_POST['sace_registration_date'] ?? ''),
-            'sace_expiry_date' => $this->processDateField($_POST['sace_expiry_date'] ?? ''),
-            'phase_registered' => sanitize_text_field($_POST['phase_registered'] ?? ''),
-            'subjects_registered' => sanitize_textarea_field($_POST['subjects_registered'] ?? ''),
-
-            // Qualifications
-            'highest_qualification' => sanitize_text_field($_POST['highest_qualification'] ?? ''),
-
-            // Quantum Tests
-            'quantum_maths_score' => $this->processNumericField($_POST['quantum_maths_score'] ?? ''),
-            'quantum_science_score' => $this->processNumericField($_POST['quantum_science_score'] ?? ''),
-            'quantum_assessment' => $this->processNumericField($_POST['quantum_assessment'] ?? ''),
-
-            // Training
-            'agent_training_date' => $this->processDateField($_POST['agent_training_date'] ?? ''),
-
-            // Criminal Record
-            'criminal_record_date' => $this->processDateField($_POST['criminal_record_date'] ?? ''),
-
-            // Agreement
-            'signed_agreement_date' => $this->processDateField($_POST['signed_agreement_date'] ?? ''),
-
-            // Banking Details
-            'bank_name' => sanitize_text_field($_POST['bank_name'] ?? ''),
-            'account_holder' => sanitize_text_field($_POST['account_holder'] ?? ''),
-            'bank_account_number' => preg_replace('/[^0-9]/', '', $_POST['account_number'] ?? ''),
-            'bank_branch_code' => preg_replace('/[^0-9]/', '', $_POST['branch_code'] ?? ''),
-            'account_type' => sanitize_text_field($_POST['account_type'] ?? ''),
-        ];
-
-        // Clear unused field based on ID type
-        if ($data['id_type'] === 'passport') {
-            $data['sa_id_no'] = '';
-        } else {
-            $data['passport_number'] = '';
-        }
-
-        return $data;
-    }
-
-    /**
-     * Process text field (return null for empty values)
-     *
-     * @param string $value Text value from form
-     * @return string|null
-     */
-    private function processTextField(string $value): ?string
-    {
-        $value = sanitize_text_field($value);
-        $value = trim($value);
-        return empty($value) ? null : $value;
-    }
-
-    /**
-     * Process date field value
-     *
-     * @param string $date_value Date value from form
-     * @return string|null Processed date or null if empty
-     */
-    private function processDateField(string $date_value): ?string
-    {
-        $date_value = trim($date_value);
-
-        // Return null for empty dates
-        if (empty($date_value)) {
-            return null;
-        }
-
-        // Validate HTML5 date format and return as-is if valid
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_value)) {
-            return $date_value;
-        }
-
-        // Try to parse with strtotime
-        $timestamp = strtotime($date_value);
-        if ($timestamp !== false) {
-            return wp_date('Y-m-d', $timestamp);
-        }
-
-        return null;
-    }
-
-    /**
-     * Process numeric field values
-     *
-     * @param string $value Numeric value from form
-     * @return int|null Processed numeric value or null if empty
-     */
-    private function processNumericField(string $value): ?int
-    {
-        $value = trim($value);
-
-        // Return null for empty values
-        if (empty($value)) {
-            return null;
-        }
-
-        // Return integer value for numeric values
-        if (is_numeric($value)) {
-            return intval($value);
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Handle file uploads
-     *
-     * @param int $agent_id Agent ID
-     * @param array|null $current_agent Current agent data
-     * @return array File paths to save
-     */
-    private function handleFileUploads(int $agent_id, ?array $current_agent): array
-    {
-        $uploaded_files = [];
-
-        // Handle signed agreement file
-        if (!empty($_FILES['signed_agreement_file']['name'])) {
-            $file_path = $this->uploadFile('signed_agreement_file', $agent_id);
-            if ($file_path) {
-                $uploaded_files['signed_agreement_file'] = $file_path;
-            }
-        }
-
-        // Handle criminal record file
-        if (!empty($_FILES['criminal_record_file']['name'])) {
-            $file_path = $this->uploadFile('criminal_record_file', $agent_id);
-            if ($file_path) {
-                $uploaded_files['criminal_record_file'] = $file_path;
-            }
-        }
-
-        return $uploaded_files;
-    }
-
-    /**
-     * Upload a single file
-     *
-     * @param string $field_name File field name
-     * @param int $agent_id Agent ID
-     * @return string|null File path or null on failure
-     */
-    private function uploadFile(string $field_name, int $agent_id): ?string
-    {
-        if (!isset($_FILES[$field_name]) || $_FILES[$field_name]['error'] !== UPLOAD_ERR_OK) {
-            return null;
-        }
-
-        $file = $_FILES[$field_name];
-
-        // Validate file type
-        $allowed_types = ['pdf', 'doc', 'docx'];
-        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($file_ext, $allowed_types)) {
-            return null;
-        }
-
-        // Require WordPress file handling functions
-        if (!function_exists('wp_handle_upload')) {
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-        }
-
-        // Use WordPress file upload handler
-        $upload_overrides = ['test_form' => false];
-        $movefile = wp_handle_upload($file, $upload_overrides);
-
-        if ($movefile && !isset($movefile['error'])) {
-            // Return relative path from uploads directory
-            $upload_dir = wp_upload_dir();
-            return str_replace($upload_dir['basedir'], '', $movefile['file']);
-        }
-
-        return null;
-    }
 
     /**
      * Get edit URL for agent

@@ -13,8 +13,7 @@ declare(strict_types=1);
 namespace WeCoza\Agents\Ajax;
 
 use WeCoza\Core\Helpers\AjaxSecurity;
-use WeCoza\Agents\Repositories\AgentRepository;
-use WeCoza\Agents\Helpers\FormHelpers;
+use WeCoza\Agents\Services\AgentService;
 use WeCoza\Agents\Services\AgentDisplayService;
 
 if (!defined('ABSPATH')) {
@@ -29,18 +28,18 @@ if (!defined('ABSPATH')) {
 class AgentsAjaxHandlers
 {
     /**
-     * Repository instance
+     * Service instance
      *
-     * @var AgentRepository
+     * @var AgentService
      */
-    private AgentRepository $repository;
+    private AgentService $agentService;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->repository = new AgentRepository();
+        $this->agentService = new AgentService();
         $this->registerHandlers();
     }
 
@@ -80,41 +79,13 @@ class AgentsAjaxHandlers
                 $order = 'ASC';
             }
 
-            // Map frontend column to database column
-            $orderby = AgentDisplayService::mapSortColumn($orderby);
+            // Get pagination data from service
+            $data = $this->agentService->getPaginatedAgents($page, $per_page, $search, $orderby, $order);
 
-            // Build query args
-            $args = [
-                'status' => 'all',
-                'orderby' => $orderby,
-                'order' => $order,
-                'limit' => max(1, min(100, $per_page)),
-                'offset' => (max(1, $page) - 1) * max(1, min(100, $per_page)),
-                'search' => $search,
-            ];
-
-            // Get agents
-            $agents_raw = $this->repository->getAgents($args);
-            $agents = [];
-            foreach ($agents_raw as $agent) {
-                $agents[] = AgentDisplayService::mapAgentFields($agent);
-            }
-
-            // Get total count
-            $total_agents = $this->repository->countAgents(['status' => 'all', 'search' => $search]);
-
-            // Calculate pagination
-            $total_pages = ceil($total_agents / $args['limit']);
-            $start_index = ($page - 1) * $args['limit'] + 1;
-            $end_index = min($start_index + $args['limit'] - 1, $total_agents);
-
-            // Get statistics
-            $statistics = AgentDisplayService::getAgentStatistics();
-
-            // Capture table rows HTML
+            // Capture table rows HTML (presentation stays in handler)
             ob_start();
             wecoza_view('agents/display/agent-display-table-rows', [
-                'agents' => $agents,
+                'agents' => $data['agents'],
                 'columns' => AgentDisplayService::getDisplayColumns(''),
                 'can_manage' => current_user_can('edit_others_posts'),
                 'show_actions' => true,
@@ -125,27 +96,27 @@ class AgentsAjaxHandlers
             ob_start();
             wecoza_view('agents/display/agent-pagination', [
                 'current_page' => $page,
-                'total_pages' => $total_pages,
-                'per_page' => $args['limit'],
-                'start_index' => $start_index,
-                'end_index' => $end_index,
-                'total_agents' => $total_agents,
+                'total_pages' => $data['total_pages'],
+                'per_page' => $per_page,
+                'start_index' => $data['start_index'],
+                'end_index' => $data['end_index'],
+                'total_agents' => $data['total_agents'],
             ], false);
             $pagination_html = ob_get_clean();
 
             // Generate statistics HTML
-            $statistics_html = $this->getStatisticsHtml($statistics);
+            $statistics_html = $this->getStatisticsHtml($data['statistics']);
 
             // Send success response (Bug #4 fix: use AjaxSecurity)
             AjaxSecurity::sendSuccess([
-                'agents' => $agents,
-                'total_agents' => $total_agents,
+                'agents' => $data['agents'],
+                'total_agents' => $data['total_agents'],
                 'current_page' => $page,
-                'per_page' => $args['limit'],
-                'total_pages' => $total_pages,
-                'start_index' => $start_index,
-                'end_index' => $end_index,
-                'statistics' => $statistics,
+                'per_page' => $per_page,
+                'total_pages' => $data['total_pages'],
+                'start_index' => $data['start_index'],
+                'end_index' => $data['end_index'],
+                'statistics' => $data['statistics'],
                 'table_html' => $table_html,
                 'pagination_html' => $pagination_html,
                 'statistics_html' => $statistics_html,
@@ -176,8 +147,8 @@ class AgentsAjaxHandlers
         }
 
         try {
-            // Attempt to delete agent (soft delete)
-            $success = $this->repository->deleteAgent($agent_id);
+            // Attempt to delete agent (soft delete) via service
+            $success = $this->agentService->deleteAgent($agent_id);
 
             if ($success) {
                 AjaxSecurity::sendSuccess([
