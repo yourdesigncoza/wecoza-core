@@ -27,12 +27,12 @@ if (!defined('ABSPATH')) {
  * @param string $capability Required capability (default: manage_learners)
  * @return void Exits with JSON error if checks fail
  */
-function verify_learner_access(string $nonce_action = 'learners_nonce', string $capability = 'manage_learners'): void {
+function verify_learner_access(string $nonce_action = 'learners_nonce', string $capability = ''): void {
     if (!check_ajax_referer($nonce_action, 'nonce', false)) {
         wp_send_json_error(['message' => 'Security check failed']);
         exit;
     }
-    if (!current_user_can($capability)) {
+    if ($capability && !current_user_can($capability)) {
         wp_send_json_error(['message' => 'Unauthorized access']);
         exit;
     }
@@ -54,7 +54,7 @@ function get_learner_service(): LearnerService {
  */
 function handle_update_learner(): void {
     try {
-        verify_learner_access('learners_nonce', 'manage_learners');
+        verify_learner_access('learners_nonce');
 
         $learner_id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         if (!$learner_id) {
@@ -106,7 +106,7 @@ function handle_update_learner(): void {
  */
 function handle_delete_learner(): void {
     try {
-        verify_learner_access('learners_nonce', 'manage_learners');
+        verify_learner_access('learners_nonce');
 
         $learner_id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         if (!$learner_id) {
@@ -133,7 +133,7 @@ function handle_delete_learner(): void {
  */
 function handle_fetch_learners_data(): void {
     try {
-        verify_learner_access('learners_nonce', 'manage_learners');
+        verify_learner_access('learners_nonce');
 
         $service = get_learner_service();
         $learnerModels = $service->getLearnersWithMappings();
@@ -199,7 +199,7 @@ function handle_fetch_dropdown_data(): void {
  */
 function handle_portfolio_deletion(): void {
     try {
-        verify_learner_access('learners_nonce', 'manage_learners');
+        verify_learner_access('learners_nonce');
 
         $portfolio_id = filter_input(INPUT_POST, 'portfolio_id', FILTER_VALIDATE_INT);
         $learner_id = filter_input(INPUT_POST, 'learner_id', FILTER_VALIDATE_INT);

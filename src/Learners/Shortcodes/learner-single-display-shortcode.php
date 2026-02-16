@@ -23,10 +23,6 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_single_learner_display_shortcode() {
-    if (!current_user_can('manage_learners')) {
-        return '<p>You do not have permission to view this content.</p>';
-    }
-
     // Get learner ID from URL
     $learner_id = isset($_GET['learner_id']) ? intval($_GET['learner_id']) : 0;
 

@@ -26,10 +26,6 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_learners_form_shortcode($atts) {
-    if (!current_user_can('manage_learners')) {
-        return '<p>You do not have permission to access this content.</p>';
-    }
-
     // Initialize variables for form errors and data
     $form_error = false;
     $error_messages = [];

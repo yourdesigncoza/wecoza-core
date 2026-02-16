@@ -19,10 +19,6 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_display_learners_shortcode() {
-    if (!current_user_can('manage_learners')) {
-        return '<p>You do not have permission to view this content.</p>';
-    }
-
     // Enqueue necessary scripts
     wp_enqueue_script('learners-display-script', WECOZA_CORE_URL . 'assets/js/learners/learners-display-shortcode.js', array('jquery'), WECOZA_CORE_VERSION, true);
 

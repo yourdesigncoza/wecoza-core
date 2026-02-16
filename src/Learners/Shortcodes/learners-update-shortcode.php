@@ -23,10 +23,6 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_learners_update_form_shortcode($atts) {
-    if (!current_user_can('manage_learners')) {
-        return '<p>You do not have permission to access this content.</p>';
-    }
-
     // Retrieve the saved URL for the redirect
     $redirect_update_url = get_option('wecoza_learners_update_form_url');
 
