@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Agents Controller
  *
@@ -78,7 +80,7 @@ class AgentsController extends BaseController
      * @param array $atts Shortcode attributes
      * @return string
      */
-    public function renderCaptureForm($atts): string
+    public function renderCaptureForm(array|string $atts = []): string
     {
         // Check permissions - editors and above
         if (!current_user_can('edit_others_posts')) {
@@ -174,7 +176,7 @@ class AgentsController extends BaseController
      * @param array $atts Shortcode attributes
      * @return string
      */
-    public function renderAgentsList($atts): string
+    public function renderAgentsList(array|string $atts = []): string
     {
         // Parse attributes
         $atts = shortcode_atts([
@@ -257,7 +259,7 @@ class AgentsController extends BaseController
      * @param array $atts Shortcode attributes
      * @return string
      */
-    public function renderSingleAgent($atts): string
+    public function renderSingleAgent(array|string $atts = []): string
     {
         // Parse attributes
         $atts = shortcode_atts([

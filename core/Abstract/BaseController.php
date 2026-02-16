@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * WeCoza Core - Abstract Base Controller
  *
@@ -84,7 +86,7 @@ abstract class BaseController
      * @param bool $return Return output instead of echoing
      * @return string|void
      */
-    protected function render(string $view, array $data = [], bool $return = true)
+    protected function render(string $view, array $data = [], bool $return = true): string
     {
         return wecoza_view($view, $data, $return);
     }
@@ -97,7 +99,7 @@ abstract class BaseController
      * @param bool $return Return output instead of echoing
      * @return string|void
      */
-    protected function component(string $component, array $data = [], bool $return = true)
+    protected function component(string $component, array $data = [], bool $return = true): string
     {
         return wecoza_component($component, $data, $return);
     }
@@ -108,7 +110,7 @@ abstract class BaseController
      * @param string|null $key Config key (dot notation supported)
      * @return mixed
      */
-    protected function config(?string $key = null)
+    protected function config(?string $key = null): mixed
     {
         $config = wecoza_config('app');
 
@@ -241,7 +243,7 @@ abstract class BaseController
      * @param mixed $default Default value if not set
      * @return mixed
      */
-    protected function input(string $key, string $type = 'string', $default = null)
+    protected function input(string $key, string $type = 'string', mixed $default = null): mixed
     {
         if (!isset($_POST[$key])) {
             return $default;
@@ -258,7 +260,7 @@ abstract class BaseController
      * @param mixed $default Default value
      * @return mixed
      */
-    protected function query(string $key, string $type = 'string', $default = null)
+    protected function query(string $key, string $type = 'string', mixed $default = null): mixed
     {
         if (!isset($_GET[$key])) {
             return $default;
@@ -284,7 +286,7 @@ abstract class BaseController
      * @param mixed $value Input value
      * @return int
      */
-    protected function sanitizeInt($value): int
+    protected function sanitizeInt(mixed $value): int
     {
         return (int) $value;
     }
