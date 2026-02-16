@@ -56,7 +56,17 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(No active requirements — use `/gsd:new-milestone` to define next milestone)
+## Current Milestone: v4.0 Technical Debt — Architectural Improvements
+
+**Goal:** Refactor WeCoza Core architecture with service layer extraction, model unification, address storage normalization, repository pattern enforcement, return type hints, and constants extraction.
+
+**Target features:**
+- Extract business logic from controllers to service classes (LearnerService, AgentService, ClientService)
+- Unify model architecture — ClientsModel and AgentModel extend BaseModel
+- Normalize address storage — migrate Agents addresses to shared locations table
+- Enforce BaseRepository method usage — replace manual SQL with parent methods
+- Add return type hints to all public methods across all modules
+- Extract magic numbers to named constants
 
 ### Out of Scope
 
@@ -155,4 +165,4 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | DB-backed agent/supervisor dropdowns | Live queries replace hardcoded fake names | ✓ v3.1 |
 
 ---
-*Last updated: 2026-02-13 after v3.1 milestone completion*
+*Last updated: 2026-02-16 after v4.0 milestone start*

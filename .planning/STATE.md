@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-13)
+See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Planning next milestone
+**Current focus:** v4.0 Technical Debt — Architectural Improvements
 
 ## Current Position
 
-Phase: N/A — between milestones
-Plan: N/A
-Status: Ready to plan
-Last activity: 2026-02-13 — v3.1 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-16 — Milestone v4.0 started
 
-Progress: N/A (no active milestone)
+Progress: N/A (requirements phase)
 
 ## Milestone History
 
@@ -47,6 +47,7 @@ None.
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
 | v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet |
+| v4.0 | Address migration requires dual-write period | Must not break existing agent CRUD |
 
 ### Quick Tasks Completed
 
@@ -65,8 +66,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-13
-Stopped at: Completed v3.1 milestone archival
+Last session: 2026-02-16
+Stopped at: Defining v4.0 milestone requirements
 Resume file: N/A
 
-**Next action:** `/gsd:new-milestone` to define next milestone.
+**Next action:** Define requirements and create roadmap for v4.0.
