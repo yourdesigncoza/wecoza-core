@@ -87,19 +87,25 @@ Plans:
 
 **Goal:** Migrate agent addresses from inline columns to the shared locations table, with dual-write for backward compatibility and zero data loss.
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 38-01-PLAN.md — Migration scripts: SQL DDL (add location_id FK) + PHP data migration (ADDR-01, ADDR-05)
+- [ ] 38-02-PLAN.md — Dual-read/dual-write in AgentRepository and AgentService (ADDR-02, ADDR-03, ADDR-04)
+
 **Requirements:**
 - ADDR-01: Migration script copies existing agent addresses to shared locations table
 - ADDR-02: AgentRepository reads addresses from locations table (with fallback to old columns)
 - ADDR-03: AgentRepository writes addresses to both locations table and old columns (dual-write)
-- ADDR-04: AgentsController uses location linking for address management
+- ADDR-04: AgentService uses LocationsModel for address management during form submission
 - ADDR-05: All existing agent addresses preserved after migration (zero data loss)
 
 **Success Criteria:**
-1. Migration script successfully copies all agent addresses to wecoza_locations table with entity_type='agent'
-2. AgentRepository::find() returns address data from locations table, falling back to old columns if not found
-3. AgentRepository::save() writes to both locations table AND old agent columns (dual-write period)
+1. Migration script successfully copies all agent addresses to locations table via agents.location_id FK
+2. AgentRepository::getAgent() returns address data from locations table, falling back to old columns if not found
+3. AgentService::handleAgentFormSubmission() writes to both locations table AND old agent columns (dual-write period)
 4. Agent capture/edit forms work identically — users see no change in address workflow
-5. Count of agent addresses before migration equals count of location records after migration
+5. Count of agent addresses before migration equals count of agents with location_id set after migration
 
 ---
 
