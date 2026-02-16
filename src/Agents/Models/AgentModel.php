@@ -5,13 +5,15 @@ declare(strict_types=1);
  * Agent Model
  *
  * Represents an agent entity with data structure and validation rules.
- * Standalone model (NOT extending BaseModel) with get/set/validate cycle.
+ * Extends BaseModel while preserving data-bag pattern and agent-specific validation.
  *
  * @package WeCoza\Agents
  * @since 3.0.0
  */
 
 namespace WeCoza\Agents\Models;
+
+use WeCoza\Core\Abstract\BaseModel;
 
 // Prevent direct access
 if (!defined('ABSPATH')) {
@@ -23,8 +25,32 @@ if (!defined('ABSPATH')) {
  *
  * @since 3.0.0
  */
-class AgentModel
+class AgentModel extends BaseModel
 {
+    /**
+     * Database table name
+     */
+    protected static string $table = 'agents';
+
+    /**
+     * Primary key column name
+     */
+    protected static string $primaryKey = 'agent_id';
+
+    /**
+     * Type casting definitions
+     */
+    protected static array $casts = [];
+
+    /**
+     * Mass-assignable properties (all allowed - data-bag manages own fields)
+     */
+    protected static array $fillable = [];
+
+    /**
+     * Properties that cannot be mass-assigned (none - data-bag pattern)
+     */
+    protected static array $guarded = [];
 
     /**
      * Agent ID (maps to 'agent_id' in database)
@@ -32,13 +58,6 @@ class AgentModel
      * @var int
      */
     protected $id = 0;
-
-    /**
-     * Database primary key field name
-     *
-     * @var string
-     */
-    protected static $primary_key = 'agent_id';
 
     /**
      * Agent data
@@ -197,6 +216,10 @@ class AgentModel
      */
     public function __construct($data = [])
     {
+        // Call parent constructor with empty array (skip BaseModel hydration - we use data-bag)
+        parent::__construct([]);
+
+        // Handle data-bag logic
         if (is_numeric($data)) {
             $this->load($data);
         } elseif (is_array($data)) {
@@ -233,12 +256,12 @@ class AgentModel
     }
 
     /**
-     * Save agent
+     * Save agent (satisfies BaseModel abstract method)
      *
      * @since 3.0.0
-     * @return bool|int Agent ID on success, false on failure
+     * @return bool Success status
      */
-    public function save()
+    public function save(): bool
     {
         $repository = new \WeCoza\Agents\Repositories\AgentRepository();
 
@@ -258,7 +281,7 @@ class AgentModel
             $success = $repository->updateAgent($this->id, $save_data);
             if ($success) {
                 $this->modified = [];
-                return $this->id;
+                return true;
             }
         } else {
             // Create new agent
@@ -266,7 +289,7 @@ class AgentModel
             if ($id) {
                 $this->id = $id;
                 $this->modified = [];
-                return $id;
+                return true;
             }
         }
 
@@ -274,12 +297,47 @@ class AgentModel
     }
 
     /**
-     * Delete agent
+     * Update existing agent (satisfies BaseModel abstract method)
+     *
+     * @since 4.0.0
+     * @return bool Success status
+     */
+    public function update(): bool
+    {
+        if (!$this->id) {
+            return false;
+        }
+
+        $repository = new \WeCoza\Agents\Repositories\AgentRepository();
+        $success = $repository->updateAgent($this->id, $this->get_save_data());
+
+        if ($success) {
+            $this->modified = [];
+        }
+
+        return $success;
+    }
+
+    /**
+     * Find agent by ID (satisfies BaseModel abstract method)
+     *
+     * @since 4.0.0
+     * @param int $id Agent ID
+     * @return static|null Agent instance or null if not found
+     */
+    public static function getById(int $id): ?static
+    {
+        $instance = new static();
+        return $instance->load($id) ? $instance : null;
+    }
+
+    /**
+     * Delete agent (satisfies BaseModel abstract method)
      *
      * @since 3.0.0
      * @return bool Success
      */
-    public function delete()
+    public function delete(): bool
     {
         if (!$this->id) {
             return false;
@@ -336,7 +394,7 @@ class AgentModel
 
         // Handle primary key mapping
         if ($this->id) {
-            $data[self::$primary_key] = $this->id;
+            $data[static::$primaryKey] = $this->id;
         }
 
         // Set timestamps
@@ -852,17 +910,28 @@ class AgentModel
     }
 
     /**
-     * Convert to array
+     * Convert to array (overrides BaseModel::toArray())
      *
      * @since 3.0.0
      * @return array Agent data array
      */
-    public function to_array()
+    public function toArray(): array
     {
         $data = $this->get_data();
         $data['id'] = $this->id;
-        $data[self::$primary_key] = $this->id;
+        $data[static::$primaryKey] = $this->id;
         return $data;
+    }
+
+    /**
+     * Convert to array (backward-compatible alias)
+     *
+     * @since 3.0.0
+     * @return array Agent data array
+     */
+    public function to_array(): array
+    {
+        return $this->toArray();
     }
 
     /**
