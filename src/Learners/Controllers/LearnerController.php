@@ -226,8 +226,8 @@ class LearnerController extends BaseController
             return;
         }
 
-        // Verify CSRF token for read operations (defense in depth)
-        $this->requireNonce('learners_nonce_action');
+        // Verify CSRF token - action-specific nonce for read operations
+        $this->requireNonce('get_learner_ajax');
 
         $id = $this->input('id', 'int') ?? $this->query('id', 'int');
 
@@ -256,8 +256,8 @@ class LearnerController extends BaseController
             return;
         }
 
-        // Verify CSRF token for read operations (defense in depth)
-        $this->requireNonce('learners_nonce_action');
+        // Verify CSRF token - action-specific nonce for list operations
+        $this->requireNonce('list_learners_ajax');
 
         $limit = $this->query('limit', 'int') ?? 50;
         $offset = $this->query('offset', 'int') ?? 0;
@@ -290,7 +290,7 @@ class LearnerController extends BaseController
             return;
         }
 
-        $this->requireNonce('learners_nonce_action');
+        $this->requireNonce('update_learner_ajax');
 
         $id = $this->input('id', 'int');
 
@@ -299,7 +299,36 @@ class LearnerController extends BaseController
             return;
         }
 
-        $data = $this->sanitizeLearnerInput($_POST);
+        $data = [
+            'title' => $this->input('title', 'string'),
+            'first_name' => $this->input('first_name', 'string'),
+            'second_name' => $this->input('second_name', 'string'),
+            'initials' => $this->input('initials', 'string'),
+            'surname' => $this->input('surname', 'string'),
+            'gender' => $this->input('gender', 'string'),
+            'race' => $this->input('race', 'string'),
+            'sa_id_no' => $this->input('sa_id_no', 'string'),
+            'passport_number' => $this->input('passport_number', 'string'),
+            'tel_number' => $this->input('tel_number', 'string'),
+            'alternative_tel_number' => $this->input('alternative_tel_number', 'string'),
+            'email_address' => $this->input('email_address', 'email'),
+            'address_line_1' => $this->input('address_line_1', 'string'),
+            'address_line_2' => $this->input('address_line_2', 'string'),
+            'postal_code' => $this->input('postal_code', 'string'),
+            'assessment_status' => $this->input('assessment_status', 'string'),
+            'city_town_id' => $this->input('city_town_id', 'int'),
+            'province_region_id' => $this->input('province_region_id', 'int'),
+            'highest_qualification' => $this->input('highest_qualification', 'int'),
+            'numeracy_level' => $this->input('numeracy_level', 'int'),
+            'communication_level' => $this->input('communication_level', 'int'),
+            'employer_id' => $this->input('employer_id', 'int'),
+            'employment_status' => $this->input('employment_status', 'bool'),
+            'disability_status' => $this->input('disability_status', 'bool'),
+            'placement_assessment_date' => $this->input('placement_assessment_date', 'string'),
+        ];
+
+        // Remove null values (fields not present in the request)
+        $data = array_filter($data, fn($v) => $v !== null);
 
         if ($this->updateLearner($id, $data)) {
             $this->sendSuccess([], 'Learner updated successfully');
@@ -319,7 +348,7 @@ class LearnerController extends BaseController
             return;
         }
 
-        $this->requireNonce('learners_nonce_action');
+        $this->requireNonce('delete_learner_ajax');
 
         $id = $this->input('id', 'int');
 
@@ -333,40 +362,6 @@ class LearnerController extends BaseController
         } else {
             $this->sendError('Failed to delete learner');
         }
-    }
-
-    /**
-     * Sanitize learner input data
-     */
-    private function sanitizeLearnerInput(array $input): array
-    {
-        return $this->sanitizeArray($input, [
-            'title' => 'string',
-            'first_name' => 'string',
-            'second_name' => 'string',
-            'initials' => 'string',
-            'surname' => 'string',
-            'gender' => 'string',
-            'race' => 'string',
-            'sa_id_no' => 'string',
-            'passport_number' => 'string',
-            'tel_number' => 'string',
-            'alternative_tel_number' => 'string',
-            'email_address' => 'email',
-            'address_line_1' => 'string',
-            'address_line_2' => 'string',
-            'postal_code' => 'string',
-            'assessment_status' => 'string',
-            'city_town_id' => 'int',
-            'province_region_id' => 'int',
-            'highest_qualification' => 'int',
-            'numeracy_level' => 'int',
-            'communication_level' => 'int',
-            'employer_id' => 'int',
-            'employment_status' => 'bool',
-            'disability_status' => 'bool',
-            'placement_assessment_date' => 'string',
-        ]);
     }
 
     /*
@@ -392,7 +387,7 @@ class LearnerController extends BaseController
                 <small>MVC Controller - For full form use: <code>[wecoza_learners_form]</code></small>
             </p>
             <form id="<?php echo esc_attr($atts['form_id']); ?>" method="post" class="needs-validation" novalidate>
-                <?php wp_nonce_field('learners_nonce_action', 'nonce'); ?>
+                <?php wp_nonce_field('create_learner_ajax', 'nonce'); ?>
 
                 <div class="row g-3">
                     <div class="col-md-6">
