@@ -3,11 +3,35 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Models;
 
-class ClientsModel {
+use WeCoza\Core\Abstract\BaseModel;
 
-    protected string $table = 'clients';
+class ClientsModel extends BaseModel implements \ArrayAccess {
 
-    protected string $primaryKey = 'id';
+    protected static string $table = 'clients';
+
+    protected static string $primaryKey = 'id';
+
+    protected static array $fillable = [
+        'client_name',
+        'company_registration_nr',
+        'seta',
+        'client_status',
+        'financial_year_end',
+        'bbbee_verification_date',
+        'main_client_id',
+        'client_town_id', // Reference to place_id in locations table
+        'contact_person',
+        'contact_person_email',
+        'contact_person_cellphone',
+        'contact_person_tel',
+        'contact_person_position',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected static array $guarded = ['id', 'created_at', 'updated_at'];
+
+    protected static array $casts = [];
 
     protected $resolvedPrimaryKey = 'id';
 
@@ -34,23 +58,7 @@ class ClientsModel {
 
     protected static $columnMapCache = [];
 
-    protected $fillable = [
-        'client_name',
-        'company_registration_nr',
-        'seta',
-        'client_status',
-        'financial_year_end',
-        'bbbee_verification_date',
-        'main_client_id',
-        'client_town_id', // Reference to place_id in locations table
-        'contact_person',
-        'contact_person_email',
-        'contact_person_cellphone',
-        'contact_person_tel',
-        'contact_person_position',
-        'created_at',
-        'updated_at',
-    ];
+    protected array $attributes = [];
 
     protected $jsonFields = [];
 
@@ -64,7 +72,11 @@ class ClientsModel {
     protected $sitesModel;
 
     public function __construct() {
-        $cacheKey = $this->table;
+        // Call parent constructor but skip hydration (we handle column resolution first)
+        parent::__construct([]);
+
+        // Column resolution mechanism (existing logic)
+        $cacheKey = static::$table;
 
         if (isset(self::$columnMapCache[$cacheKey])) {
             $this->columnMap = self::$columnMapCache[$cacheKey];
@@ -78,10 +90,12 @@ class ClientsModel {
 
         $this->resolvedPrimaryKey = $this->columnMap['id'] ?: 'id';
 
+        // Related model instantiation
         $this->communicationsModel = new ClientCommunicationsModel();
         $this->sitesModel = new SitesModel();
 
-        $this->fillable = array_values(array_filter($this->fillable, function ($field) {
+        // Filter fillable/jsonFields/dateFields based on resolved columns
+        static::$fillable = array_values(array_filter(static::$fillable, function ($field) {
             return !empty($this->columnMap[$field] ?? null);
         }));
 
@@ -94,9 +108,41 @@ class ClientsModel {
         }));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | ArrayAccess Implementation (backward compatibility for $client['field'])
+    |--------------------------------------------------------------------------
+    */
+
+    public function offsetExists($offset): bool {
+        return isset($this->attributes[$offset]);
+    }
+
+    public function offsetGet($offset): mixed {
+        return $this->attributes[$offset] ?? null;
+    }
+
+    public function offsetSet($offset, $value): void {
+        if ($offset === null) {
+            $this->attributes[] = $value;
+        } else {
+            $this->attributes[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset): void {
+        unset($this->attributes[$offset]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Column Resolution Mechanism
+    |--------------------------------------------------------------------------
+    */
+
     protected function resolveColumn($candidates) {
         foreach ((array) $candidates as $candidate) {
-            if ($candidate && wecoza_db()->tableHasColumn($this->table, $candidate)) {
+            if ($candidate && wecoza_db()->tableHasColumn(static::$table, $candidate)) {
                 return $candidate;
             }
         }
@@ -110,6 +156,15 @@ class ClientsModel {
         }
 
         return $fallback;
+    }
+
+    /**
+     * Override toArray to return attributes array (array-oriented architecture)
+     *
+     * @return array
+     */
+    public function toArray(): array {
+        return $this->attributes;
     }
 
     protected function normalizeRow($row) {
@@ -317,11 +372,11 @@ class ClientsModel {
         return $rows;
     }
 
-    public static function getById(int $id): array|null {
+    public static function getById(int $id): ?static {
         $instance = new static();
         $alias = 'c';
         $primaryKey = $instance->resolvedPrimaryKey;
-        $sql = "SELECT {$alias}.*, {$alias}.{$primaryKey} AS id FROM {$instance->table} {$alias} WHERE {$alias}.{$primaryKey} = :id";
+        $sql = "SELECT {$alias}.*, {$alias}.{$primaryKey} AS id FROM {$instance::$table} {$alias} WHERE {$alias}.{$primaryKey} = :id";
         $row = wecoza_db()->getRow($sql, [':id' => $id]);
 
         if (!$row) {
@@ -329,9 +384,12 @@ class ClientsModel {
         }
 
         $normalized = $instance->normalizeRow($row);
-        $instance->hydrateRows($normalized);
+        $instance->hydrateRows($normalized); // Mutates $normalized by reference
 
-        return $normalized ?: null;
+        // Store hydrated result in attributes for ArrayAccess
+        $instance->attributes = $normalized;
+
+        return $instance;
     }
 
     public function getByRegistrationNumber($regNr) {
