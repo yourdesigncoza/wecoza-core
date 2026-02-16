@@ -67,88 +67,93 @@ class AgentsAjaxHandlers
         // Verify nonce (Bug #4 fix: use AjaxSecurity)
         AjaxSecurity::requireNonce('agents_nonce_action');
 
-        // Get request parameters
-        $page = AjaxSecurity::post('page', 'int', 1);
-        $per_page = AjaxSecurity::post('per_page', 'int', 10);
-        $search = AjaxSecurity::post('search', 'string', '');
-        $orderby = AjaxSecurity::post('orderby', 'string', 'surname');
-        $order = strtoupper(AjaxSecurity::post('order', 'string', 'ASC'));
+        try {
+            // Get request parameters
+            $page = AjaxSecurity::post('page', 'int', 1);
+            $per_page = AjaxSecurity::post('per_page', 'int', 10);
+            $search = AjaxSecurity::post('search', 'string', '');
+            $orderby = AjaxSecurity::post('orderby', 'string', 'surname');
+            $order = strtoupper(AjaxSecurity::post('order', 'string', 'ASC'));
 
-        // Validate sort order
-        if (!in_array($order, ['ASC', 'DESC'])) {
-            $order = 'ASC';
+            // Validate sort order
+            if (!in_array($order, ['ASC', 'DESC'])) {
+                $order = 'ASC';
+            }
+
+            // Map frontend column to database column
+            $orderby = AgentDisplayService::mapSortColumn($orderby);
+
+            // Build query args
+            $args = [
+                'status' => 'all',
+                'orderby' => $orderby,
+                'order' => $order,
+                'limit' => max(1, min(100, $per_page)),
+                'offset' => (max(1, $page) - 1) * max(1, min(100, $per_page)),
+                'search' => $search,
+            ];
+
+            // Get agents
+            $agents_raw = $this->repository->getAgents($args);
+            $agents = [];
+            foreach ($agents_raw as $agent) {
+                $agents[] = AgentDisplayService::mapAgentFields($agent);
+            }
+
+            // Get total count
+            $total_agents = $this->repository->countAgents(['status' => 'all', 'search' => $search]);
+
+            // Calculate pagination
+            $total_pages = ceil($total_agents / $args['limit']);
+            $start_index = ($page - 1) * $args['limit'] + 1;
+            $end_index = min($start_index + $args['limit'] - 1, $total_agents);
+
+            // Get statistics
+            $statistics = AgentDisplayService::getAgentStatistics();
+
+            // Capture table rows HTML
+            ob_start();
+            wecoza_view('agents/display/agent-display-table-rows', [
+                'agents' => $agents,
+                'columns' => AgentDisplayService::getDisplayColumns(''),
+                'can_manage' => current_user_can('edit_others_posts'),
+                'show_actions' => true,
+            ], false);
+            $table_html = ob_get_clean();
+
+            // Capture pagination HTML
+            ob_start();
+            wecoza_view('agents/display/agent-pagination', [
+                'current_page' => $page,
+                'total_pages' => $total_pages,
+                'per_page' => $args['limit'],
+                'start_index' => $start_index,
+                'end_index' => $end_index,
+                'total_agents' => $total_agents,
+            ], false);
+            $pagination_html = ob_get_clean();
+
+            // Generate statistics HTML
+            $statistics_html = $this->getStatisticsHtml($statistics);
+
+            // Send success response (Bug #4 fix: use AjaxSecurity)
+            AjaxSecurity::sendSuccess([
+                'agents' => $agents,
+                'total_agents' => $total_agents,
+                'current_page' => $page,
+                'per_page' => $args['limit'],
+                'total_pages' => $total_pages,
+                'start_index' => $start_index,
+                'end_index' => $end_index,
+                'statistics' => $statistics,
+                'table_html' => $table_html,
+                'pagination_html' => $pagination_html,
+                'statistics_html' => $statistics_html,
+            ]);
+        } catch (\Throwable $e) {
+            wecoza_log('Error loading agents: ' . $e->getMessage(), 'error');
+            AjaxSecurity::sendError(__('An error occurred while loading agents.', 'wecoza-core'), 500);
         }
-
-        // Map frontend column to database column
-        $orderby = AgentDisplayService::mapSortColumn($orderby);
-
-        // Build query args
-        $args = [
-            'status' => 'all',
-            'orderby' => $orderby,
-            'order' => $order,
-            'limit' => max(1, min(100, $per_page)),
-            'offset' => (max(1, $page) - 1) * max(1, min(100, $per_page)),
-            'search' => $search,
-        ];
-
-        // Get agents
-        $agents_raw = $this->repository->getAgents($args);
-        $agents = [];
-        foreach ($agents_raw as $agent) {
-            $agents[] = AgentDisplayService::mapAgentFields($agent);
-        }
-
-        // Get total count
-        $total_agents = $this->repository->countAgents(['status' => 'all', 'search' => $search]);
-
-        // Calculate pagination
-        $total_pages = ceil($total_agents / $args['limit']);
-        $start_index = ($page - 1) * $args['limit'] + 1;
-        $end_index = min($start_index + $args['limit'] - 1, $total_agents);
-
-        // Get statistics
-        $statistics = AgentDisplayService::getAgentStatistics();
-
-        // Capture table rows HTML
-        ob_start();
-        wecoza_view('agents/display/agent-display-table-rows', [
-            'agents' => $agents,
-            'columns' => AgentDisplayService::getDisplayColumns(''),
-            'can_manage' => current_user_can('edit_others_posts'),
-            'show_actions' => true,
-        ], false);
-        $table_html = ob_get_clean();
-
-        // Capture pagination HTML
-        ob_start();
-        wecoza_view('agents/display/agent-pagination', [
-            'current_page' => $page,
-            'total_pages' => $total_pages,
-            'per_page' => $args['limit'],
-            'start_index' => $start_index,
-            'end_index' => $end_index,
-            'total_agents' => $total_agents,
-        ], false);
-        $pagination_html = ob_get_clean();
-
-        // Generate statistics HTML
-        $statistics_html = $this->getStatisticsHtml($statistics);
-
-        // Send success response (Bug #4 fix: use AjaxSecurity)
-        AjaxSecurity::sendSuccess([
-            'agents' => $agents,
-            'total_agents' => $total_agents,
-            'current_page' => $page,
-            'per_page' => $args['limit'],
-            'total_pages' => $total_pages,
-            'start_index' => $start_index,
-            'end_index' => $end_index,
-            'statistics' => $statistics,
-            'table_html' => $table_html,
-            'pagination_html' => $pagination_html,
-            'statistics_html' => $statistics_html,
-        ]);
     }
 
     /**

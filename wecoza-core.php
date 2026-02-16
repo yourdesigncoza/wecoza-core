@@ -358,7 +358,11 @@ add_action('plugins_loaded', function () {
             }
 
             $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
-            $emailer->send($eventId, $recipient, $emailContext);
+            $result = $emailer->send($eventId, $recipient, $emailContext);
+
+            if (!$result['success']) {
+                throw new \RuntimeException($result['error_message'] ?? 'Email send failed');
+            }
         } catch (\Exception $e) {
             wecoza_log("Email sending failed for event {$eventId}: " . $e->getMessage(), 'error');
             throw $e; // Re-throw for Action Scheduler retry

@@ -48,14 +48,28 @@ final class NotificationEmailer
      * @param int $eventId The event_id to send email for
      * @param string $recipient Email recipient
      * @param array $emailContext Context from AI enrichment (alias_map, obfuscated)
-     * @return bool True if email sent successfully
+     * @return array{success: bool, error_code?: string, error_message?: string}
      */
-    public function send(int $eventId, string $recipient, array $emailContext = []): bool
+    public function send(int $eventId, string $recipient, array $emailContext = []): array
     {
         $event = $this->eventRepository->findByEventId($eventId);
         if ($event === null) {
             wecoza_log("NotificationEmailer: Event not found for event_id {$eventId}", 'warning');
-            return false;
+            return [
+                'success' => false,
+                'error_code' => 'event_not_found',
+                'error_message' => "Event not found for event_id {$eventId}",
+            ];
+        }
+
+        // Validate recipient email before building the email
+        if (!is_email($recipient)) {
+            wecoza_log("NotificationEmailer: Invalid recipient email for event {$eventId}", 'error');
+            return [
+                'success' => false,
+                'error_code' => 'invalid_recipient',
+                'error_message' => "Invalid recipient email for event {$eventId}",
+            ];
         }
 
         // Map EventType to operation for presenter
@@ -90,12 +104,6 @@ final class NotificationEmailer
         $body = $mailData['body'];
         $headers = $mailData['headers'];
 
-        // Validate recipient email before sending
-        if (!is_email($recipient)) {
-            wecoza_log("NotificationEmailer: Invalid recipient email for event {$eventId}", 'error');
-            return false;
-        }
-
         // Capture wp_mail_failed errors for debugging
         $lastMailError = null;
         $errorHandler = function (\WP_Error $error) use (&$lastMailError) {
@@ -115,14 +123,17 @@ final class NotificationEmailer
             $errorDetail = $lastMailError ? " - Error: {$lastMailError}" : '';
             error_log(sprintf('WeCoza notification failed for event %d to %s%s', $eventId, $recipient, $errorDetail));
             wecoza_log(sprintf('NotificationEmailer: Email failed for event %d to %s%s', $eventId, $recipient, $errorDetail), 'error');
-            // Update status to 'failed' on email failure
             $this->eventRepository->updateStatus($eventId, 'failed');
-        } else {
-            // Mark event as sent with timestamp
-            $this->eventRepository->markSent($eventId);
+            return [
+                'success' => false,
+                'error_code' => 'send_failed',
+                'error_message' => sprintf('Email failed for event %d to %s%s', $eventId, $recipient, $errorDetail),
+            ];
         }
 
-        return $sent;
+        // Mark event as sent with timestamp
+        $this->eventRepository->markSent($eventId);
+        return ['success' => true];
     }
 
     /**

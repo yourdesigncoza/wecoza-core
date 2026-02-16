@@ -50,115 +50,120 @@ class ClientAjaxHandlers {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('manage_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
+            AjaxSecurity::sendError('Permission denied.', 403);
         }
 
-        $clientId = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        try {
+            $clientId = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
-        // Use ClientsModel for form handling
-        $model = new ClientsModel();
-        $sitesModel = $model->getSitesModel();
+            // Use ClientsModel for form handling
+            $model = new ClientsModel();
+            $sitesModel = $model->getSitesModel();
 
-        // Build payload from POST data
-        $payload = $this->sanitizeClientFormData($_POST);
-        $clientData = $payload['client'];
-        $siteData = $payload['site'];
-        $communicationType = $clientData['client_status'] ?? '';
-        $isNew = ((int) $clientId) <= 0;
+            // Build payload from POST data
+            $payload = $this->sanitizeClientFormData($_POST);
+            $clientData = $payload['client'];
+            $siteData = $payload['site'];
+            $communicationType = $clientData['client_status'] ?? '';
+            $isNew = ((int) $clientId) <= 0;
 
-        $errors = $model->validate($clientData, $clientId);
+            $errors = $model->validate($clientData, $clientId);
 
-        // Validate site based on type
-        if (!empty($siteData['parent_site_id'])) {
-            $expectedClientId = null;
-            if ($isNew && !empty($clientData['main_client_id'])) {
-                $expectedClientId = $clientData['main_client_id'];
+            // Validate site based on type
+            if (!empty($siteData['parent_site_id'])) {
+                $expectedClientId = null;
+                if ($isNew && !empty($clientData['main_client_id'])) {
+                    $expectedClientId = $clientData['main_client_id'];
+                }
+                $siteErrors = $sitesModel->validateSubSite($clientId, $siteData['parent_site_id'], $siteData, $expectedClientId);
+            } else {
+                $siteErrors = $sitesModel->validateHeadSite($siteData);
             }
-            $siteErrors = $sitesModel->validateSubSite($clientId, $siteData['parent_site_id'], $siteData, $expectedClientId);
-        } else {
-            $siteErrors = $sitesModel->validateHeadSite($siteData);
-        }
 
-        if ($siteErrors) {
-            foreach ($siteErrors as $field => $message) {
-                switch ($field) {
-                    case 'site_name':
-                        $errors['site_name'] = $message;
-                        break;
-                    case 'place_id':
-                        $errors['client_town_id'] = $message;
-                        $errors['site_place_id'] = $message;
-                        break;
-                    default:
-                        $errors['site_' . $field] = $message;
-                        break;
+            if ($siteErrors) {
+                foreach ($siteErrors as $field => $message) {
+                    switch ($field) {
+                        case 'site_name':
+                            $errors['site_name'] = $message;
+                            break;
+                        case 'place_id':
+                            $errors['client_town_id'] = $message;
+                            $errors['site_place_id'] = $message;
+                            break;
+                        default:
+                            $errors['site_' . $field] = $message;
+                            break;
+                    }
                 }
             }
-        }
 
-        if (!empty($errors)) {
-            AjaxSecurity::sendError('Validation errors', array('errors' => $errors));
-        }
-
-        if (!$isNew) {
-            $updated = $model->update($clientId, $clientData);
-            if (!$updated) {
-                AjaxSecurity::sendError('Failed to update client. Please try again.');
-            }
-        } else {
-            $clientId = $model->create($clientData);
-            if (!$clientId) {
-                AjaxSecurity::sendError('Failed to create client. Please try again.');
-            }
-        }
-
-        $siteData['site_name_fallback'] = $clientData['client_name'] ?? '';
-        if (!empty($siteData['site_id']) && !$sitesModel->ensureSiteBelongsToClient($siteData['site_id'], $clientId)) {
-            AjaxSecurity::sendError('Selected site does not belong to this client.');
-        }
-
-        // Save site based on type
-        if (!empty($siteData['parent_site_id'])) {
-            $saveOptions = array('fallback_to_head_site' => true);
-            if (!empty($expectedClientId)) {
-                $saveOptions['expected_client_id'] = (int) $expectedClientId;
+            if (!empty($errors)) {
+                AjaxSecurity::sendError('Validation errors', 400, array('errors' => $errors));
             }
 
-            $subSiteResult = $sitesModel->saveSubSite($clientId, $siteData['parent_site_id'], $siteData, $saveOptions);
-            if (!$subSiteResult) {
-                AjaxSecurity::sendError('Failed to save sub-site details. Please try again.');
-            }
-
-            if (is_array($subSiteResult)) {
-                $siteId = isset($subSiteResult['site_id']) ? (int) $subSiteResult['site_id'] : 0;
+            if (!$isNew) {
+                $updated = $model->update($clientId, $clientData);
+                if (!$updated) {
+                    AjaxSecurity::sendError('Failed to update client. Please try again.', 500);
+                }
             } else {
-                $siteId = (int) $subSiteResult;
+                $clientId = $model->create($clientData);
+                if (!$clientId) {
+                    AjaxSecurity::sendError('Failed to create client. Please try again.', 500);
+                }
             }
 
-            if ($siteId <= 0) {
-                AjaxSecurity::sendError('Failed to save sub-site details. Please try again.');
+            $siteData['site_name_fallback'] = $clientData['client_name'] ?? '';
+            if (!empty($siteData['site_id']) && !$sitesModel->ensureSiteBelongsToClient($siteData['site_id'], $clientId)) {
+                AjaxSecurity::sendError('Selected site does not belong to this client.', 400);
             }
-        } else {
-            $siteId = $sitesModel->saveHeadSite($clientId, $siteData);
-            if (!$siteId) {
-                AjaxSecurity::sendError('Failed to save site details. Please try again.');
+
+            // Save site based on type
+            if (!empty($siteData['parent_site_id'])) {
+                $saveOptions = array('fallback_to_head_site' => true);
+                if (!empty($expectedClientId)) {
+                    $saveOptions['expected_client_id'] = (int) $expectedClientId;
+                }
+
+                $subSiteResult = $sitesModel->saveSubSite($clientId, $siteData['parent_site_id'], $siteData, $saveOptions);
+                if (!$subSiteResult) {
+                    AjaxSecurity::sendError('Failed to save sub-site details. Please try again.', 500);
+                }
+
+                if (is_array($subSiteResult)) {
+                    $siteId = isset($subSiteResult['site_id']) ? (int) $subSiteResult['site_id'] : 0;
+                } else {
+                    $siteId = (int) $subSiteResult;
+                }
+
+                if ($siteId <= 0) {
+                    AjaxSecurity::sendError('Failed to save sub-site details. Please try again.', 500);
+                }
+            } else {
+                $siteId = $sitesModel->saveHeadSite($clientId, $siteData);
+                if (!$siteId) {
+                    AjaxSecurity::sendError('Failed to save site details. Please try again.', 500);
+                }
             }
+
+            if ($communicationType !== '') {
+                $communicationsModel = $model->getCommunicationsModel();
+                $latestType = $communicationsModel->getLatestCommunicationType($clientId);
+                if ($latestType !== $communicationType) {
+                    $communicationsModel->logCommunication($clientId, $siteId, $communicationType);
+                }
+            }
+
+            $client = $model->getById($clientId);
+
+            AjaxSecurity::sendSuccess(array(
+                'client' => $client,
+                'message' => $isNew ? 'Client created successfully!' : 'Client saved successfully!',
+            ));
+        } catch (\Throwable $e) {
+            wecoza_log('Error saving client: ' . $e->getMessage(), 'error');
+            AjaxSecurity::sendError('An error occurred while saving the client.', 500);
         }
-
-        if ($communicationType !== '') {
-            $communicationsModel = $model->getCommunicationsModel();
-            $latestType = $communicationsModel->getLatestCommunicationType($clientId);
-            if ($latestType !== $communicationType) {
-                $communicationsModel->logCommunication($clientId, $siteId, $communicationType);
-            }
-        }
-
-        $client = $model->getById($clientId);
-
-        AjaxSecurity::sendSuccess(array(
-            'client' => $client,
-            'message' => $isNew ? 'Client created successfully!' : 'Client saved successfully!',
-        ));
     }
 
     /**
@@ -168,19 +173,19 @@ class ClientAjaxHandlers {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
+            AjaxSecurity::sendError('Permission denied.', 403);
         }
 
         $clientId = isset($_GET['id']) ? intval($_GET['id']) : 0;
         if (!$clientId) {
-            AjaxSecurity::sendError('Invalid client ID.');
+            AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
         $model = new ClientsModel();
         $client = $model->getById($clientId);
 
         if (!$client) {
-            AjaxSecurity::sendError('Client not found.');
+            AjaxSecurity::sendError('Client not found.', 404);
         }
 
         AjaxSecurity::sendSuccess(array('client' => $client));
@@ -193,19 +198,19 @@ class ClientAjaxHandlers {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
+            AjaxSecurity::sendError('Permission denied.', 403);
         }
 
         $clientId = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
         if (!$clientId) {
-            AjaxSecurity::sendError('Invalid client ID.');
+            AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
         $model = new ClientsModel();
         $client = $model->getById($clientId);
 
         if (!$client) {
-            AjaxSecurity::sendError('Client not found.');
+            AjaxSecurity::sendError('Client not found.', 404);
         }
 
         // Build edit URL
@@ -234,21 +239,26 @@ class ClientAjaxHandlers {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('manage_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
+            AjaxSecurity::sendError('Permission denied.', 403);
         }
 
         $clientId = isset($_POST['id']) ? intval($_POST['id']) : 0;
         if (!$clientId) {
-            AjaxSecurity::sendError('Invalid client ID.');
+            AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
-        $model = new ClientsModel();
-        $success = $model->delete($clientId);
+        try {
+            $model = new ClientsModel();
+            $success = $model->delete($clientId);
 
-        if ($success) {
-            AjaxSecurity::sendSuccess('Client deleted successfully.');
-        } else {
-            AjaxSecurity::sendError('Failed to delete client.');
+            if ($success) {
+                AjaxSecurity::sendSuccess(['message' => 'Client deleted successfully.']);
+            } else {
+                AjaxSecurity::sendError('Failed to delete client.', 500);
+            }
+        } catch (\Throwable $e) {
+            wecoza_log('Error deleting client: ' . $e->getMessage(), 'error');
+            AjaxSecurity::sendError('An error occurred while deleting the client.', 500);
         }
     }
 
@@ -259,7 +269,7 @@ class ClientAjaxHandlers {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
+            AjaxSecurity::sendError('Permission denied.', 403);
         }
 
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
@@ -281,12 +291,12 @@ class ClientAjaxHandlers {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.');
+            AjaxSecurity::sendError('Permission denied.', 403);
         }
 
         $clientId = isset($_GET['client_id']) ? intval($_GET['client_id']) : 0;
         if (!$clientId) {
-            AjaxSecurity::sendError('Invalid client ID.');
+            AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
         $sitesModel = new SitesModel();
