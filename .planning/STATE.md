@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 40 — Return Type Hints & Constants
-Plan: 01 (completed)
-Status: In Progress (1/2 plans complete)
-Last activity: 2026-02-16 — Completed 40-01: AppConstants Class & Magic Number Extraction
+Plan: 03 (completed)
+Status: In Progress (2/2 plans complete)
+Last activity: 2026-02-16 — Completed 40-03: Return Type Hints for Controllers/AJAX/Repositories/Services
 
-Progress: 3/6 phases complete (10 plans executed)
+Progress: 3/6 phases complete (11 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,12 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+**Phase 40-03 (2026-02-16):**
+- void for AJAX handlers (wp_send_json_* terminates execution)
+- string for WordPress shortcode callbacks (must return HTML)
+- mixed for polymorphic getters (getAgentMeta returns different types based on parameter)
+- int|false for insert operations (returns ID or failure)
+
 **Phase 40-01 (2026-02-16):**
 - Use SCREAMING_SNAKE_CASE for all constant names (PHP convention)
 - Do not touch Events module existing private const values (already correctly scoped)
@@ -123,7 +129,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 40-01-PLAN.md — AppConstants class and magic number extraction
-Resume file: .planning/phases/40-return-type-hints-constants/40-01-SUMMARY.md
+Stopped at: Completed 40-03-PLAN.md — Return type hints for Controllers/AJAX/Repositories/Services
+Resume file: .planning/phases/40-return-type-hints-constants/40-03-SUMMARY.md
 
-**Next action:** Continue to 40-02 (return type hints for repositories and services)
+**Next action:** Phase 40 complete - ready for phase checker or next phase
