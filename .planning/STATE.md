@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 36 — Service Layer Extraction
-Plan: 01 (completed)
-Status: In progress (plan 01 complete)
-Last activity: 2026-02-16 — Completed 36-01: Learner Service Layer Extraction
+Plan: 02 (completed)
+Status: In progress (2/3 plans complete)
+Last activity: 2026-02-16 — Completed 36-02: Agent Service Layer Extraction
 
-Progress: 0/6 phases complete (1 plan executed)
+Progress: 0/6 phases complete (2 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,12 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+
+**Phase 36-02 (2026-02-16):**
+- AgentService owns AgentRepository (not shared across layers)
+- Form submission workflow returns structured array (success, agent_id, errors, agent, submitted_data)
+- Presentation logic (HTML rendering, URL helpers) stays in controller/handlers
+- Service handles file upload validation (PDF/DOC/DOCX only)
 
 **Phase 36-01 (2026-02-16):**
 - Service layer follows ProgressionService pattern with lazy-loaded repositories
@@ -72,7 +78,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 36-01-PLAN.md — LearnerService extracted with 13 methods
-Resume file: .planning/phases/36-service-layer-extraction/36-01-SUMMARY.md
+Stopped at: Completed 36-02-PLAN.md — AgentService extracted, controller reduced from 95 to 67 lines
+Resume file: .planning/phases/36-service-layer-extraction/36-02-SUMMARY.md
 
-**Next action:** Continue with 36-02 (Agent service extraction) or plan next phase.
+**Next action:** Continue with 36-03 (final service extraction plan) or verify completed plans.
