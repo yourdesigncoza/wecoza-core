@@ -14,7 +14,7 @@
 | 38 | Address Storage Normalization | Complete    | 2026-02-16 | 5 |
 | 39 | Repository Pattern Enforcement | Complete    | 2026-02-16 | 4 |
 | 40 | Return Type Hints & Constants | Complete    | 2026-02-16 | 5 |
-| 41 | Architectural Verification | End-to-end validation — all refactored layers work together, no regressions | All 28 | 5 |
+| 41 | Architectural Verification | Complete    | 2026-02-16 | 5 |
 
 ## Dependency Graph
 
@@ -170,7 +170,7 @@ Plans:
 
 **Goal:** End-to-end validation that all 28 requirements are met, no regressions introduced, and architecture improvements are complete.
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 41-01-PLAN.md — Automated static verification of all 28 requirements (SVC, MDL, ADDR, REPO, TYPE, CONST)
