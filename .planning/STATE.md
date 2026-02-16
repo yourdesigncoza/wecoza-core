@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 36 — Service Layer Extraction
-Plan: 03 (completed)
-Status: Complete (3/3 plans complete)
-Last activity: 2026-02-16 — Completed 36-03: Client Service Layer Extraction
+Phase: 37 — Model Architecture Unification
+Plan: 01 (completed)
+Status: In progress (1/? plans complete)
+Last activity: 2026-02-16 — Completed 37-01: ClientsModel Architecture Unification
 
-Progress: 1/6 phases complete (3 plans executed)
+Progress: 1/6 phases complete (4 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,12 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+
+**Phase 37-01 (2026-02-16):**
+- Preserved column-resolution mechanism as instance properties (runtime schema introspection)
+- Implemented ArrayAccess for backward-compatible array syntax on getById results
+- Changed getById return type from array|null to ?static (satisfies BaseModel abstract contract)
+- Stored hydrated query results in $attributes array for ArrayAccess delegation
 
 **Phase 36-03 (2026-02-16):**
 - Consolidated duplicate form submission logic (~280 lines) into ClientService::handleClientSubmission()
@@ -84,7 +90,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 36-03-PLAN.md — ClientService extracted, 280+ lines of duplicate code eliminated
-Resume file: .planning/phases/36-service-layer-extraction/36-03-SUMMARY.md
+Stopped at: Completed 37-01-PLAN.md — ClientsModel migrated to extend BaseModel with zero consumer changes
+Resume file: .planning/phases/37-model-architecture-unification/37-01-SUMMARY.md
 
-**Next action:** Phase 36 complete. Review service layer extraction results or proceed to Phase 37 (if defined).
+**Next action:** Continue Phase 37 with additional model migrations (AgentModel, etc.) or proceed to next phase.
