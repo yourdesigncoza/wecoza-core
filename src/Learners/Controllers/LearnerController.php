@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace WeCoza\Learners\Controllers;
 
 use WeCoza\Core\Abstract\BaseController;
-use WeCoza\Learners\Models\LearnerModel;
-use WeCoza\Learners\Repositories\LearnerRepository;
+use WeCoza\Learners\Services\LearnerService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -24,9 +23,9 @@ if (!defined('ABSPATH')) {
 class LearnerController extends BaseController
 {
     /**
-     * Repository instance
+     * Service instance
      */
-    private ?LearnerRepository $repository = null;
+    private ?LearnerService $learnerService = null;
 
     /**
      * Register WordPress hooks
@@ -47,168 +46,14 @@ class LearnerController extends BaseController
     }
 
     /**
-     * Get repository instance
+     * Get service instance
      */
-    private function getRepository(): LearnerRepository
+    private function getLearnerService(): LearnerService
     {
-        if ($this->repository === null) {
-            $this->repository = new LearnerRepository();
+        if ($this->learnerService === null) {
+            $this->learnerService = new LearnerService();
         }
-        return $this->repository;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | CRUD Operations
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Get a single learner by ID
-     */
-    public function getLearner(int $id): ?LearnerModel
-    {
-        return LearnerModel::getById($id);
-    }
-
-    /**
-     * Get all learners with pagination
-     */
-    public function getLearners(int $limit = 50, int $offset = 0): array
-    {
-        return LearnerModel::getAll($limit, $offset);
-    }
-
-    /**
-     * Get all learners with full data (qualifications, locations mapped)
-     */
-    public function getLearnersWithMappings(): array
-    {
-        return LearnerModel::getAllWithMappings();
-    }
-
-    /**
-     * Get total learner count
-     */
-    public function getLearnerCount(): int
-    {
-        return LearnerModel::count();
-    }
-
-    /**
-     * Create a new learner
-     */
-    public function createLearner(array $data): ?LearnerModel
-    {
-        $learner = new LearnerModel($data);
-
-        if ($learner->save()) {
-            return $learner;
-        }
-
-        return null;
-    }
-
-    /**
-     * Update an existing learner
-     */
-    public function updateLearner(int $id, array $data): bool
-    {
-        $learner = LearnerModel::getById($id);
-
-        if (!$learner) {
-            return false;
-        }
-
-        $learner->hydrate($data);
-        return $learner->update();
-    }
-
-    /**
-     * Delete a learner
-     */
-    public function deleteLearner(int $id): bool
-    {
-        $learner = LearnerModel::getById($id);
-
-        if (!$learner) {
-            return false;
-        }
-
-        return $learner->delete();
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Form Data
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Get dropdown data for forms
-     */
-    public function getDropdownData(): array
-    {
-        $repo = $this->getRepository();
-
-        $locations = $repo->getLocations();
-        $qualifications = $repo->getQualifications();
-        $employers = $repo->getEmployers();
-        $placementLevels = $repo->getPlacementLevels();
-
-        // Split placement levels into numeracy (N*) and communication (C*)
-        $numeracyLevels = [];
-        $communicationLevels = [];
-
-        foreach ($placementLevels as $level) {
-            $levelName = $level['level'] ?? '';
-            if (str_starts_with($levelName, 'N')) {
-                $numeracyLevels[] = $level;
-            } elseif (str_starts_with($levelName, 'C')) {
-                $communicationLevels[] = $level;
-            }
-        }
-
-        return [
-            'cities' => $locations['cities'] ?? [],
-            'provinces' => $locations['provinces'] ?? [],
-            'qualifications' => $qualifications,
-            'employers' => $employers,
-            'numeracy_levels' => $numeracyLevels,
-            'communication_levels' => $communicationLevels,
-        ];
-    }
-
-    /**
-     * Save portfolio files for a learner
-     */
-    public function savePortfolios(int $learnerId, array $files): array
-    {
-        return $this->getRepository()->savePortfolios($learnerId, $files);
-    }
-
-    /**
-     * Delete a portfolio file
-     */
-    public function deletePortfolio(int $portfolioId): bool
-    {
-        return $this->getRepository()->deletePortfolio($portfolioId);
-    }
-
-    /**
-     * Get sponsor employer_ids for a learner
-     */
-    public function getSponsors(int $learnerId): array
-    {
-        return $this->getRepository()->getSponsors($learnerId);
-    }
-
-    /**
-     * Save sponsors for a learner (replace all existing)
-     */
-    public function saveSponsors(int $learnerId, array $employerIds): bool
-    {
-        return $this->getRepository()->saveSponsors($learnerId, $employerIds);
+        return $this->learnerService;
     }
 
     /*
@@ -222,13 +67,11 @@ class LearnerController extends BaseController
      */
     public function ajaxGetLearner(): void
     {
-        // Capability check - only administrators can access learner PII
         if (!current_user_can('manage_learners')) {
             $this->sendError('Insufficient permissions.', 403);
             return;
         }
 
-        // Verify CSRF token
         $this->requireNonce('learners_nonce');
 
         $id = $this->input('id', 'int') ?? $this->query('id', 'int');
@@ -238,7 +81,7 @@ class LearnerController extends BaseController
             return;
         }
 
-        $learner = $this->getLearner($id);
+        $learner = $this->getLearnerService()->getLearner($id);
 
         if ($learner) {
             $this->sendSuccess($learner->toArray());
@@ -252,30 +95,30 @@ class LearnerController extends BaseController
      */
     public function ajaxGetLearners(): void
     {
-        // Capability check - only administrators can access learner PII
         if (!current_user_can('manage_learners')) {
             $this->sendError('Insufficient permissions.', 403);
             return;
         }
 
-        // Verify CSRF token
         $this->requireNonce('learners_nonce');
 
         $limit = $this->query('limit', 'int') ?? 50;
         $offset = $this->query('offset', 'int') ?? 0;
         $withMappings = $this->query('mappings', 'bool') ?? false;
 
+        $service = $this->getLearnerService();
+
         if ($withMappings) {
-            $learners = $this->getLearnersWithMappings();
+            $learners = $service->getLearnersWithMappings();
         } else {
-            $learners = $this->getLearners($limit, $offset);
+            $learners = $service->getLearners($limit, $offset);
         }
 
         $data = array_map(fn($l) => $l->toArray(), $learners);
 
         $this->sendSuccess([
             'learners' => $data,
-            'total' => $this->getLearnerCount(),
+            'total' => $service->getLearnerCount(),
             'limit' => $limit,
             'offset' => $offset,
         ]);
@@ -286,7 +129,6 @@ class LearnerController extends BaseController
      */
     public function ajaxUpdateLearner(): void
     {
-        // Capability check - only administrators can modify learner data
         if (!current_user_can('manage_learners')) {
             $this->sendError('Insufficient permissions.', 403);
             return;
@@ -329,10 +171,9 @@ class LearnerController extends BaseController
             'placement_assessment_date' => $this->input('placement_assessment_date', 'string'),
         ];
 
-        // Remove null values (fields not present in the request)
         $data = array_filter($data, fn($v) => $v !== null);
 
-        if ($this->updateLearner($id, $data)) {
+        if ($this->getLearnerService()->updateLearner($id, $data)) {
             $this->sendSuccess([], 'Learner updated successfully');
         } else {
             $this->sendError('Failed to update learner');
@@ -344,7 +185,6 @@ class LearnerController extends BaseController
      */
     public function ajaxDeleteLearner(): void
     {
-        // Capability check - only administrators can delete learner data
         if (!current_user_can('manage_learners')) {
             $this->sendError('Insufficient permissions.', 403);
             return;
@@ -359,7 +199,7 @@ class LearnerController extends BaseController
             return;
         }
 
-        if ($this->deleteLearner($id)) {
+        if ($this->getLearnerService()->deleteLearner($id)) {
             $this->sendSuccess([], 'Learner deleted successfully');
         } else {
             $this->sendError('Failed to delete learner');
@@ -432,8 +272,9 @@ class LearnerController extends BaseController
             'show_pagination' => true
         ], $atts);
 
-        $learners = $this->getLearners((int) $atts['limit']);
-        $total = $this->getLearnerCount();
+        $service = $this->getLearnerService();
+        $learners = $service->getLearners((int) $atts['limit']);
+        $total = $service->getLearnerCount();
 
         ob_start();
         ?>
@@ -492,7 +333,7 @@ class LearnerController extends BaseController
             return '<div class="alert alert-warning">No learner ID specified.</div>';
         }
 
-        $learner = $this->getLearner($learnerId);
+        $learner = $this->getLearnerService()->getLearner($learnerId);
 
         if (!$learner) {
             return '<div class="alert alert-danger">Learner not found.</div>';

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Ajax;
 
-use WeCoza\Learners\Controllers\LearnerController;
+use WeCoza\Learners\Services\LearnerService;
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -39,62 +39,12 @@ function verify_learner_access(string $nonce_action = 'learners_nonce', string $
 }
 
 /**
- * Get LearnerController instance
+ * Get LearnerService instance
  *
- * @return LearnerController
+ * @return LearnerService
  */
-function get_learner_controller(): LearnerController {
-    return new LearnerController();
-}
-
-/**
- * Generate HTML table rows for learners data
- *
- * @param array $learners Array of learner objects
- * @return string HTML string of table rows
- */
-function generate_learner_table_rows(array $learners): string {
-    $rows = '';
-    foreach ($learners as $learner) {
-        $buttons = sprintf(
-            '<div class="btn-group btn-group-sm" role="group">
-                <a href="%s" class="btn bg-discovery-subtle">View</a>
-                <a href="%s" class="btn bg-warning-subtle">Edit</a>
-                <button class="btn btn-sm bg-danger-subtle delete-learner-btn" data-id="%s">Delete</button>
-            </div>',
-            esc_url(home_url('/app/view-learner/?learner_id=' . ($learner->id ?? ''))),
-            esc_url(home_url('/app/update-learners/?learner_id=' . ($learner->id ?? ''))),
-            esc_attr($learner->id ?? '')
-        );
-
-        // Create full name with title
-        $title_with_period = !empty($learner->title) ? $learner->title . '. ' : '';
-        $full_name = trim($title_with_period . ($learner->first_name ?? '') . ' ' . ($learner->surname ?? ''));
-
-        $rows .= sprintf(
-            '<tr>
-                <td>%s</td>
-                <td>%s</td>
-                <td>%s</td>
-                <td>%s</td>
-                <td>%s</td>
-                <td>%s</td>
-                <td>%s</td>
-                <td>%s</td>
-                <td class="text-nowrap text-center">%s</td>
-            </tr>',
-            esc_html($full_name),
-            esc_html($learner->surname ?? ''),
-            esc_html($learner->gender ?? ''),
-            esc_html($learner->race ?? ''),
-            esc_html($learner->tel_number ?? ''),
-            esc_html($learner->email_address ?? ''),
-            esc_html($learner->city_town_name ?? ''),
-            esc_html($learner->employment_status ?? ''),
-            $buttons
-        );
-    }
-    return $rows;
+function get_learner_service(): LearnerService {
+    return new LearnerService();
 }
 
 /**
@@ -136,7 +86,7 @@ function handle_update_learner(): void {
                 : $value;
         }
 
-        $result = get_learner_controller()->updateLearner($learner_id, $data);
+        $result = get_learner_service()->updateLearner($learner_id, $data);
 
         if ($result) {
             wp_send_json_success(['message' => 'Learner updated successfully']);
@@ -163,7 +113,7 @@ function handle_delete_learner(): void {
             throw new Exception('Invalid learner ID');
         }
 
-        $result = get_learner_controller()->deleteLearner($learner_id);
+        $result = get_learner_service()->deleteLearner($learner_id);
 
         if ($result) {
             wp_send_json_success(['message' => 'Learner deleted successfully']);
@@ -183,24 +133,23 @@ function handle_delete_learner(): void {
  */
 function handle_fetch_learners_data(): void {
     try {
-        // Require manage_learners capability for PII data access
         verify_learner_access('learners_nonce', 'manage_learners');
 
-        $learnerModels = get_learner_controller()->getLearnersWithMappings();
+        $service = get_learner_service();
+        $learnerModels = $service->getLearnersWithMappings();
 
         if (empty($learnerModels)) {
             throw new Exception('No learners found.');
         }
 
         // Convert models to stdClass for backward compatibility
-        // Pass true to include NULL values - prevents "Undefined property" warnings
         $learners = array_map(function($model) {
             $obj = (object) $model->toDbArray(true);
             $obj->city_town_name = $model->getCityTownName();
             return $obj;
         }, $learnerModels);
 
-        $rows = generate_learner_table_rows($learners);
+        $rows = $service->generateTableRowsHtml($learners);
         wp_send_json_success($rows);
 
     } catch (Exception $e) {
@@ -215,10 +164,9 @@ function handle_fetch_learners_data(): void {
  */
 function handle_fetch_dropdown_data(): void {
     try {
-        // Dropdown data (non-PII) requires only read capability
         verify_learner_access('learners_nonce', 'read');
 
-        $dropdownData = get_learner_controller()->getDropdownData();
+        $dropdownData = get_learner_service()->getDropdownData();
 
         // Transform data for frontend dropdown format
         $cities         = wecoza_transform_dropdown($dropdownData['cities'], 'location_id', 'town');
@@ -260,7 +208,7 @@ function handle_portfolio_deletion(): void {
             throw new Exception('Invalid portfolio or learner ID');
         }
 
-        if (get_learner_controller()->deletePortfolio($portfolio_id)) {
+        if (get_learner_service()->deletePortfolio($portfolio_id)) {
             wp_send_json_success('Portfolio deleted successfully');
         } else {
             throw new Exception('Failed to delete portfolio');
