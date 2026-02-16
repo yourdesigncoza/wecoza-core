@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 39 — Repository Pattern Enforcement
-Plan: 01 (completed)
-Status: In Progress (1/4 plans complete)
-Last activity: 2026-02-16 — Completed 39-01: Repository Pattern Audit & Initial Refactoring
+Plan: 02 (completed)
+Status: In Progress (2/4 plans complete)
+Last activity: 2026-02-16 — Completed 39-02: Repository Pattern Enforcement - CRUD & Security
 
-Progress: 3/6 phases complete (8 plans executed)
+Progress: 3/6 phases complete (9 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,11 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+**Phase 39-02 (2026-02-16):**
+- Dynamic ORDER BY columns use quoteIdentifier() after whitelist validation
+- Hardcoded string literals documented as safe via audit comment
+- Bypass comments follow pattern: "// Complex query: [reason]"
+
 **Phase 39-01 (2026-02-16):**
 - FK validation runs before parent::insert (simple pre-check, no transaction needed)
 - parent::insert handles transaction internally
@@ -112,7 +117,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 39-01-PLAN.md — Repository pattern audit and initial refactoring
-Resume file: .planning/phases/39-repository-pattern-enforcement/39-01-SUMMARY.md
+Stopped at: Completed 39-02-PLAN.md — Repository pattern enforcement (CRUD & Security)
+Resume file: .planning/phases/39-repository-pattern-enforcement/39-02-SUMMARY.md
 
-**Next action:** Phase 39-02: Refactor AgentRepository CRUD methods to use BaseRepository (createAgent, updateAgent, deleteAgent, deleteAgentPermanently)
+**Next action:** Continue to 39-03 (if exists) or next phase in roadmap
