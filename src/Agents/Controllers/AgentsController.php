@@ -17,7 +17,6 @@ use WeCoza\Agents\Repositories\AgentRepository;
 use WeCoza\Agents\Models\AgentModel;
 use WeCoza\Agents\Services\WorkingAreasService;
 use WeCoza\Agents\Helpers\FormHelpers;
-use WeCoza\Agents\Helpers\ValidationHelper;
 use WeCoza\Agents\Services\AgentDisplayService;
 
 if (!defined('ABSPATH')) {
@@ -119,10 +118,15 @@ class AgentsController extends BaseController
                 // Collect form data
                 $data = $this->collectFormData();
 
-                // Validate form data
-                $validation_errors = $this->validateFormData($data, $current_agent);
-                if (!empty($validation_errors)) {
-                    $errors = $validation_errors;
+                // Validate via AgentModel (single source of truth)
+                $agentModel = new AgentModel($data);
+                $isValid = $agentModel->validate([
+                    'current_agent' => $current_agent,
+                    'repository'    => $this->getRepository(),
+                ]);
+
+                if (!$isValid) {
+                    $errors = $agentModel->get_errors();
                     $agent = $data; // Preserve submitted data
                 } else {
                     // Save agent
@@ -564,164 +568,6 @@ class AgentsController extends BaseController
         return null;
     }
 
-    /**
-     * Validate form data
-     *
-     * @param array $data Form data
-     * @param array|null $current_agent Current agent (for edit mode)
-     * @return array Validation errors
-     */
-    private function validateFormData(array $data, ?array $current_agent): array
-    {
-        $errors = [];
-
-        // Required fields
-        if (empty($data['first_name'])) {
-            $errors['first_name'] = __('First name is required.', 'wecoza-core');
-        }
-
-        if (empty($data['surname'])) {
-            $errors['surname'] = __('Surname is required.', 'wecoza-core');
-        }
-
-        if (empty($data['tel_number'])) {
-            $errors['tel_number'] = __('Contact number is required.', 'wecoza-core');
-        }
-
-        if (empty($data['email_address'])) {
-            $errors['email_address'] = __('Email address is required.', 'wecoza-core');
-        } elseif (!is_email($data['email_address'])) {
-            $errors['email_address'] = __('Please enter a valid email address.', 'wecoza-core');
-        }
-
-        if (empty($data['gender'])) {
-            $errors['gender'] = __('Gender is required.', 'wecoza-core');
-        }
-
-        if (empty($data['race'])) {
-            $errors['race'] = __('Race is required.', 'wecoza-core');
-        }
-
-        if (empty($data['residential_address_line'])) {
-            $errors['residential_address_line'] = __('Address is required.', 'wecoza-core');
-        }
-
-        if (empty($data['city'])) {
-            $errors['city'] = __('City is required.', 'wecoza-core');
-        }
-
-        if (empty($data['province'])) {
-            $errors['province'] = __('Province is required.', 'wecoza-core');
-        }
-
-        if (empty($data['residential_postal_code'])) {
-            $errors['residential_postal_code'] = __('Postal code is required.', 'wecoza-core');
-        }
-
-        if (empty($data['preferred_working_area_1'])) {
-            $errors['preferred_working_area_1'] = __('At least one preferred working area is required.', 'wecoza-core');
-        }
-
-        if (empty($data['title'])) {
-            $errors['title'] = __('Title is required.', 'wecoza-core');
-        }
-
-        if (empty($data['residential_suburb'])) {
-            $errors['residential_suburb'] = __('Suburb is required.', 'wecoza-core');
-        }
-
-        if (empty($data['subjects_registered'])) {
-            $errors['subjects_registered'] = __('Subjects registered is required.', 'wecoza-core');
-        }
-
-        if (empty($data['highest_qualification'])) {
-            $errors['highest_qualification'] = __('Highest qualification is required.', 'wecoza-core');
-        }
-
-        if (empty($data['agent_training_date'])) {
-            $errors['agent_training_date'] = __('Agent training date is required.', 'wecoza-core');
-        }
-
-        if (!isset($data['quantum_assessment']) || $data['quantum_assessment'] === '') {
-            $errors['quantum_assessment'] = __('Quantum assessment is required.', 'wecoza-core');
-        }
-
-        if (!isset($data['quantum_maths_score']) || $data['quantum_maths_score'] === '') {
-            $errors['quantum_maths_score'] = __('Quantum maths score is required.', 'wecoza-core');
-        }
-
-        if (!isset($data['quantum_science_score']) || $data['quantum_science_score'] === '') {
-            $errors['quantum_science_score'] = __('Quantum science score is required.', 'wecoza-core');
-        }
-
-        if (empty($data['signed_agreement_date'])) {
-            $errors['signed_agreement_date'] = __('Signed agreement date is required.', 'wecoza-core');
-        }
-
-        if (empty($data['bank_name'])) {
-            $errors['bank_name'] = __('Bank name is required.', 'wecoza-core');
-        }
-
-        if (empty($data['account_holder'])) {
-            $errors['account_holder'] = __('Account holder is required.', 'wecoza-core');
-        }
-
-        if (empty($data['bank_account_number'])) {
-            $errors['bank_account_number'] = __('Account number is required.', 'wecoza-core');
-        }
-
-        if (empty($data['bank_branch_code'])) {
-            $errors['bank_branch_code'] = __('Branch code is required.', 'wecoza-core');
-        }
-
-        if (empty($data['account_type'])) {
-            $errors['account_type'] = __('Account type is required.', 'wecoza-core');
-        }
-
-        // Validate ID based on type
-        if ($data['id_type'] === 'sa_id') {
-            if (empty($data['sa_id_no'])) {
-                $errors['sa_id_no'] = __('SA ID number is required.', 'wecoza-core');
-            } else {
-                // Validate SA ID format and checksum
-                $validation = ValidationHelper::validate_sa_id($data['sa_id_no']);
-                if (is_array($validation) && !$validation['valid']) {
-                    $errors['sa_id_no'] = $validation['message'];
-                } elseif (is_bool($validation) && !$validation) {
-                    $errors['sa_id_no'] = __('SA ID number is invalid.', 'wecoza-core');
-                }
-            }
-        } else {
-            if (empty($data['passport_number'])) {
-                $errors['passport_number'] = __('Passport number is required.', 'wecoza-core');
-            } else {
-                $validation = ValidationHelper::validate_passport($data['passport_number']);
-                if (is_array($validation) && !$validation['valid']) {
-                    $errors['passport_number'] = $validation['message'];
-                } elseif (is_bool($validation) && !$validation) {
-                    $errors['passport_number'] = __('Passport number is invalid.', 'wecoza-core');
-                }
-            }
-        }
-
-        // Check for duplicate email (excluding current agent if editing)
-        if (!empty($data['email_address'])) {
-            $existing = $this->getRepository()->getAgentByEmail($data['email_address']);
-            if ($existing && (!$current_agent || $existing['agent_id'] != $current_agent['agent_id'])) {
-                $errors['email_address'] = __('This email address is already registered.', 'wecoza-core');
-            }
-        }
-
-        // Check for duplicate ID number
-        if (!empty($data['sa_id_no'])) {
-            $existing = $this->getRepository()->getAgentByIdNumber($data['sa_id_no']);
-            if ($existing && (!$current_agent || $existing['agent_id'] != $current_agent['agent_id'])) {
-                $errors['sa_id_no'] = __('This ID number is already registered.', 'wecoza-core');
-            }
-        }
-
-        return $errors;
-    }
 
     /**
      * Handle file uploads

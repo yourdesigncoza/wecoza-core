@@ -153,22 +153,8 @@ class AgentRepository extends BaseRepository
      */
     public function createAgent(array $data)
     {
-        // Sanitize and validate data
+        // Sanitize data (validation is handled by AgentModel::validate())
         $cleanData = $this->sanitizeAgentData($data);
-
-        if (empty($cleanData['first_name']) || empty($cleanData['surname']) || empty($cleanData['email_address'])) {
-            return false;
-        }
-
-        // Check if email already exists
-        if ($this->getAgentByEmail($cleanData['email_address'])) {
-            return false;
-        }
-
-        // Check if ID number already exists
-        if (!empty($cleanData['sa_id_no']) && $this->getAgentByIdNumber($cleanData['sa_id_no'])) {
-            return false;
-        }
 
         // Add timestamps
         $cleanData['created_at'] = current_time('mysql');

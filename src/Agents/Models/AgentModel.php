@@ -150,6 +150,7 @@ class AgentModel
      * @var array
      */
     protected static $required_fields = [
+        'title',
         'first_name',
         'surname',
         'gender',
@@ -157,9 +158,20 @@ class AgentModel
         'tel_number',
         'email_address',
         'residential_address_line',
+        'residential_suburb',
         'city',
         'province',
         'residential_postal_code',
+        'preferred_working_area_1',
+        'subjects_registered',
+        'highest_qualification',
+        'agent_training_date',
+        'signed_agreement_date',
+        'bank_name',
+        'account_holder',
+        'bank_account_number',
+        'bank_branch_code',
+        'account_type',
     ];
 
     /**
@@ -228,12 +240,15 @@ class AgentModel
      */
     public function save()
     {
+        $repository = new \WeCoza\Agents\Repositories\AgentRepository();
+
+        // Load current agent data for uniqueness checks when editing
+        $current_agent = $this->id ? $repository->getAgent($this->id) : null;
+
         // Validate before saving
-        if (!$this->validate()) {
+        if (!$this->validate(['current_agent' => $current_agent, 'repository' => $repository])) {
             return false;
         }
-
-        $repository = new \WeCoza\Agents\Repositories\AgentRepository();
 
         // Prepare data for saving
         $save_data = $this->get_save_data();
@@ -458,15 +473,27 @@ class AgentModel
     /**
      * Validate agent data
      *
+     * Centralised validation for the Agents module. Controllers and
+     * repositories should delegate here instead of duplicating checks.
+     *
      * @since 3.0.0
+     * @param array|null $context Optional context for uniqueness checks.
+     *   - 'current_agent' (array|null): Existing agent row when editing, used to
+     *     exclude the current record from duplicate checks.
+     *   - 'repository' (AgentRepository|null): Repository instance for DB lookups.
      * @return bool Whether data is valid
      */
-    public function validate()
+    public function validate(?array $context = null)
     {
         $this->errors = [];
         $data = $this->get_data();
 
-        // Check required fields
+        $current_agent = $context['current_agent'] ?? null;
+        $repository    = $context['repository'] ?? null;
+
+        // ------------------------------------------------------------------
+        // Required fields
+        // ------------------------------------------------------------------
         foreach (self::$required_fields as $field) {
             if (empty($data[$field])) {
                 $this->errors[$field] = sprintf(
@@ -476,17 +503,32 @@ class AgentModel
             }
         }
 
-        // Validate email (using database column name)
+        // Quantum scores use a different emptiness check (0 is a valid score)
+        $quantum_fields = [
+            'quantum_assessment'   => __('Quantum assessment is required.', 'wecoza-core'),
+            'quantum_maths_score'  => __('Quantum maths score is required.', 'wecoza-core'),
+            'quantum_science_score' => __('Quantum science score is required.', 'wecoza-core'),
+        ];
+        foreach ($quantum_fields as $field => $message) {
+            if (!isset($data[$field]) || $data[$field] === '' || $data[$field] === null) {
+                $this->errors[$field] = $message;
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Email format
+        // ------------------------------------------------------------------
         if (!empty($data['email_address']) && !is_email($data['email_address'])) {
             $this->errors['email_address'] = __('Please enter a valid email address.', 'wecoza-core');
         }
 
-        // Validate ID number or passport based on type
+        // ------------------------------------------------------------------
+        // ID number / passport
+        // ------------------------------------------------------------------
         if ($data['id_type'] === 'sa_id') {
             if (empty($data['sa_id_no'])) {
                 $this->errors['sa_id_no'] = __('SA ID number is required.', 'wecoza-core');
             } else {
-                // Validate SA ID format and checksum
                 $validation = \WeCoza\Agents\Helpers\ValidationHelper::validate_sa_id($data['sa_id_no']);
                 if (is_array($validation) && !$validation['valid']) {
                     $this->errors['sa_id_no'] = $validation['message'];
@@ -507,7 +549,9 @@ class AgentModel
             }
         }
 
-        // Validate phone number format (using database column name)
+        // ------------------------------------------------------------------
+        // Phone number format
+        // ------------------------------------------------------------------
         if (!empty($data['tel_number'])) {
             $phone = preg_replace('/[^0-9]/', '', $data['tel_number']);
             if (strlen($phone) < 10) {
@@ -515,25 +559,28 @@ class AgentModel
             }
         }
 
-        // Validate postal code (using database column name)
+        // ------------------------------------------------------------------
+        // Numeric fields
+        // ------------------------------------------------------------------
         if (!empty($data['residential_postal_code']) && !is_numeric($data['residential_postal_code'])) {
             $this->errors['residential_postal_code'] = __('Postal code must be numeric.', 'wecoza-core');
         }
 
-        // Validate bank details if provided
         if (!empty($data['bank_account_number']) && !is_numeric($data['bank_account_number'])) {
             $this->errors['bank_account_number'] = __('Account number must be numeric.', 'wecoza-core');
         }
 
-        if (!empty($data['branch_code']) && !is_numeric($data['branch_code'])) {
-            $this->errors['branch_code'] = __('Branch code must be numeric.', 'wecoza-core');
+        if (!empty($data['bank_branch_code']) && !is_numeric($data['bank_branch_code'])) {
+            $this->errors['bank_branch_code'] = __('Branch code must be numeric.', 'wecoza-core');
         }
 
-        // Validate dates
+        // ------------------------------------------------------------------
+        // Date fields
+        // ------------------------------------------------------------------
         $date_fields = [
             'criminal_record_date',
             'signed_agreement_date',
-            'agent_training_date'
+            'agent_training_date',
         ];
 
         foreach ($date_fields as $field) {
@@ -542,6 +589,27 @@ class AgentModel
                     __('%s must be a valid date.', 'wecoza-core'),
                     ucfirst(str_replace('_', ' ', $field))
                 );
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Uniqueness checks (require a repository instance)
+        // ------------------------------------------------------------------
+        if ($repository) {
+            // Duplicate email
+            if (!empty($data['email_address']) && !isset($this->errors['email_address'])) {
+                $existing = $repository->getAgentByEmail($data['email_address']);
+                if ($existing && (!$current_agent || $existing['agent_id'] != $current_agent['agent_id'])) {
+                    $this->errors['email_address'] = __('This email address is already registered.', 'wecoza-core');
+                }
+            }
+
+            // Duplicate ID number
+            if (!empty($data['sa_id_no']) && !isset($this->errors['sa_id_no'])) {
+                $existing = $repository->getAgentByIdNumber($data['sa_id_no']);
+                if ($existing && (!$current_agent || $existing['agent_id'] != $current_agent['agent_id'])) {
+                    $this->errors['sa_id_no'] = __('This ID number is already registered.', 'wecoza-core');
+                }
             }
         }
 
