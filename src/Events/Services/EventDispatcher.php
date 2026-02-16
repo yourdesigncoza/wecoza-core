@@ -72,7 +72,7 @@ final class EventDispatcher
         EventType $type,
         int $classId,
         array $newRow,
-        ?array $oldRow = null,
+        ?array $oldRow = null
     ): int {
         // Check if we should dispatch this event type
         if (!$this->shouldDispatch($type)) {
@@ -128,7 +128,7 @@ final class EventDispatcher
         EventType $type,
         int $learnerId,
         int $classId,
-        array $eventData,
+        array $eventData
     ): int {
         // Check if we should dispatch this event type
         if (!$this->shouldDispatch($type)) {
@@ -175,7 +175,7 @@ final class EventDispatcher
         int $classId,
         string $oldStatus,
         string $newStatus,
-        array $classData,
+        array $classData
     ): int {
         // Status change is always significant
         if (!$this->shouldDispatch(EventType::STATUS_CHANGE)) {

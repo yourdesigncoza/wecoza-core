@@ -153,7 +153,7 @@ class AgentRepository extends BaseRepository
      * @param array $data Agent data
      * @return int|false Agent ID on success, false on failure
      */
-    public function createAgent(array $data)
+    public function createAgent(array $data): int|false
     {
         // Sanitize data (validation is handled by AgentModel::validate())
         $cleanData = $this->sanitizeAgentData($data);
@@ -632,7 +632,7 @@ class AgentRepository extends BaseRepository
      * @param mixed $metaValue Meta value
      * @return int|false Meta ID on success, false on failure
      */
-    public function addAgentMeta(int $agentId, string $metaKey, $metaValue)
+    public function addAgentMeta(int $agentId, string $metaKey, mixed $metaValue): int|false
     {
         // Complex query: operates on agent_meta table (not $table)
         // Check if meta already exists
@@ -660,7 +660,7 @@ class AgentRepository extends BaseRepository
      * @param bool $single Return single value
      * @return mixed Meta value(s)
      */
-    public function getAgentMeta(int $agentId, string $metaKey = '', bool $single = false)
+    public function getAgentMeta(int $agentId, string $metaKey = '', bool $single = false): mixed
     {
         // Complex query: operates on agent_meta table (not $table)
         $sql = "SELECT * FROM agent_meta WHERE agent_id = :agent_id";
@@ -749,7 +749,7 @@ class AgentRepository extends BaseRepository
      * @param string $noteType Note type (unused - kept for API compatibility)
      * @return int|false Note ID on success, false on failure
      */
-    public function addAgentNote(int $agentId, string $note, string $noteType = 'general')
+    public function addAgentNote(int $agentId, string $note, string $noteType = 'general'): int|false
     {
         // Complex query: operates on agent_notes table (not $table)
         // Actual schema: note_id, agent_id, note, note_date
@@ -831,7 +831,7 @@ class AgentRepository extends BaseRepository
      * @param string $reason Reason for absence
      * @return int|false Absence ID on success, false on failure
      */
-    public function addAgentAbsence(int $agentId, string $absenceDate, string $reason = '')
+    public function addAgentAbsence(int $agentId, string $absenceDate, string $reason = ''): int|false
     {
         // Complex query: operates on agent_absences table (not $table)
         // Actual schema: absence_id, agent_id, class_id, absence_date, reason, reported_at

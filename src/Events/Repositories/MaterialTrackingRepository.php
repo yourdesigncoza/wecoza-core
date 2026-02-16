@@ -277,9 +277,9 @@ final class MaterialTrackingRepository extends BaseRepository
      * @param string|null $search Search filter for class code/subject/client name (or null)
      * @return array<int, array<string, mixed>> Array of tracking records with joined data
      */
+    // Complex query: CROSS JOIN LATERAL with JSONB array elements + multi-table JOIN
     public function getTrackingDashboardData(
         int $limit = AppConstants::DEFAULT_PAGE_SIZE,
-        // Complex query: CROSS JOIN LATERAL with JSONB array elements + multi-table JOIN
         ?string $status = null,
         ?string $search = null
     ): array {
