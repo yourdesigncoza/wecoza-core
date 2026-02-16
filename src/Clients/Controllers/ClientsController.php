@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace WeCoza\Clients\Controllers;
 
 use WeCoza\Core\Abstract\BaseController;
-use WeCoza\Clients\Models\ClientsModel;
-use WeCoza\Clients\Models\SitesModel;
-use WeCoza\Clients\Repositories\ClientRepository;
+use WeCoza\Clients\Services\ClientService;
 use WeCoza\Clients\Helpers\ViewHelpers;
 
 /**
@@ -18,11 +16,11 @@ use WeCoza\Clients\Helpers\ViewHelpers;
 class ClientsController extends BaseController {
 
     /**
-     * Model instance (lazily loaded)
+     * Service instance (lazily loaded)
      *
-     * @var ClientsModel|null
+     * @var ClientService|null
      */
-    protected $model = null;
+    private ?ClientService $clientService = null;
 
     /**
      * Register hooks (required by BaseController)
@@ -34,25 +32,17 @@ class ClientsController extends BaseController {
     }
 
     /**
-     * Get model instance on-demand
+     * Get service instance on-demand
      *
-     * @return ClientsModel
+     * @return ClientService
      */
-    protected function getModel() {
-        if ($this->model === null) {
-            $this->model = new ClientsModel();
+    protected function getClientService(): ClientService
+    {
+        if ($this->clientService === null) {
+            $this->clientService = new ClientService();
         }
 
-        return $this->model;
-    }
-
-    /**
-     * Get sites model instance
-     *
-     * @return SitesModel
-     */
-    protected function getSitesModel() {
-        return $this->getModel()->getSitesModel();
+        return $this->clientService;
     }
 
 
@@ -193,19 +183,15 @@ class ClientsController extends BaseController {
             return '<p>' . __('You do not have permission to create clients.', 'wecoza-core') . '</p>';
         }
 
-        $atts = shortcode_atts(array(
-            'id' => 0,
-        ), $atts);
+        $atts = shortcode_atts(['id' => 0], $atts);
 
         $client = null;
-        $errors = array();
+        $errors = [];
         $success = false;
-        $submittedClient = array();
-        $submittedSite = array();
 
         // Get client data if editing
         if ($atts['id']) {
-            $client = $this->getModel()->getById($atts['id']);
+            $client = $this->getClientService()->getClient($atts['id']);
             if (!$client) {
                 return '<p>' . __('Client not found.', 'wecoza-core') . '</p>';
             }
@@ -216,88 +202,37 @@ class ClientsController extends BaseController {
             if (!wp_verify_nonce($_POST['nonce'], 'clients_nonce_action')) {
                 $errors[] = __('Security check failed. Please try again.', 'wecoza-core');
             } else {
-                $result = $this->handleFormSubmission($atts['id']);
-                if ($result['success']) {
-                    $success = true;
+                $result = $this->getClientService()->handleClientSubmission($_POST, (int) $atts['id']);
+                $success = $result['success'];
+                if ($success) {
                     $client = $result['client'];
                 } else {
                     $errors = $result['errors'];
-                    if (!empty($result['data']['client']) && is_array($result['data']['client'])) {
-                        $submittedClient = $result['data']['client'];
-                    }
-                    if (!empty($result['data']['site']) && is_array($result['data']['site'])) {
-                        $submittedSite = $result['data']['site'];
+                    // Merge submitted data for form re-population
+                    if (!empty($result['data']['client'])) {
+                        $client = array_merge(is_array($client) ? $client : [], $result['data']['client']);
                     }
                 }
             }
         }
 
-        if (!empty($submittedClient)) {
-            $client = array_merge(is_array($client) ? $client : array(), $submittedClient);
+        // Get form data (dropdowns, locations, sites, main clients)
+        $formData = $this->getClientService()->prepareFormData($client['id'] ?? 0);
+
+        // Add selected location data if we have a client
+        if ($client) {
+            $formData['location_data']['selected'] = [
+                'province' => $client['client_province'] ?? ($client['client_location']['province'] ?? ''),
+                'town' => $client['client_town'] ?? ($client['client_location']['town'] ?? ''),
+                'suburb' => $client['client_suburb'] ?? ($client['client_location']['suburb'] ?? ''),
+                'locationId' => !empty($client['client_town_id']) ? (int) $client['client_town_id'] : null,
+                'postalCode' => $client['client_postal_code'] ?? ($client['client_location']['postal_code'] ?? ''),
+            ];
         }
 
-        // Get dropdown data
-        $config = wecoza_config('clients');
-        $seta_options = $config['seta_options'];
-        $status_options = $config['client_status_options'];
-
-        $sitesData = array('head' => null, 'sub_sites' => array());
-        if (!empty($client['id'])) {
-            $sitesData = $this->getSitesModel()->getSitesByClient($client['id']);
-        if (!empty($submittedSite)) {
-            $sitesData['head'] = array_merge($sitesData['head'] ?? array(), $submittedSite);
-            if (!empty($submittedSite['place_id'])) {
-                $client['client_town_id'] = $submittedSite['place_id'];
-            }
-            // Address fields are stored in locations table and retrieved via SitesModel hydration
-            // No need to store address fields directly in clients table
-            if (!empty($submittedSite['site_name'])) {
-                $client['site_name'] = $submittedSite['site_name'];
-            }
-        }
-        }
-
-        $selectedProvince = $client['client_province'] ?? ($client['client_location']['province'] ?? '');
-        $selectedTown = $client['client_town'] ?? ($client['client_location']['town'] ?? '');
-        $selectedSuburb = $client['client_suburb'] ?? ($client['client_location']['suburb'] ?? '');
-        $selectedLocationId = !empty($client['client_town_id']) ? (int) $client['client_town_id'] : null;
-        $selectedPostal = $client['client_postal_code'] ?? ($client['client_location']['postal_code'] ?? '');
-
-        $hierarchy = $this->getSitesModel()->getLocationHierarchy();
-
-        $locationData = array(
-            'hierarchy' => $hierarchy,
-            'selected' => array(
-                'province' => $selectedProvince,
-                'town' => $selectedTown,
-                'suburb' => $selectedSuburb,
-                'locationId' => $selectedLocationId,
-                'postalCode' => $selectedPostal,
-            ),
-        );
-
-        // Get main clients for sub-client dropdown
-        $main_clients_raw = $this->getModel()->getMainClients();
-
-        // Transform to proper format for select options: id => client_name
-        $main_clients = ['' => 'Select Main Client'];
-        foreach ($main_clients_raw as $mainClient) {
-            if (isset($mainClient['id']) && isset($mainClient['client_name'])) {
-                $main_clients[$mainClient['id']] = $mainClient['client_name'];
-            }
-        }
-
-        // Load view
-        return wecoza_view('clients/components/client-capture-form', array(
-            'client' => $client,
-            'errors' => $errors,
-            'success' => $success,
-            'seta_options' => $seta_options,
-            'status_options' => $status_options,
-            'location_data' => $locationData,
-            'sites' => $sitesData,
-            'main_clients' => $main_clients,
-            'main_clients_raw' => $main_clients_raw,
+        return wecoza_view('clients/components/client-capture-form', array_merge(
+            ['client' => $client, 'errors' => $errors, 'success' => $success],
+            $formData
         ), true);
     }
 
@@ -313,14 +248,14 @@ class ClientsController extends BaseController {
             return '<p>' . __('You do not have permission to view clients.', 'wecoza-core') . '</p>';
         }
 
-        $atts = shortcode_atts(array(
+        $atts = shortcode_atts([
             'per_page' => 10,
             'show_search' => true,
             'show_filters' => true,
             'show_export' => true,
             'edit_url' => '/app/all-clients',
             'add_url' => '/app/all-clients',
-        ), $atts);
+        ], $atts);
 
         // Get query parameters
         $page = isset($_GET['client_page']) ? max(1, intval($_GET['client_page'])) : 1;
@@ -329,21 +264,19 @@ class ClientsController extends BaseController {
         $seta = isset($_GET['client_seta']) ? sanitize_text_field($_GET['client_seta']) : '';
 
         // Build query parameters
-        $params = array(
+        $params = [
             'search' => $search,
             'status' => $status,
             'seta' => $seta,
             'limit' => $atts['per_page'],
             'offset' => ($page - 1) * $atts['per_page'],
-        );
+        ];
 
-        // Get clients
-        $clients = $this->getModel()->getAll($params);
-        $total = $this->getModel()->count($params);
+        // Get clients and statistics via service
+        $clients = $this->getClientService()->getClients($params);
+        $total = $this->getClientService()->getClientCount($params);
         $totalPages = ceil($total / $atts['per_page']);
-
-        // Get statistics
-        $stats = $this->getModel()->getStatistics();
+        $stats = $this->getClientService()->getStatistics();
 
         // Get filter options
         $config = wecoza_config('clients');
@@ -351,7 +284,7 @@ class ClientsController extends BaseController {
         $status_options = $config['client_status_options'];
 
         // Load view
-        return wecoza_view('clients/display/clients-display', array(
+        return wecoza_view('clients/display/clients-display', [
             'clients' => $clients,
             'total' => $total,
             'page' => $page,
@@ -363,7 +296,7 @@ class ClientsController extends BaseController {
             'seta_options' => $seta_options,
             'status_options' => $status_options,
             'atts' => $atts,
-        ), true);
+        ], true);
     }
 
     /**
@@ -387,424 +320,57 @@ class ClientsController extends BaseController {
             return '<p>' . __('Invalid update request. Please access via the clients table edit button.', 'wecoza-core') . '</p>';
         }
 
-        $client = null;
-        $errors = array();
+        $errors = [];
         $success = false;
-        $submittedClient = array();
-        $submittedSite = array();
 
         // Get client data
-        $client = $this->getModel()->getById($clientId);
+        $client = $this->getClientService()->getClient($clientId);
         if (!$client) {
             return '<p>' . __('Client not found.', 'wecoza-core') . '</p>';
         }
 
-
         // Filter client data to only include known safe scalar fields
-        $client = $this->filterClientDataForForm($client);
+        $client = $this->getClientService()->filterClientDataForForm($client);
 
         // Handle form submission (non-AJAX fallback)
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nonce']) && !wp_doing_ajax()) {
             if (!wp_verify_nonce($_POST['nonce'], 'clients_nonce_action')) {
                 $errors[] = __('Security check failed. Please try again.', 'wecoza-core');
             } else {
-                $result = $this->handleFormSubmission($clientId);
-                if ($result['success']) {
-                    $success = true;
+                $result = $this->getClientService()->handleClientSubmission($_POST, $clientId);
+                $success = $result['success'];
+                if ($success) {
                     $client = $result['client'];
                 } else {
                     $errors = $result['errors'];
-                    if (!empty($result['data']['client']) && is_array($result['data']['client'])) {
-                        $submittedClient = $result['data']['client'];
-                    }
-                    if (!empty($result['data']['site']) && is_array($result['data']['site'])) {
-                        $submittedSite = $result['data']['site'];
+                    // Merge submitted data for form re-population
+                    if (!empty($result['data']['client'])) {
+                        $client = array_merge($client, $result['data']['client']);
                     }
                 }
             }
-        }
-
-        if (!empty($submittedClient)) {
-            $client = array_merge($client, $submittedClient);
         }
 
         // Apply filtering after merging to ensure no array values slip through
-        $client = $this->filterClientDataForForm($client);
+        $client = $this->getClientService()->filterClientDataForForm($client);
 
-        // Get dropdown data
-        $config = wecoza_config('clients');
-        $seta_options = $config['seta_options'];
-        $status_options = $config['client_status_options'];
+        // Get form data (dropdowns, locations, sites, main clients)
+        $formData = $this->getClientService()->prepareFormData($client['id']);
 
-        $sitesData = array('head' => null, 'sub_sites' => array());
-        $sitesData = $this->getSitesModel()->getSitesByClient($client['id']);
-        if (!empty($submittedSite)) {
-            $sitesData['head'] = array_merge($sitesData['head'] ?? array(), $submittedSite);
-            if (!empty($submittedSite['place_id'])) {
-                $client['client_town_id'] = $submittedSite['place_id'];
-            }
-            // Address fields are stored in locations table and retrieved via SitesModel hydration
-            // No need to store address fields directly in clients table
-            if (!empty($submittedSite['site_name'])) {
-                $client['site_name'] = $submittedSite['site_name'];
-            }
-        }
-
-        $selectedProvince = $client['client_province'] ?? ($client['client_location']['province'] ?? '');
-        $selectedTown = $client['client_town'] ?? ($client['client_location']['town'] ?? '');
-        $selectedSuburb = $client['client_suburb'] ?? ($client['client_location']['suburb'] ?? '');
-        $selectedLocationId = !empty($client['client_town_id']) ? (int) $client['client_town_id'] : null;
-        $selectedPostal = $client['client_postal_code'] ?? ($client['client_location']['postal_code'] ?? '');
-
-        $hierarchy = $this->getSitesModel()->getLocationHierarchy();
-
-        $locationData = array(
-            'hierarchy' => $hierarchy,
-            'selected' => array(
-                'province' => $selectedProvince,
-                'town' => $selectedTown,
-                'suburb' => $selectedSuburb,
-                'locationId' => $selectedLocationId,
-                'postalCode' => $selectedPostal,
-            ),
-        );
-
-        // Get main clients for sub-client dropdown
-        $main_clients_raw = $this->getModel()->getMainClients();
-
-        // Transform to proper format for select options: id => client_name
-        $main_clients = ['' => 'Select Main Client'];
-        foreach ($main_clients_raw as $mainClient) {
-            if (isset($mainClient['id']) && isset($mainClient['client_name'])) {
-                $main_clients[$mainClient['id']] = $mainClient['client_name'];
-            }
-        }
+        // Add selected location data
+        $formData['location_data']['selected'] = [
+            'province' => $client['client_province'] ?? ($client['client_location']['province'] ?? ''),
+            'town' => $client['client_town'] ?? ($client['client_location']['town'] ?? ''),
+            'suburb' => $client['client_suburb'] ?? ($client['client_location']['suburb'] ?? ''),
+            'locationId' => !empty($client['client_town_id']) ? (int) $client['client_town_id'] : null,
+            'postalCode' => $client['client_postal_code'] ?? ($client['client_location']['postal_code'] ?? ''),
+        ];
 
         // Load view with update-specific flag
-        return wecoza_view('clients/components/client-update-form', array(
-            'client' => $client,
-            'errors' => $errors,
-            'success' => $success,
-            'seta_options' => $seta_options,
-            'status_options' => $status_options,
-            'location_data' => $locationData,
-            'sites' => $sitesData,
-            'main_clients' => $main_clients,
-            'is_update_mode' => true,
+        return wecoza_view('clients/components/client-update-form', array_merge(
+            ['client' => $client, 'errors' => $errors, 'success' => $success, 'is_update_mode' => true],
+            $formData
         ), true);
     }
 
-    /**
-     * Handle form submission
-     *
-     * @param int $clientId Client ID (for updates)
-     * @return array
-     */
-    protected function handleFormSubmission($clientId = 0) {
-        $payload = $this->sanitizeFormData($_POST);
-        $clientData = $payload['client'];
-        $siteData = $payload['site'];
-        $communicationType = $clientData['client_status'] ?? '';
-        $isNew = ((int) $clientId) <= 0;
-
-        $errors = $this->getModel()->validate($clientData, $clientId);
-
-        // Validate site based on type
-        if (!empty($siteData['parent_site_id'])) {
-            // This is a sub-site - for new sub-clients, validate parent site belongs to main client
-            $expectedClientId = null;
-            if ($isNew && !empty($clientData['main_client_id'])) {
-                // For new sub-clients, parent site should belong to the main client
-                $expectedClientId = $clientData['main_client_id'];
-            }
-            $siteErrors = $this->getSitesModel()->validateSubSite($clientId, $siteData['parent_site_id'], $siteData, $expectedClientId);
-        } else {
-            // This is a head site
-            $siteErrors = $this->getSitesModel()->validateHeadSite($siteData);
-        }
-
-        if ($siteErrors) {
-            foreach ($siteErrors as $field => $message) {
-                switch ($field) {
-                    case 'site_name':
-                        $errors['site_name'] = $message;
-                        break;
-                    case 'place_id':
-                        $errors['client_town_id'] = $message;
-                        $errors['site_place_id'] = $message;
-                        break;
-                    default:
-                        $errors['site_' . $field] = $message;
-                        break;
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-            return array(
-                'success' => false,
-                'errors' => $errors,
-                'data' => array(
-                    'client' => $clientData,
-                    'site' => $siteData,
-                ),
-            );
-        }
-
-        if (!$isNew) {
-            $updated = $this->getModel()->update($clientId, $clientData);
-            if (!$updated) {
-                return array(
-                    'success' => false,
-                    'errors' => array('general' => __('Failed to update client. Please try again.', 'wecoza-core')),
-                    'data' => array(
-                        'client' => $clientData,
-                        'site' => $siteData,
-                    ),
-                );
-            }
-        } else {
-            $clientId = $this->getModel()->create($clientData);
-            if (!$clientId) {
-                return array(
-                    'success' => false,
-                    'errors' => array('general' => __('Failed to create client. Please try again.', 'wecoza-core')),
-                    'data' => array(
-                        'client' => $clientData,
-                        'site' => $siteData,
-                    ),
-                );
-            }
-        }
-
-        $siteData['site_name_fallback'] = $clientData['client_name'] ?? '';
-        if (!empty($siteData['site_id']) && !$this->getSitesModel()->ensureSiteBelongsToClient($siteData['site_id'], $clientId)) {
-            return array(
-                'success' => false,
-                'errors' => array('site_site_id' => __('Selected site does not belong to this client.', 'wecoza-core')),
-                'data' => array(
-                    'client' => $clientData,
-                    'site' => $siteData,
-                ),
-            );
-        }
-
-        // Save site based on type (head site or sub-site)
-        if (!empty($siteData['parent_site_id'])) {
-            // This is a sub-site
-            $saveOptions = array(
-                'fallback_to_head_site' => true,
-            );
-            if (!empty($expectedClientId)) {
-                $saveOptions['expected_client_id'] = (int) $expectedClientId;
-            }
-
-            $subSiteResult = $this->getSitesModel()->saveSubSite($clientId, $siteData['parent_site_id'], $siteData, $saveOptions);
-            if (!$subSiteResult) {
-                return array(
-                    'success' => false,
-                    'errors' => array('general' => __('Failed to save sub-site details. Please try again.', 'wecoza-core')),
-                    'data' => array(
-                        'client' => $clientData,
-                        'site' => $siteData,
-                    ),
-                );
-            }
-
-            if (is_array($subSiteResult)) {
-                $siteId = isset($subSiteResult['site_id']) ? (int) $subSiteResult['site_id'] : 0;
-                if (($subSiteResult['mode'] ?? '') === 'head') {
-                    $siteData['parent_site_id'] = null;
-                }
-            } else {
-                $siteId = (int) $subSiteResult;
-            }
-
-            if ($siteId <= 0) {
-                return array(
-                    'success' => false,
-                    'errors' => array('general' => __('Failed to save sub-site details. Please try again.', 'wecoza-core')),
-                    'data' => array(
-                        'client' => $clientData,
-                        'site' => $siteData,
-                    ),
-                );
-            }
-        } else {
-            // This is a head site
-            $siteId = $this->getSitesModel()->saveHeadSite($clientId, $siteData);
-            if (!$siteId) {
-                return array(
-                    'success' => false,
-                    'errors' => array('general' => __('Failed to save site details. Please try again.', 'wecoza-core')),
-                    'data' => array(
-                        'client' => $clientData,
-                        'site' => $siteData,
-                    ),
-                );
-            }
-        }
-
-
-
-        if ($communicationType !== '') {
-            $communicationsModel = $this->getModel()->getCommunicationsModel();
-            $latestType = $communicationsModel->getLatestCommunicationType($clientId);
-            if ($latestType !== $communicationType) {
-                $communicationsModel->logCommunication($clientId, $siteId, $communicationType);
-            }
-        }
-
-        $client = $this->getModel()->getById($clientId);
-
-        return array(
-            'success' => true,
-            'client' => $client,
-            'message' => $isNew ? __('Client created successfully!', 'wecoza-core') : __('Client saved successfully!', 'wecoza-core'),
-        );
-    }
-
-    /**
-     * Sanitize form data
-     *
-     * @param array $data Raw form data
-     * @return array
-     */
-    protected function sanitizeFormData($data) {
-        $client = array();
-
-        $client['client_name'] = isset($data['client_name']) ? sanitize_text_field($data['client_name']) : '';
-        $client['company_registration_nr'] = isset($data['company_registration_nr']) ? sanitize_text_field($data['company_registration_nr']) : '';
-        $client['seta'] = isset($data['seta']) ? sanitize_text_field($data['seta']) : '';
-        $client['client_status'] = isset($data['client_status']) ? sanitize_text_field($data['client_status']) : '';
-        $client['financial_year_end'] = isset($data['financial_year_end']) ? sanitize_text_field($data['financial_year_end']) : '';
-        $client['bbbee_verification_date'] = isset($data['bbbee_verification_date']) ? sanitize_text_field($data['bbbee_verification_date']) : '';
-
-        // Handle sub-client relationship
-        $isSubClient = isset($data['is_sub_client']) && $data['is_sub_client'] === 'on';
-        if ($isSubClient && !empty($data['main_client_id'])) {
-            $client['main_client_id'] = (int) $data['main_client_id'];
-            if ($client['main_client_id'] <= 0) {
-                $client['main_client_id'] = null;
-            }
-        } else {
-            $client['main_client_id'] = null;
-        }
-
-        // Contact person fields now go directly into client array (consolidated approach)
-        $client['contact_person'] = isset($data['contact_person']) ? sanitize_text_field($data['contact_person']) : '';
-        $client['contact_person_email'] = isset($data['contact_person_email']) ? sanitize_email($data['contact_person_email']) : '';
-        $client['contact_person_cellphone'] = isset($data['contact_person_cellphone']) ? sanitize_text_field($data['contact_person_cellphone']) : '';
-        $client['contact_person_tel'] = isset($data['contact_person_tel']) ? sanitize_text_field($data['contact_person_tel']) : '';
-        $client['contact_person_position'] = isset($data['contact_person_position']) ? sanitize_text_field($data['contact_person_position']) : '';
-
-        // Only store the place_id reference in the clients table
-        // Location data will be retrieved via SitesModel hydration
-        $placeId = isset($data['client_town_id']) ? (int) $data['client_town_id'] : 0;
-        $client['client_town_id'] = $placeId;
-
-        // Initialize site array with default values
-        $site = array(
-            'site_id' => isset($data['head_site_id']) ? (int) $data['head_site_id'] : 0,
-            'site_name' => isset($data['site_name']) ? sanitize_text_field($data['site_name']) : '',
-            'place_id' => $placeId,
-        );
-
-        // Handle sub-client relationship - if this is a sub-client, link to main client's site
-        if (!empty($client['main_client_id'])) {
-            // This is a sub-client, get the main client's head site
-            $mainClientSite = $this->getSitesModel()->getHeadSite($client['main_client_id']);
-            if ($mainClientSite && !empty($mainClientSite['site_id'])) {
-                $site['parent_site_id'] = $mainClientSite['site_id'];
-            }
-        } else {
-            // This is a main client, create a head site
-            $site['parent_site_id'] = null;
-        }
-
-        if ($placeId > 0) {
-            $location = $this->getSitesModel()->getLocationById($placeId);
-            // Address data will be retrieved via SitesModel hydration
-            // No need to store location fields directly in the clients table
-        }
-
-        return array(
-            'client' => $client,
-            'site' => $site,
-        );
-    }
-
-    /**
-     * Filter and process client data for form rendering
-     *
-     * @param array $client Raw client data from database
-     * @return array Processed client data with safe fields
-     */
-    protected function filterClientDataForForm($client) {
-        if (!is_array($client)) {
-            return array();
-        }
-
-        $processed = array();
-
-        // First, extract basic scalar fields
-        $scalarFields = array(
-            'id', 'client_name', 'company_registration_nr', 'seta', 'client_status',
-            'financial_year_end', 'bbbee_verification_date', 'main_client_id',
-            'client_town_id', // Reference to place_id in locations table
-            'created_at', 'updated_at',
-            'contact_person', 'contact_person_email', 'contact_person_cellphone',
-            'contact_person_tel', 'contact_person_position',
-            // Hydrated address display fields (populated by SitesModel::hydrateClients)
-            'client_street_address', 'client_suburb', 'client_postal_code',
-            'client_province', 'client_town',
-        );
-
-        foreach ($scalarFields as $field) {
-            if (array_key_exists($field, $client)) {
-                $value = $client[$field];
-                if (is_scalar($value) || is_null($value)) {
-                    $processed[$field] = $value;
-                }
-            }
-        }
-
-        // Extract site data from head_site array if available
-        if (!empty($client['head_site']) && is_array($client['head_site'])) {
-            $headSite = $client['head_site'];
-
-            // Map site fields to form fields
-            if (!empty($headSite['site_id']) && !isset($processed['site_id'])) {
-                $processed['site_id'] = $headSite['site_id'];
-            }
-            if (!empty($headSite['site_name']) && !isset($processed['site_name'])) {
-                $processed['site_name'] = $headSite['site_name'];
-            }
-            // Address fields removed - now get address from location data via place_id
-            if (!empty($headSite['place_id']) && !isset($processed['client_town_id'])) {
-                $processed['client_town_id'] = $headSite['place_id'];
-            }
-
-            // Location data will be hydrated by SitesModel from locations table
-            // No need to store location fields directly in clients table
-        }
-
-        // Keep client_location array if it exists and is properly structured
-        if (!empty($client['client_location']) && is_array($client['client_location'])) {
-            $processed['client_location'] = $client['client_location'];
-        }
-
-        // Log what fields were processed vs filtered for debugging
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            $processedFields = array_keys($processed);
-            $allFields = array_keys($client);
-            $filteredFields = array_diff($allFields, $processedFields);
-            if (!empty($filteredFields)) {
-                wecoza_log('Processed fields: ' . implode(', ', $processedFields));
-                wecoza_log('Filtered out fields: ' . print_r($filteredFields, true));
-            }
-        }
-
-        return $processed;
-    }
 }

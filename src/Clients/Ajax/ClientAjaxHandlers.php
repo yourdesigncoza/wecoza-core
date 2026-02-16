@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace WeCoza\Clients\Ajax;
 
 use WeCoza\Core\Helpers\AjaxSecurity;
-use WeCoza\Clients\Repositories\ClientRepository;
-use WeCoza\Clients\Repositories\LocationRepository;
-use WeCoza\Clients\Models\ClientsModel;
+use WeCoza\Clients\Services\ClientService;
 use WeCoza\Clients\Models\SitesModel;
 
 /**
@@ -17,13 +15,11 @@ use WeCoza\Clients\Models\SitesModel;
  */
 class ClientAjaxHandlers {
 
-    private ClientRepository $clientRepository;
-    private LocationRepository $locationRepository;
+    private ClientService $clientService;
 
     public function __construct()
     {
-        $this->clientRepository = new ClientRepository();
-        $this->locationRepository = new LocationRepository();
+        $this->clientService = new ClientService();
         $this->registerHandlers();
     }
 
@@ -55,111 +51,16 @@ class ClientAjaxHandlers {
 
         try {
             $clientId = isset($_POST['id']) ? intval($_POST['id']) : 0;
+            $result = $this->clientService->handleClientSubmission($_POST, $clientId);
 
-            // Use ClientsModel for form handling
-            $model = new ClientsModel();
-            $sitesModel = $model->getSitesModel();
-
-            // Build payload from POST data
-            $payload = $this->sanitizeClientFormData($_POST);
-            $clientData = $payload['client'];
-            $siteData = $payload['site'];
-            $communicationType = $clientData['client_status'] ?? '';
-            $isNew = ((int) $clientId) <= 0;
-
-            $errors = $model->validate($clientData, $clientId);
-
-            // Validate site based on type
-            if (!empty($siteData['parent_site_id'])) {
-                $expectedClientId = null;
-                if ($isNew && !empty($clientData['main_client_id'])) {
-                    $expectedClientId = $clientData['main_client_id'];
-                }
-                $siteErrors = $sitesModel->validateSubSite($clientId, $siteData['parent_site_id'], $siteData, $expectedClientId);
-            } else {
-                $siteErrors = $sitesModel->validateHeadSite($siteData);
+            if (!$result['success']) {
+                AjaxSecurity::sendError('Validation errors', 400, ['errors' => $result['errors']]);
             }
 
-            if ($siteErrors) {
-                foreach ($siteErrors as $field => $message) {
-                    switch ($field) {
-                        case 'site_name':
-                            $errors['site_name'] = $message;
-                            break;
-                        case 'place_id':
-                            $errors['client_town_id'] = $message;
-                            $errors['site_place_id'] = $message;
-                            break;
-                        default:
-                            $errors['site_' . $field] = $message;
-                            break;
-                    }
-                }
-            }
-
-            if (!empty($errors)) {
-                AjaxSecurity::sendError('Validation errors', 400, array('errors' => $errors));
-            }
-
-            if (!$isNew) {
-                $updated = $model->update($clientId, $clientData);
-                if (!$updated) {
-                    AjaxSecurity::sendError('Failed to update client. Please try again.', 500);
-                }
-            } else {
-                $clientId = $model->create($clientData);
-                if (!$clientId) {
-                    AjaxSecurity::sendError('Failed to create client. Please try again.', 500);
-                }
-            }
-
-            $siteData['site_name_fallback'] = $clientData['client_name'] ?? '';
-            if (!empty($siteData['site_id']) && !$sitesModel->ensureSiteBelongsToClient($siteData['site_id'], $clientId)) {
-                AjaxSecurity::sendError('Selected site does not belong to this client.', 400);
-            }
-
-            // Save site based on type
-            if (!empty($siteData['parent_site_id'])) {
-                $saveOptions = array('fallback_to_head_site' => true);
-                if (!empty($expectedClientId)) {
-                    $saveOptions['expected_client_id'] = (int) $expectedClientId;
-                }
-
-                $subSiteResult = $sitesModel->saveSubSite($clientId, $siteData['parent_site_id'], $siteData, $saveOptions);
-                if (!$subSiteResult) {
-                    AjaxSecurity::sendError('Failed to save sub-site details. Please try again.', 500);
-                }
-
-                if (is_array($subSiteResult)) {
-                    $siteId = isset($subSiteResult['site_id']) ? (int) $subSiteResult['site_id'] : 0;
-                } else {
-                    $siteId = (int) $subSiteResult;
-                }
-
-                if ($siteId <= 0) {
-                    AjaxSecurity::sendError('Failed to save sub-site details. Please try again.', 500);
-                }
-            } else {
-                $siteId = $sitesModel->saveHeadSite($clientId, $siteData);
-                if (!$siteId) {
-                    AjaxSecurity::sendError('Failed to save site details. Please try again.', 500);
-                }
-            }
-
-            if ($communicationType !== '') {
-                $communicationsModel = $model->getCommunicationsModel();
-                $latestType = $communicationsModel->getLatestCommunicationType($clientId);
-                if ($latestType !== $communicationType) {
-                    $communicationsModel->logCommunication($clientId, $siteId, $communicationType);
-                }
-            }
-
-            $client = $model->getById($clientId);
-
-            AjaxSecurity::sendSuccess(array(
-                'client' => $client,
-                'message' => $isNew ? 'Client created successfully!' : 'Client saved successfully!',
-            ));
+            AjaxSecurity::sendSuccess([
+                'client' => $result['client'],
+                'message' => $result['message'],
+            ]);
         } catch (\Throwable $e) {
             wecoza_log('Error saving client: ' . $e->getMessage(), 'error');
             AjaxSecurity::sendError('An error occurred while saving the client.', 500);
@@ -181,14 +82,13 @@ class ClientAjaxHandlers {
             AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
-        $model = new ClientsModel();
-        $client = $model->getById($clientId);
+        $client = $this->clientService->getClient($clientId);
 
         if (!$client) {
             AjaxSecurity::sendError('Client not found.', 404);
         }
 
-        AjaxSecurity::sendSuccess(array('client' => $client));
+        AjaxSecurity::sendSuccess(['client' => $client]);
     }
 
     /**
@@ -206,27 +106,10 @@ class ClientAjaxHandlers {
             AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
-        $model = new ClientsModel();
-        $client = $model->getById($clientId);
+        $data = $this->clientService->getClientDetails($clientId);
 
-        if (!$client) {
+        if (!$data) {
             AjaxSecurity::sendError('Client not found.', 404);
-        }
-
-        // Build edit URL
-        $editUrl = site_url('/client-management', is_ssl() ? 'https' : 'http');
-        $editUrl = add_query_arg(['mode' => 'update', 'id' => $clientId], $editUrl);
-
-        // site_name already hydrated by getById() -> hydrateClients()
-        $data = array_merge($client, array(
-            'site_name' => $client['site_name'] ?? '',
-            'edit_url' => $editUrl,
-        ));
-
-        // Get main client name if applicable
-        if (!empty($client['main_client_id'])) {
-            $mainClient = $model->getById($client['main_client_id']);
-            $data['main_client_name'] = $mainClient['client_name'] ?? '';
         }
 
         AjaxSecurity::sendSuccess($data);
@@ -248,8 +131,7 @@ class ClientAjaxHandlers {
         }
 
         try {
-            $model = new ClientsModel();
-            $success = $model->delete($clientId);
+            $success = $this->clientService->deleteClient($clientId);
 
             if ($success) {
                 AjaxSecurity::sendSuccess(['message' => 'Client deleted successfully.']);
@@ -275,13 +157,9 @@ class ClientAjaxHandlers {
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
         $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
-        $model = new ClientsModel();
-        $clients = $model->getAll(array(
-            'search' => $search,
-            'limit' => $limit,
-        ));
+        $clients = $this->clientService->searchClients($search, $limit);
 
-        AjaxSecurity::sendSuccess(array('clients' => $clients));
+        AjaxSecurity::sendSuccess(['clients' => $clients]);
     }
 
     /**
@@ -299,10 +177,9 @@ class ClientAjaxHandlers {
             AjaxSecurity::sendError('Invalid client ID.', 400);
         }
 
-        $sitesModel = new SitesModel();
-        $sites = $sitesModel->getSitesByClient($clientId);
+        $sites = $this->clientService->getBranchClients($clientId);
 
-        AjaxSecurity::sendSuccess(array('sites' => $sites));
+        AjaxSecurity::sendSuccess(['sites' => $sites]);
     }
 
     /**
@@ -318,8 +195,7 @@ class ClientAjaxHandlers {
             wp_die('Permission denied.');
         }
 
-        $model = new ClientsModel();
-        $clients = $model->getAll();
+        $csvData = $this->clientService->exportClientsAsCsv();
 
         // Set headers for CSV download
         header('Content-Type: text/csv; charset=utf-8');
@@ -332,34 +208,10 @@ class ClientAjaxHandlers {
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
         // Add headers
-        $headers = array(
-            'ID',
-            'Client Name',
-            'Company Registration Nr',
-            'Contact Person',
-            'Email',
-            'Cellphone',
-            'Town',
-            'Status',
-            'SETA',
-            'Created Date',
-        );
-        fputcsv($output, $headers);
+        fputcsv($output, $csvData['headers']);
 
-        // Add data
-        foreach ($clients as $client) {
-            $row = array(
-                $client['id'],
-                $client['client_name'],
-                $client['company_registration_nr'],
-                $client['contact_person'],
-                $client['contact_person_email'],
-                $client['contact_person_cellphone'],
-                $client['client_town'],
-                $client['client_status'],
-                $client['seta'],
-                $client['created_at'],
-            );
+        // Add data rows
+        foreach ($csvData['rows'] as $row) {
             fputcsv($output, $row);
         }
 
@@ -373,14 +225,13 @@ class ClientAjaxHandlers {
     public function getLocations() {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
-        $sitesModel = new SitesModel();
-        $hierarchy = $sitesModel->getLocationHierarchy();
+        $hierarchy = $this->clientService->getLocationHierarchy();
 
         if (!is_array($hierarchy)) {
             AjaxSecurity::sendError('Unable to load locations right now. Please try again shortly.', 500);
         }
 
-        AjaxSecurity::sendSuccess(array('hierarchy' => $hierarchy));
+        AjaxSecurity::sendSuccess(['hierarchy' => $hierarchy]);
     }
 
     /**
@@ -412,65 +263,4 @@ class ClientAjaxHandlers {
         AjaxSecurity::sendSuccess(array('duplicates' => $duplicates));
     }
 
-    /**
-     * Sanitize client form data
-     *
-     * @param array $data Raw form data
-     * @return array
-     */
-    protected function sanitizeClientFormData($data) {
-        $client = array();
-
-        $client['client_name'] = isset($data['client_name']) ? sanitize_text_field($data['client_name']) : '';
-        $client['company_registration_nr'] = isset($data['company_registration_nr']) ? sanitize_text_field($data['company_registration_nr']) : '';
-        $client['seta'] = isset($data['seta']) ? sanitize_text_field($data['seta']) : '';
-        $client['client_status'] = isset($data['client_status']) ? sanitize_text_field($data['client_status']) : '';
-        $client['financial_year_end'] = isset($data['financial_year_end']) ? sanitize_text_field($data['financial_year_end']) : '';
-        $client['bbbee_verification_date'] = isset($data['bbbee_verification_date']) ? sanitize_text_field($data['bbbee_verification_date']) : '';
-
-        // Handle sub-client relationship
-        $isSubClient = isset($data['is_sub_client']) && $data['is_sub_client'] === 'on';
-        if ($isSubClient && !empty($data['main_client_id'])) {
-            $client['main_client_id'] = (int) $data['main_client_id'];
-            if ($client['main_client_id'] <= 0) {
-                $client['main_client_id'] = null;
-            }
-        } else {
-            $client['main_client_id'] = null;
-        }
-
-        // Contact person fields
-        $client['contact_person'] = isset($data['contact_person']) ? sanitize_text_field($data['contact_person']) : '';
-        $client['contact_person_email'] = isset($data['contact_person_email']) ? sanitize_email($data['contact_person_email']) : '';
-        $client['contact_person_cellphone'] = isset($data['contact_person_cellphone']) ? sanitize_text_field($data['contact_person_cellphone']) : '';
-        $client['contact_person_tel'] = isset($data['contact_person_tel']) ? sanitize_text_field($data['contact_person_tel']) : '';
-        $client['contact_person_position'] = isset($data['contact_person_position']) ? sanitize_text_field($data['contact_person_position']) : '';
-
-        // Place ID reference
-        $placeId = isset($data['client_town_id']) ? (int) $data['client_town_id'] : 0;
-        $client['client_town_id'] = $placeId;
-
-        // Initialize site array
-        $site = array(
-            'site_id' => isset($data['head_site_id']) ? (int) $data['head_site_id'] : 0,
-            'site_name' => isset($data['site_name']) ? sanitize_text_field($data['site_name']) : '',
-            'place_id' => $placeId,
-        );
-
-        // Handle sub-client relationship for site
-        if (!empty($client['main_client_id'])) {
-            $sitesModel = new SitesModel();
-            $mainClientSite = $sitesModel->getHeadSite($client['main_client_id']);
-            if ($mainClientSite && !empty($mainClientSite['site_id'])) {
-                $site['parent_site_id'] = $mainClientSite['site_id'];
-            }
-        } else {
-            $site['parent_site_id'] = null;
-        }
-
-        return array(
-            'client' => $client,
-            'site' => $site,
-        );
-    }
 }
