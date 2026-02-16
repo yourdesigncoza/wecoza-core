@@ -121,12 +121,7 @@ final class ClientRepository extends BaseRepository
      */
     public function getMainClients(): array
     {
-        $sql = "SELECT client_id, client_name, company_registration_nr
-                FROM {$this->table}
-                WHERE main_client_id IS NULL
-                ORDER BY client_name";
-
-        return wecoza_db()->getAll($sql) ?: [];
+        return $this->findBy(['main_client_id' => null], 1000, 0, 'client_name', 'ASC');
     }
 
     /**
@@ -141,16 +136,13 @@ final class ClientRepository extends BaseRepository
             return [];
         }
 
-        $sql = "SELECT client_id, client_name, company_registration_nr, client_status
-                FROM {$this->table}
-                WHERE main_client_id = :main_client_id
-                ORDER BY client_name";
-
-        return wecoza_db()->getAll($sql, [':main_client_id' => $mainClientId]) ?: [];
+        return $this->findBy(['main_client_id' => $mainClientId], 1000, 0, 'client_name', 'ASC');
     }
 
     /**
      * Search clients by name or registration number (ILIKE)
+     *
+     * Complex query: ILIKE search not supported by BaseRepository findBy
      *
      * @param string $term Search term
      * @param int $limit Maximum results

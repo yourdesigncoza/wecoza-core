@@ -98,6 +98,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Base query with common joins for full learner data
+     *
+     * Complex query: CTE + 6-table JOIN for full learner data with portfolio aggregation
      */
     private function baseQueryWithMappings(): string
     {
@@ -241,44 +243,30 @@ class LearnerRepository extends BaseRepository
             return null;
         }
 
-        try {
-            $newId = $this->executeTransaction(function () use ($filteredData) {
+        // Validate highest_qualification FK if provided
+        if (!empty($filteredData['highest_qualification'])) {
+            try {
                 $pdo = $this->db->getPdo();
-
-                // Validate highest_qualification if provided
-                if (!empty($filteredData['highest_qualification'])) {
-                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM learner_qualifications WHERE id = :id");
-                    $stmt->execute(['id' => $filteredData['highest_qualification']]);
-                    if ($stmt->fetchColumn() == 0) {
-                        throw new Exception("Invalid highest qualification ID: " . $filteredData['highest_qualification']);
-                    }
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM learner_qualifications WHERE id = :id");
+                $stmt->execute(['id' => $filteredData['highest_qualification']]);
+                if ($stmt->fetchColumn() == 0) {
+                    error_log("WeCoza Core: Invalid highest qualification ID: " . $filteredData['highest_qualification']);
+                    return null;
                 }
-
-                // Build insert SQL
-                $columns = array_keys($filteredData);
-                $placeholders = array_map(fn($c) => ":{$c}", $columns);
-
-                $sql = sprintf(
-                    "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
-                    static::$table,
-                    implode(', ', $columns),
-                    implode(', ', $placeholders),
-                    static::$primaryKey
-                );
-
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute($filteredData);
-                return (int) $stmt->fetchColumn();
-            });
-
-            // Clear cache
-            delete_transient('learner_db_get_learners_mappings');
-
-            return $newId;
-        } catch (Exception $e) {
-            error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::insert'));
-            return null;
+            } catch (Exception $e) {
+                error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::insert FK validation'));
+                return null;
+            }
         }
+
+        // Delegate to parent::insert after FK validation
+        $newId = parent::insert($filteredData);
+
+        if ($newId !== null) {
+            delete_transient('learner_db_get_learners_mappings');
+        }
+
+        return $newId;
     }
 
     /**
@@ -317,6 +305,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Get locations for dropdowns (cached 15 min)
+     *
+     * Complex query: DISTINCT ON for deduplicated location dropdowns from locations table
      */
     public function getLocations(): array
     {
@@ -368,6 +358,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Get qualifications for dropdown (cached 15 min)
+     *
+     * Complex query: reads from learner_qualifications table (not $table)
      */
     public function getQualifications(): array
     {
@@ -393,6 +385,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Get placement levels for dropdown (cached 15 min)
+     *
+     * Complex query: reads from learner_placement_level table (not $table)
      */
     public function getPlacementLevels(): array
     {
@@ -418,6 +412,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Get employers for dropdown (cached 15 min)
+     *
+     * Complex query: reads from employers table (not $table)
      */
     public function getEmployers(): array
     {
@@ -449,6 +445,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Get learners with their progression context for class assignment
+     *
+     * Complex query: dual CTE with 4-table JOIN for progression context
      *
      * Optimized query that fetches:
      * - Last completed course (product name, completion date)
@@ -556,6 +554,8 @@ class LearnerRepository extends BaseRepository
     /**
      * Get active LP for a specific learner
      *
+     * Complex query: 3-table JOIN with calculated progress percentage
+     *
      * Used for collision detection when adding learner to class.
      *
      * @param int $learnerId
@@ -605,6 +605,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Get portfolios for a learner
+     *
+     * Complex query: reads from learner_portfolios table (not $table)
      */
     public function getPortfolios(int $learnerId): array
     {
@@ -626,6 +628,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Save learner portfolios
+     *
+     * Complex query: multi-table transactional portfolio upload with file I/O
      */
     public function savePortfolios(int $learnerId, array $files): array
     {
@@ -723,6 +727,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Delete portfolio file
+     *
+     * Complex query: multi-table transactional portfolio deletion with file cleanup
      */
     public function deletePortfolio(int $portfolioId): bool
     {
@@ -790,6 +796,8 @@ class LearnerRepository extends BaseRepository
     /**
      * Get sponsor employer_ids for a learner
      *
+     * Complex query: reads from learner_sponsors table (not $table)
+     *
      * @param int $learnerId
      * @return array Array of employer_id integers
      */
@@ -813,6 +821,8 @@ class LearnerRepository extends BaseRepository
 
     /**
      * Save sponsors for a learner (replace all existing)
+     *
+     * Complex query: transactional replace-all on learner_sponsors table
      *
      * @param int $learnerId
      * @param array $employerIds Array of employer_id integers
