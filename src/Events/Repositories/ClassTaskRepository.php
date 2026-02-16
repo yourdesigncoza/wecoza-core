@@ -16,6 +16,8 @@ if (!defined('ABSPATH')) {
 
 final class ClassTaskRepository extends BaseRepository
 {
+    // quoteIdentifier: all column names in this repository are hardcoded literals (safe)
+
     protected static string $table = 'classes';
     protected static string $primaryKey = 'class_id';
 
@@ -49,6 +51,7 @@ final class ClassTaskRepository extends BaseRepository
      */
     public function fetchClasses(int $limit, string $sortDirection, ?int $classIdFilter): array
     {
+        // Complex query: 4-table JOIN with dynamic WHERE and ORDER BY
         $orderDirection = strtolower($sortDirection) === 'asc' ? 'ASC' : 'DESC';
 
         $whereClause = '';

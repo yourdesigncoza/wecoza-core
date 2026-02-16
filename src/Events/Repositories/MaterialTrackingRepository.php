@@ -18,6 +18,8 @@ if (!defined('ABSPATH')) {
  */
 final class MaterialTrackingRepository extends BaseRepository
 {
+    // quoteIdentifier: all column names in this repository are hardcoded literals (safe)
+
     protected static string $table = 'class_material_tracking';
     protected static string $primaryKey = 'id';
 
@@ -50,6 +52,7 @@ final class MaterialTrackingRepository extends BaseRepository
      */
     public function markNotificationSent(int $classId, string $notificationType): void
     {
+        // Complex query: UPSERT (ON CONFLICT DO UPDATE) not supported by BaseRepository
         $sql = 'INSERT INTO class_material_tracking
              (class_id, notification_type, notification_sent_at, delivery_status, created_at, updated_at)
              VALUES (:class_id, :type, NOW(), \'notified\', NOW(), NOW())
@@ -85,6 +88,7 @@ final class MaterialTrackingRepository extends BaseRepository
      */
     public function markDelivered(int $classId, int $eventIndex): void
     {
+        // Complex query: nested jsonb_set operations on classes table
         // Validate and sanitize event index (must be non-negative integer)
         $eventIndex = (int) $eventIndex;
         if ($eventIndex < 0) {
@@ -156,6 +160,7 @@ final class MaterialTrackingRepository extends BaseRepository
      * @return bool True if notification was sent, false otherwise
      */
     public function wasNotificationSent(int $classId, string $notificationType): bool
+        // Complex query: EXISTS-style check on specific columns
     {
         $sql = 'SELECT notification_sent_at
              FROM class_material_tracking
@@ -182,6 +187,7 @@ final class MaterialTrackingRepository extends BaseRepository
      * @param int $classId The class ID
      * @return array<string, mixed> Array with orange_status, red_status, and overall_status
      */
+        // Complex query: pivots notification_type rows into status object
     public function getDeliveryStatus(int $classId): array
     {
         $sql = 'SELECT
@@ -232,6 +238,7 @@ final class MaterialTrackingRepository extends BaseRepository
      *
      * @param int $classId The class ID
      * @return array<int, array<string, mixed>> Array of tracking records
+        // Complex query: column-specific SELECT with ORDER BY notification_type
      */
     public function getTrackingRecords(int $classId): array
     {
@@ -271,6 +278,7 @@ final class MaterialTrackingRepository extends BaseRepository
      */
     public function getTrackingDashboardData(
         int $limit = 50,
+        // Complex query: CROSS JOIN LATERAL with JSONB array elements + multi-table JOIN
         ?string $status = null,
         ?string $search = null
     ): array {
@@ -344,6 +352,7 @@ final class MaterialTrackingRepository extends BaseRepository
      *
      * @return array<string, int> Array with keys: total, pending, completed
      */
+        // Complex query: CROSS JOIN LATERAL with JSONB + conditional aggregation
     public function getTrackingStatistics(): array
     {
         $sql = 'SELECT

@@ -19,6 +19,8 @@ if (!defined('ABSPATH')) {
  */
 final class LocationRepository extends BaseRepository
 {
+    // quoteIdentifier: all column names in this repository are hardcoded literals (safe)
+
     protected static string $table = 'public.locations';
     protected static string $primaryKey = 'location_id';
 
@@ -112,7 +114,7 @@ final class LocationRepository extends BaseRepository
      */
     public function findByCoordinates(float $latitude, float $longitude, float $radiusKm = 10.0, int $limit = 10): array
     {
-        // Using Haversine formula for distance calculation
+        // Complex query: Haversine formula distance calculation
         $sql = "SELECT location_id, street_address, suburb, town, province, postal_code, latitude, longitude,
                        (6371 * acos(cos(radians(:lat)) * cos(radians(latitude)) * cos(radians(longitude) - radians(:lng)) + sin(radians(:lat2)) * sin(radians(latitude)))) AS distance
                 FROM {$this->table}
@@ -140,6 +142,7 @@ final class LocationRepository extends BaseRepository
      */
     public function checkDuplicates(string $suburb, string $town, ?int $excludeId = null): array
     {
+        // Complex query: LOWER() case-insensitive matching with optional exclude
         $suburb = trim($suburb);
         $town = trim($town);
 

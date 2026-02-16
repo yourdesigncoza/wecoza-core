@@ -23,6 +23,8 @@ if (!defined('ABSPATH')) {
 
 class LearnerProgressionRepository extends BaseRepository
 {
+    // quoteIdentifier: all column names in this repository are hardcoded literals (safe)
+
     /**
      * Table name
      */
@@ -38,6 +40,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     private function baseQuery(): string
     {
+        // Complex query: 4-table JOIN for full progression context
         return "
             SELECT
                 lpt.*,
@@ -74,6 +77,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findCurrentForLearner(int $learnerId): ?array
     {
+        // Complex query: base query + status filter (uses baseQuery JOINs)
         $sql = $this->baseQuery() . "
             WHERE lpt.learner_id = :learner_id
             AND lpt.status = 'in_progress'
@@ -95,6 +99,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findAllForLearner(int $learnerId): array
     {
+        // Complex query: base query + learner filter (uses baseQuery JOINs)
         $sql = $this->baseQuery() . "
             WHERE lpt.learner_id = :learner_id
             ORDER BY lpt.start_date DESC
@@ -114,6 +119,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findHistoryForLearner(int $learnerId): array
     {
+        // Complex query: base query + completed status filter (uses baseQuery JOINs)
         $sql = $this->baseQuery() . "
             WHERE lpt.learner_id = :learner_id
             AND lpt.status = 'completed'
@@ -134,6 +140,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findByClass(int $classId, ?string $status = null): array
     {
+        // Complex query: base query + class filter with optional status (uses baseQuery JOINs)
         $sql = $this->baseQuery() . " WHERE lpt.class_id = :class_id";
         $params = ['class_id' => $classId];
 
@@ -158,6 +165,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findByProduct(int $productId, ?string $status = null): array
     {
+        // Complex query: base query + product filter with optional status (uses baseQuery JOINs)
         $sql = $this->baseQuery() . " WHERE lpt.product_id = :product_id";
         $params = ['product_id' => $productId];
 
@@ -182,6 +190,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function insert(array $data): ?int
     {
+        // Complex query: custom column whitelist with transaction and cache clear
         $columns = [
             'learner_id', 'product_id', 'class_id',
             'hours_trained', 'hours_present', 'hours_absent',
@@ -229,6 +238,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function update(int $trackingId, array $data): bool
     {
+        // Complex query: custom column whitelist with cache clear
         $columns = [
             'hours_trained', 'hours_present', 'hours_absent',
             'status', 'completion_date',
@@ -264,6 +274,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function delete(int $trackingId): bool
     {
+        // Complex query: manual DELETE with cache clear (could use parent but needs cache clear)
         $sql = "DELETE FROM learner_lp_tracking WHERE tracking_id = :tracking_id";
 
         try {
@@ -281,6 +292,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function logHours(array $data): bool
     {
+        // Complex query: operates on learner_hours_log table (not $table)
         $columns = [
             'learner_id', 'product_id', 'class_id', 'tracking_id',
             'log_date', 'hours_trained', 'hours_present',
@@ -309,6 +321,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function getHoursLog(int $trackingId): array
     {
+        // Complex query: reads from learner_hours_log table (not $table)
         $sql = "
             SELECT * FROM learner_hours_log
             WHERE tracking_id = :tracking_id
@@ -329,6 +342,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function getHoursLogForLearner(int $learnerId, ?string $startDate = null, ?string $endDate = null): array
     {
+        // Complex query: JOIN learner_hours_log + products with date range filter
         $sql = "
             SELECT lhl.*, p.product_name
             FROM learner_hours_log lhl
@@ -362,6 +376,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function getMonthlyProgressions(int $year, int $month): array
     {
+        // Complex query: 5-table JOIN with date range for monthly report
         $startDate = sprintf('%04d-%02d-01', $year, $month);
         $endDate = wp_date('Y-m-t', strtotime($startDate));
 
@@ -399,6 +414,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findWithFilters(array $filters = [], int $limit = 50, int $offset = 0): array
     {
+        // Complex query: dynamic JOIN + multi-criteria filter with pagination
         $sql = $this->baseQuery();
         $conditions = [];
         $params = [];
@@ -459,6 +475,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function countWithFilters(array $filters = []): int
     {
+        // Complex query: dynamic JOIN + multi-criteria COUNT
         $sql = "SELECT COUNT(*) FROM learner_lp_tracking lpt";
         $conditions = [];
         $params = [];
@@ -502,6 +519,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function savePortfolioFile(int $trackingId, array $fileData): ?int
     {
+        // Complex query: operates on learner_progression_portfolios table (not $table)
         $sql = "
             INSERT INTO learner_progression_portfolios
             (tracking_id, file_name, file_path, file_type, file_size, uploaded_by, uploaded_at)
@@ -531,6 +549,7 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function getPortfolioFiles(int $trackingId): array
     {
+        // Complex query: reads from learner_progression_portfolios table (not $table)
         $sql = "SELECT * FROM learner_progression_portfolios WHERE tracking_id = :tracking_id ORDER BY uploaded_at DESC";
 
         try {
