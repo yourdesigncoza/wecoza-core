@@ -62,6 +62,12 @@ Phase 40 (TYPE+CONST) ───────────────────�
 
 **Goal:** Make ClientsModel and AgentModel extend BaseModel, removing all duplicate get/set/toArray methods and using the shared validation framework.
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 37-01-PLAN.md — ClientsModel extends BaseModel with ArrayAccess for backward-compatible array syntax (MDL-01)
+- [ ] 37-02-PLAN.md — AgentModel extends BaseModel preserving data-bag pattern and validation (MDL-02, MDL-03, MDL-04)
+
 **Requirements:**
 - MDL-01: ClientsModel extends BaseModel with inherited get/set/toArray/validate
 - MDL-02: AgentModel extends BaseModel with inherited get/set/toArray/validate
