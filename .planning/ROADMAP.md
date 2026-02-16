@@ -139,6 +139,13 @@ Plans:
 
 **Goal:** Add return type hints to all public methods and extract all magic numbers to named constants.
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 40-01-PLAN.md — AppConstants class creation + magic number extraction across all modules (CONST-01..04)
+- [ ] 40-02-PLAN.md — Return type hints for all model classes (TYPE-02, TYPE-05)
+- [ ] 40-03-PLAN.md — Return type hints for controllers, AJAX handlers, repositories, services (TYPE-01, TYPE-03, TYPE-04)
+
 **Requirements:**
 - TYPE-01: All public controller methods have return type hints
 - TYPE-02: All public model methods have return type hints
