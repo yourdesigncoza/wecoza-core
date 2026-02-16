@@ -375,6 +375,10 @@ class LearnerController extends BaseController
      */
     public function renderCaptureForm(array $atts = []): string
     {
+        if (!current_user_can('manage_learners')) {
+            return '<p>You do not have permission to access this content.</p>';
+        }
+
         $atts = shortcode_atts([
             'form_id' => 'wecoza_learner_form',
             'redirect' => ''
@@ -417,6 +421,10 @@ class LearnerController extends BaseController
      */
     public function renderLearnerList(array $atts = []): string
     {
+        if (!current_user_can('manage_learners')) {
+            return '<p>You do not have permission to access this content.</p>';
+        }
+
         $atts = shortcode_atts([
             'limit' => 10,
             'show_pagination' => true
@@ -468,6 +476,10 @@ class LearnerController extends BaseController
      */
     public function renderUpdateForm(array $atts = []): string
     {
+        if (!current_user_can('manage_learners')) {
+            return '<p>You do not have permission to access this content.</p>';
+        }
+
         $atts = shortcode_atts([
             'learner_id' => 0
         ], $atts);

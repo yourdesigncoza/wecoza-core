@@ -90,6 +90,12 @@ final class NotificationEmailer
         $body = $mailData['body'];
         $headers = $mailData['headers'];
 
+        // Validate recipient email before sending
+        if (!is_email($recipient)) {
+            wecoza_log("NotificationEmailer: Invalid recipient email for event {$eventId}", 'error');
+            return false;
+        }
+
         // Capture wp_mail_failed errors for debugging
         $lastMailError = null;
         $errorHandler = function (\WP_Error $error) use (&$lastMailError) {

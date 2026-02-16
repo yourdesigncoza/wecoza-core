@@ -19,18 +19,18 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Verify AJAX request has valid nonce
- * Security checks for learner AJAX handlers
+ * Verify AJAX request has valid nonce and capability
  *
- * @param bool $require_admin Whether admin capability is required
+ * @param string $nonce_action Action-specific nonce action name
+ * @param string $capability Required capability (default: manage_learners)
  * @return void Exits with JSON error if checks fail
  */
-function verify_learner_access(bool $require_admin = true): void {
-    if (!check_ajax_referer('learners_nonce', 'nonce', false)) {
+function verify_learner_access(string $nonce_action = 'learners_nonce', string $capability = 'manage_learners'): void {
+    if (!check_ajax_referer($nonce_action, 'nonce', false)) {
         wp_send_json_error(['message' => 'Security check failed']);
         exit;
     }
-    if ($require_admin && !current_user_can('manage_options')) {
+    if (!current_user_can($capability)) {
         wp_send_json_error(['message' => 'Unauthorized access']);
         exit;
     }
@@ -102,7 +102,7 @@ function generate_learner_table_rows(array $learners): string {
  */
 function handle_update_learner(): void {
     try {
-        verify_learner_access();
+        verify_learner_access('learners_nonce', 'manage_learners');
 
         $learner_id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         if (!$learner_id) {
@@ -154,7 +154,7 @@ function handle_update_learner(): void {
  */
 function handle_delete_learner(): void {
     try {
-        verify_learner_access();
+        verify_learner_access('learners_nonce', 'manage_learners');
 
         $learner_id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         if (!$learner_id) {
@@ -181,8 +181,8 @@ function handle_delete_learner(): void {
  */
 function handle_fetch_learners_data(): void {
     try {
-        // Allow non-admins to view learners list (read-only)
-        verify_learner_access(false);
+        // Require manage_learners capability for PII data access
+        verify_learner_access('learners_nonce', 'manage_learners');
 
         $learnerModels = get_learner_controller()->getLearnersWithMappings();
 
@@ -213,8 +213,8 @@ function handle_fetch_learners_data(): void {
  */
 function handle_fetch_dropdown_data(): void {
     try {
-        // Allow non-admins to fetch dropdown data (for forms)
-        verify_learner_access(false);
+        // Dropdown data (non-PII) requires only read capability
+        verify_learner_access('learners_nonce', 'read');
 
         $dropdownData = get_learner_controller()->getDropdownData();
 
@@ -264,7 +264,7 @@ function handle_fetch_dropdown_data(): void {
  */
 function handle_portfolio_deletion(): void {
     try {
-        verify_learner_access();
+        verify_learner_access('learners_nonce', 'manage_learners');
 
         $portfolio_id = filter_input(INPUT_POST, 'portfolio_id', FILTER_VALIDATE_INT);
         $learner_id = filter_input(INPUT_POST, 'learner_id', FILTER_VALIDATE_INT);

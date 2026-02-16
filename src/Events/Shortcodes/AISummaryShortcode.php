@@ -63,6 +63,10 @@ final class AISummaryShortcode
 
     public function render(array $atts = [], string $content = '', string $tag = ''): string
     {
+        if (!is_user_logged_in()) {
+            return '<p>' . esc_html__('You must be logged in to view this content.', 'wecoza-events') . '</p>';
+        }
+
         $atts = shortcode_atts([
             'limit' => self::DEFAULT_LIMIT,
             'layout' => self::LAYOUT_CARD,

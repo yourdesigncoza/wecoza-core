@@ -479,9 +479,12 @@ final class SettingsPage
             'email_context' => [],
         ]);
 
-        // Send test email to each recipient
+        // Send test email to each validated recipient
         $sent = 0;
         foreach ($recipients as $recipient) {
+            if (!is_email($recipient)) {
+                continue;
+            }
             $subject = '[TEST] ' . $mailData['subject'];
             if (wp_mail($recipient, $subject, $mailData['body'], $mailData['headers'])) {
                 $sent++;
