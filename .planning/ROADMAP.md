@@ -38,6 +38,11 @@ Phase 40 (TYPE+CONST) ───────────────────�
 
 **Goal:** Extract business logic from LearnerController, AgentsController, and ClientsController into dedicated service classes. Controllers should only handle input validation, service delegation, and response formatting.
 
+**Plans:** 3 plans (all Wave 1 — parallel)
+- [ ] 36-01-PLAN.md — LearnerService extraction (SVC-01)
+- [ ] 36-02-PLAN.md — AgentService extraction (SVC-02)
+- [ ] 36-03-PLAN.md — ClientService extraction (SVC-03, biggest DRY win)
+
 **Requirements:**
 - SVC-01: Learner business logic extracted from LearnerController to LearnerService
 - SVC-02: Agent business logic extracted from AgentsController to AgentService
