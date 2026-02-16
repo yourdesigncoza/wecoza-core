@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 36 — Service Layer Extraction
-Plan: 02 (completed)
-Status: In progress (2/3 plans complete)
-Last activity: 2026-02-16 — Completed 36-02: Agent Service Layer Extraction
+Plan: 03 (completed)
+Status: Complete (3/3 plans complete)
+Last activity: 2026-02-16 — Completed 36-03: Client Service Layer Extraction
 
-Progress: 0/6 phases complete (2 plans executed)
+Progress: 1/6 phases complete (3 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,12 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+
+**Phase 36-03 (2026-02-16):**
+- Consolidated duplicate form submission logic (~280 lines) into ClientService::handleClientSubmission()
+- Unified data sanitization from two near-identical methods into single service method
+- Service provides both CRUD wrappers and high-level business logic (form handling, export)
+- 83% reduction in saveClient() AJAX handler (120 → 24 lines)
 
 **Phase 36-02 (2026-02-16):**
 - AgentService owns AgentRepository (not shared across layers)
@@ -78,7 +84,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 36-02-PLAN.md — AgentService extracted, controller reduced from 95 to 67 lines
-Resume file: .planning/phases/36-service-layer-extraction/36-02-SUMMARY.md
+Stopped at: Completed 36-03-PLAN.md — ClientService extracted, 280+ lines of duplicate code eliminated
+Resume file: .planning/phases/36-service-layer-extraction/36-03-SUMMARY.md
 
-**Next action:** Continue with 36-03 (final service extraction plan) or verify completed plans.
+**Next action:** Phase 36 complete. Review service layer extraction results or proceed to Phase 37 (if defined).
