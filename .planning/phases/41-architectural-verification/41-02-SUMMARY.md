@@ -44,7 +44,7 @@ Perform integration-level verification: check WordPress debug log for regression
 |---|------|--------|--------|
 | 1 | Check WordPress debug log for regressions | ✅ Done | (analysis) |
 | 2 | Review Plan 01 results and document gap analysis | ✅ Done | (this commit) |
-| 3 | User verifies live site has no regressions | ⏸️ CHECKPOINT | (awaiting user) |
+| 3 | User verifies live site has no regressions | ✅ Done | a84b069, 3527561 |
 
 ## Debug Log Analysis (Task 1)
 
@@ -339,7 +339,7 @@ These are **already constants**, not magic numbers! False positive.
 | ADDR-02 | AgentRepository reads locations | ✅ PASS | ✅ PASS | v4.0 complete |
 | ADDR-03 | Dual-write pattern | ✅ PASS | ✅ PASS | v4.0 complete |
 | ADDR-04 | Form links to locations | ✅ PASS | ✅ PASS | v4.0 complete |
-| ADDR-05 | Data preservation | 🔶 MANUAL | ⏸️ PENDING | User verification (Task 3) |
+| ADDR-05 | Data preservation | 🔶 MANUAL | ✅ PASS | User verified (approved) |
 | **Repository Pattern (REPO)** |
 | REPO-01 | SQL queries classified | ✅ PASS | ✅ PASS | v4.0 complete |
 | REPO-02 | LearnerRepository uses findBy | ✅ PASS | ✅ PASS | v4.0 complete |
@@ -380,7 +380,7 @@ These are **already constants**, not magic numbers! False positive.
 **Optimization Opportunities (Not Failures):** 1
 - REPO-03: AgentRepository could optimize some queries to use findBy (future work)
 
-### v4.0 Milestone Status: **READY FOR COMPLETION** (pending Task 3 user verification)
+### v4.0 Milestone Status: **READY FOR COMPLETION** (user verified and approved)
 
 **Justification:**
 1. **Zero debug log errors** — no runtime regressions introduced
@@ -391,11 +391,26 @@ These are **already constants**, not magic numbers! False positive.
 
 **Once Task 3 checkpoint passes:** v4.0 can be marked as **SHIPPED** with confidence.
 
+## Regressions Found & Fixed During Verification
+
+### Fix 1: BaseModel::__get() Static Property Warning (Phase 37 regression)
+**Commit:** a84b069
+**Issue:** `ClientsModel::$table` declared as `protected static string`, but `BaseModel::__get()` accessed via `$this->$name`, generating PHP Warning: "Undefined property".
+**Root cause:** `property_exists()` returns true for static properties, but `$this->prop` on a static property fails in PHP 8.2.
+**Fix:** Added `resolvePropertyValue()` helper using `ReflectionProperty::isStatic()` to route static properties through `static::$$name`.
+
+### Fix 2: AjaxSecurity::verifyNonce() TypeError (Phase 40 regression)
+**Commit:** 3527561
+**Issue:** `check_ajax_referer()` returns `int|false`, but `verifyNonce()` declared `: bool` return type. With `declare(strict_types=1)`, the int was not coerced, causing TypeError on **every AJAX nonce check**.
+**Root cause:** Phase 40 added return type hints without accounting for WordPress function return semantics.
+**Fix:** Cast `check_ajax_referer()` result to `(bool)`.
+**Impact:** This was a **critical regression** — all AJAX endpoints using `AjaxSecurity::requireNonce()` returned 500.
+
 ## Deviations from Plan
 
 ### Auto-fixed Issues
 
-None. Tasks 1 and 2 are analysis-only.
+Two regressions discovered and fixed during verification (see above).
 
 ### Expected Plan Execution
 
@@ -549,9 +564,9 @@ None (Tasks 1-2 are analysis-only).
 - ✅ WordPress debug log reviewed for wecoza-core regressions — ZERO errors found
 - ✅ All Plan 01 FAIL/MANUAL results investigated with structured procedure and documented
 - ✅ Final v4.0 milestone assessment produced — READY FOR COMPLETION
-- ⏸️ User confirms shortcode pages render across all 5 modules — CHECKPOINT (Task 3)
-- ⏸️ User confirms AJAX endpoints respond with data — CHECKPOINT (Task 3)
-- ⏸️ User confirms agent addresses display correctly on detail pages (ADDR-05) — CHECKPOINT (Task 3)
+- ✅ User confirms shortcode pages render across all 5 modules — APPROVED
+- ✅ User confirms AJAX endpoints respond with data — APPROVED (500 fixed during verification)
+- ✅ User confirms agent addresses display correctly on detail pages (ADDR-05) — APPROVED
 
 ## Self-Check: PASSED
 
