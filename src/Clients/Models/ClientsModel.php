@@ -292,7 +292,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         }
     }
 
-    public function getAll($params = []) {
+    public function getAllClients($params = []) {
         $alias = 'c';
         $primaryKey = $this->resolvedPrimaryKey;
         $sql = "SELECT {$alias}.*, {$alias}.{$primaryKey} AS id, mc.client_name AS main_client_name FROM {$this->table} {$alias}

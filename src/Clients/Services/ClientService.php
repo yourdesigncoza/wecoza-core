@@ -329,7 +329,7 @@ class ClientService
      */
     public function getClients(array $params = []): array
     {
-        return $this->model->getAll($params);
+        return $this->model->getAllClients($params);
     }
 
     /**
@@ -363,7 +363,7 @@ class ClientService
      */
     public function searchClients(string $search, int $limit = 10): array
     {
-        return $this->model->getAll([
+        return $this->model->getAllClients([
             'search' => $search,
             'limit' => $limit,
         ]);
@@ -545,7 +545,7 @@ class ClientService
      */
     public function exportClientsAsCsv(): array
     {
-        $clients = $this->model->getAll();
+        $clients = $this->model->getAllClients();
 
         $headers = [
             'ID',

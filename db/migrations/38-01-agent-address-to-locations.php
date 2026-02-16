@@ -23,7 +23,7 @@ declare(strict_types=1);
 $dryRun = in_array('--dry-run', $argv, true);
 
 // Bootstrap WordPress
-$wpLoadPath = dirname(__DIR__, 4) . '/wp-load.php';
+$wpLoadPath = dirname(__DIR__, 5) . '/wp-load.php';
 if (!file_exists($wpLoadPath)) {
     echo "ERROR: WordPress wp-load.php not found at: {$wpLoadPath}\n";
     exit(1);
