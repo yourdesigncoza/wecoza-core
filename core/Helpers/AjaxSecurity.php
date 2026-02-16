@@ -39,7 +39,7 @@ class AjaxSecurity
         if (!function_exists('check_ajax_referer')) {
             return false;
         }
-        return check_ajax_referer($action, $field, false);
+        return (bool) check_ajax_referer($action, $field, false);
     }
 
     /**
