@@ -113,6 +113,12 @@ Plans:
 
 **Goal:** Replace manual SQL queries with BaseRepository findBy/updateBy/deleteBy methods where appropriate. Document justified bypasses for complex queries.
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 39-01-PLAN.md — SQL audit + refactor LearnerRepository and ClientRepository (REPO-01, REPO-02, REPO-04)
+- [ ] 39-02-PLAN.md — Refactor AgentRepository, ClassRepository, ClassEventRepository + quoteIdentifier + bypass docs (REPO-03, REPO-05, REPO-06)
+
 **Requirements:**
 - REPO-01: Audit identifies all direct SQL queries bypassing BaseRepository methods
 - REPO-02: LearnerRepository uses findBy/updateBy/deleteBy where appropriate
