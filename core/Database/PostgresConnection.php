@@ -44,11 +44,6 @@ class PostgresConnection
     private array $connectionInfo = [];
 
     /**
-     * Whether connection has been attempted
-     */
-    private bool $connectionAttempted = false;
-
-    /**
      * Cache for table column metadata (avoids repeated information_schema queries)
      */
     private array $tableColumnsCache = [];
@@ -84,14 +79,12 @@ class PostgresConnection
      */
     private function connect(): void
     {
-        // Skip if already connected or connection already attempted
-        if ($this->pdo !== null || $this->connectionAttempted) {
+        // Skip if already connected
+        if ($this->pdo !== null) {
             return;
         }
 
-        $this->connectionAttempted = true;
-
-        // Check if WordPress functions are available
+        // Check if WordPress functions are available (will retry on next query)
         if (!function_exists('get_option')) {
             error_log('WeCoza Core: WordPress not ready - deferring database connection');
             return;
@@ -656,7 +649,6 @@ class PostgresConnection
 
         return array_merge($this->connectionInfo, [
             'connected' => $this->pdo !== null,
-            'connection_attempted' => $this->connectionAttempted,
         ]);
     }
 
