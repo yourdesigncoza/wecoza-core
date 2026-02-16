@@ -220,31 +220,16 @@ function handle_fetch_dropdown_data(): void {
 
         $dropdownData = get_learner_controller()->getDropdownData();
 
-        // Transform data for frontend format
-        $cities = array_map(function($city) {
-            return ['id' => $city['location_id'], 'name' => $city['town']];
-        }, $dropdownData['cities']);
-
-        $provinces = array_map(function($province) {
-            return ['id' => $province['location_id'], 'name' => $province['province']];
-        }, $dropdownData['provinces']);
-
-        $qualifications = array_map(function($qualification) {
-            return ['id' => $qualification['id'], 'name' => $qualification['qualification']];
-        }, $dropdownData['qualifications']);
-
-        $employers = array_map(function($employer) {
-            return ['id' => $employer['employer_id'], 'name' => $employer['employer_name']];
-        }, $dropdownData['employers']);
+        // Transform data for frontend dropdown format
+        $cities         = wecoza_transform_dropdown($dropdownData['cities'], 'location_id', 'town');
+        $provinces      = wecoza_transform_dropdown($dropdownData['provinces'], 'location_id', 'province');
+        $qualifications = wecoza_transform_dropdown($dropdownData['qualifications'], 'id', 'qualification');
+        $employers      = wecoza_transform_dropdown($dropdownData['employers'], 'employer_id', 'employer_name');
 
         // Structure placement levels for frontend
         $placement_levels_data = [
-            'numeracy_levels' => array_values(array_map(function($level) {
-                return ['id' => $level['placement_level_id'], 'name' => $level['level']];
-            }, $dropdownData['numeracy_levels'])),
-            'communication_levels' => array_values(array_map(function($level) {
-                return ['id' => $level['placement_level_id'], 'name' => $level['level']];
-            }, $dropdownData['communication_levels']))
+            'numeracy_levels'      => array_values(wecoza_transform_dropdown($dropdownData['numeracy_levels'], 'placement_level_id', 'level')),
+            'communication_levels' => array_values(wecoza_transform_dropdown($dropdownData['communication_levels'], 'placement_level_id', 'level')),
         ];
 
         wp_send_json_success([

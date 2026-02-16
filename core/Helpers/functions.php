@@ -411,6 +411,27 @@ if (!function_exists('wecoza_admin_exception_details')) {
 |--------------------------------------------------------------------------
 */
 
+if (!function_exists('wecoza_transform_dropdown')) {
+    /**
+     * Transform an array of associative arrays into a standardised dropdown format.
+     *
+     * Replaces repetitive array_map calls that convert varying key names
+     * (e.g. 'location_id'/'town') into a consistent ['id' => …, 'name' => …] shape.
+     *
+     * @param array  $data      Source data rows.
+     * @param string $idField   Key to use as the 'id' value.
+     * @param string $nameField Key to use as the 'name' value.
+     * @return array Transformed array with 'id' and 'name' keys.
+     */
+    function wecoza_transform_dropdown(array $data, string $idField, string $nameField): array
+    {
+        return array_map(fn($item) => [
+            'id'   => $item[$idField],
+            'name' => $item[$nameField],
+        ], $data);
+    }
+}
+
 if (!function_exists('wecoza_sanitize_value')) {
     /**
      * Sanitize a value based on type
