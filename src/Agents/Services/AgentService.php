@@ -111,6 +111,7 @@ class AgentService
      * Orchestrates the complete form submission workflow:
      * - Collects and sanitizes form data
      * - Validates via AgentModel
+     * - Syncs address to locations table (dual-write)
      * - Saves to database via repository
      * - Handles file uploads
      *
@@ -140,6 +141,13 @@ class AgentService
                 'agent' => null,
                 'submitted_data' => $data,
             ];
+        }
+
+        // Sync address to locations table (dual-write)
+        $existingLocationId = $currentAgent['location_id'] ?? null;
+        $locationId = $this->syncAddressToLocation($data, $existingLocationId);
+        if ($locationId !== null) {
+            $data['location_id'] = $locationId;
         }
 
         // Save agent
@@ -413,6 +421,127 @@ class AgentService
         }
 
         return null;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Location Management (Dual-Write Support)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Sync agent address to locations table
+     *
+     * Implements dual-write pattern: creates or updates location record for agent address.
+     * Uses direct SQL via wecoza_db() to bypass LocationsModel validation (which requires
+     * non-null longitude/latitude, but agent forms don't capture coordinates).
+     *
+     * @param array $addressData Agent data containing address fields
+     * @param int|null $existingLocationId Existing location_id (for updates)
+     * @return int|null Location ID on success, null on failure or empty address
+     */
+    private function syncAddressToLocation(array $addressData, ?int $existingLocationId = null): ?int
+    {
+        // Map agent address fields to locations table fields
+        $locationData = [
+            'street_address' => trim($addressData['residential_address_line'] ?? ''),
+            'suburb' => trim($addressData['residential_suburb'] ?? ''),
+            'town' => trim($addressData['city'] ?? ''),
+            'province' => trim($addressData['province'] ?? ''),
+            'postal_code' => trim($addressData['residential_postal_code'] ?? ''),
+        ];
+
+        // Append address_line_2 if not empty
+        if (!empty($addressData['address_line_2'])) {
+            $locationData['street_address'] .= ', ' . trim($addressData['address_line_2']);
+        }
+
+        // If all address fields are empty, return null (no location to create)
+        if (empty($locationData['street_address']) &&
+            empty($locationData['suburb']) &&
+            empty($locationData['town']) &&
+            empty($locationData['province']) &&
+            empty($locationData['postal_code'])) {
+            return null;
+        }
+
+        try {
+            // If updating existing location
+            if ($existingLocationId !== null) {
+                $payload = [
+                    'street_address' => $locationData['street_address'],
+                    'suburb' => $locationData['suburb'],
+                    'town' => $locationData['town'],
+                    'province' => $locationData['province'],
+                    'postal_code' => $locationData['postal_code'],
+                    'updated_at' => current_time('mysql'),
+                ];
+
+                $result = wecoza_db()->update(
+                    'public.locations',
+                    $payload,
+                    'location_id = :id',
+                    [':id' => $existingLocationId]
+                );
+
+                if ($result !== false) {
+                    return $existingLocationId;
+                }
+
+                wecoza_log('Failed to update location ' . $existingLocationId, 'warning');
+                return null;
+            }
+
+            // Check for existing duplicate via direct SQL
+            $sql = "SELECT location_id FROM public.locations
+                    WHERE LOWER(street_address) = LOWER(:street_address)
+                      AND LOWER(suburb) = LOWER(:suburb)
+                      AND LOWER(town) = LOWER(:town)
+                      AND LOWER(province) = LOWER(:province)
+                      AND postal_code = :postal_code
+                    LIMIT 1";
+
+            $params = [
+                ':street_address' => $locationData['street_address'],
+                ':suburb' => $locationData['suburb'],
+                ':town' => $locationData['town'],
+                ':province' => $locationData['province'],
+                ':postal_code' => $locationData['postal_code'],
+            ];
+
+            $existing = wecoza_db()->getRow($sql, $params);
+
+            // If exact match found, reuse that location_id
+            if ($existing) {
+                return (int) $existing['location_id'];
+            }
+
+            // Create new location via direct SQL
+            $payload = [
+                'street_address' => $locationData['street_address'],
+                'suburb' => $locationData['suburb'],
+                'town' => $locationData['town'],
+                'province' => $locationData['province'],
+                'postal_code' => $locationData['postal_code'],
+                'longitude' => null,
+                'latitude' => null,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ];
+
+            $locationId = wecoza_db()->insert('public.locations', $payload);
+
+            if ($locationId) {
+                return (int) $locationId;
+            }
+
+            wecoza_log('Failed to create location record', 'warning');
+            return null;
+
+        } catch (\Exception $e) {
+            wecoza_log('Location sync error: ' . $e->getMessage(), 'error');
+            return null;
+        }
     }
 
     /*
