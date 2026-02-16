@@ -128,17 +128,9 @@ add_action('wp_enqueue_scripts', function () {
         true
     );
 
-    // Localize script with action-specific nonces
     wp_localize_script('wecoza-learners-app', 'WeCozaLearners', [
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('learners_nonce'),
-        'nonces' => [
-            'update_learner' => wp_create_nonce('learners_nonce'),
-            'delete_learner' => wp_create_nonce('learners_nonce'),
-            'delete_portfolio' => wp_create_nonce('learners_nonce'),
-            'fetch_data' => wp_create_nonce('learners_nonce'),
-            'fetch_dropdown' => wp_create_nonce('learners_nonce'),
-        ],
         'plugin_url' => WECOZA_CORE_URL,
         'uploads_url' => wp_upload_dir()['baseurl'],
         'home_url' => home_url(),

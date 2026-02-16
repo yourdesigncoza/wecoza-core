@@ -226,8 +226,8 @@ class LearnerController extends BaseController
             return;
         }
 
-        // Verify CSRF token - action-specific nonce for read operations
-        $this->requireNonce('get_learner_ajax');
+        // Verify CSRF token
+        $this->requireNonce('learners_nonce');
 
         $id = $this->input('id', 'int') ?? $this->query('id', 'int');
 
@@ -256,8 +256,8 @@ class LearnerController extends BaseController
             return;
         }
 
-        // Verify CSRF token - action-specific nonce for list operations
-        $this->requireNonce('list_learners_ajax');
+        // Verify CSRF token
+        $this->requireNonce('learners_nonce');
 
         $limit = $this->query('limit', 'int') ?? 50;
         $offset = $this->query('offset', 'int') ?? 0;
@@ -290,7 +290,7 @@ class LearnerController extends BaseController
             return;
         }
 
-        $this->requireNonce('update_learner_ajax');
+        $this->requireNonce('learners_nonce');
 
         $id = $this->input('id', 'int');
 
@@ -348,7 +348,7 @@ class LearnerController extends BaseController
             return;
         }
 
-        $this->requireNonce('delete_learner_ajax');
+        $this->requireNonce('learners_nonce');
 
         $id = $this->input('id', 'int');
 
@@ -391,7 +391,7 @@ class LearnerController extends BaseController
                 <small>MVC Controller - For full form use: <code>[wecoza_learners_form]</code></small>
             </p>
             <form id="<?php echo esc_attr($atts['form_id']); ?>" method="post" class="needs-validation" novalidate>
-                <?php wp_nonce_field('create_learner_ajax', 'nonce'); ?>
+                <?php wp_nonce_field('learners_nonce', 'nonce'); ?>
 
                 <div class="row g-3">
                     <div class="col-md-6">
