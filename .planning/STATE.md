@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 37 — Model Architecture Unification
+Phase: 38 — Address Storage Normalization
 Plan: 02 (completed)
 Status: Complete (2/2 plans complete)
-Last activity: 2026-02-16 — Completed 37-02: AgentModel BaseModel Migration
+Last activity: 2026-02-16 — Completed 38-02: Agent Address Dual-Read/Dual-Write Implementation
 
-Progress: 2/6 phases complete (5 plans executed)
+Progress: 3/6 phases complete (7 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,11 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+**Phase 38-02 (2026-02-16):**
+- Use direct SQL via wecoza_db() instead of LocationsModel to bypass longitude/latitude validation
+- Concatenate address_line_2 into street_address when syncing to locations table
+- Graceful degradation: location sync failure doesn't block agent save
+
 **Phase 37-02 (2026-02-16):**
 - Override BaseModel constructor with empty array to skip hydration (data-bag pattern)
 - Keep get()/set() methods distinct from BaseModel (BaseModel has no such methods)
@@ -64,6 +69,9 @@ See: .planning/MILESTONES.md for full details
 - AJAX handlers maintain backward compatibility with legacy action names
 
 Full decision log in PROJECT.md Key Decisions table.
+- [Phase 38-02]: Use direct SQL via wecoza_db() instead of LocationsModel to bypass longitude/latitude validation
+- [Phase 38-02]: Concatenate address_line_2 into street_address when syncing to locations table
+- [Phase 38-02]: Graceful degradation: location sync failure doesn't block agent save
 
 ### Pending Todos
 
@@ -96,7 +104,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 37-02-PLAN.md — AgentModel migrated to extend BaseModel
-Resume file: .planning/phases/37-model-architecture-unification/37-02-SUMMARY.md
+Stopped at: Completed 38-02-PLAN.md — Agent address dual-read/dual-write implementation
+Resume file: .planning/phases/38-address-storage-normalization/38-02-SUMMARY.md
 
-**Next action:** Phase 37 complete (2/2 plans). All models (ClientsModel, AgentModel, LearnerModel) now extend BaseModel.
+**Next action:** Phase 38 complete (2/2 plans). Agents now use shared locations table with dual-read/dual-write pattern.
