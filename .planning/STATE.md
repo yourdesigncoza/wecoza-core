@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 37 — Model Architecture Unification
-Plan: 01 (completed)
-Status: In progress (1/? plans complete)
-Last activity: 2026-02-16 — Completed 37-01: ClientsModel Architecture Unification
+Plan: 02 (completed)
+Status: Complete (2/2 plans complete)
+Last activity: 2026-02-16 — Completed 37-02: AgentModel BaseModel Migration
 
-Progress: 1/6 phases complete (4 plans executed)
+Progress: 2/6 phases complete (5 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,12 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+**Phase 37-02 (2026-02-16):**
+- Override BaseModel constructor with empty array to skip hydration (data-bag pattern)
+- Keep get()/set() methods distinct from BaseModel (BaseModel has no such methods)
+- Consolidate to_array() into toArray() override with backward-compatible alias
+- Change save() return type from bool|int to bool (BaseModel abstract requires bool)
+
 
 **Phase 37-01 (2026-02-16):**
 - Preserved column-resolution mechanism as instance properties (runtime schema introspection)
@@ -90,7 +96,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 37-01-PLAN.md — ClientsModel migrated to extend BaseModel with zero consumer changes
-Resume file: .planning/phases/37-model-architecture-unification/37-01-SUMMARY.md
+Stopped at: Completed 37-02-PLAN.md — AgentModel migrated to extend BaseModel
+Resume file: .planning/phases/37-model-architecture-unification/37-02-SUMMARY.md
 
-**Next action:** Continue Phase 37 with additional model migrations (AgentModel, etc.) or proceed to next phase.
+**Next action:** Phase 37 complete (2/2 plans). All models (ClientsModel, AgentModel, LearnerModel) now extend BaseModel.
