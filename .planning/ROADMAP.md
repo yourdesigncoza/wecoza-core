@@ -10,7 +10,7 @@
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
 | 36 | Service Layer Extraction | Complete    | 2026-02-16 | 4 |
-| 37 | Model Architecture Unification | ClientsModel and AgentModel extend BaseModel — no duplicate methods | MDL-01..04 | 4 |
+| 37 | Model Architecture Unification | Complete    | 2026-02-16 | 4 |
 | 38 | Address Storage Normalization | Agent addresses migrated to shared locations table with dual-write | ADDR-01..05 | 5 |
 | 39 | Repository Pattern Enforcement | All repositories use BaseRepository methods — manual SQL only for complex queries | REPO-01..06 | 4 |
 | 40 | Return Type Hints & Constants | All public methods typed, all magic numbers extracted to constants | TYPE-01..05, CONST-01..04 | 5 |
@@ -62,7 +62,7 @@ Phase 40 (TYPE+CONST) ───────────────────�
 
 **Goal:** Make ClientsModel and AgentModel extend BaseModel, removing all duplicate get/set/toArray methods and using the shared validation framework.
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 37-01-PLAN.md — ClientsModel extends BaseModel with ArrayAccess for backward-compatible array syntax (MDL-01)
