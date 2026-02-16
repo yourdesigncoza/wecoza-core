@@ -170,6 +170,12 @@ Plans:
 
 **Goal:** End-to-end validation that all 28 requirements are met, no regressions introduced, and architecture improvements are complete.
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 41-01-PLAN.md — Automated static verification of all 28 requirements (SVC, MDL, ADDR, REPO, TYPE, CONST)
+- [ ] 41-02-PLAN.md — Debug log regression check, gap analysis, user verification checkpoint
+
 **Requirements:** Validates all 28 requirements (SVC-01..04, MDL-01..04, ADDR-01..05, REPO-01..06, TYPE-01..05, CONST-01..04)
 
 **Success Criteria:**
