@@ -49,7 +49,7 @@ class ProgressionService
             }
 
             // Put current LP on hold
-            $holdNotes = "Put on hold - learner assigned to new class. " . date('Y-m-d H:i:s');
+            $holdNotes = "Put on hold - learner assigned to new class. " . current_time('mysql');
             $current->putOnHold($holdNotes);
         }
 
@@ -58,7 +58,7 @@ class ProgressionService
             'product_id' => $productId,
             'class_id' => $classId,
             'status' => 'in_progress',
-            'start_date' => date('Y-m-d'),
+            'start_date' => wp_date('Y-m-d'),
             'notes' => $notes,
         ]);
 
@@ -213,7 +213,7 @@ class ProgressionService
             $db->query($sql, [
                 'learner_id' => $progression->getLearnerId(),
                 'product_id' => $progression->getProductId(),
-                'date' => date('Y-m-d'),
+                'date' => wp_date('Y-m-d'),
                 'notes' => 'LP completed: ' . ($progression->getNotes() ?? '')
             ]);
         } catch (Exception $e) {

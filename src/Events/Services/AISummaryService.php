@@ -37,7 +37,7 @@ final class AISummaryService
 {
     use DataObfuscator;
 
-    private const TIMEOUT_SECONDS = 60;
+    private const TIMEOUT_SECONDS = 30;
 
     /**
      * @var callable
@@ -418,7 +418,12 @@ final class AISummaryService
             return 'Unknown error.';
         }
 
-        $message = preg_replace('/sk-[A-Za-z0-9]{20,}/', 'sk-REDACTED', $message) ?? $message;
+        // Redact OpenAI API keys (sk-... and sk-proj-... patterns)
+        $message = preg_replace('/sk-[A-Za-z0-9\-_]{20,}/', 'sk-REDACTED', $message) ?? $message;
+        // Redact Bearer tokens
+        $message = preg_replace('/Bearer\s+[A-Za-z0-9\-_\.]{20,}/', 'Bearer REDACTED', $message) ?? $message;
+        // Redact Authorization header values
+        $message = preg_replace('/Authorization:\s*[^\s,;]+/', 'Authorization: REDACTED', $message) ?? $message;
 
         return $message;
     }

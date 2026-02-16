@@ -24,6 +24,10 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_learners_form_shortcode($atts) {
+    if (!current_user_can('manage_learners')) {
+        return '<p>You do not have permission to access this content.</p>';
+    }
+
     // Initialize variables for form errors and data
     $form_error = false;
     $error_messages = [];
@@ -68,8 +72,8 @@ function wecoza_learners_form_shortcode($atts) {
             'employer_id' => intval($_POST['employer_id']),
             'disability_status' => isset($_POST['disability_status']) && $_POST['disability_status'] !== '' ? (int) filter_var($_POST['disability_status'], FILTER_VALIDATE_BOOLEAN) : 0,
             'scanned_portfolio' => $scanned_portfolio_path,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
         ];
 
         // Validate SA ID or Passport

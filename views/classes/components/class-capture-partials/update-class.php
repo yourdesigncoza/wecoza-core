@@ -298,7 +298,7 @@ if (isset($data['class_data']) && $data['class_data']):
                         <td class="py-2">
                            <p class="fw-semibold mb-0">
                               <?php if (!empty($data['class_data']['original_start_date'])): ?>
-                                 <?php echo esc_html(date('M j, Y', strtotime($data['class_data']['original_start_date']))); ?>
+                                 <?php echo esc_html(wp_date('M j, Y', strtotime($data['class_data']['original_start_date']))); ?>
                               <?php else: ?>
                                  <span class="text-muted">N/A</span>
                               <?php endif; ?>
@@ -605,8 +605,8 @@ if (isset($data['class_data']) && $data['class_data']):
                               $interval = 30 * 60; // 30 minutes in seconds
 
                               for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . date('g:i A', $time) . '</option>';
+                                 $timeStr = wp_date('H:i', $time);
+                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
                               }
                               ?>
                         </select>
@@ -623,8 +623,8 @@ if (isset($data['class_data']) && $data['class_data']):
                               $interval = 30 * 60; // 30 minutes in seconds
 
                               for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . date('g:i A', $time) . '</option>';
+                                 $timeStr = wp_date('H:i', $time);
+                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
                               }
                               ?>
                         </select>
@@ -933,7 +933,7 @@ if (isset($data['class_data']) && $data['class_data']):
       // Load public holidays data for the schedule form
       try {
           $publicHolidaysController = \WeCoza\Classes\Controllers\PublicHolidaysController::getInstance();
-          $currentYear = date('Y');
+          $currentYear = wp_date('Y');
           $nextYear = $currentYear + 1;
           
           // Get holidays for current and next year to cover class schedules

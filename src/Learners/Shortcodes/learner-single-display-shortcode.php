@@ -21,6 +21,10 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_single_learner_display_shortcode() {
+    if (!current_user_can('manage_learners')) {
+        return '<p>You do not have permission to view this content.</p>';
+    }
+
     // Get learner ID from URL
     $learner_id = isset($_GET['learner_id']) ? intval($_GET['learner_id']) : 0;
 
@@ -417,7 +421,7 @@ function wecoza_single_learner_display_shortcode() {
                                         </td>
                                         <td class="py-2">
                                             <p class="fw-semibold mb-0">
-                                                <?php echo date('F j, Y g:i a', strtotime($learner->created_at)); ?>
+                                                <?php echo wp_date('F j, Y g:i a', strtotime($learner->created_at)); ?>
                                             </p>
                                         </td>
                                     </tr>
@@ -433,7 +437,7 @@ function wecoza_single_learner_display_shortcode() {
                                         </td>
                                         <td class="py-2">
                                             <p class="fw-semibold mb-0">
-                                                <?php echo date('F j, Y g:i a', strtotime($learner->updated_at)); ?>
+                                                <?php echo wp_date('F j, Y g:i a', strtotime($learner->updated_at)); ?>
                                             </p>
                                         </td>
                                     </tr>
@@ -463,7 +467,7 @@ function wecoza_single_learner_display_shortcode() {
                                         <td class="py-2">
                                             <p class="fw-semibold mb-0">
                                                 <?php echo !empty($learner->placement_assessment_date) ?
-                                                    date('F j, Y', strtotime($learner->placement_assessment_date)) :
+                                                    wp_date('F j, Y', strtotime($learner->placement_assessment_date)) :
                                                     'Not assessed'; ?>
                                             </p>
                                         </td>
@@ -550,7 +554,7 @@ function wecoza_single_learner_display_shortcode() {
                                                 Portfolio <?php echo $index + 1; ?>
                                                 <?php if (!empty($portfolio['upload_date'])): ?>
                                                     <small class="text-muted ms-2">
-                                                        (Uploaded: <?php echo date('Y-m-d', strtotime($portfolio['upload_date'])); ?>)
+                                                        (Uploaded: <?php echo wp_date('Y-m-d', strtotime($portfolio['upload_date'])); ?>)
                                                     </small>
                                                 <?php endif; ?>
                                             </div>

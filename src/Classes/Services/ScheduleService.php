@@ -242,8 +242,9 @@ class ScheduleService
         string $classSubject
     ): array {
         $events = [];
-        $start = new DateTime($startDate);
-        $end = new DateTime($deliveryDate);
+        $tz = wp_timezone();
+        $start = new DateTime($startDate, $tz);
+        $end = new DateTime($deliveryDate, $tz);
         $interval = new DateInterval('P1D');
         $period = new DatePeriod($start, $interval, $end);
 
@@ -321,7 +322,7 @@ class ScheduleService
             foreach ($scheduleData as $key => $schedule) {
                 if (is_numeric($key) && is_array($schedule) && isset($schedule['date']) && isset($schedule['start_time']) && isset($schedule['end_time'])) {
                     $duration = $this->calculateEventDuration($schedule['start_time'], $schedule['end_time']);
-                    $dayName = $schedule['day'] ?? date('l', strtotime($schedule['date']));
+                    $dayName = $schedule['day'] ?? wp_date('l', strtotime($schedule['date']));
 
                     $events[] = [
                         'id' => 'class_' . $class['class_id'] . '_' . $schedule['date'],
@@ -344,8 +345,9 @@ class ScheduleService
         } else {
             // Handle pattern-based generation
             $pattern = $scheduleData['pattern'] ?? 'weekly';
-            $startDate = isset($scheduleData['startDate']) ? new DateTime($scheduleData['startDate']) : null;
-            $endDate = isset($scheduleData['endDate']) ? new DateTime($scheduleData['endDate']) : null;
+            $tz = wp_timezone();
+            $startDate = isset($scheduleData['startDate']) ? new DateTime($scheduleData['startDate'], $tz) : null;
+            $endDate = isset($scheduleData['endDate']) ? new DateTime($scheduleData['endDate'], $tz) : null;
             $timeData = $scheduleData['timeData'] ?? [];
             $selectedDays = $scheduleData['selectedDays'] ?? [];
 
@@ -375,7 +377,7 @@ class ScheduleService
 
                 foreach ($scheduleEntries as $schedule) {
                     if (isset($schedule['date']) && isset($schedule['start_time']) && isset($schedule['end_time'])) {
-                        $date = new DateTime($schedule['date']);
+                        $date = new DateTime($schedule['date'], $tz);
                         $dayName = $date->format('l');
 
                         $events[] = [
@@ -505,8 +507,9 @@ class ScheduleService
                     ];
 
                     try {
-                        $currentDate = new DateTime($stopDate);
-                        $endDate = new DateTime($restartDate);
+                        $tz = wp_timezone();
+                        $currentDate = new DateTime($stopDate, $tz);
+                        $endDate = new DateTime($restartDate, $tz);
                         $currentDate->add(new DateInterval('P1D'));
 
                         while ($currentDate < $endDate) {

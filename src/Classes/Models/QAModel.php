@@ -34,10 +34,10 @@ class QAModel
         $data = [];
 
         if (empty($start_date)) {
-            $start_date = date('Y-m-01', strtotime('-6 months'));
+            $start_date = wp_date('Y-m-01', strtotime('-6 months'));
         }
         if (empty($end_date)) {
-            $end_date = date('Y-m-t');
+            $end_date = wp_date('Y-m-t');
         }
 
         $data['monthly_rates'] = $this->getMonthlyCompletionRates($start_date, $end_date);

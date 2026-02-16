@@ -139,6 +139,10 @@ class QAController extends BaseController
      */
     public function getQAAnalytics(): void
     {
+        if (!is_user_logged_in()) {
+            $this->sendError('Authentication required.', 401);
+            return;
+        }
         $this->requireNonce('qa_dashboard_nonce');
 
         $start_date = $this->input('start_date', 'string', '');
@@ -156,6 +160,10 @@ class QAController extends BaseController
      */
     public function getQASummary(): void
     {
+        if (!is_user_logged_in()) {
+            $this->sendError('Authentication required.', 401);
+            return;
+        }
         $this->requireNonce('qa_dashboard_nonce');
 
         $qa_model = new QAModel();
@@ -169,6 +177,10 @@ class QAController extends BaseController
      */
     public function getQAVisits(): void
     {
+        if (!is_user_logged_in()) {
+            $this->sendError('Authentication required.', 401);
+            return;
+        }
         $this->requireNonce('qa_dashboard_nonce');
 
         $class_id = $this->input('class_id', 'int', 0);
@@ -238,7 +250,7 @@ class QAController extends BaseController
         $export_data = $qa_model->getExportData($start_date, $end_date);
 
         if ($format === 'csv') {
-            $filename = sanitize_file_name('qa-reports-' . date('Y-m-d') . '.csv');
+            $filename = sanitize_file_name('qa-reports-' . wp_date('Y-m-d') . '.csv');
             header('Content-Type: text/csv');
             header('Content-Disposition: attachment; filename="' . $filename . '"');
 
@@ -412,6 +424,10 @@ class QAController extends BaseController
      */
     public function getClassQAData(): void
     {
+        if (!is_user_logged_in()) {
+            $this->sendError('Authentication required.', 401);
+            return;
+        }
         $this->requireNonce('wecoza_class_nonce');
 
         $class_id = $this->input('class_id', 'int', 0);

@@ -214,7 +214,7 @@ $editUrl = site_url($atts['edit_url'] ?? '/app/all-clients', is_ssl() ? 'https' 
                         <?php foreach ($clients as $client): ?>
                             <?php 
                             $statusClass = $statusBadgeMap[$client['client_status']] ?? 'badge-phoenix-info';
-                            $createdDate = !empty($client['created_at']) ? date('M j, Y', strtotime($client['created_at'])) : '';
+                            $createdDate = !empty($client['created_at']) ? wp_date('M j, Y', strtotime($client['created_at'])) : '';
                             $editLink = add_query_arg(['mode' => 'update', 'client_id' => $client['id']], $editUrl);
                             ?>
                             <tr data-client-id="<?php echo (int) $client['id']; ?>" data-client-name="<?php echo esc_attr($client['client_name']); ?>">

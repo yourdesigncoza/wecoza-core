@@ -139,7 +139,7 @@ class ClassModel extends BaseModel
             $db = wecoza_db();
             $db->beginTransaction();
 
-            $now = date('Y-m-d H:i:s');
+            $now = current_time('mysql');
             $this->setCreatedAt($now);
             $this->setUpdatedAt($now);
 
@@ -201,7 +201,7 @@ class ClassModel extends BaseModel
             $db = wecoza_db();
             $db->beginTransaction();
 
-            $this->setUpdatedAt(date('Y-m-d H:i:s'));
+            $this->setUpdatedAt(current_time('mysql'));
 
             // Prepare data for repository (uses column whitelisting for security)
             $data = [

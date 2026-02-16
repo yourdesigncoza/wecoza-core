@@ -350,7 +350,7 @@ class ViewHelpers {
         }
 
         $timestamp = strtotime($date);
-        return $timestamp ? date($format, $timestamp) : $date;
+        return $timestamp ? wp_date($format, $timestamp) : $date;
     }
 
     /**

@@ -94,7 +94,7 @@ final class EventDispatcher
         // Build event data
         $eventData = $this->buildEventData($newRow, $oldRow, $diff, [
             'changed_fields' => array_keys($diff),
-            'timestamp' => date('c'),
+            'timestamp' => wp_date('c'),
         ]);
 
         // Create DTO
@@ -138,7 +138,7 @@ final class EventDispatcher
         // Enrich event data with class reference
         $eventData['class_id'] = $classId;
         $eventData['metadata'] = [
-            'timestamp' => date('c'),
+            'timestamp' => wp_date('c'),
             'learner_id' => $learnerId,
         ];
 
@@ -192,7 +192,7 @@ final class EventDispatcher
 
         $eventData = $this->buildEventData($classData, null, $diff, [
             'changed_fields' => ['class_status'],
-            'timestamp' => date('c'),
+            'timestamp' => wp_date('c'),
             'status_transition' => "{$oldStatus} -> {$newStatus}",
         ]);
 

@@ -81,7 +81,7 @@ class PublicHolidaysController extends BaseController
      */
     public function getAllHolidayDates(): array
     {
-        $currentYear = (int) date('Y');
+        $currentYear = (int) wp_date('Y');
         $nextYear = $currentYear + 1;
 
         $currentYearHolidays = $this->getHolidaysByYear($currentYear);
@@ -115,8 +115,8 @@ class PublicHolidaysController extends BaseController
      */
     public function getHolidaysInRange(string $startDate, string $endDate): array
     {
-        $startYear = (int) date('Y', strtotime($startDate));
-        $endYear = (int) date('Y', strtotime($endDate));
+        $startYear = (int) wp_date('Y', strtotime($startDate));
+        $endYear = (int) wp_date('Y', strtotime($endDate));
 
         $holidays = [];
         for ($year = $startYear; $year <= $endYear; $year++) {
@@ -168,10 +168,10 @@ class PublicHolidaysController extends BaseController
             return;
         }
 
-        $year = intval($_POST['year'] ?? date('Y'));
+        $year = intval($_POST['year'] ?? wp_date('Y'));
 
         if ($year < 2020 || $year > 2030) {
-            $year = (int) date('Y');
+            $year = (int) wp_date('Y');
         }
 
         try {

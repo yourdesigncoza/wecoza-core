@@ -228,8 +228,8 @@
                               $interval = 30 * 60; // 30 minutes in seconds
 
                               for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . date('g:i A', $time) . '</option>';
+                                 $timeStr = wp_date('H:i', $time);
+                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
                               }
                               ?>
                         </select>
@@ -247,8 +247,8 @@
                               $interval = 30 * 60; // 30 minutes in seconds
 
                               for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . date('g:i A', $time) . '</option>';
+                                 $timeStr = wp_date('H:i', $time);
+                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
                               }
                               ?>
                         </select>

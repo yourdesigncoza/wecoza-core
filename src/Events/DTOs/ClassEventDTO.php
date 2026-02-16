@@ -196,7 +196,7 @@ final class ClassEventDTO
             aiSummary: $summary,
             notificationStatus: $this->notificationStatus,
             createdAt: $this->createdAt,
-            enrichedAt: $enrichedAt ?? date('c'),
+            enrichedAt: $enrichedAt ?? wp_date('c'),
             sentAt: $this->sentAt,
             viewedAt: $this->viewedAt,
             acknowledgedAt: $this->acknowledgedAt,
@@ -219,7 +219,7 @@ final class ClassEventDTO
             notificationStatus: 'sent',
             createdAt: $this->createdAt,
             enrichedAt: $this->enrichedAt,
-            sentAt: $sentAt ?? date('c'),
+            sentAt: $sentAt ?? wp_date('c'),
             viewedAt: $this->viewedAt,
             acknowledgedAt: $this->acknowledgedAt,
         );
@@ -242,7 +242,7 @@ final class ClassEventDTO
             createdAt: $this->createdAt,
             enrichedAt: $this->enrichedAt,
             sentAt: $this->sentAt,
-            viewedAt: $viewedAt ?? date('c'),
+            viewedAt: $viewedAt ?? wp_date('c'),
             acknowledgedAt: $this->acknowledgedAt,
         );
     }
@@ -265,7 +265,7 @@ final class ClassEventDTO
             enrichedAt: $this->enrichedAt,
             sentAt: $this->sentAt,
             viewedAt: $this->viewedAt,
-            acknowledgedAt: $acknowledgedAt ?? date('c'),
+            acknowledgedAt: $acknowledgedAt ?? wp_date('c'),
         );
     }
 

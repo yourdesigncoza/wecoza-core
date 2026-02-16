@@ -128,10 +128,17 @@ add_action('wp_enqueue_scripts', function () {
         true
     );
 
-    // Localize script
+    // Localize script with action-specific nonces
     wp_localize_script('wecoza-learners-app', 'WeCozaLearners', [
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('learners_nonce_action'),
+        'nonce' => wp_create_nonce('learners_nonce'),
+        'nonces' => [
+            'update_learner' => wp_create_nonce('learners_nonce'),
+            'delete_learner' => wp_create_nonce('learners_nonce'),
+            'delete_portfolio' => wp_create_nonce('learners_nonce'),
+            'fetch_data' => wp_create_nonce('learners_nonce'),
+            'fetch_dropdown' => wp_create_nonce('learners_nonce'),
+        ],
         'plugin_url' => WECOZA_CORE_URL,
         'uploads_url' => wp_upload_dir()['baseurl'],
         'home_url' => home_url(),
@@ -263,7 +270,7 @@ add_action('plugins_loaded', function () {
 
     // Action Scheduler Performance Tuning
     add_filter('action_scheduler_queue_runner_time_limit', function () {
-        return 60;  // 60 seconds (default is 30)
+        return 120;  // 120 seconds for AI enrichment processing
     });
 
     add_filter('action_scheduler_queue_runner_batch_size', function () {
@@ -272,74 +279,98 @@ add_action('plugins_loaded', function () {
 
     // Material Notification Cron Handler
     add_action('wecoza_material_notifications_check', function () {
-        if (!class_exists(\WeCoza\Events\Services\MaterialNotificationService::class)) {
-            return;
-        }
-
-        $service = new \WeCoza\Events\Services\MaterialNotificationService();
-
-        // Check and send 7-day (orange) notifications
-        $orangeClasses = $service->findOrangeStatusClasses();
-        if (!empty($orangeClasses)) {
-            $sentOrange = $service->sendMaterialNotifications($orangeClasses, 'orange');
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("WeCoza Material Cron: Sent {$sentOrange} orange (7-day) notifications");
+        try {
+            if (!class_exists(\WeCoza\Events\Services\MaterialNotificationService::class)) {
+                throw new \RuntimeException('MaterialNotificationService class not found');
             }
-        }
 
-        // Check and send 5-day (red) notifications
-        $redClasses = $service->findRedStatusClasses();
-        if (!empty($redClasses)) {
-            $sentRed = $service->sendMaterialNotifications($redClasses, 'red');
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("WeCoza Material Cron: Sent {$sentRed} red (5-day) notifications");
+            $service = new \WeCoza\Events\Services\MaterialNotificationService();
+
+            // Check and send 7-day (orange) notifications
+            $orangeClasses = $service->findOrangeStatusClasses();
+            if (!empty($orangeClasses)) {
+                $sentOrange = $service->sendMaterialNotifications($orangeClasses, 'orange');
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("WeCoza Material Cron: Sent {$sentOrange} orange (7-day) notifications");
+                }
             }
+
+            // Check and send 5-day (red) notifications
+            $redClasses = $service->findRedStatusClasses();
+            if (!empty($redClasses)) {
+                $sentRed = $service->sendMaterialNotifications($redClasses, 'red');
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("WeCoza Material Cron: Sent {$sentRed} red (5-day) notifications");
+                }
+            }
+        } catch (\Exception $e) {
+            wecoza_log('Material notification check failed: ' . $e->getMessage(), 'error');
+            throw $e;
         }
     });
 
     // Notification Processor Cron Handler (re-enabled for class_events table in Phase 18)
     add_action('wecoza_process_notifications', function () {
-        if (!class_exists(\WeCoza\Events\Services\NotificationProcessor::class)) {
-            return;
-        }
+        try {
+            if (!class_exists(\WeCoza\Events\Services\NotificationProcessor::class)) {
+                throw new \RuntimeException('NotificationProcessor class not found');
+            }
 
-        $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
-        $processor->process();
+            $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
+            $processor->process();
+        } catch (\Exception $e) {
+            wecoza_log('Notification processing failed: ' . $e->getMessage(), 'error');
+            throw $e; // Re-throw for Action Scheduler retry
+        }
     });
 
     // Action Scheduler Job Handlers for Async Notifications (re-enabled for class_events table in Phase 18)
     add_action('wecoza_process_event', function (int $eventId) {
-        if (!class_exists(\WeCoza\Events\Services\NotificationEnricher::class)) {
-            return;
-        }
-
-        $enricher = \WeCoza\Events\Services\NotificationEnricher::boot();
-        $result = $enricher->enrich($eventId);
-
-        if ($result['success'] && $result['should_email']) {
-            // Schedule email for each recipient
-            $recipients = $result['recipients'] ?? [];
-            foreach ($recipients as $recipient) {
-                as_enqueue_async_action(
-                    'wecoza_send_notification_email',
-                    [
-                        'event_id' => $eventId,
-                        'recipient' => $recipient,
-                        'email_context' => $result['email_context'],
-                    ],
-                    'wecoza-notifications'
-                );
+        try {
+            if (!class_exists(\WeCoza\Events\Services\NotificationEnricher::class)) {
+                throw new \RuntimeException('NotificationEnricher class not found');
             }
+
+            $enricher = \WeCoza\Events\Services\NotificationEnricher::boot();
+            $result = $enricher->enrich($eventId);
+
+            if (!$result['success']) {
+                throw new \RuntimeException($result['error'] ?? 'Enrichment failed');
+            }
+
+            if ($result['should_email']) {
+                // Schedule email for each recipient
+                $recipients = $result['recipients'] ?? [];
+                foreach ($recipients as $recipient) {
+                    as_enqueue_async_action(
+                        'wecoza_send_notification_email',
+                        [
+                            'event_id' => $eventId,
+                            'recipient' => $recipient,
+                            'email_context' => $result['email_context'],
+                        ],
+                        'wecoza-notifications'
+                    );
+                }
+            }
+        } catch (\Exception $e) {
+            wecoza_log("Event processing failed for ID {$eventId}: " . $e->getMessage(), 'error');
+            throw $e; // Re-throw for Action Scheduler retry
         }
     }, 10, 1);
 
     add_action('wecoza_send_notification_email', function (int $eventId, string $recipient, array $emailContext = []) {
-        if (!class_exists(\WeCoza\Events\Services\NotificationEmailer::class)) {
-            return;
-        }
+        try {
+            if (!class_exists(\WeCoza\Events\Services\NotificationEmailer::class)) {
+                throw new \RuntimeException('NotificationEmailer class not found');
+            }
 
-        $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
-        $emailer->send($eventId, $recipient, $emailContext);
+            $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
+            $emailer->send($eventId, $recipient, $emailContext);
+        } catch (\Exception $e) {
+            wecoza_log("Email sending failed for event {$eventId} to {$recipient}: " . $e->getMessage(), 'error');
+            throw $e; // Re-throw for Action Scheduler retry
+        }
     }, 10, 3);
 
     /*

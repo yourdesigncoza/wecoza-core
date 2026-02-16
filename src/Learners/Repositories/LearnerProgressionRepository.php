@@ -190,7 +190,7 @@ class LearnerProgressionRepository extends BaseRepository
         $filteredData = array_intersect_key($data, array_flip($columns));
 
         if (!isset($filteredData['start_date'])) {
-            $filteredData['start_date'] = date('Y-m-d');
+            $filteredData['start_date'] = wp_date('Y-m-d');
         }
         if (!isset($filteredData['status'])) {
             $filteredData['status'] = 'in_progress';
@@ -236,7 +236,7 @@ class LearnerProgressionRepository extends BaseRepository
         ];
 
         $filteredData = array_intersect_key($data, array_flip($columns));
-        $filteredData['updated_at'] = date('Y-m-d H:i:s');
+        $filteredData['updated_at'] = current_time('mysql');
 
         $setParts = [];
         foreach (array_keys($filteredData) as $column) {
@@ -286,7 +286,7 @@ class LearnerProgressionRepository extends BaseRepository
         ];
 
         $filteredData = array_intersect_key($data, array_flip($columns));
-        $filteredData['created_at'] = date('Y-m-d H:i:s');
+        $filteredData['created_at'] = current_time('mysql');
 
         $columnList = implode(', ', array_keys($filteredData));
         $placeholders = ':' . implode(', :', array_keys($filteredData));
@@ -361,7 +361,7 @@ class LearnerProgressionRepository extends BaseRepository
     public function getMonthlyProgressions(int $year, int $month): array
     {
         $startDate = sprintf('%04d-%02d-01', $year, $month);
-        $endDate = date('Y-m-t', strtotime($startDate));
+        $endDate = wp_date('Y-m-t', strtotime($startDate));
 
         $sql = "
             SELECT
@@ -515,7 +515,7 @@ class LearnerProgressionRepository extends BaseRepository
                 'file_type' => $fileData['file_type'] ?? null,
                 'file_size' => $fileData['file_size'] ?? null,
                 'uploaded_by' => $fileData['uploaded_by'] ?? null,
-                'uploaded_at' => date('Y-m-d H:i:s'),
+                'uploaded_at' => current_time('mysql'),
             ]);
             return (int) $stmt->fetchColumn();
         } catch (Exception $e) {

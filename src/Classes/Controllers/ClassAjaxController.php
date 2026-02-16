@@ -350,10 +350,10 @@ class ClassAjaxController extends BaseController
             }
 
             if (isset($note['created_at'])) {
-                $note['created_at'] = date('c', strtotime($note['created_at']));
+                $note['created_at'] = wp_date('c', strtotime($note['created_at']));
             }
             if (isset($note['updated_at'])) {
-                $note['updated_at'] = date('c', strtotime($note['updated_at']));
+                $note['updated_at'] = wp_date('c', strtotime($note['updated_at']));
             }
         }
 
@@ -387,8 +387,8 @@ class ClassAjaxController extends BaseController
                 [sanitize_text_field($note_data['category'] ?? '')],
             'priority' => sanitize_text_field($note_data['priority'] ?? ''),
             'author_id' => get_current_user_id(),
-            'created_at' => $note_data['created_at'] ?? date('c'),
-            'updated_at' => date('c'),
+            'created_at' => $note_data['created_at'] ?? wp_date('c'),
+            'updated_at' => wp_date('c'),
             'attachments' => $note_data['attachments'] ?? []
         ];
 
@@ -748,6 +748,11 @@ class ClassAjaxController extends BaseController
     {
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wecoza_class_nonce')) {
             wp_send_json_error('Invalid security token');
+            return;
+        }
+
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error('Insufficient permissions.', 403);
             return;
         }
 

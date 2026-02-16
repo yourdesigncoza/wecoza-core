@@ -533,7 +533,7 @@ class AgentsController extends BaseController
         // Try to parse with strtotime
         $timestamp = strtotime($date_value);
         if ($timestamp !== false) {
-            return date('Y-m-d', $timestamp);
+            return wp_date('Y-m-d', $timestamp);
         }
 
         return null;

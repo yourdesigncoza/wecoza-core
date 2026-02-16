@@ -224,7 +224,7 @@ if (!empty($class_notes_data)) {
                                  <i class="bi bi-calendar"></i>
                                  <?php
                                  if (!empty($note['created_at'])) {
-                                     echo date('M j, Y', strtotime($note['created_at']));
+                                     echo wp_date('M j, Y', strtotime($note['created_at']));
                                  } else {
                                      echo 'Unknown date';
                                  }

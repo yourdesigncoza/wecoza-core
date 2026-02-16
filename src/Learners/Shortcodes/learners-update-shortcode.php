@@ -21,6 +21,10 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_learners_update_form_shortcode($atts) {
+    if (!current_user_can('manage_learners')) {
+        return '<p>You do not have permission to access this content.</p>';
+    }
+
     // Retrieve the saved URL for the redirect
     $redirect_update_url = get_option('wecoza_learners_update_form_url');
 
@@ -114,7 +118,7 @@ function wecoza_learners_update_form_shortcode($atts) {
             'employer_id' => intval($_POST['employer_id']),
             'disability_status' => isset($_POST['disability_status']) ? (int)filter_var($_POST['disability_status'], FILTER_VALIDATE_BOOLEAN) : 0,
             'scanned_portfolio' => $learner->scanned_portfolio,
-            'updated_at' => date('Y-m-d H:i:s')
+            'updated_at' => current_time('mysql')
         ];
 
         // Proceed only if there are no errors
@@ -299,17 +303,21 @@ function wecoza_learners_update_form_shortcode($atts) {
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div id="id_fields_container" class="col-md-2">
                 <div id="sa_id_field" class="mb-3 <?php echo empty($learner->sa_id_no) ? 'd-none' : ''; ?>">
-                    <label for="sa_id_no" class="form-label">SA ID Number</label>
-                    <input type="text" id="sa_id_no" name="sa_id_no" class="form-control form-control-sm"
+                    <label for="sa_id_no" class="form-label">SA ID Number <span class="text-danger">*</span></label>
+                    <input type="text" id="sa_id_no" name="sa_id_no" class="form-control form-control-sm" maxlength="13"
                            value="<?php echo esc_attr($learner->sa_id_no); ?>">
+                    <div class="invalid-feedback">Please provide a valid SA ID number.</div>
+                    <div class="valid-feedback">Valid ID number!</div>
                 </div>
 
                 <div id="passport_field" class="mb-3 <?php echo empty($learner->passport_number) ? 'd-none' : ''; ?>">
-                    <label for="passport_number" class="form-label">Passport Number</label>
-                    <input type="text" id="passport_number" name="passport_number" class="form-control form-control-sm"
+                    <label for="passport_number" class="form-label">Passport Number <span class="text-danger">*</span></label>
+                    <input type="text" id="passport_number" name="passport_number" class="form-control form-control-sm" maxlength="12"
                            value="<?php echo esc_attr($learner->passport_number); ?>">
+                    <div class="invalid-feedback">Please provide a valid passport number.</div>
+                    <div class="valid-feedback">Valid passport number!</div>
                 </div>
             </div>
             <div class="col-md-2">
@@ -459,7 +467,7 @@ function wecoza_learners_update_form_shortcode($atts) {
                                 <div class="d-flex align-items-center mb-0 portfolio-item mt-4">
                                     <span class="me-2 small" style="font-size:12px">Portfolio <?php echo $index + 1; ?></span>
                                     <span class="text-muted me-2 small" style="font-size:12px">
-                                        (Uploaded: <?php echo date('Y-m-d', strtotime($portfolio['upload_date'])); ?>)
+                                        (Uploaded: <?php echo wp_date('Y-m-d', strtotime($portfolio['upload_date'])); ?>)
                                     </span>
                                     <button type="button"
                                             class="delete-portfolio btn btn-subtle-danger"

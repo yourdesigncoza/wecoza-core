@@ -228,7 +228,7 @@ class ClassController extends BaseController
 
         try {
             $publicHolidaysController = PublicHolidaysController::getInstance();
-            $currentYear = (int) date('Y');
+            $currentYear = (int) wp_date('Y');
             $nextYear = $currentYear + 1;
 
             $currentYearHolidays = $publicHolidaysController->getHolidaysForCalendar($currentYear);
@@ -277,6 +277,10 @@ class ClassController extends BaseController
      */
     public function captureClassShortcode($atts): string
     {
+        if (!is_user_logged_in()) {
+            return '<p>You must be logged in to access this content.</p>';
+        }
+
         $atts = shortcode_atts([
             'redirect_url' => '',
         ], $atts);
@@ -361,6 +365,10 @@ class ClassController extends BaseController
      */
     public function displayClassesShortcode($atts): string
     {
+        if (!is_user_logged_in()) {
+            return '<p>You must be logged in to access this content.</p>';
+        }
+
         $atts = shortcode_atts([
             'limit' => 50,
             'order_by' => 'created_at',
@@ -399,6 +407,10 @@ class ClassController extends BaseController
      */
     public function displaySingleClassShortcode($atts): string
     {
+        if (!is_user_logged_in()) {
+            return '<p>You must be logged in to access this content.</p>';
+        }
+
         $atts = shortcode_atts([
             'class_id' => 0,
             'show_loading' => true,
@@ -491,7 +503,7 @@ class ClassController extends BaseController
             return false;
         }
 
-        $currentDate = date('Y-m-d');
+        $currentDate = wp_date('Y-m-d');
 
         foreach ($stopRestartDates as $period) {
             if (!isset($period['stop_date']) || !isset($period['restart_date'])) {
@@ -515,17 +527,17 @@ class ClassController extends BaseController
     private function logDebugData(int $class_id, array $class_data): void
     {
         $upload_dir = wp_upload_dir();
-        $log_dir = $upload_dir['basedir'] . '/wecoza-logs/update-form/' . date('Y-m-d');
+        $log_dir = $upload_dir['basedir'] . '/wecoza-logs/update-form/' . wp_date('Y-m-d');
 
         if (!file_exists($log_dir)) {
             wp_mkdir_p($log_dir);
         }
 
-        $timestamp = date('H-i-s');
+        $timestamp = wp_date('H-i-s');
         $log_file = $log_dir . '/' . $timestamp . '-class-' . $class_id . '-data.json';
 
         $debug_data = [
-            'timestamp' => date('Y-m-d H:i:s'),
+            'timestamp' => current_time('mysql'),
             'class_id' => $class_id,
             'user_id' => get_current_user_id(),
             'request_uri' => $_SERVER['REQUEST_URI'] ?? '',
@@ -569,7 +581,7 @@ class ClassController extends BaseController
         $summary_file = $log_dir . '/' . $timestamp . '-class-' . $class_id . '-summary.log';
         $summary = "Update Form Debug Log\n";
         $summary .= "=====================\n";
-        $summary .= "Timestamp: " . date('Y-m-d H:i:s') . "\n";
+        $summary .= "Timestamp: " . current_time('mysql') . "\n";
         $summary .= "Class ID: $class_id\n";
         $summary .= "User ID: " . get_current_user_id() . "\n\n";
         $summary .= "Field Population Status:\n";

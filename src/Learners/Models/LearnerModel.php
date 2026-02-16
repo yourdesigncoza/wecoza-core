@@ -172,8 +172,8 @@ class LearnerModel extends BaseModel
     public function save(): bool
     {
         $data = $this->toDbArray(true);
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['updated_at'] = date('Y-m-d H:i:s');
+        $data['created_at'] = current_time('mysql');
+        $data['updated_at'] = current_time('mysql');
 
         unset($data['id']);
 
@@ -197,7 +197,7 @@ class LearnerModel extends BaseModel
         }
 
         $data = $this->toDbArray(true);
-        $data['updated_at'] = date('Y-m-d H:i:s');
+        $data['updated_at'] = current_time('mysql');
 
         return self::getRepository()->update($this->id, $data);
     }

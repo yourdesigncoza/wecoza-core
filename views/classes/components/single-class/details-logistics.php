@@ -41,7 +41,7 @@ $end_date = $end_date ?? null;
             <td class="py-2">
                <p class="fw-semibold mb-0">
                   <?php if (!empty($end_date)): ?>
-                  <?php echo esc_html(date('M j, Y', strtotime($end_date))); ?>
+                  <?php echo esc_html(wp_date('M j, Y', strtotime($end_date))); ?>
                   <?php else: ?>
                   <span class="text-muted">N/A</span>
                   <?php endif; ?>
@@ -60,7 +60,7 @@ $end_date = $end_date ?? null;
             <td class="py-2">
                <p class="fw-semibold mb-0">
                   <?php if (!empty($class['original_start_date'])): ?>
-                  <?php echo esc_html(date('M j, Y', strtotime($class['original_start_date']))); ?>
+                  <?php echo esc_html(wp_date('M j, Y', strtotime($class['original_start_date']))); ?>
                   <?php else: ?>
                   <span class="text-muted">N/A</span>
                   <?php endif; ?>
@@ -84,7 +84,7 @@ $end_date = $end_date ?? null;
                if (!empty($deliveries)): ?>
                   <?php foreach ($deliveries as $delivery): ?>
                   <div class="mb-1">
-                     <span class="fw-semibold"><?php echo esc_html(date('M j, Y', strtotime($delivery['date']))); ?></span>
+                     <span class="fw-semibold"><?php echo esc_html(wp_date('M j, Y', strtotime($delivery['date']))); ?></span>
                      <?php if (!empty($delivery['description'])): ?>
                         <span class="text-muted small"> - <?php echo esc_html($delivery['description']); ?></span>
                      <?php endif; ?>
@@ -111,7 +111,7 @@ $end_date = $end_date ?? null;
             <td class="py-2">
                <p class="fw-semibold mb-0">
                   <?php if (!empty($class['created_at'])): ?>
-                  <?php echo esc_html(date('M j, Y g:i A', strtotime($class['created_at']))); ?>
+                  <?php echo esc_html(wp_date('M j, Y g:i A', strtotime($class['created_at']))); ?>
                   <?php else: ?>
                   <span class="text-muted">N/A</span>
                   <?php endif; ?>
@@ -130,7 +130,7 @@ $end_date = $end_date ?? null;
             <td class="py-2">
                <p class="fw-semibold mb-0">
                   <?php if (!empty($class['updated_at'])): ?>
-                  <?php echo esc_html(date('M j, Y g:i A', strtotime($class['updated_at']))); ?>
+                  <?php echo esc_html(wp_date('M j, Y g:i A', strtotime($class['updated_at']))); ?>
                   <?php else: ?>
                   <span class="text-muted">N/A</span>
                   <?php endif; ?>
@@ -156,7 +156,7 @@ $end_date = $end_date ?? null;
                            <?php echo esc_html($visit['type'] ?? 'QA Visit'); ?>
                         </span>
                         <span class="fw-semibold">
-                           <?php echo esc_html(date('M j, Y', strtotime($visit['date']))); ?>
+                           <?php echo esc_html(wp_date('M j, Y', strtotime($visit['date']))); ?>
                         </span>
                      </div>
                      <?php if (!empty($visit['officer'])): ?>
@@ -206,15 +206,16 @@ $end_date = $end_date ?? null;
                      <?php foreach ($stopPeriods as $period): ?>
                      <?php
                         if (isset($period['stop_date']) && isset($period['restart_date'])):
-                            $stopDate = new DateTime($period['stop_date']);
-                            $restartDate = new DateTime($period['restart_date']);
+                            $tz = wp_timezone();
+                            $stopDate = new DateTime($period['stop_date'], $tz);
+                            $restartDate = new DateTime($period['restart_date'], $tz);
                             $interval = $stopDate->diff($restartDate);
                             $days = $interval->days;
                         ?>
                      <div class="fs-9 mb-1">
                         <i class="bi bi-calendar-range me-1"></i>
-                        <?php echo date('M j', strtotime($period['stop_date'])); ?> -
-                        <?php echo date('M j, Y', strtotime($period['restart_date'])); ?>
+                        <?php echo wp_date('M j', strtotime($period['stop_date'])); ?> -
+                        <?php echo wp_date('M j, Y', strtotime($period['restart_date'])); ?>
                         <span class="text-muted">(<?php echo $days; ?> day<?php echo $days !== 1 ? 's' : ''; ?>)</span>
                      </div>
                      <?php endif; ?>
@@ -288,7 +289,7 @@ $end_date = $end_date ?? null;
                <div class="fw-semibold mb-0">
                   <?php echo esc_html($class['initial_agent_name']); ?>
                   <div class="fs-9 text-muted">
-                     Started: <?php echo !empty($class['initial_agent_start_date']) ? date('M j, Y', strtotime($class['initial_agent_start_date'])) : 'N/A'; ?>
+                     Started: <?php echo !empty($class['initial_agent_start_date']) ? wp_date('M j, Y', strtotime($class['initial_agent_start_date'])) : 'N/A'; ?>
                   </div>
                </div>
             </td>

@@ -26,11 +26,11 @@ ob_start();
     <div class="qa-dashboard-controls">
         <div class="control-group">
             <label for="date-range-start">Start Date:</label>
-            <input type="date" id="date-range-start" value="<?php echo date('Y-m-01', strtotime('-6 months')); ?>">
+            <input type="date" id="date-range-start" value="<?php echo wp_date('Y-m-01', strtotime('-6 months')); ?>">
         </div>
         <div class="control-group">
             <label for="date-range-end">End Date:</label>
-            <input type="date" id="date-range-end" value="<?php echo date('Y-m-t'); ?>">
+            <input type="date" id="date-range-end" value="<?php echo wp_date('Y-m-t'); ?>">
         </div>
         <div class="control-group">
             <label for="department-filter">Department:</label>

@@ -76,8 +76,8 @@ class QAVisitModel extends BaseModel
             $this->getVisitType(),
             $this->getOfficerName(),
             $this->getLatestDocument() ? json_encode($this->getLatestDocument()) : null,
-            date('Y-m-d H:i:s'),
-            date('Y-m-d H:i:s')
+            current_time('mysql'),
+            current_time('mysql')
         ];
 
         $db->query($sql, $params);
@@ -101,7 +101,7 @@ class QAVisitModel extends BaseModel
             $this->getVisitType(),
             $this->getOfficerName(),
             $this->getLatestDocument() ? json_encode($this->getLatestDocument()) : null,
-            date('Y-m-d H:i:s'),
+            current_time('mysql'),
             $this->getId()
         ];
 

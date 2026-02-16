@@ -51,7 +51,7 @@ if (empty($class['qa_reports']) || !is_array($class['qa_reports'])) {
                <tr>
                   <td>
                      <?php
-                        $reportDate = isset($report['date']) ? date('M j, Y', strtotime($report['date'])) : 'N/A';
+                        $reportDate = isset($report['date']) ? wp_date('M j, Y', strtotime($report['date'])) : 'N/A';
                         echo esc_html($reportDate);
                         ?>
                   </td>

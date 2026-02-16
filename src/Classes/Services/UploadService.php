@@ -153,7 +153,7 @@ class UploadService
         }
 
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $newFilename = 'qa_report_' . date('Ymd_His') . '_' . uniqid() . '.' . $extension;
+        $newFilename = 'qa_report_' . wp_date('Ymd_His') . '_' . uniqid() . '.' . $extension;
         $filePath = $this->qaReportsDir . $newFilename;
 
         if (!move_uploaded_file($file['tmp_name'], $filePath)) {

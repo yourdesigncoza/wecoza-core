@@ -329,8 +329,8 @@ class FormDataProcessor
 
         if (!isset($scheduleData['metadata'])) {
             $scheduleData['metadata'] = [
-                'lastUpdated' => date('c'),
-                'validatedAt' => date('c')
+                'lastUpdated' => wp_date('c'),
+                'validatedAt' => wp_date('c')
             ];
         }
 
@@ -373,8 +373,8 @@ class FormDataProcessor
             'exceptionDates' => [],
             'holidayOverrides' => [],
             'metadata' => [
-                'lastUpdated' => date('c'),
-                'validatedAt' => date('c')
+                'lastUpdated' => wp_date('c'),
+                'validatedAt' => wp_date('c')
             ]
         ];
 
@@ -624,7 +624,7 @@ class FormDataProcessor
         }
 
         $timestamp = strtotime($date);
-        return $timestamp !== false && date('Y-m-d', $timestamp) === $date;
+        return $timestamp !== false && wp_date('Y-m-d', $timestamp) === $date;
     }
 
     /**

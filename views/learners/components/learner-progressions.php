@@ -45,7 +45,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                 <?php if ($currentLP['class_code']): ?>
                                     <?php echo esc_html($currentLP['class_code']); ?> |
                                 <?php endif; ?>
-                                Started: <?php echo date('M j, Y', strtotime($currentLP['start_date'])); ?>
+                                Started: <?php echo wp_date('M j, Y', strtotime($currentLP['start_date'])); ?>
                             </small>
                         </div>
                         <span class="badge badge-phoenix badge-phoenix-primary">In Progress</span>
@@ -169,8 +169,8 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                         <div class="text-muted small">
                                             <span>
                                                 <i class="bi bi-calendar3 me-1"></i>
-                                                <?php echo date('M Y', strtotime($lp['start_date'])); ?> -
-                                                <?php echo date('M Y', strtotime($lp['completion_date'])); ?>
+                                                <?php echo wp_date('M Y', strtotime($lp['start_date'])); ?> -
+                                                <?php echo wp_date('M Y', strtotime($lp['completion_date'])); ?>
                                             </span>
                                             <span class="ms-3">
                                                 <i class="bi bi-clock me-1"></i>

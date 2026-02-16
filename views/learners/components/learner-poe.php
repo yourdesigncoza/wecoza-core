@@ -31,7 +31,7 @@ function formatPortfolioLinks($portfolioDetails, $uploadsUrl) {
     $html = '<div class="portfolio-links">';
     foreach ($portfolios as $index => $portfolio) {
         $uploadDate = !empty($portfolio['date']) ? 
-            '<span class="text-muted ms-2">(' . date('Y-m-d', strtotime($portfolio['date'])) . ')</span>' : '';
+            '<span class="text-muted ms-2">(' . wp_date('Y-m-d', strtotime($portfolio['date'])) . ')</span>' : '';
 
         // Construct full URL path
         $fullPath = rtrim($uploadsUrl, '/') . '/' . ltrim($portfolio['path'], '/');

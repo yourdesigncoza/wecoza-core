@@ -312,7 +312,7 @@ class ClientAjaxHandlers {
 
         // Set headers for CSV download
         header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=clients-export-' . date('Y-m-d') . '.csv');
+        header('Content-Disposition: attachment; filename=clients-export-' . wp_date('Y-m-d') . '.csv');
 
         // Create output
         $output = fopen('php://output', 'w');

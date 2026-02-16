@@ -175,8 +175,9 @@ $component_data = [
 
               if ($start_date_local) {
                   // Calculate monthly statistics
-                  $current_date = new DateTime($start_date_local);
-                  $end_datetime = $end_date_local ? new DateTime($end_date_local) : (clone $current_date)->add(new DateInterval('P1Y'));
+                  $tz = wp_timezone();
+                  $current_date = new DateTime($start_date_local, $tz);
+                  $end_datetime = $end_date_local ? new DateTime($end_date_local, $tz) : (clone $current_date)->add(new DateInterval('P1Y'));
 
                   // Calculate daily hours based on schedule format
                   $daily_hours = 0;
@@ -184,8 +185,8 @@ $component_data = [
                       $time_data = $schedule_data_local['timeData'];
 
                       if ($time_data['mode'] === 'single' && isset($time_data['startTime'], $time_data['endTime'])) {
-                          $start_time = new DateTime($time_data['startTime']);
-                          $end_time = new DateTime($time_data['endTime']);
+                          $start_time = new DateTime($time_data['startTime'], $tz);
+                          $end_time = new DateTime($time_data['endTime'], $tz);
                           $daily_hours = ($end_time->getTimestamp() - $start_time->getTimestamp()) / 3600;
                       } elseif ($time_data['mode'] === 'per-day' && isset($time_data['perDayTimes'])) {
                           // Average hours across all configured days
@@ -197,8 +198,8 @@ $component_data = [
                               $end_field = isset($day_times['endTime']) ? 'endTime' : 'end_time';
 
                               if (isset($day_times[$start_field], $day_times[$end_field])) {
-                                  $start_time = new DateTime($day_times[$start_field]);
-                                  $end_time = new DateTime($day_times[$end_field]);
+                                  $start_time = new DateTime($day_times[$start_field], $tz);
+                                  $end_time = new DateTime($day_times[$end_field], $tz);
                                   $total_hours += ($end_time->getTimestamp() - $start_time->getTimestamp()) / 3600;
                                   $day_count++;
                               }
@@ -286,8 +287,8 @@ $component_data = [
                           if (!empty($stop_restart_dates) && is_array($stop_restart_dates)) {
                               foreach ($stop_restart_dates as $period) {
                                   if (!empty($period['stopDate'])) {
-                                      $stop_date = new DateTime($period['stopDate']);
-                                      $restart_date = !empty($period['restartDate']) ? new DateTime($period['restartDate']) : null;
+                                      $stop_date = new DateTime($period['stopDate'], $tz);
+                                      $restart_date = !empty($period['restartDate']) ? new DateTime($period['restartDate'], $tz) : null;
 
                                       if ($current_date >= $stop_date && ($restart_date === null || $current_date < $restart_date)) {
                                           $is_in_stop_period = true;

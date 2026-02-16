@@ -234,8 +234,8 @@ class LearnerProgressionModel extends BaseModel
         $this->hoursAbsent = $this->calculateAbsentHours();
 
         $data = $this->toDbArray();
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['updated_at'] = date('Y-m-d H:i:s');
+        $data['created_at'] = current_time('mysql');
+        $data['updated_at'] = current_time('mysql');
         unset($data['tracking_id']);
 
         $newId = self::getRepository()->insert($data);
@@ -260,7 +260,7 @@ class LearnerProgressionModel extends BaseModel
         $this->hoursAbsent = $this->calculateAbsentHours();
 
         $data = $this->toDbArray();
-        $data['updated_at'] = date('Y-m-d H:i:s');
+        $data['updated_at'] = current_time('mysql');
 
         return self::getRepository()->update($this->trackingId, $data);
     }
@@ -271,13 +271,13 @@ class LearnerProgressionModel extends BaseModel
     public function markComplete(int $completedBy, ?string $portfolioPath = null): bool
     {
         $this->status = 'completed';
-        $this->completionDate = date('Y-m-d');
+        $this->completionDate = wp_date('Y-m-d');
         $this->markedCompleteBy = $completedBy;
-        $this->markedCompleteDate = date('Y-m-d H:i:s');
+        $this->markedCompleteDate = current_time('mysql');
 
         if ($portfolioPath) {
             $this->portfolioFilePath = $portfolioPath;
-            $this->portfolioUploadedAt = date('Y-m-d H:i:s');
+            $this->portfolioUploadedAt = current_time('mysql');
         }
 
         return $this->update();
@@ -321,7 +321,7 @@ class LearnerProgressionModel extends BaseModel
             'product_id' => $this->productId,
             'class_id' => $this->classId,
             'tracking_id' => $this->trackingId,
-            'log_date' => date('Y-m-d'),
+            'log_date' => wp_date('Y-m-d'),
             'hours_trained' => $trained,
             'hours_present' => $present,
             'source' => $source,

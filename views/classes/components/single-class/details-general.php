@@ -200,16 +200,16 @@ $schedule_data = $schedule_data ?? null;
                                  $end_field = isset($day_times['endTime']) ? 'endTime' : 'end_time';
 
                                  if (isset($day_times[$start_field], $day_times[$end_field])) {
-                                     $start_time = date('g:i A', strtotime($day_times[$start_field]));
-                                     $end_time = date('g:i A', strtotime($day_times[$end_field]));
+                                     $start_time = wp_date('g:i A', strtotime($day_times[$start_field]));
+                                     $end_time = wp_date('g:i A', strtotime($day_times[$end_field]));
                                      $day_display .= ": {$start_time} - {$end_time}";
                                  }
                              }
                              // Check if we have single time mode
                              elseif (isset($time_data['mode']) && $time_data['mode'] === 'single' &&
                                      isset($time_data['startTime'], $time_data['endTime'])) {
-                                 $start_time = date('g:i A', strtotime($time_data['startTime']));
-                                 $end_time = date('g:i A', strtotime($time_data['endTime']));
+                                 $start_time = wp_date('g:i A', strtotime($time_data['startTime']));
+                                 $end_time = wp_date('g:i A', strtotime($time_data['endTime']));
                                  $day_display .= ": {$start_time} - {$end_time}";
                              }
 

@@ -871,13 +871,13 @@ class ClassRepository extends BaseRepository
             'exam_type' => 'Open Book Exam',
             'class_duration' => 240,
             'class_address_line' => '123 Sample Street, Sample City, 1234',
-            'original_start_date' => date('Y-m-d'),
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
+            'original_start_date' => wp_date('Y-m-d'),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql'),
             'schedule_data' => [
                 'pattern' => 'weekly',
-                'startDate' => date('Y-m-d'),
-                'endDate' => date('Y-m-d', strtotime('+3 months')),
+                'startDate' => wp_date('Y-m-d'),
+                'endDate' => wp_date('Y-m-d', strtotime('+3 months')),
                 'selectedDays' => ['Monday', 'Wednesday', 'Friday'],
                 'timeData' => [
                     'mode' => 'per-day',
@@ -893,7 +893,7 @@ class ClassRepository extends BaseRepository
             ],
             'exception_dates' => null,
             'stop_restart_dates' => [
-                ['stop_date' => date('Y-m-d', strtotime('+10 days')), 'restart_date' => date('Y-m-d', strtotime('+15 days'))]
+                ['stop_date' => wp_date('Y-m-d', strtotime('+10 days')), 'restart_date' => wp_date('Y-m-d', strtotime('+15 days'))]
             ],
             'learner_ids' => [
                 ['id' => 1, 'name' => 'Alice Johnson', 'status' => 'CIC - Currently in Class'],
@@ -907,7 +907,7 @@ class ClassRepository extends BaseRepository
             'class_notes_data' => [],
             'backup_agent_ids' => [],
             'initial_class_agent' => 5,
-            'initial_agent_start_date' => date('Y-m-d', strtotime('-30 days'))
+            'initial_agent_start_date' => wp_date('Y-m-d', strtotime('-30 days'))
         ];
     }
 }

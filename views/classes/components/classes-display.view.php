@@ -195,7 +195,7 @@ $controller = $controller ?? null;
                                     <td>
                                         <?php if (!empty($class['original_start_date'])): ?>
                                         <span class="text-nowrap">
-                                            <?php echo esc_html(date('M j, Y', strtotime($class['original_start_date']))); ?>
+                                            <?php echo esc_html(wp_date('M j, Y', strtotime($class['original_start_date']))); ?>
                                         </span>
                                         <?php else: ?>
                                         <span class="text-muted">-</span>
