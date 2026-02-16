@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 40 — Return Type Hints & Constants
-Plan: 03 (completed)
-Status: In Progress (2/2 plans complete)
-Last activity: 2026-02-16 — Completed 40-03: Return Type Hints for Controllers/AJAX/Repositories/Services
+Phase: 41 — Architectural Verification
+Plan: 01 (completed)
+Status: In Progress (1/2 plans complete)
+Last activity: 2026-02-16 — Completed 41-01: Automated Architectural Verification
 
-Progress: 3/6 phases complete (11 plans executed)
+Progress: 3/6 phases complete (12 plans executed)
 
 ## Milestone History
 
@@ -33,6 +33,12 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+**Phase 41-01 (2026-02-16):**
+- PHP constructors excluded from return type checks (language constraint)
+- Magic methods and polymorphic getters justified for : mixed return types
+- 57 complex query bypass comments accepted per Phase 39-02 pattern
+- Classes/Locations/Events module failures documented as out-of-scope technical debt
+
 **Phase 40-03 (2026-02-16):**
 - void for AJAX handlers (wp_send_json_* terminates execution)
 - string for WordPress shortcode callbacks (must return HTML)
@@ -129,7 +135,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 40-03-PLAN.md — Return type hints for Controllers/AJAX/Repositories/Services
-Resume file: .planning/phases/40-return-type-hints-constants/40-03-SUMMARY.md
+Stopped at: Completed 41-01-PLAN.md — Automated Architectural Verification
+Resume file: .planning/phases/41-architectural-verification/41-01-SUMMARY.md
 
-**Next action:** Phase 40 complete - ready for phase checker or next phase
+**Next action:** Continue to 41-02 (Manual Verification & Gap Closure)
