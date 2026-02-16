@@ -1,0 +1,116 @@
+# Requirements: WeCoza Core v4.0
+
+**Defined:** 2026-02-16
+**Core Value:** Single source of truth for all WeCoza functionality — unified plugin architecture
+
+## v4.0 Requirements
+
+Architectural improvements and technical debt reduction. Each maps to roadmap phases.
+
+### Service Layer Extraction
+
+- [ ] **SVC-01**: Learner business logic extracted from LearnerController to LearnerService
+- [ ] **SVC-02**: Agent business logic extracted from AgentsController to AgentService
+- [ ] **SVC-03**: Client business logic extracted from ClientsController to ClientService
+- [ ] **SVC-04**: Controllers contain only input validation, service calls, and response handling (<100 lines per method)
+
+### Model Architecture Unification
+
+- [ ] **MDL-01**: ClientsModel extends BaseModel with inherited get/set/toArray/validate
+- [ ] **MDL-02**: AgentModel extends BaseModel with inherited get/set/toArray/validate
+- [ ] **MDL-03**: No duplicate get/set/toArray methods in ClientsModel or AgentModel
+- [ ] **MDL-04**: Validation framework consistent across all models using BaseModel::validate()
+
+### Address Storage Normalization
+
+- [ ] **ADDR-01**: Migration script copies existing agent addresses to shared locations table
+- [ ] **ADDR-02**: AgentRepository reads addresses from locations table (with fallback to old columns)
+- [ ] **ADDR-03**: AgentRepository writes addresses to both locations table and old columns (dual-write)
+- [ ] **ADDR-04**: AgentsController uses location linking for address management
+- [ ] **ADDR-05**: All existing agent addresses preserved after migration (zero data loss)
+
+### Repository Pattern Enforcement
+
+- [ ] **REPO-01**: Audit identifies all direct SQL queries bypassing BaseRepository methods
+- [ ] **REPO-02**: LearnerRepository uses findBy/updateBy/deleteBy where appropriate
+- [ ] **REPO-03**: AgentRepository uses findBy/updateBy/deleteBy where appropriate
+- [ ] **REPO-04**: ClientRepository uses findBy/updateBy/deleteBy where appropriate
+- [ ] **REPO-05**: All column names use quoteIdentifier() in repository queries
+- [ ] **REPO-06**: Complex queries (joins, aggregations) documented as justified bypasses
+
+### Return Type Hints
+
+- [ ] **TYPE-01**: All public controller methods have return type hints
+- [ ] **TYPE-02**: All public model methods have return type hints
+- [ ] **TYPE-03**: All public service methods have return type hints
+- [ ] **TYPE-04**: All public repository methods have return type hints
+- [ ] **TYPE-05**: Union types used appropriately (string|void, array|null) — no untyped mixed
+
+### Constants Extraction
+
+- [ ] **CONST-01**: Pagination limits extracted to named constants (SCREAMING_SNAKE_CASE)
+- [ ] **CONST-02**: Timeout values extracted to named constants
+- [ ] **CONST-03**: Quantum/score limits extracted to named constants
+- [ ] **CONST-04**: No magic numbers in business logic across all modules
+
+## Future Requirements
+
+Deferred to subsequent milestones.
+
+### Address Migration Cleanup
+- **ADDR-06**: Remove old address columns from agents table (after dual-write validation period)
+- **ADDR-07**: Remove dual-read fallback code (after confirming all data migrated)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| New module development | Focus is refactoring existing code only |
+| UI/template changes | Architecture-only milestone |
+| Database schema additions (except address migration) | Minimize schema risk |
+| Test suite creation | Separate milestone — this is refactoring only |
+| Frontend JavaScript refactoring | PHP-only scope |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SVC-01 | — | Pending |
+| SVC-02 | — | Pending |
+| SVC-03 | — | Pending |
+| SVC-04 | — | Pending |
+| MDL-01 | — | Pending |
+| MDL-02 | — | Pending |
+| MDL-03 | — | Pending |
+| MDL-04 | — | Pending |
+| ADDR-01 | — | Pending |
+| ADDR-02 | — | Pending |
+| ADDR-03 | — | Pending |
+| ADDR-04 | — | Pending |
+| ADDR-05 | — | Pending |
+| REPO-01 | — | Pending |
+| REPO-02 | — | Pending |
+| REPO-03 | — | Pending |
+| REPO-04 | — | Pending |
+| REPO-05 | — | Pending |
+| REPO-06 | — | Pending |
+| TYPE-01 | — | Pending |
+| TYPE-02 | — | Pending |
+| TYPE-03 | — | Pending |
+| TYPE-04 | — | Pending |
+| TYPE-05 | — | Pending |
+| CONST-01 | — | Pending |
+| CONST-02 | — | Pending |
+| CONST-03 | — | Pending |
+| CONST-04 | — | Pending |
+
+**Coverage:**
+- v4.0 requirements: 28 total
+- Mapped to phases: 0
+- Unmapped: 28 (awaiting roadmap)
+
+---
+*Requirements defined: 2026-02-16*
+*Last updated: 2026-02-16 after initial definition*
