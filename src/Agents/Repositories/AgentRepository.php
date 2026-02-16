@@ -121,6 +121,7 @@ class AgentRepository extends BaseRepository
             'agent_training_date',
             'status',
             'residential_suburb',
+            'location_id',
             'created_at',
             'updated_at',
             'created_by',
@@ -174,11 +175,25 @@ class AgentRepository extends BaseRepository
      */
     public function getAgent(int $agentId): ?array
     {
-        $sql = "SELECT * FROM agents WHERE agent_id = :agent_id AND status != 'deleted' LIMIT 1";
+        $sql = "SELECT a.*,
+                       l.street_address AS loc_street_address,
+                       l.suburb AS loc_suburb,
+                       l.town AS loc_town,
+                       l.province AS loc_province,
+                       l.postal_code AS loc_postal_code
+                FROM agents a
+                LEFT JOIN public.locations l ON a.location_id = l.location_id
+                WHERE a.agent_id = :agent_id AND a.status != 'deleted'
+                LIMIT 1";
         $params = [':agent_id' => $agentId];
 
         $result = wecoza_db()->getRow($sql, $params);
-        return $result ?: null;
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->resolveAddressFields($result);
     }
 
     /**
@@ -189,11 +204,25 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentByEmail(string $email): ?array
     {
-        $sql = "SELECT * FROM agents WHERE email_address = :email AND status != 'deleted' LIMIT 1";
+        $sql = "SELECT a.*,
+                       l.street_address AS loc_street_address,
+                       l.suburb AS loc_suburb,
+                       l.town AS loc_town,
+                       l.province AS loc_province,
+                       l.postal_code AS loc_postal_code
+                FROM agents a
+                LEFT JOIN public.locations l ON a.location_id = l.location_id
+                WHERE a.email_address = :email AND a.status != 'deleted'
+                LIMIT 1";
         $params = [':email' => $email];
 
         $result = wecoza_db()->getRow($sql, $params);
-        return $result ?: null;
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->resolveAddressFields($result);
     }
 
     /**
@@ -204,11 +233,25 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentByIdNumber(string $idNumber): ?array
     {
-        $sql = "SELECT * FROM agents WHERE sa_id_no = :id_number AND status != 'deleted' LIMIT 1";
+        $sql = "SELECT a.*,
+                       l.street_address AS loc_street_address,
+                       l.suburb AS loc_suburb,
+                       l.town AS loc_town,
+                       l.province AS loc_province,
+                       l.postal_code AS loc_postal_code
+                FROM agents a
+                LEFT JOIN public.locations l ON a.location_id = l.location_id
+                WHERE a.sa_id_no = :id_number AND a.status != 'deleted'
+                LIMIT 1";
         $params = [':id_number' => $idNumber];
 
         $result = wecoza_db()->getRow($sql, $params);
-        return $result ?: null;
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->resolveAddressFields($result);
     }
 
     /**
@@ -232,15 +275,23 @@ class AgentRepository extends BaseRepository
         $args = wp_parse_args($args, $defaults);
 
         // Build query
-        $sql = "SELECT * FROM agents WHERE 1=1";
+        $sql = "SELECT a.*,
+                       l.street_address AS loc_street_address,
+                       l.suburb AS loc_suburb,
+                       l.town AS loc_town,
+                       l.province AS loc_province,
+                       l.postal_code AS loc_postal_code
+                FROM agents a
+                LEFT JOIN public.locations l ON a.location_id = l.location_id
+                WHERE 1=1";
         $params = [];
 
         // Status filter
         if (!empty($args['status'])) {
             if ($args['status'] === 'all') {
-                $sql .= " AND status != 'deleted'";
+                $sql .= " AND a.status != 'deleted'";
             } else {
-                $sql .= " AND status = :status";
+                $sql .= " AND a.status = :status";
                 $params[':status'] = $args['status'];
             }
         }
@@ -249,11 +300,11 @@ class AgentRepository extends BaseRepository
         if (!empty($args['search'])) {
             $search = '%' . $args['search'] . '%';
             $sql .= " AND (
-                first_name LIKE :search1 OR
-                surname LIKE :search2 OR
-                email_address LIKE :search3 OR
-                tel_number LIKE :search4 OR
-                sa_id_no LIKE :search5
+                a.first_name LIKE :search1 OR
+                a.surname LIKE :search2 OR
+                a.email_address LIKE :search3 OR
+                a.tel_number LIKE :search4 OR
+                a.sa_id_no LIKE :search5
             )";
             $params[':search1'] = $search;
             $params[':search2'] = $search;
@@ -266,7 +317,7 @@ class AgentRepository extends BaseRepository
         $allowedOrderby = $this->getAllowedOrderColumns();
         $orderby = in_array($args['orderby'], $allowedOrderby) ? $args['orderby'] : 'created_at';
         $order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
-        $sql .= " ORDER BY $orderby $order";
+        $sql .= " ORDER BY a.$orderby $order";
 
         // Limit and offset
         if ($args['limit'] > 0) {
@@ -275,7 +326,15 @@ class AgentRepository extends BaseRepository
             $params[':offset'] = (int) $args['offset'];
         }
 
-        return wecoza_db()->getAll($sql, $params) ?: [];
+        $results = wecoza_db()->getAll($sql, $params) ?: [];
+
+        // Apply address resolution to each row
+        $resolved = [];
+        foreach ($results as $row) {
+            $resolved[] = $this->resolveAddressFields($row);
+        }
+
+        return $resolved;
     }
 
     /**
@@ -529,6 +588,9 @@ class AgentRepository extends BaseRepository
 
             // Legacy fields
             'residential_suburb' => 'sanitize_text_field',
+
+            // Location reference
+            'location_id' => 'absint',
         ];
 
         $cleanData = [];
@@ -537,6 +599,11 @@ class AgentRepository extends BaseRepository
             if (isset($data[$field])) {
                 $cleanData[$field] = call_user_func($sanitizeFunction, $data[$field]);
             }
+        }
+
+        // Handle location_id: convert 0 or empty to null to avoid FK violation
+        if (isset($cleanData['location_id']) && empty($cleanData['location_id'])) {
+            $cleanData['location_id'] = null;
         }
 
         return $cleanData;
@@ -822,5 +889,43 @@ class AgentRepository extends BaseRepository
         );
 
         return $result !== false;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Address Resolution (Dual-Read Support)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Resolve address fields from locations table with fallback to inline columns
+     *
+     * Implements dual-read pattern: If location record exists (loc_* fields not null),
+     * override inline address columns. Otherwise, use inline columns as-is.
+     *
+     * @param array $row Agent row with loc_* prefixed location fields
+     * @return array Agent row with resolved address fields and loc_* fields removed
+     */
+    private function resolveAddressFields(array $row): array
+    {
+        // If location record exists (loc_street_address is not null), use location data
+        if (!empty($row['loc_street_address'])) {
+            $row['residential_address_line'] = $row['loc_street_address'];
+            $row['residential_suburb'] = $row['loc_suburb'];
+            $row['city'] = $row['loc_town'];
+            $row['province'] = $row['loc_province'];
+            $row['residential_postal_code'] = $row['loc_postal_code'];
+        }
+
+        // Remove loc_* prefixed keys
+        unset(
+            $row['loc_street_address'],
+            $row['loc_suburb'],
+            $row['loc_town'],
+            $row['loc_province'],
+            $row['loc_postal_code']
+        );
+
+        return $row;
     }
 }

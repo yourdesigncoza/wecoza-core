@@ -111,6 +111,7 @@ class AgentModel extends BaseModel
         'city' => '',
         'province' => '',
         'residential_postal_code' => '',
+        'location_id' => null,
 
         // Working Areas (matches database)
         'preferred_working_area_1' => null,
