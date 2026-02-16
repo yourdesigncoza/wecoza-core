@@ -100,33 +100,7 @@ class ClassRepository extends BaseRepository
      */
     public function insertClass(array $data): ?int
     {
-        // Filter to only allowed columns
-        $filteredData = $this->filterAllowedColumns($data, $this->getAllowedInsertColumns());
-
-        if (empty($filteredData)) {
-            error_log('WeCoza Core: Insert rejected - no valid columns in data');
-            return null;
-        }
-
-        $columns = array_keys($filteredData);
-        $placeholders = array_map(fn($c) => ":{$c}", $columns);
-
-        $sql = sprintf(
-            "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
-            static::$table,
-            implode(', ', $columns),
-            implode(', ', $placeholders),
-            static::$primaryKey
-        );
-
-        try {
-            $stmt = $this->db->query($sql, $filteredData);
-            $result = $stmt->fetch();
-            return $result ? (int)$result[static::$primaryKey] : null;
-        } catch (Exception $e) {
-            error_log('WeCoza Core: Error inserting class: ' . $e->getMessage());
-            return null;
-        }
+        return parent::insert($data);
     }
 
     /**
@@ -138,31 +112,7 @@ class ClassRepository extends BaseRepository
      */
     public function updateClass(int $id, array $data): bool
     {
-        // Filter to only allowed columns
-        $filteredData = $this->filterAllowedColumns($data, $this->getAllowedUpdateColumns());
-
-        if (empty($filteredData)) {
-            error_log('WeCoza Core: Update rejected - no valid columns in data');
-            return false;
-        }
-
-        $setClauses = array_map(fn($c) => "{$c} = :{$c}", array_keys($filteredData));
-        $filteredData['id'] = $id;
-
-        $sql = sprintf(
-            "UPDATE %s SET %s WHERE %s = :id",
-            static::$table,
-            implode(', ', $setClauses),
-            static::$primaryKey
-        );
-
-        try {
-            $this->db->query($sql, $filteredData);
-            return true;
-        } catch (Exception $e) {
-            error_log('WeCoza Core: Error updating class: ' . $e->getMessage());
-            return false;
-        }
+        return parent::update($id, $data);
     }
 
     /**
@@ -173,35 +123,7 @@ class ClassRepository extends BaseRepository
      */
     public function deleteClass(int $id): bool
     {
-        $sql = sprintf(
-            "DELETE FROM %s WHERE %s = ?",
-            static::$table,
-            static::$primaryKey
-        );
-
-        try {
-            $this->db->query($sql, [$id]);
-            return true;
-        } catch (Exception $e) {
-            error_log('WeCoza Core: Error deleting class: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Filter data to only include allowed columns
-     *
-     * @param array $data Input data
-     * @param array $allowedColumns Allowed column names
-     * @return array Filtered data
-     */
-    protected function filterAllowedColumns(array $data, array $allowedColumns): array
-    {
-        return array_filter(
-            $data,
-            fn($key) => in_array($key, $allowedColumns, true),
-            ARRAY_FILTER_USE_KEY
-        );
+        return parent::delete($id);
     }
 
     /*
@@ -215,6 +137,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getClients(): array
     {
+        // Complex query: static context, reads from clients table (not $table)
         try {
             $db = wecoza_db();
             $sql = "SELECT client_id, client_name FROM public.clients ORDER BY client_name ASC";
@@ -240,6 +163,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getSites(): array
     {
+        // Complex query: static context, JOIN sites + locations tables
         try {
             $db = wecoza_db();
             $sql = "SELECT s.site_id, s.client_id, s.site_name, l.street_address as address
@@ -279,6 +203,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getLearners(): array
     {
+        // Complex query: static context, dual CTE with 5-table JOIN for progression context
         try {
             $cache_key = 'wecoza_class_learners_with_progression';
             $cached_learners = get_transient($cache_key);
@@ -420,6 +345,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getAgents(): array
     {
+        // Complex query: static context, reads from agents table (not $table)
         $cache_key = 'wecoza_class_agents';
         $cached = get_transient($cache_key);
         if ($cached !== false) {
@@ -458,6 +384,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getSupervisors(): array
     {
+        // Complex query: static context, reads from agents table (not $table)
         $cache_key = 'wecoza_class_supervisors';
         $cached = get_transient($cache_key);
         if ($cached !== false) {
@@ -563,6 +490,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getAllClasses(array $options = []): array
     {
+        // Complex query: static context with dynamic ORDER BY + JOIN to clients
         $db = wecoza_db();
 
         $limit = isset($options['limit']) ? intval($options['limit']) : 50;
@@ -623,6 +551,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getSingleClass(int $class_id): ?array
     {
+        // Complex query: delegates to ClassModel::getById then enriches with multiple lookups
         try {
             $classModel = ClassModel::getById($class_id);
 
@@ -713,6 +642,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getSiteAddresses(): array
     {
+        // Complex query: static context, JOIN sites + locations tables
         try {
             $db = wecoza_db();
 
@@ -769,6 +699,7 @@ class ClassRepository extends BaseRepository
      */
     public static function getCachedClassNotes(int $class_id, array $options = []): array
     {
+        // Complex query: static context, reads JSONB column from classes table
         $cache_key = "wecoza_class_notes_{$class_id}";
         $cached_notes = get_transient($cache_key);
 
