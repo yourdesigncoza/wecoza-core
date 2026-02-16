@@ -13,7 +13,7 @@
 | 37 | Model Architecture Unification | Complete    | 2026-02-16 | 4 |
 | 38 | Address Storage Normalization | Complete    | 2026-02-16 | 5 |
 | 39 | Repository Pattern Enforcement | Complete    | 2026-02-16 | 4 |
-| 40 | Return Type Hints & Constants | All public methods typed, all magic numbers extracted to constants | TYPE-01..05, CONST-01..04 | 5 |
+| 40 | Return Type Hints & Constants | Complete    | 2026-02-16 | 5 |
 | 41 | Architectural Verification | End-to-end validation — all refactored layers work together, no regressions | All 28 | 5 |
 
 ## Dependency Graph
@@ -139,7 +139,7 @@ Plans:
 
 **Goal:** Add return type hints to all public methods and extract all magic numbers to named constants.
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 40-01-PLAN.md — AppConstants class creation + magic number extraction across all modules (CONST-01..04)
