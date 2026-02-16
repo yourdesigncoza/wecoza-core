@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 36 — Service Layer Extraction
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-16 — Roadmap created (6 phases, 28 requirements)
+Plan: 01 (completed)
+Status: In progress (plan 01 complete)
+Last activity: 2026-02-16 — Completed 36-01: Learner Service Layer Extraction
 
-Progress: 0/6 phases complete
+Progress: 0/6 phases complete (1 plan executed)
 
 ## Milestone History
 
@@ -33,6 +33,11 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
+
+**Phase 36-01 (2026-02-16):**
+- Service layer follows ProgressionService pattern with lazy-loaded repositories
+- Table row HTML generation placed in service (business logic for field mapping)
+- AJAX handlers maintain backward compatibility with legacy action names
 
 Full decision log in PROJECT.md Key Decisions table.
 
@@ -67,7 +72,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Roadmap created, ready to plan Phase 36
-Resume file: N/A
+Stopped at: Completed 36-01-PLAN.md — LearnerService extracted with 13 methods
+Resume file: .planning/phases/36-service-layer-extraction/36-01-SUMMARY.md
 
-**Next action:** `/gsd:plan-phase 36` to plan Service Layer Extraction.
+**Next action:** Continue with 36-02 (Agent service extraction) or plan next phase.
