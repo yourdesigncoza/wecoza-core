@@ -125,33 +125,10 @@ final class ClassEventRepository extends BaseRepository
      */
     public function findPendingForProcessing(int $limit = 50): array
     {
-        $sql = <<<SQL
-SELECT *
-FROM class_events
-WHERE notification_status = 'pending'
-ORDER BY created_at ASC
-LIMIT :limit
-SQL;
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if (!$stmt) {
-            throw new RuntimeException('Failed to prepare pending events query');
-        }
-
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute pending events query');
-        }
-
-        $results = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row !== false) {
-                $results[] = ClassEventDTO::fromRow($row);
-            }
-        }
-
-        return $results;
+        return array_map(
+            fn($row) => ClassEventDTO::fromRow($row),
+            $this->findBy(['notification_status' => 'pending'], $limit, 0, 'created_at', 'ASC')
+        );
     }
 
     /**
@@ -164,35 +141,10 @@ SQL;
      */
     public function findByEntity(string $entityType, int $entityId, int $limit = 50): array
     {
-        $sql = <<<SQL
-SELECT *
-FROM class_events
-WHERE entity_type = :entity_type AND entity_id = :entity_id
-ORDER BY created_at DESC
-LIMIT :limit
-SQL;
-
-        $stmt = $this->db->getPdo()->prepare($sql);
-        if (!$stmt) {
-            throw new RuntimeException('Failed to prepare entity events query');
-        }
-
-        $stmt->bindValue(':entity_type', $entityType, PDO::PARAM_STR);
-        $stmt->bindValue(':entity_id', $entityId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Failed to execute entity events query');
-        }
-
-        $results = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row !== false) {
-                $results[] = ClassEventDTO::fromRow($row);
-            }
-        }
-
-        return $results;
+        return array_map(
+            fn($row) => ClassEventDTO::fromRow($row),
+            $this->findBy(['entity_type' => $entityType, 'entity_id' => $entityId], $limit, 0, 'created_at', 'DESC')
+        );
     }
 
     /**
@@ -216,6 +168,7 @@ SQL;
      */
     public function updateAiSummary(int $eventId, array $summary): bool
     {
+        // Complex query: json_encode + CURRENT_TIMESTAMP in single UPDATE
         $sql = <<<SQL
 UPDATE class_events
 SET ai_summary = :ai_summary,
@@ -242,6 +195,7 @@ SQL;
      */
     public function markSent(int $eventId): bool
     {
+        // Complex query: SET multiple columns with CURRENT_TIMESTAMP
         $sql = <<<SQL
 UPDATE class_events
 SET notification_status = 'sent',
@@ -267,6 +221,7 @@ SQL;
      */
     public function markViewed(int $eventId): bool
     {
+        // Complex query: conditional UPDATE with IS NULL check
         $sql = <<<SQL
 UPDATE class_events
 SET viewed_at = CURRENT_TIMESTAMP
@@ -291,6 +246,7 @@ SQL;
      */
     public function markAcknowledged(int $eventId): bool
     {
+        // Complex query: conditional UPDATE with IS NULL check
         $sql = <<<SQL
 UPDATE class_events
 SET acknowledged_at = CURRENT_TIMESTAMP
@@ -316,6 +272,7 @@ SQL;
      */
     public function getTimeline(int $limit = 50, ?int $afterId = null): array
     {
+        // Complex query: cursor-based pagination with optional WHERE
         $whereClause = $afterId !== null ? 'WHERE event_id < :after_id' : '';
 
         $sql = <<<SQL
@@ -357,6 +314,7 @@ SQL;
      */
     public function getUnreadCount(): int
     {
+        // Complex query: COUNT with IS NULL condition (not supported by parent::count criteria)
         $sql = <<<SQL
 SELECT COUNT(*)
 FROM class_events

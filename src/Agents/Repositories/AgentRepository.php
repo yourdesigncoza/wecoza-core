@@ -163,8 +163,9 @@ class AgentRepository extends BaseRepository
         $cleanData['created_by'] = get_current_user_id();
         $cleanData['updated_by'] = get_current_user_id();
 
-        // Insert agent
-        return wecoza_db()->insert('agents', $cleanData);
+        // Insert agent using parent method
+        $result = parent::insert($cleanData);
+        return $result ?? false;
     }
 
     /**
@@ -175,6 +176,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgent(int $agentId): ?array
     {
+        // Complex query: LEFT JOIN to locations table for dual-read address resolution
         $sql = "SELECT a.*,
                        l.street_address AS loc_street_address,
                        l.suburb AS loc_suburb,
@@ -204,6 +206,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentByEmail(string $email): ?array
     {
+        // Complex query: LEFT JOIN to locations table for dual-read address resolution
         $sql = "SELECT a.*,
                        l.street_address AS loc_street_address,
                        l.suburb AS loc_suburb,
@@ -233,6 +236,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentByIdNumber(string $idNumber): ?array
     {
+        // Complex query: LEFT JOIN to locations table for dual-read address resolution
         $sql = "SELECT a.*,
                        l.street_address AS loc_street_address,
                        l.suburb AS loc_suburb,
@@ -262,6 +266,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgents(array $args = []): array
     {
+        // Complex query: LEFT JOIN + LIKE search + status filter + pagination
         $defaults = [
             'status' => 'active',
             'orderby' => 'created_at',
@@ -313,11 +318,11 @@ class AgentRepository extends BaseRepository
             $params[':search5'] = $search;
         }
 
-        // Order - validate against whitelist
+        // Order - validate against whitelist and quote identifier
         $allowedOrderby = $this->getAllowedOrderColumns();
         $orderby = in_array($args['orderby'], $allowedOrderby) ? $args['orderby'] : 'created_at';
         $order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
-        $sql .= " ORDER BY a.$orderby $order";
+        $sql .= " ORDER BY a." . $this->quoteIdentifier($orderby) . " $order";
 
         // Limit and offset
         if ($args['limit'] > 0) {
@@ -362,15 +367,8 @@ class AgentRepository extends BaseRepository
         $cleanData['updated_at'] = current_time('mysql');
         $cleanData['updated_by'] = get_current_user_id();
 
-        // Update agent using string WHERE with colon-prefixed params
-        $result = wecoza_db()->update(
-            'agents',
-            $cleanData,
-            'agent_id = :agent_id',
-            [':agent_id' => $agentId]
-        );
-
-        return $result !== false;
+        // Update agent using parent method
+        return parent::update($agentId, $cleanData);
     }
 
     /**
@@ -397,14 +395,8 @@ class AgentRepository extends BaseRepository
         $this->deleteAgentNotes($agentId);
         $this->deleteAgentAbsences($agentId);
 
-        // Delete agent using string WHERE with colon-prefixed params
-        $result = wecoza_db()->delete(
-            'agents',
-            'agent_id = :agent_id',
-            [':agent_id' => $agentId]
-        );
-
-        return $result !== false;
+        // Delete agent using parent method
+        return parent::delete($agentId);
     }
 
     /**
@@ -415,6 +407,7 @@ class AgentRepository extends BaseRepository
      */
     public function countAgents(array $args = []): int
     {
+        // Complex query: COUNT with LIKE search + status filter
         $defaults = [
             'status' => 'active',
             'search' => '',
@@ -640,6 +633,7 @@ class AgentRepository extends BaseRepository
      */
     public function addAgentMeta(int $agentId, string $metaKey, $metaValue)
     {
+        // Complex query: operates on agent_meta table (not $table)
         // Check if meta already exists
         $existing = $this->getAgentMeta($agentId, $metaKey, true);
 
@@ -667,6 +661,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentMeta(int $agentId, string $metaKey = '', bool $single = false)
     {
+        // Complex query: operates on agent_meta table (not $table)
         $sql = "SELECT * FROM agent_meta WHERE agent_id = :agent_id";
         $params = [':agent_id' => $agentId];
 
@@ -705,6 +700,7 @@ class AgentRepository extends BaseRepository
      */
     public function updateAgentMeta(int $agentId, string $metaKey, $metaValue): bool
     {
+        // Complex query: operates on agent_meta table (not $table)
         $result = wecoza_db()->update(
             'agent_meta',
             ['meta_value' => maybe_serialize($metaValue)],
@@ -724,6 +720,7 @@ class AgentRepository extends BaseRepository
      */
     public function deleteAgentMeta(int $agentId, string $metaKey = ''): bool
     {
+        // Complex query: operates on agent_meta table (not $table)
         $where = 'agent_id = :agent_id';
         $params = [':agent_id' => $agentId];
 
@@ -753,6 +750,7 @@ class AgentRepository extends BaseRepository
      */
     public function addAgentNote(int $agentId, string $note, string $noteType = 'general')
     {
+        // Complex query: operates on agent_notes table (not $table)
         // Actual schema: note_id, agent_id, note, note_date
         return wecoza_db()->insert('agent_notes', [
             'agent_id' => $agentId,
@@ -770,6 +768,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentNotes(int $agentId, array $args = []): array
     {
+        // Complex query: operates on agent_notes table (not $table)
         $defaults = [
             'note_type' => '', // Unused - kept for API compatibility
             'orderby' => 'note_date', // Actual column name
@@ -779,13 +778,17 @@ class AgentRepository extends BaseRepository
 
         $args = wp_parse_args($args, $defaults);
 
+        // Validate orderby against allowed columns
+        $allowedOrderby = ['note_id', 'note_date'];
+        $orderby = in_array($args['orderby'], $allowedOrderby) ? $args['orderby'] : 'note_date';
+
         // Actual schema: note_id, agent_id, note, note_date
         $sql = "SELECT * FROM agent_notes WHERE agent_id = :agent_id";
         $params = [':agent_id' => $agentId];
 
         // note_type column doesn't exist in actual schema, skip filter
 
-        $sql .= " ORDER BY {$args['orderby']} {$args['order']}";
+        $sql .= " ORDER BY " . $this->quoteIdentifier($orderby) . " {$args['order']}";
 
         if ($args['limit'] > 0) {
             $sql .= " LIMIT :limit";
@@ -803,6 +806,7 @@ class AgentRepository extends BaseRepository
      */
     public function deleteAgentNotes(int $agentId): bool
     {
+        // Complex query: operates on agent_notes table (not $table)
         $result = wecoza_db()->delete(
             'agent_notes',
             'agent_id = :agent_id',
@@ -828,6 +832,7 @@ class AgentRepository extends BaseRepository
      */
     public function addAgentAbsence(int $agentId, string $absenceDate, string $reason = '')
     {
+        // Complex query: operates on agent_absences table (not $table)
         // Actual schema: absence_id, agent_id, class_id, absence_date, reason, reported_at
         return wecoza_db()->insert('agent_absences', [
             'agent_id' => $agentId,
@@ -847,6 +852,7 @@ class AgentRepository extends BaseRepository
      */
     public function getAgentAbsences(int $agentId, array $args = []): array
     {
+        // Complex query: operates on agent_absences table with date range filter
         $defaults = [
             'from_date' => '',
             'to_date' => '',
@@ -855,6 +861,10 @@ class AgentRepository extends BaseRepository
         ];
 
         $args = wp_parse_args($args, $defaults);
+
+        // Validate orderby against allowed columns
+        $allowedOrderby = ['absence_id', 'absence_date', 'reported_at'];
+        $orderby = in_array($args['orderby'], $allowedOrderby) ? $args['orderby'] : 'absence_date';
 
         $sql = "SELECT * FROM agent_absences WHERE agent_id = :agent_id";
         $params = [':agent_id' => $agentId];
@@ -869,7 +879,7 @@ class AgentRepository extends BaseRepository
             $params[':to_date'] = $args['to_date'];
         }
 
-        $sql .= " ORDER BY {$args['orderby']} {$args['order']}";
+        $sql .= " ORDER BY " . $this->quoteIdentifier($orderby) . " {$args['order']}";
 
         return wecoza_db()->getAll($sql, $params) ?: [];
     }
@@ -882,6 +892,7 @@ class AgentRepository extends BaseRepository
      */
     public function deleteAgentAbsences(int $agentId): bool
     {
+        // Complex query: operates on agent_absences table (not $table)
         $result = wecoza_db()->delete(
             'agent_absences',
             'agent_id = :agent_id',
