@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Controllers;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseController;
 use WeCoza\Clients\Services\ClientService;
 use WeCoza\Clients\Helpers\ViewHelpers;
@@ -249,7 +250,7 @@ class ClientsController extends BaseController {
         }
 
         $atts = shortcode_atts([
-            'per_page' => 10,
+            'per_page' => AppConstants::SEARCH_RESULT_LIMIT,
             'show_search' => true,
             'show_filters' => true,
             'show_export' => true,

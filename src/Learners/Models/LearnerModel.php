@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Models;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseModel;
 use WeCoza\Learners\Repositories\LearnerRepository;
 
@@ -127,7 +128,7 @@ class LearnerModel extends BaseModel
     /**
      * Get all learners with optional pagination
      */
-    public static function getAll(int $limit = 50, int $offset = 0): array
+    public static function getAll(int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0): array
     {
         $results = self::getRepository()->findAll($limit, $offset);
 

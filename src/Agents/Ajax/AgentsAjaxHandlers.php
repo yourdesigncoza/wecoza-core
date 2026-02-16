@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Agents\Ajax;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\Agents\Services\AgentService;
 use WeCoza\Agents\Services\AgentDisplayService;
@@ -69,7 +70,7 @@ class AgentsAjaxHandlers
         try {
             // Get request parameters
             $page = AjaxSecurity::post('page', 'int', 1);
-            $per_page = AjaxSecurity::post('per_page', 'int', 10);
+            $per_page = AjaxSecurity::post('per_page', 'int', AppConstants::SEARCH_RESULT_LIMIT);
             $search = AjaxSecurity::post('search', 'string', '');
             $orderby = AjaxSecurity::post('orderby', 'string', 'surname');
             $order = strtoupper(AjaxSecurity::post('order', 'string', 'ASC'));

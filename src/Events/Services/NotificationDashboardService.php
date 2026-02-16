@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Events\Services;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Events\DTOs\ClassEventDTO;
 use WeCoza\Events\Repositories\ClassEventRepository;
 
@@ -50,7 +51,7 @@ final class NotificationDashboardService
      * @param bool $unreadOnly Filter to unread events only
      * @return array<int, ClassEventDTO>
      */
-    public function getTimeline(int $limit = 50, ?int $afterEventId = null, bool $unreadOnly = false): array
+    public function getTimeline(int $limit = AppConstants::DEFAULT_PAGE_SIZE, ?int $afterEventId = null, bool $unreadOnly = false): array
     {
         $events = $this->repository->getTimeline($limit, $afterEventId);
 
@@ -70,7 +71,7 @@ final class NotificationDashboardService
      * @param int $limit Maximum events to return
      * @return array<int, ClassEventDTO>
      */
-    public function getByEntity(string $entityType, int $entityId, int $limit = 50): array
+    public function getByEntity(string $entityType, int $entityId, int $limit = AppConstants::DEFAULT_PAGE_SIZE): array
     {
         return $this->repository->findByEntity($entityType, $entityId, $limit);
     }

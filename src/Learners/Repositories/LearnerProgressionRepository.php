@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 use PDO;
 use Exception;
@@ -412,7 +413,7 @@ class LearnerProgressionRepository extends BaseRepository
     /**
      * Find progressions with filters (for admin panel)
      */
-    public function findWithFilters(array $filters = [], int $limit = 50, int $offset = 0): array
+    public function findWithFilters(array $filters = [], int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0): array
     {
         // Complex query: dynamic JOIN + multi-criteria filter with pagination
         $sql = $this->baseQuery();

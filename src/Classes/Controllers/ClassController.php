@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Classes\Controllers;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseController;
 use WeCoza\Classes\Models\ClassModel;
 use WeCoza\Classes\Repositories\ClassRepository;
@@ -372,7 +373,7 @@ class ClassController extends BaseController
         }
 
         $atts = shortcode_atts([
-            'limit' => 50,
+            'limit' => AppConstants::DEFAULT_PAGE_SIZE,
             'order_by' => 'created_at',
             'order' => 'DESC',
             'show_loading' => true,

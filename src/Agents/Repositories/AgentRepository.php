@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Agents\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 
 if (!defined('ABSPATH')) {
@@ -271,7 +272,7 @@ class AgentRepository extends BaseRepository
             'status' => 'active',
             'orderby' => 'created_at',
             'order' => 'DESC',
-            'limit' => 100,
+            'limit' => AppConstants::MAX_PAGE_SIZE,
             'offset' => 0,
             'search' => '',
             'meta_query' => [],

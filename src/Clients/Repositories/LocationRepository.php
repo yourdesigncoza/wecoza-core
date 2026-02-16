@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 use WeCoza\Clients\Models\LocationsModel;
 
@@ -112,7 +113,7 @@ final class LocationRepository extends BaseRepository
      * @param int $limit Maximum results
      * @return array
      */
-    public function findByCoordinates(float $latitude, float $longitude, float $radiusKm = 10.0, int $limit = 10): array
+    public function findByCoordinates(float $latitude, float $longitude, float $radiusKm = 10.0, int $limit = AppConstants::SEARCH_RESULT_LIMIT): array
     {
         // Complex query: Haversine formula distance calculation
         $sql = "SELECT location_id, street_address, suburb, town, province, postal_code, latitude, longitude,

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Services;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Learners\Models\LearnerModel;
 use WeCoza\Learners\Repositories\LearnerRepository;
 
@@ -53,7 +54,7 @@ class LearnerService
      * @param int $offset Number of learners to skip
      * @return array Array of LearnerModel instances
      */
-    public function getLearners(int $limit = 50, int $offset = 0): array
+    public function getLearners(int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0): array
     {
         return LearnerModel::getAll($limit, $offset);
     }

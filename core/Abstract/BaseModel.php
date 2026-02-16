@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace WeCoza\Core\Abstract;
 
 use WeCoza\Core\Database\PostgresConnection;
+use WeCoza\Core\Abstract\AppConstants;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -337,7 +338,7 @@ abstract class BaseModel
      * @param int $offset Offset for pagination
      * @return array Array of model instances
      */
-    public static function getAll(int $limit = 50, int $offset = 0): array
+    public static function getAll(int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0): array
     {
         // Default implementation - override in child for custom behavior
         return [];

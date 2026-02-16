@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Events\Repositories\MaterialTrackingRepository;
 
 use function current_user_can;
@@ -29,7 +30,7 @@ final class MaterialTrackingDashboardService
      */
     public function getDashboardData(array $filters = []): array
     {
-        $limit = isset($filters['limit']) ? (int) $filters['limit'] : 50;
+        $limit = isset($filters['limit']) ? (int) $filters['limit'] : AppConstants::DEFAULT_PAGE_SIZE;
         $limit = max(1, min(200, $limit)); // Enforce 1-200 range
 
         $status = $filters['status'] ?? null;

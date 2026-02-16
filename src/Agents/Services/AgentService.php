@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Agents\Services;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Agents\Repositories\AgentRepository;
 use WeCoza\Agents\Models\AgentModel;
 
@@ -570,7 +571,7 @@ class AgentService
 
         // Sanitize inputs
         $page = max(1, $page);
-        $perPage = max(1, min(100, $perPage));
+        $perPage = max(1, min(AppConstants::MAX_PAGE_SIZE, $perPage));
         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
 
         // Build query args

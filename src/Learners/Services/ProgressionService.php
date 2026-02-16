@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Services;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Learners\Models\LearnerProgressionModel;
 use WeCoza\Learners\Repositories\LearnerProgressionRepository;
 use Exception;
@@ -354,7 +355,7 @@ class ProgressionService
     /**
      * Get progressions for admin panel with filters
      */
-    public function getProgressionsForAdmin(array $filters = [], int $limit = 50, int $offset = 0): array
+    public function getProgressionsForAdmin(array $filters = [], int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0): array
     {
         $data = $this->repository->findWithFilters($filters, $limit, $offset);
         $total = $this->repository->countWithFilters($filters);

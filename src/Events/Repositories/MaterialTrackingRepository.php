@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Events\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 use WeCoza\Core\Database\PostgresConnection;
 use PDO;
@@ -277,7 +278,7 @@ final class MaterialTrackingRepository extends BaseRepository
      * @return array<int, array<string, mixed>> Array of tracking records with joined data
      */
     public function getTrackingDashboardData(
-        int $limit = 50,
+        int $limit = AppConstants::DEFAULT_PAGE_SIZE,
         // Complex query: CROSS JOIN LATERAL with JSONB array elements + multi-table JOIN
         ?string $status = null,
         ?string $search = null

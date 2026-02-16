@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Ajax;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\Clients\Services\ClientService;
 use WeCoza\Clients\Models\SitesModel;
@@ -155,7 +156,7 @@ class ClientAjaxHandlers {
         }
 
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
-        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : AppConstants::SEARCH_RESULT_LIMIT;
 
         $clients = $this->clientService->searchClients($search, $limit);
 

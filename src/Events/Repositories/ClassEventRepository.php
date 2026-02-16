@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Events\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 use WeCoza\Events\DTOs\ClassEventDTO;
 use WeCoza\Events\Enums\EventType;
@@ -123,7 +124,7 @@ final class ClassEventRepository extends BaseRepository
      * @param int $limit Maximum events to return
      * @return array<int, ClassEventDTO>
      */
-    public function findPendingForProcessing(int $limit = 50): array
+    public function findPendingForProcessing(int $limit = AppConstants::DEFAULT_PAGE_SIZE): array
     {
         return array_map(
             fn($row) => ClassEventDTO::fromRow($row),
@@ -139,7 +140,7 @@ final class ClassEventRepository extends BaseRepository
      * @param int $limit Maximum events to return
      * @return array<int, ClassEventDTO>
      */
-    public function findByEntity(string $entityType, int $entityId, int $limit = 50): array
+    public function findByEntity(string $entityType, int $entityId, int $limit = AppConstants::DEFAULT_PAGE_SIZE): array
     {
         return array_map(
             fn($row) => ClassEventDTO::fromRow($row),
@@ -270,7 +271,7 @@ SQL;
      * @param int|null $afterId Pagination cursor (get events after this ID)
      * @return array<int, ClassEventDTO>
      */
-    public function getTimeline(int $limit = 50, ?int $afterId = null): array
+    public function getTimeline(int $limit = AppConstants::DEFAULT_PAGE_SIZE, ?int $afterId = null): array
     {
         // Complex query: cursor-based pagination with optional WHERE
         $whereClause = $afterId !== null ? 'WHERE event_id < :after_id' : '';

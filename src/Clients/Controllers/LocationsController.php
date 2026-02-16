@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Controllers;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseController;
 use WeCoza\Clients\Models\LocationsModel;
 
@@ -317,7 +318,7 @@ class LocationsController extends BaseController {
         }
 
         $atts = shortcode_atts(array(
-            'per_page' => 10,
+            'per_page' => AppConstants::SEARCH_RESULT_LIMIT,
             'show_search' => true,
             'edit_url' => '/edit-locations',
         ), $atts);

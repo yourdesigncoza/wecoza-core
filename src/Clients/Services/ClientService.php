@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Services;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Clients\Models\ClientsModel;
 use WeCoza\Clients\Models\SitesModel;
 
@@ -361,7 +362,7 @@ class ClientService
      * @param int $limit Result limit
      * @return array
      */
-    public function searchClients(string $search, int $limit = 10): array
+    public function searchClients(string $search, int $limit = AppConstants::SEARCH_RESULT_LIMIT): array
     {
         return $this->model->getAllClients([
             'search' => $search,

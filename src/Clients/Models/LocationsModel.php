@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Models;
 
+use WeCoza\Core\Abstract\AppConstants;
+
 class LocationsModel {
 
     protected string $table = 'public.locations';
@@ -175,7 +177,7 @@ class LocationsModel {
     }
 
     public function getAll(array $params = array()): array {
-        $limit = isset($params["limit"]) ? max(1, (int) $params["limit"]) : 10;
+        $limit = isset($params["limit"]) ? max(1, (int) $params["limit"]) : AppConstants::SEARCH_RESULT_LIMIT;
         $offset = isset($params["offset"]) ? max(0, (int) $params["offset"]) : 0;
         $search = isset($params["search"]) ? trim((string) $params["search"]) : '';
 

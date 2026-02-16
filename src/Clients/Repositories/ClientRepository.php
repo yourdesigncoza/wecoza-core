@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Clients\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 use WeCoza\Clients\Models\ClientsModel;
 
@@ -148,7 +149,7 @@ final class ClientRepository extends BaseRepository
      * @param int $limit Maximum results
      * @return array
      */
-    public function searchClients(string $term, int $limit = 20): array
+    public function searchClients(string $term, int $limit = AppConstants::SHORTCODE_DEFAULT_LIMIT): array
     {
         $term = trim($term);
         if ($term === '') {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Classes\Repositories;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseRepository;
 use WeCoza\Classes\Models\ClassModel;
 use WeCoza\Classes\Models\QAVisitModel;
@@ -493,7 +494,7 @@ class ClassRepository extends BaseRepository
         // Complex query: static context with dynamic ORDER BY + JOIN to clients
         $db = wecoza_db();
 
-        $limit = isset($options['limit']) ? intval($options['limit']) : 50;
+        $limit = isset($options['limit']) ? intval($options['limit']) : AppConstants::DEFAULT_PAGE_SIZE;
         $order_by = isset($options['order_by']) ? $options['order_by'] : 'created_at';
         $order = isset($options['order']) ? strtoupper($options['order']) : 'DESC';
 
@@ -724,7 +725,7 @@ class ClassRepository extends BaseRepository
                         return strtotime($b['created_at'] ?? '0') - strtotime($a['created_at'] ?? '0');
                     });
 
-                    $limit = isset($options['limit']) ? (int)$options['limit'] : 50;
+                    $limit = isset($options['limit']) ? (int)$options['limit'] : AppConstants::DEFAULT_PAGE_SIZE;
                     $offset = isset($options['offset']) ? (int)$options['offset'] : 0;
 
                     if ($limit > 0) {

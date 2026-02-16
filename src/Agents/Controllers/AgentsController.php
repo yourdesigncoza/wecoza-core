@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Agents\Controllers;
 
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Core\Abstract\BaseController;
 use WeCoza\Agents\Services\AgentService;
 use WeCoza\Agents\Services\WorkingAreasService;
@@ -156,7 +157,7 @@ class AgentsController extends BaseController
     {
         // Parse attributes
         $atts = shortcode_atts([
-            'per_page' => 10,
+            'per_page' => AppConstants::SEARCH_RESULT_LIMIT,
             'show_search' => true,
             'show_filters' => true,
             'show_pagination' => true,

@@ -25,6 +25,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use WeCoza\Core\Abstract\AppConstants;
+
 abstract class BaseRepository
 {
     /**
@@ -196,7 +198,7 @@ abstract class BaseRepository
      * @param string $order Sort direction (ASC or DESC)
      * @return array Array of records
      */
-    public function findAll(int $limit = 50, int $offset = 0, string $orderBy = 'created_at', string $order = 'DESC'): array
+    public function findAll(int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0, string $orderBy = 'created_at', string $order = 'DESC'): array
     {
         // Validate orderBy against whitelist (SQL injection prevention)
         $orderBy = $this->validateOrderColumn($orderBy);
@@ -234,7 +236,7 @@ abstract class BaseRepository
      * @param string $order Sort direction
      * @return array Array of matching records
      */
-    public function findBy(array $criteria, int $limit = 50, int $offset = 0, string $orderBy = 'created_at', string $order = 'DESC'): array
+    public function findBy(array $criteria, int $limit = AppConstants::DEFAULT_PAGE_SIZE, int $offset = 0, string $orderBy = 'created_at', string $order = 'DESC'): array
     {
         if (empty($criteria)) {
             return $this->findAll($limit, $offset, $orderBy, $order);
@@ -555,7 +557,7 @@ abstract class BaseRepository
      */
     public function paginate(
         int $page = 1,
-        int $perPage = 20,
+        int $perPage = AppConstants::SHORTCODE_DEFAULT_LIMIT,
         array $criteria = [],
         string $orderBy = 'created_at',
         string $order = 'DESC'

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace WeCoza\Learners\Controllers;
 
 use WeCoza\Core\Abstract\BaseController;
+use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Learners\Services\LearnerService;
 
 if (!defined('ABSPATH')) {
@@ -102,7 +103,7 @@ class LearnerController extends BaseController
 
         $this->requireNonce('learners_nonce');
 
-        $limit = $this->query('limit', 'int') ?? 50;
+        $limit = $this->query('limit', 'int') ?? AppConstants::DEFAULT_PAGE_SIZE;
         $offset = $this->query('offset', 'int') ?? 0;
         $withMappings = $this->query('mappings', 'bool') ?? false;
 
@@ -268,7 +269,7 @@ class LearnerController extends BaseController
         }
 
         $atts = shortcode_atts([
-            'limit' => 10,
+            'limit' => AppConstants::SEARCH_RESULT_LIMIT,
             'show_pagination' => true
         ], $atts);
 
