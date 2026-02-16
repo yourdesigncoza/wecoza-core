@@ -5,21 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v4.0 Technical Debt — Architectural Improvements
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 41 — Architectural Verification
-Plan: 01 (completed)
-Status: In Progress (1/2 plans complete)
-Last activity: 2026-02-16 — Completed 41-01: Automated Architectural Verification
+Phase: None — milestone v4.0 complete
+Plan: N/A
+Status: Between milestones
+Last activity: 2026-02-16 — Shipped v4.0 Technical Debt
 
-Progress: 3/6 phases complete (12 plans executed)
+Progress: 41 phases complete across 8 milestones (87 plans executed)
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v4.0 | Technical Debt | 2026-02-16 | 36-41 | 14 |
 | v3.1 | Form Field Wiring Fixes | 2026-02-13 | 31-35 | 8 |
 | v3.0 | Agents Integration | 2026-02-12 | 26-30 | 11 |
 | v2.0 | Clients Integration | 2026-02-12 | 21-25 | 10 |
@@ -33,76 +34,8 @@ See: .planning/MILESTONES.md for full details
 ## Accumulated Context
 
 ### Decisions
-**Phase 41-01 (2026-02-16):**
-- PHP constructors excluded from return type checks (language constraint)
-- Magic methods and polymorphic getters justified for : mixed return types
-- 57 complex query bypass comments accepted per Phase 39-02 pattern
-- Classes/Locations/Events module failures documented as out-of-scope technical debt
 
-**Phase 40-03 (2026-02-16):**
-- void for AJAX handlers (wp_send_json_* terminates execution)
-- string for WordPress shortcode callbacks (must return HTML)
-- mixed for polymorphic getters (getAgentMeta returns different types based on parameter)
-- int|false for insert operations (returns ID or failure)
-
-**Phase 40-01 (2026-02-16):**
-- Use SCREAMING_SNAKE_CASE for all constant names (PHP convention)
-- Do not touch Events module existing private const values (already correctly scoped)
-- Leave raw SQL LIMIT 10 in query strings unchanged (parameterization out of scope)
-- Leave validation length limits unchanged (domain rules, not magic numbers)
-
-**Phase 39-02 (2026-02-16):**
-- Dynamic ORDER BY columns use quoteIdentifier() after whitelist validation
-- Hardcoded string literals documented as safe via audit comment
-- Bypass comments follow pattern: "// Complex query: [reason]"
-
-**Phase 39-01 (2026-02-16):**
-- FK validation runs before parent::insert (simple pre-check, no transaction needed)
-- parent::insert handles transaction internally
-- findBy supports null criteria (main_client_id IS NULL)
-
-**Phase 38-02 (2026-02-16):**
-- Use direct SQL via wecoza_db() instead of LocationsModel to bypass longitude/latitude validation
-- Concatenate address_line_2 into street_address when syncing to locations table
-- Graceful degradation: location sync failure doesn't block agent save
-
-**Phase 37-02 (2026-02-16):**
-- Override BaseModel constructor with empty array to skip hydration (data-bag pattern)
-- Keep get()/set() methods distinct from BaseModel (BaseModel has no such methods)
-- Consolidate to_array() into toArray() override with backward-compatible alias
-- Change save() return type from bool|int to bool (BaseModel abstract requires bool)
-
-
-**Phase 37-01 (2026-02-16):**
-- Preserved column-resolution mechanism as instance properties (runtime schema introspection)
-- Implemented ArrayAccess for backward-compatible array syntax on getById results
-- Changed getById return type from array|null to ?static (satisfies BaseModel abstract contract)
-- Stored hydrated query results in $attributes array for ArrayAccess delegation
-
-**Phase 36-03 (2026-02-16):**
-- Consolidated duplicate form submission logic (~280 lines) into ClientService::handleClientSubmission()
-- Unified data sanitization from two near-identical methods into single service method
-- Service provides both CRUD wrappers and high-level business logic (form handling, export)
-- 83% reduction in saveClient() AJAX handler (120 → 24 lines)
-
-**Phase 36-02 (2026-02-16):**
-- AgentService owns AgentRepository (not shared across layers)
-- Form submission workflow returns structured array (success, agent_id, errors, agent, submitted_data)
-- Presentation logic (HTML rendering, URL helpers) stays in controller/handlers
-- Service handles file upload validation (PDF/DOC/DOCX only)
-
-**Phase 36-01 (2026-02-16):**
-- Service layer follows ProgressionService pattern with lazy-loaded repositories
-- Table row HTML generation placed in service (business logic for field mapping)
-- AJAX handlers maintain backward compatibility with legacy action names
-
-Full decision log in PROJECT.md Key Decisions table.
-- [Phase 38-02]: Use direct SQL via wecoza_db() instead of LocationsModel to bypass longitude/latitude validation
-- [Phase 38-02]: Concatenate address_line_2 into street_address when syncing to locations table
-- [Phase 38-02]: Graceful degradation: location sync failure doesn't block agent save
-- [Phase 39-01]: FK validation runs before parent::insert (simple pre-check, no transaction needed)
-- [Phase 39-01]: parent::insert handles transaction internally
-- [Phase 39-01]: findBy supports null criteria (main_client_id IS NULL)
+Cleared at milestone boundary. Full decision log in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -115,7 +48,10 @@ None.
 | v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
 | v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
 | v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet |
-| v4.0 | Address migration requires dual-write period | Must not break existing agent CRUD |
+| v4.0 tech debt | Address dual-write period active, old columns remain | Must eventually remove old columns (ADDR-06/07) |
+| v4.0 tech debt | Classes module SVC-04 gap | ClassController still has thick methods |
+| v4.0 tech debt | LocationsModel/SitesModel missing type hints | TYPE-02 gap |
+| v4.0 tech debt | Events constants not fully extracted | CONST-04 gap |
 
 ### Quick Tasks Completed
 
@@ -135,7 +71,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 41-01-PLAN.md — Automated Architectural Verification
-Resume file: .planning/phases/41-architectural-verification/41-01-SUMMARY.md
+Stopped at: v4.0 milestone archived
+Resume file: N/A
 
-**Next action:** Continue to 41-02 (Manual Verification & Gap Closure)
+**Next action:** `/gsd:new-milestone` — define next milestone

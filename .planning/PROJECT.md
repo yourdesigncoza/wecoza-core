@@ -2,7 +2,7 @@
 
 ## What This Is
 
-WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend and MVC architecture.
+WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend, MVC architecture, service layer pattern, unified model hierarchy, and full return type coverage.
 
 ## Core Value
 
@@ -53,20 +53,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Server-side validation for 14 agent required fields + AgentDisplayService DRY refactor — v3.1
 - ✓ Clients security (removed 7 unused AJAX endpoints, unified nonces, eliminated double submission) — v3.1
 - ✓ Events late escaping (wp_kses_post on presenter HTML) + tracking table sync — v3.1
+- ✓ Service layer extraction (LearnerService, AgentService, ClientService) — v4.0
+- ✓ Model architecture unification (ClientsModel, AgentModel extend BaseModel) — v4.0
+- ✓ Address storage normalization (agents linked to shared locations table, dual-write) — v4.0
+- ✓ Repository pattern enforcement (80%+ queries via BaseRepository, quoteIdentifier) — v4.0
+- ✓ Return type hints on all public methods across all modules — v4.0
+- ✓ Constants extraction (AppConstants with SCREAMING_SNAKE_CASE) — v4.0
 
 ### Active
 
-## Current Milestone: v4.0 Technical Debt — Architectural Improvements
-
-**Goal:** Refactor WeCoza Core architecture with service layer extraction, model unification, address storage normalization, repository pattern enforcement, return type hints, and constants extraction.
-
-**Target features:**
-- Extract business logic from controllers to service classes (LearnerService, AgentService, ClientService)
-- Unify model architecture — ClientsModel and AgentModel extend BaseModel
-- Normalize address storage — migrate Agents addresses to shared locations table
-- Enforce BaseRepository method usage — replace manual SQL with parent methods
-- Add return type hints to all public methods across all modules
-- Extract magic numbers to named constants
+(None — define next milestone with `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -77,29 +73,33 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - Client billing/invoicing — separate domain
 - CRM-style pipeline — overkill for current needs
 - Client portal (self-service) — would require auth system changes
+- Test suite creation — separate milestone (refactoring-only scope in v4.0)
+- Frontend JavaScript refactoring — PHP-only scope in v4.0
 
 ## Context
 
-### Current State (v3.1 Shipped)
+### Current State (v4.0 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~46,000+ lines of PHP across 5 modules
-- **Agents module:** 14+ PHP files in `src/Agents/` (includes AgentDisplayService)
+- **Total:** ~77,500 lines of PHP across 5 modules
+- **Agents module:** 16+ PHP files in `src/Agents/` (includes AgentService, AgentDisplayService)
 - **Events module:** 40+ PHP files in `src/Events/`
-- **Clients module:** 15+ PHP files in `src/Clients/`
-- **Learners module:** `src/Learners/`
+- **Clients module:** 17+ PHP files in `src/Clients/` (includes ClientService)
+- **Learners module:** `src/Learners/` (includes LearnerService)
 - **Classes module:** `src/Classes/`
+- **Core:** `core/Abstract/AppConstants.php` — shared constants
 - **View templates:** 22+ templates in `views/`
 - **JavaScript:** 21+ JS files across `assets/js/`
-- **Test coverage:** 4 test files in `tests/Events/`, 1 integration test in `tests/integration/`
+- **Test coverage:** 4 test files in `tests/Events/`, 1 integration test, 1 architecture verification script
 - **Form field audits:** `docs/formfieldanalysis/*.md` (5 modules audited)
 
 **Architecture:**
-- `core/` — Framework abstractions (Base classes, security helpers)
-- `src/Learners/` — Learner module
+- `core/` — Framework abstractions (BaseController, BaseModel, BaseRepository, AppConstants, AjaxSecurity)
+- `src/Learners/` — Learner module with LearnerService
 - `src/Classes/` — Classes module
 - `src/Events/` — Events module with notification system
-- `src/Clients/` — Clients module (client, location, site management)
+- `src/Clients/` — Clients module with ClientService
+- `src/Agents/` — Agents module with AgentService (models extend BaseModel)
 - `views/` — PHP templates
 - `assets/` — JS/CSS files
 - `vendor/` — Action Scheduler 3.9.3 (Composer-managed)
@@ -125,6 +125,10 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - Settings page may need admin menu entry for easier discovery
 - 2 test failures in AI summarization test suite (test format issues, not production bugs)
 - agent_meta table doesn't exist (v3.0 FEAT-02 — metadata features not available yet)
+- Address migration dual-write period active — old agent address columns still present (ADDR-06/07 deferred)
+- Classes module SVC-04 gap — ClassController still has thick methods (future tech debt)
+- LocationsModel/SitesModel missing return type hints (TYPE-02 gap — future tech debt)
+- Events module constants not fully extracted (CONST-04 gap — future tech debt)
 
 ## Constraints
 
@@ -163,6 +167,15 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Tracking table sync (no transaction) | JSONB is source of truth, tracking is secondary | ✓ v3.1 |
 | AgentDisplayService for shared methods | Eliminates ~200 lines of duplication | ✓ v3.1 |
 | DB-backed agent/supervisor dropdowns | Live queries replace hardcoded fake names | ✓ v3.1 |
+| Service layer pattern (validate-delegate-respond) | Thin controllers, testable business logic | ✓ v4.0 |
+| ClientsModel/AgentModel extend BaseModel | Unified model hierarchy, shared validation | ✓ v4.0 |
+| ArrayAccess for backward-compatible array syntax | Existing callers unchanged after model refactor | ✓ v4.0 |
+| Dual-write for address migration | Zero-downtime migration, graceful degradation | ✓ v4.0 |
+| Direct SQL for location sync (bypass LocationsModel) | Avoids longitude/latitude validation on existing data | ✓ v4.0 |
+| BaseRepository method delegation (findBy/updateBy) | Consistent CRUD, reduces manual SQL | ✓ v4.0 |
+| quoteIdentifier() for all dynamic column names | SQL injection prevention in ORDER BY clauses | ✓ v4.0 |
+| AppConstants with SCREAMING_SNAKE_CASE | Shared constants, eliminates magic numbers | ✓ v4.0 |
+| 4 acceptable deviations documented as tech debt | Classes/Locations/Events gaps deferred to future | ⚠️ v4.0 |
 
 ---
-*Last updated: 2026-02-16 after v4.0 milestone start*
+*Last updated: 2026-02-16 after v4.0 milestone*

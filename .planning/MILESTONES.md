@@ -1,5 +1,33 @@
 # Project Milestones: WeCoza Core
 
+## v4.0 Technical Debt (Shipped: 2026-02-16)
+
+**Delivered:** Refactored WeCoza Core architecture with service layer extraction, model unification, address storage normalization, repository pattern enforcement, return type hints, and constants extraction across all 5 modules.
+
+**Phases completed:** 36-41 (14 plans total, 21 tasks)
+
+**Key accomplishments:**
+
+- Created LearnerService, AgentService, ClientService — controllers reduced to thin validate-delegate-respond pattern (~83% handler reduction)
+- ClientsModel and AgentModel now extend BaseModel with ArrayAccess backward compatibility and unified validation
+- Migration scripts + dual-read/dual-write linking agents to shared locations table with graceful degradation
+- Comprehensive SQL audit; 80%+ simple queries replaced with BaseRepository methods; quoteIdentifier enforced
+- AppConstants class with SCREAMING_SNAKE_CASE; return type hints on all public methods across all modules
+- Automated verification of all 28 requirements; 4 acceptable deviations documented as future tech debt
+
+**Stats:**
+
+- 80 files modified, 23,214 insertions, 1,774 deletions
+- 77,552 lines of PHP total
+- 6 phases, 14 plans, 28 requirements
+- Same day from start to ship (2026-02-16, ~6 hours)
+
+**Git range:** `8d7cc4b` → `9d50625`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+
 ## v3.1 Form Field Wiring Fixes (Shipped: 2026-02-13)
 
 **Delivered:** Fixed all critical data loss bugs, XSS vulnerabilities, security gaps, and code duplication across 5 modules identified by comprehensive form field wiring audits.
@@ -190,4 +218,3 @@
 
 **What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
 
----
