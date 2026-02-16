@@ -612,4 +612,27 @@ abstract class BaseRepository
     {
         return $this->db->rollback();
     }
+
+    /**
+     * Execute a callback within a database transaction
+     *
+     * Automatically begins a transaction, executes the callback,
+     * commits on success, and rolls back on exception.
+     *
+     * @param callable $callback The operations to execute within the transaction
+     * @return mixed The return value of the callback
+     * @throws Exception Re-throws any exception after rolling back
+     */
+    protected function executeTransaction(callable $callback): mixed
+    {
+        $this->beginTransaction();
+        try {
+            $result = $callback();
+            $this->commit();
+            return $result;
+        } catch (Exception $e) {
+            $this->rollback();
+            throw $e;
+        }
+    }
 }
