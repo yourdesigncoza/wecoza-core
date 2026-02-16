@@ -15,7 +15,7 @@ class ClientCommunicationsModel {
     /**
      * Record a communication entry for a client
      */
-    public function logCommunication($clientId, $siteId, $type, $subject = null, $content = null, $userId = null) {
+    public function logCommunication(int $clientId, int $siteId, string $type, ?string $subject = null, ?string $content = null, ?int $userId = null): bool {
         $clientId = (int) $clientId;
         $siteId = (int) $siteId;
         $type = trim((string) $type);
@@ -55,7 +55,7 @@ class ClientCommunicationsModel {
     /**
      * Get latest communication for a single client
      */
-    public function getLatestCommunication($clientId) {
+    public function getLatestCommunication(int $clientId): ?array {
         $clientId = (int) $clientId;
         if ($clientId <= 0) {
             return null;
@@ -76,7 +76,7 @@ class ClientCommunicationsModel {
      * @param array $clientIds
      * @return array<int,array>
      */
-    public function getLatestCommunications(array $clientIds) {
+    public function getLatestCommunications(array $clientIds): array {
         $ids = array_values(array_unique(array_map('intval', array_filter($clientIds))));
         if (empty($ids)) {
             return array();
@@ -117,7 +117,7 @@ class ClientCommunicationsModel {
     /**
      * Convenience wrapper returning the latest communication type string
      */
-    public function getLatestCommunicationType($clientId) {
+    public function getLatestCommunicationType(int $clientId): ?string {
         $latest = $this->getLatestCommunication($clientId);
         return $latest ? $latest['communication_type'] : null;
     }
@@ -125,7 +125,7 @@ class ClientCommunicationsModel {
     /**
      * Convenience wrapper returning map of client_id => [communication_type, communication_date]
      */
-    public function getLatestCommunicationTypes(array $clientIds) {
+    public function getLatestCommunicationTypes(array $clientIds): array {
         $latest = $this->getLatestCommunications($clientIds);
         $map = array();
 

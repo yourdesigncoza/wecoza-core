@@ -17,7 +17,7 @@ class LocationsModel {
         $this->sitesModel = new SitesModel();
     }
 
-    public function validate(array $data, $id = null) {
+    public function validate(array $data, ?int $id = null): array {
         $errors = array();
 
         $provinceOptions = wecoza_config('clients')['province_options'] ?? array();
@@ -77,7 +77,7 @@ class LocationsModel {
         return $errors;
     }
 
-    public function create(array $data) {
+    public function create(array $data): array|false {
         $longitude = $this->normalizeCoordinate($data['longitude']);
         $latitude = $this->normalizeCoordinate($data['latitude']);
 
@@ -126,7 +126,7 @@ class LocationsModel {
         return !empty($row);
     }
 
-    public function checkDuplicates($streetAddress, $suburb, $town) {
+    public function checkDuplicates(string $streetAddress, string $suburb, string $town): array {
         $conditions = array();
         $params = array();
 
@@ -200,7 +200,7 @@ class LocationsModel {
         return wecoza_db()->getAll($sql, $bind) ?: array();
     }
 
-    public function count(array $params = array()) {
+    public function count(array $params = array()): int {
         $search = isset($params["search"]) ? trim((string) $params["search"]) : '';
         $where = array();
         $bind = array();
@@ -241,7 +241,7 @@ class LocationsModel {
         return false; // Not implemented - use updateById() instead
     }
 
-    public function updateById($id, array $data) {
+    public function updateById(int $id, array $data): array|false {
         $id = (int) $id;
         if ($id <= 0) {
             return false;

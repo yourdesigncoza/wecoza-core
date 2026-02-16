@@ -235,7 +235,7 @@ class QAVisitModel extends BaseModel
     public function getOfficerName(): ?string { return $this->officerName; }
     public function setOfficerName($officerName): self { $this->officerName = $officerName; return $this; }
 
-    public function getLatestDocument() { return $this->latestDocument; }
+    public function getLatestDocument(): ?string { return $this->latestDocument; }
     public function setLatestDocument($latestDocument): self {
         if (is_string($latestDocument)) {
             $this->latestDocument = json_decode($latestDocument, true);

@@ -64,12 +64,12 @@ class SitesModel {
         );
     }
 
-    public function refreshLocationCache() {
+    public function refreshLocationCache(): void {
         self::$locationCache = null;
-        return $this->rebuildLocationCache();
+        $this->rebuildLocationCache();
     }
 
-    public function clearLocationCache() {
+    public function clearLocationCache(): void {
         $key = $this->getLocationCacheKey();
         delete_transient($key);
         delete_option($key);
@@ -104,7 +104,7 @@ class SitesModel {
         }, $rows);
     }
 
-    public function rebuildLocationCache() {
+    public function rebuildLocationCache(): array {
         $rows = $this->fetchAllLocations();
 
         $hierarchy = array();
@@ -290,15 +290,17 @@ class SitesModel {
         return wecoza_db()->getAll($sql, $params) ?: array();
     }
 
-    public function refreshHeadSiteCache($clientIds = null) {
+    public function refreshHeadSiteCache($clientIds = null): void {
         if ($clientIds === null) {
             self::$headSiteCache = null;
-            return $this->ensureHeadSiteCache();
+            $this->ensureHeadSiteCache();
+            return;
         }
 
         $clientIds = array_values(array_unique(array_filter(array_map('intval', (array) $clientIds))));
         if (empty($clientIds)) {
-            return $this->ensureHeadSiteCache();
+            $this->ensureHeadSiteCache();
+            return;
         }
 
         $cache = $this->ensureHeadSiteCache();
@@ -318,11 +320,9 @@ class SitesModel {
 
         self::$headSiteCache = $cache;
         $this->persistHeadSiteCache($cache);
-
-        return self::$headSiteCache;
     }
 
-    public function clearHeadSiteCache($clientIds = null) {
+    public function clearHeadSiteCache($clientIds = null): void {
         if ($clientIds === null) {
             $key = $this->getHeadSiteCacheKey();
             delete_transient($key);
@@ -347,7 +347,7 @@ class SitesModel {
         $this->persistHeadSiteCache($cache);
     }
 
-    public function getHeadSitesForClients(array $clientIds) {
+    public function getHeadSitesForClients(array $clientIds): array {
         $ids = array_values(array_unique(array_filter(array_map('intval', $clientIds))));
         if (empty($ids)) {
             return array();
@@ -363,7 +363,7 @@ class SitesModel {
         return $map;
     }
 
-    public function getHeadSite($clientId) {
+    public function getHeadSite(int $clientId): ?array {
         $clientId = (int) $clientId;
         if ($clientId <= 0) {
             return null;
@@ -373,7 +373,7 @@ class SitesModel {
         return !empty($cache['map'][$clientId]) ? $cache['map'][$clientId] : null;
     }
 
-    public function getSitesByClient($clientId) {
+    public function getSitesByClient(int $clientId): array {
         $clientId = (int) $clientId;
         if ($clientId <= 0) {
             return array('head' => null, 'sub_sites' => array());
@@ -407,7 +407,7 @@ class SitesModel {
         return array('head' => $head, 'sub_sites' => $subs);
     }
 
-    public function saveHeadSite($clientId, array $data) {
+    public function saveHeadSite(int $clientId, array $data): int|false {
         $clientId = (int) $clientId;
         if ($clientId <= 0) {
             return false;
@@ -449,7 +449,7 @@ class SitesModel {
         return $siteId;
     }
 
-    public function validateHeadSite(array $data) {
+    public function validateHeadSite(array $data): array {
         $errors = array();
 
         $name = trim((string) ($data['site_name'] ?? ''));
@@ -468,7 +468,7 @@ class SitesModel {
         return $errors;
     }
 
-    public function getSiteById($siteId) {
+    public function getSiteById(int $siteId): ?array {
         $siteId = (int) $siteId;
         if ($siteId <= 0) {
             return null;
@@ -488,7 +488,7 @@ class SitesModel {
         return $hydrated ? $hydrated[0] : $row;
     }
 
-    public function ensureSiteBelongsToClient($siteId, $clientId) {
+    public function ensureSiteBelongsToClient(int $siteId, int $clientId): bool {
         $site = $this->getSiteById($siteId);
         if (!$site) {
             return false;
@@ -497,7 +497,7 @@ class SitesModel {
         return (int) $site['client_id'] === (int) $clientId;
     }
 
-    public function hydrateClients(array &$clients) {
+    public function hydrateClients(array &$clients): void {
         if (empty($clients)) {
             return;
         }
@@ -608,7 +608,7 @@ class SitesModel {
         return (bool) $this->locationsEnabled;
     }
 
-    public function getLocationHierarchy($useCache = true) {
+    public function getLocationHierarchy(bool $useCache = true): array {
         if (!$useCache) {
             $cache = $this->refreshLocationCache();
             return $cache['hierarchy'];
@@ -618,7 +618,7 @@ class SitesModel {
         return $cache['hierarchy'];
     }
 
-    public function getLocationById($locationId) {
+    public function getLocationById(int $locationId): ?array {
         $locationId = (int) $locationId;
         if ($locationId <= 0) {
             return null;
@@ -670,7 +670,7 @@ class SitesModel {
     /**
      * Save a sub-site under a parent site
      */
-    public function saveSubSite($clientId, $parentSiteId, array $data, array $options = array()) {
+    public function saveSubSite(int $clientId, int $parentSiteId, array $data, array $options = array()): array|false {
         $clientId = (int) $clientId;
         $parentSiteId = (int) $parentSiteId;
         
@@ -759,7 +759,7 @@ class SitesModel {
     /**
      * Validate sub-site data
      */
-    public function validateSubSite($clientId, $parentSiteId, array $data, $expectedClientId = null) {
+    public function validateSubSite(int $clientId, int $parentSiteId, array $data, ?int $expectedClientId = null): array {
         $errors = array();
 
         $name = trim((string) ($data['site_name'] ?? ''));
@@ -789,7 +789,7 @@ class SitesModel {
     /**
      * Get head sites for a client (for parent site selection)
      */
-    public function getHeadSitesForClient($clientId) {
+    public function getHeadSitesForClient(int $clientId): array {
         $clientId = (int) $clientId;
         if ($clientId <= 0) {
             return array();
@@ -799,7 +799,7 @@ class SitesModel {
                 FROM ' . $this->table . '
                 WHERE client_id = :client_id AND parent_site_id IS NULL
                 ORDER BY site_name';
-        
+
         $sites = wecoza_db()->getAll($sql, array(':client_id' => $clientId));
         return $sites ? $this->hydrateLocationForSites($sites) : array();
     }
@@ -807,7 +807,7 @@ class SitesModel {
     /**
      * Get sub-sites for a parent site
      */
-    public function getSubSites($parentSiteId) {
+    public function getSubSites(int $parentSiteId): array {
         $parentSiteId = (int) $parentSiteId;
         if ($parentSiteId <= 0) {
             return array();
@@ -817,7 +817,7 @@ class SitesModel {
                 FROM ' . $this->table . '
                 WHERE parent_site_id = :parent_site_id
                 ORDER BY site_name';
-        
+
         $sites = wecoza_db()->getAll($sql, array(':parent_site_id' => $parentSiteId));
         return $sites ? $this->hydrateLocationForSites($sites) : array();
     }
@@ -825,7 +825,7 @@ class SitesModel {
     /**
      * Get all sites for a client with hierarchy
      */
-    public function getAllSitesWithHierarchy($clientId) {
+    public function getAllSitesWithHierarchy(int $clientId): array {
         $result = $this->getSitesByClient($clientId);
 
         $head = $result['head'] ?? null;
@@ -840,7 +840,7 @@ class SitesModel {
     /**
      * Delete a sub-site
      */
-    public function deleteSubSite($siteId, $clientId) {
+    public function deleteSubSite(int $siteId, int $clientId): bool {
         $siteId = (int) $siteId;
         $clientId = (int) $clientId;
         

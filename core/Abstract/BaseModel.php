@@ -77,7 +77,7 @@ abstract class BaseModel
      * @param string $name Property name
      * @return mixed
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         // Try exact match first
         if (property_exists($this, $name)) {

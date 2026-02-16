@@ -292,7 +292,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         }
     }
 
-    public function getAllClients($params = []) {
+    public function getAllClients(array $params = []): array {
         $alias = 'c';
         $primaryKey = $this->resolvedPrimaryKey;
         $sql = "SELECT {$alias}.*, {$alias}.{$primaryKey} AS id, mc.client_name AS main_client_name FROM {$this->table} {$alias}
@@ -392,7 +392,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return $instance;
     }
 
-    public function getByRegistrationNumber($regNr) {
+    public function getByRegistrationNumber(string $regNr): array|false {
         $alias = 'c';
         $primaryKey = $this->resolvedPrimaryKey;
         $registrationColumn = $this->getColumn('company_registration_nr');
@@ -413,7 +413,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return $normalized;
     }
 
-    public function create(array $data) {
+    public function create(array $data): int|false {
         $data['created_at'] = current_time('mysql');
         $data['updated_at'] = current_time('mysql');
 
@@ -439,7 +439,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return false;
     }
 
-    public function updateById($id, array $data) {
+    public function updateById(int $id, array $data): bool {
         $data['updated_at'] = current_time('mysql');
         $prepared = $this->prepareDataForSave($data);
 
@@ -462,7 +462,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return false;
     }
 
-    public function deleteById($id) {
+    public function deleteById(int $id): bool {
         // Soft delete: set deleted_at timestamp instead of hard delete
         $data = ['deleted_at' => current_time('mysql')];
         $where = $this->resolvedPrimaryKey . ' = :id';
@@ -471,7 +471,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return $result !== false;
     }
 
-    public function count($params = []) {
+    public function count(array $params = []): int {
         $alias = 'c';
         $sql = "SELECT COUNT(*) FROM {$this->table} {$alias}";
         $where = [];
@@ -525,7 +525,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return (int) $count;
     }
 
-    public function getStatistics() {
+    public function getStatistics(): array {
         $alias = 'c';
         $statusColumn = $this->getColumn('client_status');
 
@@ -556,7 +556,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         ]);
     }
 
-    public function getForDropdown() {
+    public function getForDropdown(): array {
         $alias = 'c';
         $primaryKey = $this->resolvedPrimaryKey;
         $nameColumn = $this->getColumn('client_name', $primaryKey);
@@ -582,7 +582,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return $rows;
     }
 
-    public function validate($data, $id = null) {
+    public function validate(array $data, ?int $id = null): array {
         $errors = [];
         $config = wecoza_config('clients');
         $rules = $config['validation_rules'] ?? [];
@@ -648,21 +648,21 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
         return $errors;
     }
 
-    public function getLocationHierarchy($useCache = true) {
+    public function getLocationHierarchy(bool $useCache = true): array {
         return $this->sitesModel->getLocationHierarchy($useCache);
     }
 
-    public function getLocationById($locationId) {
+    public function getLocationById(int $locationId): ?array {
         return $this->sitesModel->getLocationById($locationId);
     }
 
-    public function getSitesModel() {
+    public function getSitesModel(): SitesModel {
         return $this->sitesModel;
     }
 
 
 
-    public function getCommunicationsModel() {
+    public function getCommunicationsModel(): ClientCommunicationsModel {
         return $this->communicationsModel;
     }
 
@@ -678,7 +678,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
     /**
      * Get only main clients (clients without a main_client_id)
      */
-    public function getMainClients() {
+    public function getMainClients(): array {
         $alias = 'c';
         $primaryKey = $this->resolvedPrimaryKey;
         $nameColumn = $this->getColumn('client_name', $primaryKey);
@@ -717,7 +717,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
     /**
      * Get sub-clients of a specific main client
      */
-    public function getSubClients($mainClientId) {
+    public function getSubClients(int $mainClientId): array {
         $mainClientId = (int) $mainClientId;
         if ($mainClientId <= 0) {
             return [];
@@ -761,7 +761,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
     /**
      * Get all clients with their sub-client relationship information
      */
-    public function getAllWithHierarchy() {
+    public function getAllWithHierarchy(): array {
         $alias = 'c';
         $primaryKey = $this->resolvedPrimaryKey;
         $nameColumn = $this->getColumn('client_name', $primaryKey);
@@ -798,7 +798,7 @@ class ClientsModel extends BaseModel implements \ArrayAccess {
     /**
      * Update client hierarchy (change a client from main to sub-client or vice versa)
      */
-    public function updateClientHierarchy($clientId, $mainClientId = null) {
+    public function updateClientHierarchy(int $clientId, ?int $mainClientId = null): bool {
         $clientId = (int) $clientId;
         if ($clientId <= 0) {
             return false;
