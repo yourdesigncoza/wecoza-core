@@ -235,7 +235,7 @@ class AgentModel extends BaseModel
      * @param int $id Agent ID
      * @return bool Success
      */
-    public function load($id)
+    public function load(int $id): bool
     {
         $id = absint($id);
         if (!$id) {
@@ -362,7 +362,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @param array $data Agent data
      */
-    public function set_data($data)
+    public function set_data(array $data): void
     {
         foreach ($data as $key => $value) {
             $this->set($key, $value);
@@ -375,7 +375,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return array Agent data
      */
-    public function get_data()
+    public function get_data(): array
     {
         return array_merge(self::$defaults, $this->data);
     }
@@ -423,7 +423,7 @@ class AgentModel extends BaseModel
      * @param string $key Property key
      * @return mixed Property value
      */
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         if ($key === 'id') {
             return $this->id;
@@ -439,7 +439,7 @@ class AgentModel extends BaseModel
      * @param string $key Property key
      * @param mixed $value Property value
      */
-    public function __set($key, $value)
+    public function __set(string $key, mixed $value): void
     {
         if ($key === 'id') {
             $this->id = absint($value);
@@ -455,7 +455,7 @@ class AgentModel extends BaseModel
      * @param string $key Property key
      * @return bool Whether property is set
      */
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         if ($key === 'id') {
             return isset($this->id);
@@ -472,7 +472,7 @@ class AgentModel extends BaseModel
      * @param mixed $default Default value
      * @return mixed Property value
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if (isset($this->data[$key])) {
             return $this->data[$key];
@@ -492,7 +492,7 @@ class AgentModel extends BaseModel
      * @param string $key Property key
      * @param mixed $value Property value
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): static
     {
         // Track modifications
         if (!isset($this->data[$key]) || $this->data[$key] !== $value) {
@@ -500,16 +500,18 @@ class AgentModel extends BaseModel
         }
 
         $this->data[$key] = $value;
+
+        return $this;
     }
 
     /**
      * Check if field was modified
      *
      * @since 3.0.0
-     * @param string $key Property key
+     * @param string|null $key Property key
      * @return bool Whether field was modified
      */
-    public function is_modified($key = null)
+    public function is_modified(?string $key = null): bool
     {
         if ($key === null) {
             return !empty($this->modified);
@@ -524,7 +526,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return array Modified field keys
      */
-    public function get_modified_fields()
+    public function get_modified_fields(): array
     {
         return array_keys($this->modified);
     }
@@ -542,7 +544,7 @@ class AgentModel extends BaseModel
      *   - 'repository' (AgentRepository|null): Repository instance for DB lookups.
      * @return bool Whether data is valid
      */
-    public function validate(?array $context = null)
+    public function validate(?array $context = null): bool
     {
         $this->errors = [];
         $data = $this->get_data();
@@ -686,7 +688,7 @@ class AgentModel extends BaseModel
      * @param mixed $default Default value
      * @return mixed Field value
      */
-    public function get_form_field($form_field_name, $default = null)
+    public function get_form_field(string $form_field_name, mixed $default = null): mixed
     {
         // Use FormHelpers to map form field to database field
         if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
@@ -704,7 +706,7 @@ class AgentModel extends BaseModel
      * @param string $form_field_name Form field name
      * @param mixed $value Field value
      */
-    public function set_form_field($form_field_name, $value)
+    public function set_form_field(string $form_field_name, mixed $value): void
     {
         // Use FormHelpers to map form field to database field
         if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
@@ -721,7 +723,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @param array $form_data Form data with form field names
      */
-    public function set_form_data($form_data)
+    public function set_form_data(array $form_data): void
     {
         // Use FormHelpers to map form fields to database fields
         if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
@@ -738,7 +740,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return array Data with form field names
      */
-    public function get_form_data()
+    public function get_form_data(): array
     {
         $data = $this->get_data();
 
@@ -756,7 +758,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return array Validation errors
      */
-    public function get_errors()
+    public function get_errors(): array
     {
         return $this->errors;
     }
@@ -784,7 +786,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return string Display name
      */
-    public function get_display_name()
+    public function get_display_name(): string
     {
         $parts = [];
 
@@ -810,7 +812,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return string Initials
      */
-    public function get_initials()
+    public function get_initials(): string
     {
         if ($this->get('initials')) {
             return $this->get('initials');
@@ -835,7 +837,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return array Preferred areas
      */
-    public function get_preferred_areas()
+    public function get_preferred_areas(): array
     {
         $areas = [];
 
@@ -859,7 +861,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @param array $areas Preferred areas
      */
-    public function set_preferred_areas($areas)
+    public function set_preferred_areas(array $areas): void
     {
         if (is_array($areas)) {
             // Set individual database columns
@@ -873,10 +875,10 @@ class AgentModel extends BaseModel
      * Check if agent has quantum qualification
      *
      * @since 3.0.0
-     * @param string $type Quantum type (maths, science, or null for any)
+     * @param string|null $type Quantum type (maths, science, or null for any)
      * @return bool Whether agent has qualification
      */
-    public function has_quantum_qualification($type = null)
+    public function has_quantum_qualification(?string $type = null): bool
     {
         if ($type === 'maths') {
             return $this->get('quantum_maths_score') > 0;
@@ -898,7 +900,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return string Status label
      */
-    public function get_status_label()
+    public function get_status_label(): string
     {
         $status = $this->get('status', 'active');
         $labels = [
@@ -941,7 +943,7 @@ class AgentModel extends BaseModel
      * @since 3.0.0
      * @return string JSON representation
      */
-    public function to_json()
+    public function to_json(): string
     {
         return json_encode($this->to_array());
     }
