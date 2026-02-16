@@ -43,7 +43,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to save a client
      */
-    public function saveClient() {
+    public function saveClient(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('manage_wecoza_clients')) {
@@ -71,7 +71,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to get a client
      */
-    public function getClient() {
+    public function getClient(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
@@ -95,7 +95,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to get client details for modal
      */
-    public function getClientDetails() {
+    public function getClientDetails(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
@@ -119,7 +119,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to delete a client
      */
-    public function deleteClient() {
+    public function deleteClient(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('manage_wecoza_clients')) {
@@ -148,7 +148,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to search clients
      */
-    public function searchClients() {
+    public function searchClients(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
@@ -166,7 +166,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to get branch clients (sites)
      */
-    public function getBranchClients() {
+    public function getBranchClients(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         if (!current_user_can('view_wecoza_clients')) {
@@ -186,7 +186,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to export clients
      */
-    public function exportClients() {
+    public function exportClients(): void {
         // Check nonce manually for export
         if (!wp_verify_nonce($_REQUEST['nonce'] ?? '', 'clients_nonce_action')) {
             wp_die('Security check failed.');
@@ -223,7 +223,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to fetch locations lazily
      */
-    public function getLocations() {
+    public function getLocations(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
         $hierarchy = $this->clientService->getLocationHierarchy();
@@ -238,7 +238,7 @@ class ClientAjaxHandlers {
     /**
      * AJAX handler to check location duplicates
      */
-    public function checkLocationDuplicates() {
+    public function checkLocationDuplicates(): void {
         // Custom nonce check for locations
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 

@@ -50,7 +50,7 @@ class ClientsController extends BaseController {
     /**
      * Register shortcodes
      */
-    public function registerShortcodes() {
+    public function registerShortcodes(): void {
         add_shortcode('wecoza_capture_clients', array($this, 'captureClientShortcode'));
         add_shortcode('wecoza_display_clients', array($this, 'displayClientsShortcode'));
         add_shortcode('wecoza_update_clients', array($this, 'updateClientShortcode'));
@@ -59,7 +59,7 @@ class ClientsController extends BaseController {
     /**
      * Enqueue plugin assets
      */
-    public function enqueueAssets() {
+    public function enqueueAssets(): void {
         global $post;
 
         // Check if we're on a page with our shortcodes
@@ -178,7 +178,7 @@ class ClientsController extends BaseController {
      * @param array $atts Shortcode attributes
      * @return string
      */
-    public function captureClientShortcode($atts) {
+    public function captureClientShortcode($atts): string {
         // Check permissions
         if (!current_user_can('manage_wecoza_clients')) {
             return '<p>' . __('You do not have permission to create clients.', 'wecoza-core') . '</p>';
@@ -243,7 +243,7 @@ class ClientsController extends BaseController {
      * @param array $atts Shortcode attributes
      * @return string
      */
-    public function displayClientsShortcode($atts) {
+    public function displayClientsShortcode($atts): string {
         // Check permissions
         if (!current_user_can('view_wecoza_clients')) {
             return '<p>' . __('You do not have permission to view clients.', 'wecoza-core') . '</p>';
@@ -306,7 +306,7 @@ class ClientsController extends BaseController {
      * @param array $atts Shortcode attributes
      * @return string
      */
-    public function updateClientShortcode($atts) {
+    public function updateClientShortcode($atts): string {
         // Check permissions
         if (!current_user_can('edit_wecoza_clients')) {
             return '<p>' . __('You do not have permission to update clients.', 'wecoza-core') . '</p>';

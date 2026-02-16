@@ -28,13 +28,13 @@ class LocationsController extends BaseController {
         return $this->model;
     }
 
-    public function registerShortcodes() {
+    public function registerShortcodes(): void {
         add_shortcode('wecoza_locations_capture', array($this, 'captureLocationShortcode'));
         add_shortcode('wecoza_locations_list', array($this, 'listLocationsShortcode'));
         add_shortcode('wecoza_locations_edit', array($this, 'editLocationShortcode'));
     }
 
-    public function enqueueAssets() {
+    public function enqueueAssets(): void {
         global $post;
 
         if (!is_a($post, 'WP_Post')) {
@@ -104,7 +104,7 @@ class LocationsController extends BaseController {
         // List page uses server-side ILIKE search — no Google Maps needed
     }
 
-    public function captureLocationShortcode($atts) {
+    public function captureLocationShortcode($atts): string {
         if (!current_user_can('manage_wecoza_clients')) {
             return '<p>' . esc_html__('You do not have permission to capture locations.', 'wecoza-core') . '</p>';
         }
@@ -201,7 +201,7 @@ class LocationsController extends BaseController {
         return !empty($optionKey) ? $optionKey : '';
     }
 
-    public function editLocationShortcode($atts) {
+    public function editLocationShortcode($atts): string {
         if (!current_user_can('edit_wecoza_clients')) {
             return '<p>' . esc_html__('You do not have permission to edit locations.', 'wecoza-core') . '</p>';
         }
@@ -312,7 +312,7 @@ class LocationsController extends BaseController {
         );
     }
 
-    public function listLocationsShortcode($atts) {
+    public function listLocationsShortcode($atts): string {
         if (!current_user_can('view_wecoza_clients')) {
             return '<p>' . esc_html__('You do not have permission to view locations.', 'wecoza-core') . '</p>';
         }
