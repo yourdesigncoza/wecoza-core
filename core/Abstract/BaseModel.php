@@ -81,22 +81,35 @@ abstract class BaseModel
     {
         // Try exact match first
         if (property_exists($this, $name)) {
-            return $this->$name;
+            return $this->resolvePropertyValue($name);
         }
 
         // Try camelCase conversion
         $camelCase = $this->snakeToCamel($name);
         if (property_exists($this, $camelCase)) {
-            return $this->$camelCase;
+            return $this->resolvePropertyValue($camelCase);
         }
 
         // Try snake_case conversion
         $snakeCase = $this->camelToSnake($name);
         if (property_exists($this, $snakeCase)) {
-            return $this->$snakeCase;
+            return $this->resolvePropertyValue($snakeCase);
         }
 
         return null;
+    }
+
+    /**
+     * Resolve a property value, handling both static and instance properties.
+     *
+     * property_exists() returns true for static properties, but accessing them
+     * via $this->prop generates a PHP warning. Use Reflection to detect static
+     * properties and access them via static::$prop instead.
+     */
+    private function resolvePropertyValue(string $name): mixed
+    {
+        $ref = new \ReflectionProperty(static::class, $name);
+        return $ref->isStatic() ? static::$$name : $this->$name;
     }
 
     /**
