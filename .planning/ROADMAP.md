@@ -9,7 +9,7 @@
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
-| 36 | Service Layer Extraction | Controllers become thin routing — all business logic in service classes | SVC-01..04 | 4 |
+| 36 | Service Layer Extraction | Complete    | 2026-02-16 | 4 |
 | 37 | Model Architecture Unification | ClientsModel and AgentModel extend BaseModel — no duplicate methods | MDL-01..04 | 4 |
 | 38 | Address Storage Normalization | Agent addresses migrated to shared locations table with dual-write | ADDR-01..05 | 5 |
 | 39 | Repository Pattern Enforcement | All repositories use BaseRepository methods — manual SQL only for complex queries | REPO-01..06 | 4 |
@@ -38,7 +38,7 @@ Phase 40 (TYPE+CONST) ───────────────────�
 
 **Goal:** Extract business logic from LearnerController, AgentsController, and ClientsController into dedicated service classes. Controllers should only handle input validation, service delegation, and response formatting.
 
-**Plans:** 3 plans (all Wave 1 — parallel)
+**Plans:** 3/3 plans complete
 - [ ] 36-01-PLAN.md — LearnerService extraction (SVC-01)
 - [ ] 36-02-PLAN.md — AgentService extraction (SVC-02)
 - [ ] 36-03-PLAN.md — ClientService extraction (SVC-03, biggest DRY win)
