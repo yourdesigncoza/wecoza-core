@@ -110,7 +110,7 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 | 26-30 | v3.0 | 11 | Complete | 2026-02-12 |
 | 31-35 | v3.1 | 8 | Complete | 2026-02-13 |
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
-| 42-43 | v4.1 | 0 | In Progress | — |
+| 42-43 | v4.1 | 3 | In Progress | — |
 
 **Total: 43 phases, 87 plans, 8 milestones shipped, 1 in progress**
 
@@ -128,10 +128,10 @@ Plans:
 
 **Goal:** Register [wecoza_manage_placement_levels] shortcode using Phase 42 infrastructure. Same UI pattern, configured for 3-column table (level code + description).
 **Depends on:** Phase 42
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 43 to break down)
+- [ ] 43-01-PLAN.md -- Fix auto-increment sequence + human verification of shortcode CRUD
 
 ---
-*Last updated: 2026-02-17 after v4.1 milestone creation*
+*Last updated: 2026-02-17 after Phase 43 planning*
