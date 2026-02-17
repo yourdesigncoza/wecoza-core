@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 42 — Lookup Table CRUD Infrastructure + Qualifications Shortcode
-Plan: 01 COMPLETE — backend infrastructure built
-Status: In progress — Plan 02 (view + JS) next
-Last activity: 2026-02-17 - Executed 42-01: LookupTable CRUD infrastructure
+Plan: 02 COMPLETE — frontend view + JS CRUD manager built and verified
+Status: Phase 42 COMPLETE — Phase 43 (Placement Levels Shortcode) next
+Last activity: 2026-02-17 - Executed 42-02: manage.view.php + lookup-table-manager.js; human verified
 
 Progress: 41 phases complete across 8 milestones (88 plans executed), 2 phases in progress
 
@@ -38,6 +38,8 @@ See: .planning/MILESTONES.md for full details
 - 42-01: LookupTableRepository does not extend BaseRepository — BaseRepository uses static $table, runtime config injection requires standalone class
 - 42-01: TABLES constant lives in LookupTableController; AjaxHandler calls getTableConfig() — single source of truth
 - 42-01: SHORTCODE_MAP constant in controller for clean tag-to-tableKey dispatch
+- 42-02: Used btn-subtle-* over btn-phoenix-* for in-table action buttons; wrapped in btn-group — matches app-wide pattern
+- 42-02: PHP-to-JS config via embedded JSON script tag avoids per-shortcode wp_localize_script registration
 
 ### Roadmap Evolution
 
@@ -45,6 +47,7 @@ See: .planning/MILESTONES.md for full details
 - Phase 43 added: Placement Levels Shortcode
 - Milestone v4.1 created: Lookup Table Admin (Phases 42-43)
 - Phase 42, Plan 01 complete: backend infrastructure (Repository, AjaxHandler, Controller)
+- Phase 42, Plan 02 complete: frontend view template + JS CRUD manager; human verified
 
 ### Pending Todos
 
@@ -84,11 +87,12 @@ None.
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 42 | 01 | 2 min | 2/2 | 4 |
+| 42 | 02 | 15 min | 2/2 | 2 |
 
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 42-01-PLAN.md — backend infrastructure (Repository, AjaxHandler, Controller)
+Stopped at: Completed 42-02-PLAN.md — frontend view + JS CRUD manager, human verified
 Resume file: N/A
 
-**Next action:** Execute Plan 02 — view template (manage.view.php) + lookup-table-manager.js
+**Next action:** Execute Phase 43 — Placement Levels Shortcode
