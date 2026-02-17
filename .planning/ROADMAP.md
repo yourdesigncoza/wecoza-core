@@ -118,7 +118,7 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 
 **Goal:** Build generic LookupTables module (Controller, Repository, Ajax handler, view, JS). Register [wecoza_manage_qualifications] shortcode. Inline-editable Phoenix-styled table for CRUD on learner_qualifications table.
 **Depends on:** Phase 41
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 42-01-PLAN.md -- Backend: Repository + AJAX handler + Controller + wecoza-core.php registration
