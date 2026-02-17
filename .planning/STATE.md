@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 42 — Lookup Table CRUD Infrastructure + Qualifications Shortcode
-Plan: 02 COMPLETE — frontend view + JS CRUD manager built and verified
-Status: Phase 42 COMPLETE — Phase 43 (Placement Levels Shortcode) next
-Last activity: 2026-02-17 - Executed 42-02: manage.view.php + lookup-table-manager.js; human verified
+Phase: 43 — Placement Levels Shortcode
+Plan: 01 COMPLETE — auto-increment DDL applied, end-to-end CRUD verified
+Status: Phase 43 COMPLETE — Milestone v4.1 Lookup Table Admin shipped
+Last activity: 2026-02-17 - Executed 43-01: DDL fix + human verified all 7 CRUD steps
 
-Progress: 41 phases complete across 8 milestones (88 plans executed), 2 phases in progress
+Progress: 43 phases complete across 8 milestones (89 plans executed), milestone v4.1 Lookup Table Admin shipped
 
 ## Milestone History
 
@@ -48,6 +48,7 @@ See: .planning/MILESTONES.md for full details
 - Milestone v4.1 created: Lookup Table Admin (Phases 42-43)
 - Phase 42, Plan 01 complete: backend infrastructure (Repository, AjaxHandler, Controller)
 - Phase 42, Plan 02 complete: frontend view template + JS CRUD manager; human verified
+- Phase 43, Plan 01 complete: DDL sequence fix on placement_level_id; all 7 CRUD steps verified; milestone v4.1 shipped
 
 ### Pending Todos
 
@@ -88,11 +89,12 @@ None.
 |-------|------|----------|-------|-------|
 | 42 | 01 | 2 min | 2/2 | 4 |
 | 42 | 02 | 15 min | 2/2 | 2 |
+| 43 | 01 | 10 min | 2/2 | 0 |
 
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 42-02-PLAN.md — frontend view + JS CRUD manager, human verified
+Stopped at: Completed 43-01-PLAN.md — DDL fix + human verified; milestone v4.1 Lookup Table Admin shipped
 Resume file: N/A
 
-**Next action:** Execute Phase 43 — Placement Levels Shortcode
+**Next action:** Define next phase or milestone
