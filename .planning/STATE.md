@@ -67,11 +67,12 @@ None.
 | 008 | Fix Event Dates heading border colspan | 2026-02-05 | 7c997f4 | [008-fix-event-dates-heading-border](./quick/008-fix-event-dates-heading-border/) |
 | 009 | Rename AI Summary/AI Generation Details in email template | 2026-02-05 | ebb2a43 | [009-update-email-template-rename-ai-summary-](./quick/009-update-email-template-rename-ai-summary-/) |
 | 010 | Convert Bootstrap badges to Phoenix style | 2026-02-05 | 9742c0b | [010-update-bootstrap-badges-to-phoenix-style](./quick/010-update-bootstrap-badges-to-phoenix-style/) |
+| 011 | Improve post-save UX in client capture form | 2026-02-17 | d5cccbe | [11-after-saving-a-new-client-via-wecoza-cap](./quick/11-after-saving-a-new-client-via-wecoza-cap/) |
 
 ## Session Continuity
 
-Last session: 2026-02-16
-Stopped at: v4.0 milestone archived
+Last session: 2026-02-17
+Stopped at: Quick task 11 complete
 Resume file: N/A
 
 **Next action:** `/gsd:new-milestone` — define next milestone
