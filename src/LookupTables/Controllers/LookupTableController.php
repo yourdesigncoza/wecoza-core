@@ -1,0 +1,197 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * Lookup Table Controller
+ *
+ * Registers shortcodes, enqueues assets, and holds the TABLES configuration
+ * constant for the generic Lookup Table Manager module.
+ *
+ * Supports the following shortcodes:
+ *   [wecoza_manage_qualifications]      — Phase 42
+ *   [wecoza_manage_placement_levels]    — Phase 43
+ *
+ * @package WeCoza\LookupTables\Controllers
+ * @since 4.1.0
+ */
+
+namespace WeCoza\LookupTables\Controllers;
+
+use WeCoza\Core\Abstract\BaseController;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class LookupTableController extends BaseController
+{
+    /**
+     * Configuration for all supported lookup tables.
+     *
+     * Keys:
+     *   - table      : Physical PostgreSQL table name
+     *   - pk         : Primary key column name
+     *   - columns    : Whitelisted columns allowed for INSERT/UPDATE
+     *   - labels     : Human-readable column header labels (1:1 with columns)
+     *   - title      : Page/card title
+     *   - capability : WordPress capability required for write operations
+     */
+    private const TABLES = [
+        'qualifications' => [
+            'table'      => 'learner_qualifications',
+            'pk'         => 'id',
+            'columns'    => ['qualification'],
+            'labels'     => ['Qualification'],
+            'title'      => 'Manage Qualifications',
+            'capability' => 'manage_options',
+        ],
+        'placement_levels' => [
+            'table'      => 'learner_placement_level',
+            'pk'         => 'placement_level_id',
+            'columns'    => ['level', 'level_desc'],
+            'labels'     => ['Level Code', 'Description'],
+            'title'      => 'Manage Placement Levels',
+            'capability' => 'manage_options',
+        ],
+    ];
+
+    /**
+     * Map shortcode tag => table_key for renderManageTable dispatch
+     */
+    private const SHORTCODE_MAP = [
+        'wecoza_manage_qualifications'   => 'qualifications',
+        'wecoza_manage_placement_levels' => 'placement_levels',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Static Config Accessor
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Return the config array for a given table key, or null if not found
+     *
+     * Used by LookupTableAjaxHandler to resolve table config without
+     * duplicating the TABLES constant in the AJAX handler.
+     *
+     * @param string $key Table key (e.g. 'qualifications', 'placement_levels')
+     * @return array|null
+     */
+    public static function getTableConfig(string $key): ?array
+    {
+        return self::TABLES[$key] ?? null;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | WordPress Hooks
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Register all WordPress hooks
+     *
+     * @return void
+     */
+    protected function registerHooks(): void
+    {
+        add_action('init', [$this, 'registerShortcodes']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
+    }
+
+    /**
+     * Register lookup table shortcodes
+     *
+     * @return void
+     */
+    public function registerShortcodes(): void
+    {
+        add_shortcode('wecoza_manage_qualifications', [$this, 'renderManageTable']);
+        add_shortcode('wecoza_manage_placement_levels', [$this, 'renderManageTable']);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shortcode Renderer
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Render the lookup table management card.
+     * Determines which table to manage from the shortcode tag.
+     *
+     * @param array|string $atts    Shortcode attributes
+     * @param string       $content Shortcode enclosed content (unused)
+     * @param string       $tag     Shortcode tag name
+     * @return string HTML output
+     */
+    public function renderManageTable(array|string $atts = [], string $content = '', string $tag = ''): string
+    {
+        // Determine table_key from shortcode tag
+        $tableKey = self::SHORTCODE_MAP[$tag] ?? null;
+        if ($tableKey === null) {
+            return '<div class="alert alert-danger">Unknown lookup table shortcode.</div>';
+        }
+
+        // Retrieve config from TABLES constant
+        $config = self::getTableConfig($tableKey);
+        if ($config === null) {
+            return '<div class="alert alert-danger">Lookup table configuration not found.</div>';
+        }
+
+        // Capability check
+        if (!current_user_can($config['capability'])) {
+            return '<div class="alert alert-warning">You do not have permission to manage this table.</div>';
+        }
+
+        return $this->render('lookup-tables/manage', [
+            'tableKey' => $tableKey,
+            'config'   => $config,
+            'nonce'    => wp_create_nonce('lookup_table_nonce'),
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Asset Enqueuing
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Conditionally enqueue lookup table manager JS only on pages
+     * that contain one of the lookup table shortcodes.
+     *
+     * @return void
+     */
+    public function enqueueAssets(): void
+    {
+        global $post;
+
+        if (!is_a($post, 'WP_Post')) {
+            return;
+        }
+
+        $hasShortcode = has_shortcode($post->post_content, 'wecoza_manage_qualifications')
+                     || has_shortcode($post->post_content, 'wecoza_manage_placement_levels');
+
+        if (!$hasShortcode) {
+            return;
+        }
+
+        wp_register_script(
+            'wecoza-lookup-table-manager',
+            WECOZA_CORE_URL . 'assets/js/lookup-tables/lookup-table-manager.js',
+            ['jquery'],
+            WECOZA_CORE_VERSION,
+            true
+        );
+
+        wp_enqueue_script('wecoza-lookup-table-manager');
+
+        wp_localize_script('wecoza-lookup-table-manager', 'WeCozaLookupTables', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce'    => wp_create_nonce('lookup_table_nonce'),
+        ]);
+    }
+}

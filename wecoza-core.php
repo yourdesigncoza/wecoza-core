@@ -55,6 +55,7 @@ spl_autoload_register(function (string $class) {
         'WeCoza\\Settings\\' => WECOZA_CORE_PATH . 'src/Settings/',
         'WeCoza\\ShortcodeInspector\\' => WECOZA_CORE_PATH . 'src/ShortcodeInspector/',
         'WeCoza\\Dev\\' => WECOZA_CORE_PATH . 'src/Dev/',
+        'WeCoza\\LookupTables\\' => WECOZA_CORE_PATH . 'src/LookupTables/',
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
@@ -259,6 +260,14 @@ add_action('plugins_loaded', function () {
     }
     if (class_exists(\WeCoza\Agents\Ajax\AgentsAjaxHandlers::class)) {
         new \WeCoza\Agents\Ajax\AgentsAjaxHandlers();
+    }
+
+    // Initialize Lookup Tables Module
+    if (class_exists(\WeCoza\LookupTables\Controllers\LookupTableController::class)) {
+        new \WeCoza\LookupTables\Controllers\LookupTableController();
+    }
+    if (class_exists(\WeCoza\LookupTables\Ajax\LookupTableAjaxHandler::class)) {
+        new \WeCoza\LookupTables\Ajax\LookupTableAjaxHandler();
     }
 
     // Initialize Dev Toolbar (debug mode only)
