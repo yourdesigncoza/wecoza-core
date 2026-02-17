@@ -327,12 +327,20 @@ class AgentsController extends BaseController
         wp_localize_script('wecoza-agents-app', 'wecozaAgents', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('agents_nonce_action'),
+            'saveAction' => 'wecoza_agents_save',
             'debug' => defined('WP_DEBUG') && WP_DEBUG,
             'loadingText' => __('Loading...', 'wecoza-core'),
             'errorText' => __('Error loading agents. Please try again.', 'wecoza-core'),
             'confirmDeleteText' => __('Are you sure you want to delete this agent? This action cannot be undone.', 'wecoza-core'),
             'deleteSuccessText' => __('Agent deleted successfully.', 'wecoza-core'),
             'deleteErrorText' => __('Error deleting agent. Please try again.', 'wecoza-core'),
+            'messages' => [
+                'form' => [
+                    'saved' => __('Agent saved successfully.', 'wecoza-core'),
+                    'saving' => __('Saving...', 'wecoza-core'),
+                    'error' => __('An error occurred. Please try again.', 'wecoza-core'),
+                ],
+            ],
             'urls' => [
                 'displayAgents' => home_url('/app/all-agents/'),
                 'viewAgent' => home_url('/app/agent-view/'),
