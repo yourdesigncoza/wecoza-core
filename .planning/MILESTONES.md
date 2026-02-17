@@ -218,3 +218,29 @@
 
 **What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
 
+
+## v4.1 Lookup Table Admin (Shipped: 2026-02-17)
+
+**Delivered:** Generic config-driven lookup table admin infrastructure with Phoenix inline-edit UI, plus two shortcodes for qualifications and placement levels management.
+
+**Phases completed:** 42-43 (3 plans total, 6 tasks)
+
+**Key accomplishments:**
+
+- Built generic LookupTables module — config-driven Repository, single AJAX endpoint with sub_action dispatch, Controller with TABLES/SHORTCODE_MAP constants
+- Created Phoenix inline-edit table UI — manage.view.php template + lookup-table-manager.js with add/edit/delete, column-agnostic via config
+- Shipped `[wecoza_manage_qualifications]` shortcode for learner qualifications admin CRUD
+- Shipped `[wecoza_manage_placement_levels]` shortcode via config reuse — zero new PHP/JS code, only DB sequence fix needed
+
+**Stats:**
+
+- 14 files changed, 1,945 insertions, 14 deletions
+- 2 phases, 3 plans, 6 tasks
+- Same day from start to ship (2026-02-17)
+
+**Git range:** `6cd71da` → `5b53f76`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+

@@ -192,7 +192,7 @@ class ClassTypesController
                 delete_transient('wecoza_class_subjects_' . $row['class_type_code']);
             }
         } catch (\Exception $e) {
-            // Fallback: clear known codes
+            wecoza_log('Failed to query class types for cache clear, using fallback: ' . $e->getMessage(), 'warning');
             foreach (['AET','REALLL','SOFT','GETC','BA2','BA3','BA4','WALK','HEXA','RUN'] as $code) {
                 delete_transient('wecoza_class_subjects_' . $code);
             }

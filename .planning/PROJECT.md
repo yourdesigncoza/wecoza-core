@@ -59,6 +59,9 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Repository pattern enforcement (80%+ queries via BaseRepository, quoteIdentifier) — v4.0
 - ✓ Return type hints on all public methods across all modules — v4.0
 - ✓ Constants extraction (AppConstants with SCREAMING_SNAKE_CASE) — v4.0
+- ✓ Generic lookup table CRUD infrastructure (config-driven Repository, AjaxHandler, Controller) — v4.1
+- ✓ Qualifications admin shortcode `[wecoza_manage_qualifications]` with inline-edit Phoenix table — v4.1
+- ✓ Placement levels admin shortcode `[wecoza_manage_placement_levels]` via config reuse — v4.1
 
 ### Active
 
@@ -78,7 +81,7 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v4.0 Shipped)
+### Current State (v4.1 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
 - **Total:** ~77,500 lines of PHP across 5 modules
@@ -87,8 +90,10 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - **Clients module:** 17+ PHP files in `src/Clients/` (includes ClientService)
 - **Learners module:** `src/Learners/` (includes LearnerService)
 - **Classes module:** `src/Classes/`
+- **LookupTables module:** `src/LookupTables/` (3 files — config-driven CRUD for any lookup table)
 - **Core:** `core/Abstract/AppConstants.php` — shared constants
-- **View templates:** 22+ templates in `views/`
+- **View templates:** 23+ templates in `views/` (includes `lookup-tables/manage.view.php`)
+- **Shortcodes:** `[wecoza_manage_qualifications]`, `[wecoza_manage_placement_levels]`
 - **JavaScript:** 21+ JS files across `assets/js/`
 - **Test coverage:** 4 test files in `tests/Events/`, 1 integration test, 1 architecture verification script
 - **Form field audits:** `docs/formfieldanalysis/*.md` (5 modules audited)
@@ -176,6 +181,9 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | quoteIdentifier() for all dynamic column names | SQL injection prevention in ORDER BY clauses | ✓ v4.0 |
 | AppConstants with SCREAMING_SNAKE_CASE | Shared constants, eliminates magic numbers | ✓ v4.0 |
 | 4 acceptable deviations documented as tech debt | Classes/Locations/Events gaps deferred to future | ⚠️ v4.0 |
+| Config-driven LookupTableRepository (not extending BaseRepository) | BaseRepository uses static $table; runtime config needs standalone class | ✓ v4.1 |
+| TABLES + SHORTCODE_MAP constants in Controller | Single source of truth; AjaxHandler calls getTableConfig() | ✓ v4.1 |
+| PHP-to-JS config via embedded JSON script tag | Avoids per-shortcode wp_localize_script registration | ✓ v4.1 |
 
 ---
-*Last updated: 2026-02-16 after v4.0 milestone*
+*Last updated: 2026-02-17 after v4.1 milestone*

@@ -175,10 +175,12 @@ class ClassAjaxController extends BaseController
         } catch (\Error $e) {
             ob_clean();
             restore_error_handler();
+            wecoza_log('PHP Error saving class: ' . $e->getMessage(), 'error', $e);
             wp_send_json_error('A server error occurred. Please check the error logs.');
         } catch (\Throwable $e) {
             ob_clean();
             restore_error_handler();
+            wecoza_log('Critical error saving class: ' . $e->getMessage(), 'error', $e);
             wp_send_json_error('A critical error occurred. Please check the error logs.');
         }
     }

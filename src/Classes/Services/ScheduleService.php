@@ -541,7 +541,7 @@ class ScheduleService
                             $currentDate->add(new DateInterval('P1D'));
                         }
                     } catch (Exception $e) {
-                        // Log error silently
+                        wecoza_log('Schedule event generation failed: ' . $e->getMessage(), 'warning');
                     }
                 }
             }

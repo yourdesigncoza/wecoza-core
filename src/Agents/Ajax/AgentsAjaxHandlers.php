@@ -54,6 +54,7 @@ class AgentsAjaxHandlers
         // Bug #10 fix: standardized wecoza_agents_ prefix
         add_action('wp_ajax_wecoza_agents_paginate', [$this, 'handlePagination']);
         add_action('wp_ajax_wecoza_agents_delete', [$this, 'handleDelete']);
+        add_action('wp_ajax_wecoza_agents_save', [$this, 'handleSave']);
         // NO nopriv handlers (Bug #12 fix: entire WP requires login)
     }
 
@@ -162,6 +163,53 @@ class AgentsAjaxHandlers
         } catch (\Exception $e) {
             wecoza_log('Error deleting agent: ' . $e->getMessage(), 'error');
             AjaxSecurity::sendError(__('An error occurred while deleting the agent.', 'wecoza-core'), 500);
+        }
+    }
+
+    /**
+     * Handle AJAX save request (create or update)
+     *
+     * @return void
+     */
+    public function handleSave(): void
+    {
+        AjaxSecurity::requireNonce('agents_nonce_action');
+        AjaxSecurity::requireCapability('edit_others_posts');
+
+        $agent_id = AjaxSecurity::post('editing_agent_id', 'int', 0);
+        $current_agent = null;
+
+        if ($agent_id > 0) {
+            $current_agent = $this->agentService->getAgent($agent_id);
+            if (!$current_agent) {
+                AjaxSecurity::sendError(__('Agent not found.', 'wecoza-core'), 404);
+            }
+        }
+
+        try {
+            $result = $this->agentService->handleAgentFormSubmission(
+                $_POST,
+                $_FILES,
+                $agent_id > 0 ? $agent_id : null,
+                $current_agent
+            );
+
+            if ($result['success']) {
+                AjaxSecurity::sendSuccess([
+                    'message'  => __('Agent saved successfully.', 'wecoza-core'),
+                    'agent_id' => $result['agent_id'],
+                    'is_new'   => ($agent_id === 0),
+                ]);
+            } else {
+                AjaxSecurity::sendError(
+                    __('Validation failed.', 'wecoza-core'),
+                    422,
+                    ['errors' => $result['errors']]
+                );
+            }
+        } catch (\Throwable $e) {
+            wecoza_log('Error saving agent: ' . $e->getMessage(), 'error');
+            AjaxSecurity::sendError(__('An unexpected error occurred while saving the agent.', 'wecoza-core'), 500);
         }
     }
 

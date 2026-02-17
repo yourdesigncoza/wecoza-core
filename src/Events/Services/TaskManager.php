@@ -493,7 +493,7 @@ SQL;
                 $dt = new \DateTimeImmutable((string) $rawDate);
                 $eventDate = $dt->format('j M Y'); // e.g., "20 Feb 2026"
             } catch (\Exception $e) {
-                // Leave as null if unparseable
+                wecoza_log("Unparseable event date '{$rawDate}': " . $e->getMessage(), 'warning');
             }
         }
 

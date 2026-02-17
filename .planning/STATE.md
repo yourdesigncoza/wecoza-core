@@ -2,24 +2,25 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-16)
+See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
 **Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: None — milestone v4.0 complete
-Plan: N/A
-Status: Between milestones
-Last activity: 2026-02-16 — Shipped v4.0 Technical Debt
+Phase: 43 — Placement Levels Shortcode
+Plan: 01 COMPLETE — auto-increment DDL applied, end-to-end CRUD verified
+Status: Phase 43 COMPLETE — Milestone v4.1 Lookup Table Admin shipped
+Last activity: 2026-02-17 - Executed 43-01: DDL fix + human verified all 7 CRUD steps
 
-Progress: 41 phases complete across 8 milestones (87 plans executed)
+Progress: 43 phases complete across 8 milestones (89 plans executed), milestone v4.1 Lookup Table Admin shipped
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v4.1 | Lookup Table Admin | 2026-02-17 | 42-43 | 3 |
 | v4.0 | Technical Debt | 2026-02-16 | 36-41 | 14 |
 | v3.1 | Form Field Wiring Fixes | 2026-02-13 | 31-35 | 8 |
 | v3.0 | Agents Integration | 2026-02-12 | 26-30 | 11 |
@@ -35,7 +36,20 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-Cleared at milestone boundary. Full decision log in PROJECT.md Key Decisions table.
+- 42-01: LookupTableRepository does not extend BaseRepository — BaseRepository uses static $table, runtime config injection requires standalone class
+- 42-01: TABLES constant lives in LookupTableController; AjaxHandler calls getTableConfig() — single source of truth
+- 42-01: SHORTCODE_MAP constant in controller for clean tag-to-tableKey dispatch
+- 42-02: Used btn-subtle-* over btn-phoenix-* for in-table action buttons; wrapped in btn-group — matches app-wide pattern
+- 42-02: PHP-to-JS config via embedded JSON script tag avoids per-shortcode wp_localize_script registration
+
+### Roadmap Evolution
+
+- Phase 42 added: Lookup Table CRUD Infrastructure + Qualifications Shortcode
+- Phase 43 added: Placement Levels Shortcode
+- Milestone v4.1 created: Lookup Table Admin (Phases 42-43)
+- Phase 42, Plan 01 complete: backend infrastructure (Repository, AjaxHandler, Controller)
+- Phase 42, Plan 02 complete: frontend view template + JS CRUD manager; human verified
+- Phase 43, Plan 01 complete: DDL sequence fix on placement_level_id; all 7 CRUD steps verified; milestone v4.1 shipped
 
 ### Pending Todos
 
@@ -67,11 +81,21 @@ None.
 | 008 | Fix Event Dates heading border colspan | 2026-02-05 | 7c997f4 | [008-fix-event-dates-heading-border](./quick/008-fix-event-dates-heading-border/) |
 | 009 | Rename AI Summary/AI Generation Details in email template | 2026-02-05 | ebb2a43 | [009-update-email-template-rename-ai-summary-](./quick/009-update-email-template-rename-ai-summary-/) |
 | 010 | Convert Bootstrap badges to Phoenix style | 2026-02-05 | 9742c0b | [010-update-bootstrap-badges-to-phoenix-style](./quick/010-update-bootstrap-badges-to-phoenix-style/) |
+| 011 | Improve post-save UX in client capture form | 2026-02-17 | d5cccbe | [11-after-saving-a-new-client-via-wecoza-cap](./quick/11-after-saving-a-new-client-via-wecoza-cap/) |
+| 012 | Improve post-save UX in agent capture form | 2026-02-17 | cdb36ee | [12-after-saving-a-new-agent-via-wecoza-capt](./quick/12-after-saving-a-new-agent-via-wecoza-capt/) |
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 42 | 01 | 2 min | 2/2 | 4 |
+| 42 | 02 | 15 min | 2/2 | 2 |
+| 43 | 01 | 10 min | 2/2 | 0 |
 
 ## Session Continuity
 
-Last session: 2026-02-16
-Stopped at: v4.0 milestone archived
+Last session: 2026-02-17
+Stopped at: Completed 43-01-PLAN.md — DDL fix + human verified; milestone v4.1 Lookup Table Admin shipped
 Resume file: N/A
 
-**Next action:** `/gsd:new-milestone` — define next milestone
+**Next action:** Define next milestone with `/gsd:new-milestone`

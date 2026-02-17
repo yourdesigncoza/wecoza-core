@@ -10,6 +10,7 @@
 - ✅ **v3.0 Agents Integration** — Phases 26-30 (shipped 2026-02-12)
 - ✅ **v3.1 Form Field Wiring Fixes** — Phases 31-35 (shipped 2026-02-13)
 - ✅ **v4.0 Technical Debt** — Phases 36-41 (shipped 2026-02-16)
+- ✅ **v4.1 Lookup Table Admin** — Phases 42-43 (shipped 2026-02-17)
 
 ## Phases
 
@@ -97,6 +98,16 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 
 </details>
 
+<details>
+<summary>✅ v4.1 Lookup Table Admin (Phases 42-43) — SHIPPED 2026-02-17</summary>
+
+- [x] Phase 42: Lookup Table CRUD Infrastructure + Qualifications Shortcode (2/2 plans) — completed 2026-02-17
+- [x] Phase 43: Placement Levels Shortcode (1/1 plan) — completed 2026-02-17
+
+See: `.planning/milestones/v4.1-ROADMAP.md`
+
+</details>
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -109,8 +120,9 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 | 26-30 | v3.0 | 11 | Complete | 2026-02-12 |
 | 31-35 | v3.1 | 8 | Complete | 2026-02-13 |
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
+| 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
 
-**Total: 41 phases, 87 plans, 8 milestones shipped**
+**Total: 43 phases, 90 plans, 9 milestones shipped**
 
 ---
-*Last updated: 2026-02-16 after v4.0 milestone completion*
+*Last updated: 2026-02-17 after v4.1 milestone completion*

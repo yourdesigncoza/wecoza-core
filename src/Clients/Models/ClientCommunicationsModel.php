@@ -67,7 +67,7 @@ class ClientCommunicationsModel {
                 ORDER BY communication_date DESC, communication_id DESC
                 LIMIT 1';
 
-        return wecoza_db()->getRow($sql, array(':client_id' => $clientId));
+        return wecoza_db()->getRow($sql, array(':client_id' => $clientId)) ?: null;
     }
 
     /**

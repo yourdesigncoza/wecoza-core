@@ -22,6 +22,9 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
 ?>
 
+<div class="wecoza-agents-form-container">
+<div class="wecoza-agents-feedback mt-3"></div>
+
 <?php if ($mode === 'edit' && !empty($agent['agent_id'])) : ?>
     <div class="alert alert-subtle-primary mb-4">
         <i class="fas fa-edit me-2"></i>
@@ -579,3 +582,4 @@ use WeCoza\Agents\Helpers\FormHelpers;
         </div>
     </div>
 </form>
+</div><!-- /.wecoza-agents-form-container -->
