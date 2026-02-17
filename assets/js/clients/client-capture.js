@@ -497,6 +497,12 @@
             });
         }
 
+        var scrollToFeedback = function () {
+            if (container.length) {
+                $('html, body').animate({ scrollTop: container.offset().top - 80 }, 400);
+            }
+        };
+
         form.on('submit', function (event) {
             if (!form[0].checkValidity()) {
                 form.addClass('was-validated');
@@ -525,38 +531,42 @@
                     var data = response.data || {};
                     var message = data.message || config.messages.form.saved;
                     renderMessage('success', message);
+                    scrollToFeedback();
 
                     // Remove validation state to clear tick marks
                     form.removeClass('was-validated');
 
                     // Check if this was a new client and form should be cleared
                     var isNewClient = !form.find('input[name="id"]').val();
+
                     if (data.client && data.client.id) {
-                        var idInput = form.find('input[name="id"]');
-                        if (!idInput.length) {
-                            idInput = $('<input>', { type: 'hidden', name: 'id' }).appendTo(form);
-                        }
-                        idInput.val(data.client.id);
-
-                        if (data.client.head_site && data.client.head_site.site_id) {
-                            form.find('input[name="head_site_id"]').val(data.client.head_site.site_id);
-                            if (data.client.head_site.site_name && !form.find('input[name="site_name"]').val()) {
-                                form.find('input[name="site_name"]').val(data.client.head_site.site_name);
-                            }
-                        }
-
-                        // Clear form if it was a new client and configuration allows it
                         if (isNewClient && config.clear_form_on_success) {
-                            setTimeout(function() {
-                                clearForm();
-                                // Clear success message after 3 seconds
-                                setTimeout(function() {
-                                    feedback.empty();
-                                }, 3000);
-                            }, 1500); // Give user time to see success message
-                        } else if (!isNewClient) {
-                            // For updates, reload page after brief delay to show saved data
-                            setTimeout(function() {
+                            // NEW CLIENT: clear immediately, auto-dismiss banner after 5 seconds
+                            clearForm();
+                            form.find('input[name="id"]').remove();
+                            form.find('input[name="head_site_id"]').val('');
+                            setTimeout(function () {
+                                feedback.fadeOut(300, function () {
+                                    $(this).empty().show();
+                                });
+                            }, 5000);
+                        } else if (isNewClient) {
+                            // NEW CLIENT but clear_form_on_success is false: set id so form becomes edit mode
+                            var idInput = form.find('input[name="id"]');
+                            if (!idInput.length) {
+                                idInput = $('<input>', { type: 'hidden', name: 'id' }).appendTo(form);
+                            }
+                            idInput.val(data.client.id);
+
+                            if (data.client.head_site && data.client.head_site.site_id) {
+                                form.find('input[name="head_site_id"]').val(data.client.head_site.site_id);
+                                if (data.client.head_site.site_name && !form.find('input[name="site_name"]').val()) {
+                                    form.find('input[name="site_name"]').val(data.client.head_site.site_name);
+                                }
+                            }
+                        } else {
+                            // UPDATE: reload page after brief delay to show saved data
+                            setTimeout(function () {
                                 window.location.reload();
                             }, 1500);
                         }
@@ -565,11 +575,14 @@
                     form.trigger('wecoza:client-saved', [response]);
                 } else if (response && response.data && response.data.errors) {
                     renderMessage('error', extractErrors(response.data.errors));
+                    scrollToFeedback();
                 } else {
                     renderMessage('error', config.messages.form.error);
+                    scrollToFeedback();
                 }
             }).fail(function (xhr, status, error) {
                 renderMessage('error', config.messages.form.error);
+                scrollToFeedback();
             }).always(function () {
                 setSubmittingState(false);
             });
