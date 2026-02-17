@@ -12,6 +12,8 @@
 (function($) {
     'use strict';
 
+    $(function () {
+
     // Hide loader container after 2 seconds
     setTimeout(function() {
         $('#wecoza-agents-loader-container').hide();
@@ -253,4 +255,5 @@
         toggleIdFields($(this).val());
     });
 
+    }); // end $(function)
 })(jQuery);

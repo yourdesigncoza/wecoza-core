@@ -26,7 +26,7 @@ if (!defined('ABSPATH')) {
 |--------------------------------------------------------------------------
 */
 
-define('WECOZA_CORE_VERSION', '1.0.1');
+define('WECOZA_CORE_VERSION', '1.0.2');
 define('WECOZA_CORE_PATH', plugin_dir_path(__FILE__));
 define('WECOZA_CORE_DIR', plugin_dir_path(__FILE__)); // Alias for WECOZA_CORE_PATH
 define('WECOZA_CORE_URL', plugin_dir_url(__FILE__));
@@ -54,6 +54,7 @@ spl_autoload_register(function (string $class) {
         'WeCoza\\Agents\\' => WECOZA_CORE_PATH . 'src/Agents/',
         'WeCoza\\Settings\\' => WECOZA_CORE_PATH . 'src/Settings/',
         'WeCoza\\ShortcodeInspector\\' => WECOZA_CORE_PATH . 'src/ShortcodeInspector/',
+        'WeCoza\\Dev\\' => WECOZA_CORE_PATH . 'src/Dev/',
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
@@ -258,6 +259,11 @@ add_action('plugins_loaded', function () {
     }
     if (class_exists(\WeCoza\Agents\Ajax\AgentsAjaxHandlers::class)) {
         new \WeCoza\Agents\Ajax\AgentsAjaxHandlers();
+    }
+
+    // Initialize Dev Toolbar (debug mode only)
+    if (defined('WP_DEBUG') && WP_DEBUG && class_exists(\WeCoza\Dev\DevToolbarController::class)) {
+        (new \WeCoza\Dev\DevToolbarController())->register();
     }
 
     // Action Scheduler Performance Tuning

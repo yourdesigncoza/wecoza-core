@@ -42,26 +42,31 @@ class WorkingAreasService {
     }
     
     /**
-     * Load working areas data
-     * 
-     * @return array Array of working areas
+     * Load working areas from the locations table
      */
     private static function load_working_areas(): array {
-        return array(
-            '1' => 'Sandton, Johannesburg, Gauteng, 2196',
-            '2' => 'Durbanville, Cape Town, Western Cape, 7551',
-            '3' => 'Durban, Durban, KwaZulu-Natal, 4320',
-            '4' => 'Hatfield, Pretoria, Gauteng, 0028',
-            '5' => 'Stellenbosch, Stellenbosch, Western Cape, 7600',
-            '6' => 'Polokwane, Polokwane, Limpopo, 0699',
-            '7' => 'Kimberley, Kimberley, Northern Cape, 8301',
-            '8' => 'Nelspruit, Mbombela, Mpumalanga, 1200',
-            '9' => 'Bloemfontein, Bloemfontein, Free State, 9300',
-            '10' => 'Port Elizabeth, Gqeberha, Eastern Cape, 6001',
-            '11' => 'Soweto, Johannesburg, Gauteng, 1804',
-            '12' => 'Paarl, Paarl, Western Cape, 7620',
-            '13' => 'Pietermaritzburg, Pietermaritzburg, KwaZulu-Natal, 3201',
-            '14' => 'East London, East London, Eastern Cape, 5201',
-        );
+        try {
+            $db = wecoza_db();
+            $stmt = $db->query(
+                'SELECT location_id, suburb, town, province, postal_code FROM locations ORDER BY town, suburb'
+            );
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $areas = [];
+            foreach ($rows as $row) {
+                $label = implode(', ', array_filter([
+                    $row['suburb'],
+                    $row['town'],
+                    $row['province'],
+                    $row['postal_code'],
+                ]));
+                $areas[(string) $row['location_id']] = $label;
+            }
+
+            return $areas;
+        } catch (\Throwable $e) {
+            wecoza_log('WorkingAreasService: Failed to load locations: ' . $e->getMessage(), 'error');
+            return [];
+        }
     }
 }
