@@ -10,7 +10,7 @@
 - ✅ **v3.0 Agents Integration** — Phases 26-30 (shipped 2026-02-12)
 - ✅ **v3.1 Form Field Wiring Fixes** — Phases 31-35 (shipped 2026-02-13)
 - ✅ **v4.0 Technical Debt** — Phases 36-41 (shipped 2026-02-16)
-- 🚧 **v4.1 Lookup Table Admin** — Phases 42-43
+- ✅ **v4.1 Lookup Table Admin** — Phases 42-43 (shipped 2026-02-17)
 
 ## Phases
 
@@ -98,6 +98,16 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 
 </details>
 
+<details>
+<summary>✅ v4.1 Lookup Table Admin (Phases 42-43) — SHIPPED 2026-02-17</summary>
+
+- [x] Phase 42: Lookup Table CRUD Infrastructure + Qualifications Shortcode (2/2 plans) — completed 2026-02-17
+- [x] Phase 43: Placement Levels Shortcode (1/1 plan) — completed 2026-02-17
+
+See: `.planning/milestones/v4.1-ROADMAP.md`
+
+</details>
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -110,28 +120,9 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 | 26-30 | v3.0 | 11 | Complete | 2026-02-12 |
 | 31-35 | v3.1 | 8 | Complete | 2026-02-13 |
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
-| 42-43 | v4.1 | 3 | In Progress | — |
+| 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
 
-**Total: 43 phases, 87 plans, 8 milestones shipped, 1 in progress**
-
-### Phase 42: Lookup Table CRUD Infrastructure + Qualifications Shortcode
-
-**Goal:** Build generic LookupTables module (Controller, Repository, Ajax handler, view, JS). Register [wecoza_manage_qualifications] shortcode. Inline-editable Phoenix-styled table for CRUD on learner_qualifications table.
-**Depends on:** Phase 41
-**Plans:** 2/2 plans complete
-
-Plans:
-- [ ] 42-01-PLAN.md -- Backend: Repository + AJAX handler + Controller + wecoza-core.php registration
-- [ ] 42-02-PLAN.md -- Frontend: View template + JavaScript + human verification
-
-### Phase 43: Placement Levels Shortcode
-
-**Goal:** Register [wecoza_manage_placement_levels] shortcode using Phase 42 infrastructure. Same UI pattern, configured for 3-column table (level code + description).
-**Depends on:** Phase 42
-**Plans:** 1/1 plans complete
-
-Plans:
-- [ ] 43-01-PLAN.md -- Fix auto-increment sequence + human verification of shortcode CRUD
+**Total: 43 phases, 90 plans, 9 milestones shipped**
 
 ---
-*Last updated: 2026-02-17 after Phase 43 planning*
+*Last updated: 2026-02-17 after v4.1 milestone completion*

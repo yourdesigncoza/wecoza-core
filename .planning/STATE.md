@@ -2,10 +2,10 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-16)
+See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v4.1 Lookup Table Admin — Phases 42-43
+**Current focus:** Planning next milestone
 
 ## Current Position
 
@@ -20,6 +20,7 @@ Progress: 43 phases complete across 8 milestones (89 plans executed), milestone 
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v4.1 | Lookup Table Admin | 2026-02-17 | 42-43 | 3 |
 | v4.0 | Technical Debt | 2026-02-16 | 36-41 | 14 |
 | v3.1 | Form Field Wiring Fixes | 2026-02-13 | 31-35 | 8 |
 | v3.0 | Agents Integration | 2026-02-12 | 26-30 | 11 |
@@ -97,4 +98,4 @@ Last session: 2026-02-17
 Stopped at: Completed 43-01-PLAN.md — DDL fix + human verified; milestone v4.1 Lookup Table Admin shipped
 Resume file: N/A
 
-**Next action:** Define next phase or milestone
+**Next action:** Define next milestone with `/gsd:new-milestone`
