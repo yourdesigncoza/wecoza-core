@@ -241,17 +241,39 @@ if (!function_exists('wecoza_log')) {
     /**
      * Log a message (only when WP_DEBUG is enabled)
      *
-     * @param string $message Message to log
-     * @param string $level Log level (info, warning, error)
+     * Automatically appends caller file:line for warning/error levels.
+     * Pass a Throwable as $context to log its message and trace.
+     *
+     * @param string          $message Message to log
+     * @param string          $level   Log level (info, warning, error)
+     * @param \Throwable|null $context Optional exception/error for stack trace
      * @return void
      */
-    function wecoza_log(string $message, string $level = 'info'): void {
+    function wecoza_log(string $message, string $level = 'info', ?\Throwable $context = null): void {
         if (!defined('WP_DEBUG') || !WP_DEBUG) {
             return;
         }
 
-        $prefix = sprintf('[WeCoza Core][%s]', strtoupper($level));
+        $prefix = sprintf('[WeCoza][%s]', strtoupper($level));
+
+        // Append caller location for warning/error so we know WHERE the log came from
+        if (in_array($level, ['warning', 'error'], true)) {
+            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $frame  = $caller[1] ?? $caller[0] ?? null;
+            if ($frame) {
+                $file = basename($frame['file'] ?? 'unknown');
+                $line = $frame['line'] ?? '?';
+                $message .= " ({$file}:{$line})";
+            }
+        }
+
         error_log("{$prefix} {$message}");
+
+        // Log exception details when provided
+        if ($context !== null) {
+            error_log("{$prefix} Exception: " . $context->getMessage());
+            error_log("{$prefix} Trace: " . $context->getTraceAsString());
+        }
     }
 }
 

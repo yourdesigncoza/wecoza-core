@@ -242,7 +242,7 @@ class ClassController extends BaseController
                 'events' => $allHolidays
             ]);
         } catch (\Exception $e) {
-            // Silently fail - holidays are optional
+            wecoza_log('Failed to load public holidays: ' . $e->getMessage(), 'warning');
         }
 
         wp_localize_script('wecoza-calendar-js', 'wecozaCalendar', [

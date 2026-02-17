@@ -8,10 +8,9 @@
  * @var bool $can_manage Whether user can manage tracking
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-?>
+if (!defined("ABSPATH")) {
+    exit();
+} ?>
 <div class="wecoza-material-tracking-dashboard">
     <div class="card h-100">
         <!-- Header -->
@@ -25,10 +24,10 @@ if (!defined('ABSPATH')) {
                 </div>
                 <div class="search-box col-auto">
                     <form class="position-relative">
-                        <input 
-                            type="search" 
-                            class="form-control search-input search form-control-sm" 
-                            id="material-tracking-search" 
+                        <input
+                            type="search"
+                            class="form-control search-input search form-control-sm"
+                            id="material-tracking-search"
                             placeholder="Search by class code, subject, or client..."
                             aria-label="Search">
                         <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -50,16 +49,18 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
             </div>
-            
+
             <!-- Statistics Strip -->
-            <?php echo $this->render('material-tracking/statistics', ['statistics' => $statistics]); ?>
+            <?php echo $this->render("material-tracking/statistics", [
+                "statistics" => $statistics,
+            ]); ?>
         </div>
 
         <!-- Tracking Records Table -->
         <div class="card-body p-0">
             <div class="table-responsive scrollbar" style="max-height: 600px; overflow-y: auto;">
                 <table id="material-tracking-table" class="table table-hover table-sm fs-9 mb-0 overflow-hidden">
-                    <thead class="border-bottom sticky-top bg-body">
+                    <thead class="border-bottom bg-body">
                         <tr>
                             <th scope="col" class="border-0 ps-3" data-sortable="true" data-sort-key="class_code" data-sort-type="text" style="cursor: pointer;">
                                 Class Code/Subject
@@ -94,20 +95,28 @@ if (!defined('ABSPATH')) {
                         <?php if (empty($records)): ?>
                             <tr>
                                 <td colspan="7" class="text-center py-5">
-                                    <?php echo $this->render('material-tracking/empty-state', []); ?>
+                                    <?php echo $this->render(
+                                        "material-tracking/empty-state",
+                                        [],
+                                    ); ?>
                                 </td>
                             </tr>
-                        <?php else: ?>
-                            <?php 
+                        <?php
                             // Generate shared nonce for all mark-as-delivered checkboxes
-                            $tracking_nonce = wp_create_nonce('wecoza_material_tracking_action');
-                            ?>
+                            // Generate shared nonce for all mark-as-delivered checkboxes
+                            else: ?>
+                            <?php $tracking_nonce = wp_create_nonce(
+                                "wecoza_material_tracking_action",
+                            ); ?>
                             <?php foreach ($records as $record): ?>
-                                <?php echo $this->render('material-tracking/list-item', [
-                                    'record' => $record, 
-                                    'can_manage' => $can_manage,
-                                    'tracking_nonce' => $tracking_nonce
-                                ]); ?>
+                                <?php echo $this->render(
+                                    "material-tracking/list-item",
+                                    [
+                                        "record" => $record,
+                                        "can_manage" => $can_manage,
+                                        "tracking_nonce" => $tracking_nonce,
+                                    ],
+                                ); ?>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -118,9 +127,13 @@ if (!defined('ABSPATH')) {
         <!-- Footer -->
         <div class="card-footer border-top text-center py-2">
             <p class="mb-0 text-body-tertiary fs-10">
-                <span id="last-updated">Last updated: Just now</span> • 
-                Showing <span id="visible-count"><?php echo count($records); ?></span> of 
-                <span id="total-count"><?php echo $statistics['total']['count']; ?></span> records
+                <span id="last-updated">Last updated: Just now</span> •
+                Showing <span id="visible-count"><?php echo count(
+                    $records,
+                ); ?></span> of
+                <span id="total-count"><?php echo $statistics["total"][
+                    "count"
+                ]; ?></span> records
             </p>
         </div>
     </div>
@@ -208,10 +221,10 @@ if (!defined('ABSPATH')) {
 
 <script>
 jQuery(document).ready(function($) {
-    const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+    const ajaxUrl = '<?php echo esc_js(admin_url("admin-ajax.php")); ?>';
     let lastUpdateTime = Date.now();
     let currentSort = { key: null, direction: 'asc' };
-    
+
     // Update last updated time
     function updateLastUpdatedTime() {
         const secondsAgo = Math.floor((Date.now() - lastUpdateTime) / 1000);
@@ -225,13 +238,13 @@ jQuery(document).ready(function($) {
         }
         $('#last-updated').text('Last updated: ' + timeText);
     }
-    
+
     setInterval(updateLastUpdatedTime, 10000); // Update every 10 seconds
-    
+
     // Show alert notification
     function showAlert(type, message) {
         let alertClass, iconClass, iconColor;
-        
+
         if (type === 'success') {
             alertClass = 'alert-subtle-success';
             iconClass = 'fa-check-circle';
@@ -245,7 +258,7 @@ jQuery(document).ready(function($) {
             iconClass = 'fa-info-circle';
             iconColor = 'text-info';
         }
-        
+
         const alertId = 'alert-' + Date.now();
         const alertHtml = `
             <div id="${alertId}" class="alert ${alertClass} d-flex align-items-center mb-2" role="alert">
@@ -254,9 +267,9 @@ jQuery(document).ready(function($) {
                 <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         `;
-        
+
         $('#material-tracking-alert-container').append(alertHtml);
-        
+
         // Auto-dismiss after 5 seconds
         setTimeout(function() {
             $('#' + alertId).fadeOut(300, function() {
@@ -264,12 +277,12 @@ jQuery(document).ready(function($) {
             });
         }, 5000);
     }
-    
+
     // Column sorting
     function sortTable(sortKey, sortType) {
         const tbody = $('#material-tracking-table tbody');
         const rows = tbody.find('tr').get();
-        
+
         // Determine sort direction
         if (currentSort.key === sortKey) {
             currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -277,11 +290,11 @@ jQuery(document).ready(function($) {
             currentSort.key = sortKey;
             currentSort.direction = 'asc';
         }
-        
+
         // Sort rows
         rows.sort(function(a, b) {
             let aVal, bVal;
-            
+
             if (sortType === 'text') {
                 if (sortKey === 'class_code') {
                     aVal = $(a).data('class-code') || '';
@@ -292,7 +305,7 @@ jQuery(document).ready(function($) {
                 } else if (sortKey === 'status') {
                     aVal = $(a).data('status') || '';
                 }
-                
+
                 if (sortKey === 'class_code') {
                     bVal = $(b).data('class-code') || '';
                 } else if (sortKey === 'client_name') {
@@ -302,7 +315,7 @@ jQuery(document).ready(function($) {
                 } else if (sortKey === 'status') {
                     bVal = $(b).data('status') || '';
                 }
-                
+
                 aVal = aVal.toString().toLowerCase();
                 bVal = bVal.toString().toLowerCase();
             } else if (sortType === 'date') {
@@ -314,24 +327,24 @@ jQuery(document).ready(function($) {
                     bVal = new Date($(b).data('event-date') || 0).getTime();
                 }
             }
-            
+
             if (currentSort.direction === 'asc') {
                 return aVal > bVal ? 1 : -1;
             } else {
                 return aVal < bVal ? 1 : -1;
             }
         });
-        
+
         // Reorder DOM
         $.each(rows, function(index, row) {
             tbody.append(row);
         });
-        
+
         // Update sort indicators
         $('th[data-sortable="true"]').each(function() {
             const th = $(this);
             const indicator = th.find('.sort-indicator');
-            
+
             if (th.data('sort-key') === sortKey) {
                 indicator.removeClass('d-none');
                 const icon = indicator.find('i');
@@ -345,14 +358,14 @@ jQuery(document).ready(function($) {
             }
         });
     }
-    
+
     // Sort column click handler
     $('th[data-sortable="true"]').on('click', function() {
         const sortKey = $(this).data('sort-key');
         const sortType = $(this).data('sort-type');
         sortTable(sortKey, sortType);
     });
-    
+
     // Mark as delivered checkbox handler
     $(document).on('change', '.mark-delivered-checkbox:not(:disabled)', function() {
         const checkbox = $(this);
@@ -388,7 +401,7 @@ jQuery(document).ready(function($) {
                     const completedCount = parseInt($('#stat-completed').text()) + 1;
                     $('#stat-pending').text(pendingCount);
                     $('#stat-completed').text(completedCount);
-                    
+
                     lastUpdateTime = Date.now();
                     updateLastUpdatedTime();
                 } else {
@@ -402,7 +415,7 @@ jQuery(document).ready(function($) {
             }
         });
     });
-    
+
     // Search and filter
     function filterRecords() {
         const searchTerm = $('#material-tracking-search').val().toLowerCase();
@@ -433,12 +446,12 @@ jQuery(document).ready(function($) {
 
     $('#material-tracking-search').on('input', filterRecords);
     $('#status-filter').on('change', filterRecords);
-    
+
     // Refresh dashboard
     $('#refresh-dashboard').on('click', function() {
         location.reload();
     });
-    
+
     // Statistics item click to filter
     $('.stat-item').on('click', function() {
         const status = $(this).data('status');

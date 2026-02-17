@@ -97,6 +97,7 @@ class ClientService
 
         // Return early if validation errors
         if (!empty($errors)) {
+            wecoza_log('Client validation errors: ' . wp_json_encode($errors), 'warning');
             return [
                 'success' => false,
                 'errors' => $errors,
@@ -233,7 +234,8 @@ class ClientService
         }
 
         // Reload and return client
-        $client = $this->model->getById($clientId);
+        $clientModel = $this->model->getById($clientId);
+        $client = $clientModel ? $clientModel->toArray() : [];
 
         return [
             'success' => true,
@@ -319,7 +321,8 @@ class ClientService
      */
     public function getClient(int $id): ?array
     {
-        return $this->model->getById($id);
+        $client = $this->model->getById($id);
+        return $client ? $client->toArray() : null;
     }
 
     /**
@@ -398,11 +401,13 @@ class ClientService
      */
     public function getClientDetails(int $clientId): ?array
     {
-        $client = $this->model->getById($clientId);
+        $clientModel = $this->model->getById($clientId);
 
-        if (!$client) {
+        if (!$clientModel) {
             return null;
         }
+
+        $client = $clientModel->toArray();
 
         // Build edit URL
         $editUrl = site_url('/client-management', is_ssl() ? 'https' : 'http');
@@ -416,8 +421,8 @@ class ClientService
 
         // Get main client name if applicable
         if (!empty($client['main_client_id'])) {
-            $mainClient = $this->model->getById($client['main_client_id']);
-            $data['main_client_name'] = $mainClient['client_name'] ?? '';
+            $mainClient = $this->model->getById((int) $client['main_client_id']);
+            $data['main_client_name'] = $mainClient ? $mainClient['client_name'] ?? '' : '';
         }
 
         return $data;

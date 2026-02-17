@@ -26,61 +26,84 @@
  * @since 1.2.0
  */
 
-if (!defined('ABSPATH')) {
-    exit;
+if (!defined("ABSPATH")) {
+    exit();
 }
 
-$eventId = esc_attr($item['event_id'] ?? 0);
-$eventType = esc_attr($item['event_type'] ?? '');
-$operation = esc_attr($item['operation'] ?? '');
-$isRead = !empty($item['is_read']);
-$isAcknowledged = !empty($item['is_acknowledged']);
-$searchIndex = esc_attr($item['search_index'] ?? '');
-$readStateClass = $item['read_state_class'] ?? ($isRead ? 'notification-read' : 'notification-unread');
+$eventId = esc_attr($item["event_id"] ?? 0);
+$eventType = esc_attr($item["event_type"] ?? "");
+$operation = esc_attr($item["operation"] ?? "");
+$isRead = !empty($item["is_read"]);
+$isAcknowledged = !empty($item["is_acknowledged"]);
+$searchIndex = esc_attr($item["search_index"] ?? "");
+$readStateClass =
+    $item["read_state_class"] ??
+    ($isRead ? "notification-read" : "notification-unread");
 ?>
 
-<div class="notification-item card mb-2 <?php echo esc_attr($readStateClass); ?> <?php echo !$isRead ? 'border-start border-3' : ''; ?>"
+<div class="notification-item card mb-2 <?php echo esc_attr(
+    $readStateClass,
+); ?> <?php echo !$isRead ? "border-start border-3" : ""; ?>"
      data-role="summary-item"
      data-event-id="<?php echo $eventId; ?>"
      data-operation="<?php echo $operation; ?>"
      data-search-index="<?php echo $searchIndex; ?>"
-     data-is-read="<?php echo $isRead ? '1' : '0'; ?>">
+     data-is-read="<?php echo $isRead ? "1" : "0"; ?>">
 
     <div class="card-body p-3">
         <div class="d-flex justify-content-between align-items-start">
             <div class="notification-content flex-grow-1">
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <?php if (!$isRead): ?>
-                    <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__('NEW', 'wecoza-events'); ?></span>
+                    <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__(
+                        "NEW",
+                        "wecoza-events",
+                    ); ?></span>
                     <?php endif; ?>
 
-                    <span class="badge <?php echo esc_attr($item['operation_badge_class'] ?? 'badge-phoenix badge-phoenix-secondary'); ?> text-uppercase fs-10">
-                        <?php echo esc_html($item['operation_label'] ?? $eventType); ?>
+                    <span class="badge <?php echo esc_attr(
+                        $item["operation_badge_class"] ??
+                            "badge-phoenix badge-phoenix-secondary",
+                    ); ?> text-uppercase fs-10">
+                        <?php echo esc_html(
+                            $item["operation_label"] ?? $eventType,
+                        ); ?>
                     </span>
                 </div>
 
                 <h6 class="mb-0 fw-bold text-body">
-                    <?php echo esc_html($item['class_code'] ?? __('Unknown', 'wecoza-events')); ?>
+                    <?php echo esc_html(
+                        $item["class_code"] ?? __("Unknown", "wecoza-events"),
+                    ); ?>
                 </h6>
                 <p class="text-body-secondary mb-0 fs-9">
-                    <?php echo esc_html($item['class_subject'] ?? ''); ?>
+                    <?php echo esc_html($item["class_subject"] ?? ""); ?>
                 </p>
 
                 <small class="text-body-tertiary d-block mt-1 fs-10">
                     <i class="bi bi-clock me-1"></i>
-                    <?php echo esc_html($item['created_at_formatted'] ?? ''); ?>
-                    <?php if (!empty($item['sent_at_formatted'])): ?>
-                    &middot; <i class="bi bi-send me-1"></i> <?php echo esc_html__('Sent:', 'wecoza-events'); ?> <?php echo esc_html($item['sent_at_formatted']); ?>
+                    <?php echo esc_html($item["created_at_formatted"] ?? ""); ?>
+                    <?php if (!empty($item["sent_at_formatted"])): ?>
+                    &middot; <i class="bi bi-send me-1"></i> <?php echo esc_html__(
+                        "Sent:",
+                        "wecoza-events",
+                    ); ?> <?php echo esc_html($item["sent_at_formatted"]); ?>
                     <?php endif; ?>
                 </small>
 
-                <?php if (!empty($item['has_summary']) && !empty($item['summary_html'])): ?>
+                <?php if (
+                    !empty($item["has_summary"]) &&
+                    !empty($item["summary_html"])
+                ): ?>
                 <div class="ai-summary mt-2 p-2 bg-body-tertiary rounded fs-9">
-                    <?php echo wp_kses_post($item['summary_html']); ?>
+                    <?php echo wp_kses_post($item["summary_html"]); ?>
                 </div>
-                <?php elseif (empty($item['has_summary'])): ?>
+                <?php elseif (empty($item["has_summary"])): ?>
                 <p class="text-body-secondary fs-9 fst-italic mt-2 mb-0">
-                    <?php echo esc_html__('No AI summary available for this change.', 'wecoza-events'); ?>
+                    <?php echo esc_html__(
+                        "No summary available for this change.",
+                        "wecoza-events",
+                    ); ?>
                 </p>
                 <?php endif; ?>
             </div>
@@ -91,7 +114,10 @@ $readStateClass = $item['read_state_class'] ?? ($isRead ? 'notification-read' : 
                     class="btn btn-sm btn-outline-secondary py-0 px-2 fs-10"
                     data-role="mark-read-btn"
                     data-event-id="<?php echo $eventId; ?>">
-                    <i class="bi bi-check me-1"></i><?php echo esc_html__('Mark Read', 'wecoza-events'); ?>
+                    <i class="bi bi-check me-1"></i><?php echo esc_html__(
+                        "Mark Read",
+                        "wecoza-events",
+                    ); ?>
                 </button>
                 <?php endif; ?>
 
@@ -100,11 +126,17 @@ $readStateClass = $item['read_state_class'] ?? ($isRead ? 'notification-read' : 
                     class="btn btn-sm btn-outline-success py-0 px-2 fs-10"
                     data-role="acknowledge-btn"
                     data-event-id="<?php echo $eventId; ?>">
-                    <i class="bi bi-check2-circle me-1"></i><?php echo esc_html__('Acknowledge', 'wecoza-events'); ?>
+                    <i class="bi bi-check2-circle me-1"></i><?php echo esc_html__(
+                        "Acknowledge",
+                        "wecoza-events",
+                    ); ?>
                 </button>
                 <?php else: ?>
                 <span class="badge badge-phoenix badge-phoenix-success fs-10">
-                    <i class="bi bi-check-circle me-1"></i> <?php echo esc_html__('Acknowledged', 'wecoza-events'); ?>
+                    <i class="bi bi-check-circle me-1"></i> <?php echo esc_html__(
+                        "Acknowledged",
+                        "wecoza-events",
+                    ); ?>
                 </span>
                 <?php endif; ?>
             </div>

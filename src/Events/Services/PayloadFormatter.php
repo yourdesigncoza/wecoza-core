@@ -34,6 +34,7 @@ final class PayloadFormatter
             /** @var array<string, mixed>|null $decoded */
             $decoded = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
+            wecoza_log('Failed to decode JSON payload: ' . $exception->getMessage(), 'warning');
             return null;
         }
 
@@ -85,6 +86,7 @@ final class PayloadFormatter
             /** @var array<string, mixed>|null $decoded */
             $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
+            wecoza_log('Failed to decode JSON array value: ' . $exception->getMessage(), 'warning');
             return [];
         }
 

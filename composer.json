@@ -16,7 +16,8 @@
             "WeCoza\\Classes\\": "src/Classes/",
             "WeCoza\\Events\\": "src/Events/",
             "WeCoza\\Settings\\": "src/Settings/",
-            "WeCoza\\ShortcodeInspector\\": "src/ShortcodeInspector/"
+            "WeCoza\\ShortcodeInspector\\": "src/ShortcodeInspector/",
+            "WeCoza\\Dev\\": "src/Dev/"
         },
         "files": [
             "core/Helpers/functions.php"

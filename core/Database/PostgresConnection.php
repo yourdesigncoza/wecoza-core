@@ -309,9 +309,9 @@ class PostgresConnection
      *
      * @param string $table Table name
      * @param array $data Associative array of column => value
-     * @return string|bool Last insert ID or true (no RETURNING), false on failure
+     * @return string|int|bool Last insert ID (string or int depending on column type) or true (no RETURNING), false on failure
      */
-    public function insert(string $table, array $data): string|bool
+    public function insert(string $table, array $data): string|int|bool
     {
         try {
             $pdo = $this->getPdo();
