@@ -10,6 +10,7 @@
 - ✅ **v3.0 Agents Integration** — Phases 26-30 (shipped 2026-02-12)
 - ✅ **v3.1 Form Field Wiring Fixes** — Phases 31-35 (shipped 2026-02-13)
 - ✅ **v4.0 Technical Debt** — Phases 36-41 (shipped 2026-02-16)
+- 🚧 **v4.1 Lookup Table Admin** — Phases 42-43
 
 ## Phases
 
@@ -109,8 +110,28 @@ See: `.planning/milestones/v4.0-ROADMAP.md`
 | 26-30 | v3.0 | 11 | Complete | 2026-02-12 |
 | 31-35 | v3.1 | 8 | Complete | 2026-02-13 |
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
+| 42-43 | v4.1 | 0 | In Progress | — |
 
-**Total: 41 phases, 87 plans, 8 milestones shipped**
+**Total: 43 phases, 87 plans, 8 milestones shipped, 1 in progress**
+
+### Phase 42: Lookup Table CRUD Infrastructure + Qualifications Shortcode
+
+**Goal:** Build generic LookupTables module (Controller, Repository, Ajax handler, view, JS). Register [wecoza_manage_qualifications] shortcode. Inline-editable Phoenix-styled table for CRUD on learner_qualifications table.
+**Depends on:** Phase 41
+**Plans:** 2 plans
+
+Plans:
+- [ ] 42-01-PLAN.md -- Backend: Repository + AJAX handler + Controller + wecoza-core.php registration
+- [ ] 42-02-PLAN.md -- Frontend: View template + JavaScript + human verification
+
+### Phase 43: Placement Levels Shortcode
+
+**Goal:** Register [wecoza_manage_placement_levels] shortcode using Phase 42 infrastructure. Same UI pattern, configured for 3-column table (level code + description).
+**Depends on:** Phase 42
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 43 to break down)
 
 ---
-*Last updated: 2026-02-16 after v4.0 milestone completion*
+*Last updated: 2026-02-17 after v4.1 milestone creation*
