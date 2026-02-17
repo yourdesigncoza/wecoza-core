@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Planning next milestone
+**Current focus:** v4.1 Lookup Table Admin — Phases 42-43
 
 ## Current Position
 
-Phase: None — milestone v4.0 complete
-Plan: N/A
-Status: Between milestones
-Last activity: 2026-02-17 - Completed quick task 012: Show success banner and clear form after agent save
+Phase: 42 — Lookup Table CRUD Infrastructure + Qualifications Shortcode
+Plan: 01 COMPLETE — backend infrastructure built
+Status: In progress — Plan 02 (view + JS) next
+Last activity: 2026-02-17 - Executed 42-01: LookupTable CRUD infrastructure
 
-Progress: 41 phases complete across 8 milestones (87 plans executed)
+Progress: 41 phases complete across 8 milestones (88 plans executed), 2 phases in progress
 
 ## Milestone History
 
@@ -35,7 +35,16 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-Cleared at milestone boundary. Full decision log in PROJECT.md Key Decisions table.
+- 42-01: LookupTableRepository does not extend BaseRepository — BaseRepository uses static $table, runtime config injection requires standalone class
+- 42-01: TABLES constant lives in LookupTableController; AjaxHandler calls getTableConfig() — single source of truth
+- 42-01: SHORTCODE_MAP constant in controller for clean tag-to-tableKey dispatch
+
+### Roadmap Evolution
+
+- Phase 42 added: Lookup Table CRUD Infrastructure + Qualifications Shortcode
+- Phase 43 added: Placement Levels Shortcode
+- Milestone v4.1 created: Lookup Table Admin (Phases 42-43)
+- Phase 42, Plan 01 complete: backend infrastructure (Repository, AjaxHandler, Controller)
 
 ### Pending Todos
 
@@ -70,10 +79,16 @@ None.
 | 011 | Improve post-save UX in client capture form | 2026-02-17 | d5cccbe | [11-after-saving-a-new-client-via-wecoza-cap](./quick/11-after-saving-a-new-client-via-wecoza-cap/) |
 | 012 | Improve post-save UX in agent capture form | 2026-02-17 | cdb36ee | [12-after-saving-a-new-agent-via-wecoza-capt](./quick/12-after-saving-a-new-agent-via-wecoza-capt/) |
 
+## Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 42 | 01 | 2 min | 2/2 | 4 |
+
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Quick task 12 complete
+Stopped at: Completed 42-01-PLAN.md — backend infrastructure (Repository, AjaxHandler, Controller)
 Resume file: N/A
 
-**Next action:** `/gsd:new-milestone` — define next milestone
+**Next action:** Execute Plan 02 — view template (manage.view.php) + lookup-table-manager.js
