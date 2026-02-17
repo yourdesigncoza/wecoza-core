@@ -128,7 +128,7 @@ Plans:
 
 **Goal:** Register [wecoza_manage_placement_levels] shortcode using Phase 42 infrastructure. Same UI pattern, configured for 3-column table (level code + description).
 **Depends on:** Phase 42
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 43-01-PLAN.md -- Fix auto-increment sequence + human verification of shortcode CRUD
