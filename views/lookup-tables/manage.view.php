@@ -55,12 +55,14 @@ if (!defined('ABSPATH')) {
                         </td>
                     <?php endforeach; ?>
                     <td class="align-middle text-end pe-3">
-                        <button type="button"
-                                class="btn btn-sm btn-phoenix-success lookup-btn-add"
-                                data-table-key="<?= esc_attr($tableKey) ?>"
-                                title="Add">
-                            <span class="fas fa-plus"></span> Add
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button type="button"
+                                    class="btn btn-sm btn-subtle-success lookup-btn-add"
+                                    data-table-key="<?= esc_attr($tableKey) ?>"
+                                    title="Add">
+                                <span class="fas fa-plus"></span> Add
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 <!-- Data rows are populated by lookup-table-manager.js on page load -->

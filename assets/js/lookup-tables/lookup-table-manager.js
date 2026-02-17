@@ -117,17 +117,19 @@
                 $tr.append($td);
             });
 
-            // Actions cell
+            // Actions cell — btn-group with subtle buttons
             var $actions = $(
                 '<td class="align-middle text-end pe-3">' +
-                '<button type="button" class="btn btn-sm btn-phoenix-primary lookup-btn-edit" ' +
+                '<div class="btn-group" role="group">' +
+                '<button type="button" class="btn btn-sm btn-subtle-primary lookup-btn-edit" ' +
                     'data-id="' + pkValue + '" data-table-key="' + tableKey + '" title="Edit">' +
                     '<span class="fas fa-pencil-alt"></span>' +
                 '</button>' +
-                '<button type="button" class="btn btn-sm btn-phoenix-danger lookup-btn-delete ms-1" ' +
+                '<button type="button" class="btn btn-sm btn-subtle-danger lookup-btn-delete" ' +
                     'data-id="' + pkValue + '" data-table-key="' + tableKey + '" title="Delete">' +
                     '<span class="fas fa-trash-alt"></span>' +
                 '</button>' +
+                '</div>' +
                 '</td>'
             );
             $tr.append($actions);
@@ -219,15 +221,15 @@
 
         // Swap edit button to save (checkmark)
         $btn
-            .removeClass('btn-phoenix-primary lookup-btn-edit')
-            .addClass('btn-phoenix-success lookup-btn-save')
+            .removeClass('btn-subtle-primary lookup-btn-edit')
+            .addClass('btn-subtle-success lookup-btn-save')
             .attr('title', 'Save')
             .html('<span class="fas fa-check"></span>');
 
         // Swap delete button to cancel (times)
         $row.find('.lookup-btn-delete')
-            .removeClass('btn-phoenix-danger lookup-btn-delete')
-            .addClass('btn-phoenix-secondary lookup-btn-cancel')
+            .removeClass('btn-subtle-danger lookup-btn-delete')
+            .addClass('btn-subtle-secondary lookup-btn-cancel')
             .attr('title', 'Cancel')
             .html('<span class="fas fa-times"></span>');
     });
