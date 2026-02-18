@@ -15,6 +15,8 @@ namespace WeCoza\Learners\Ajax;
 
 use WeCoza\Learners\Services\ProgressionService;
 use WeCoza\Learners\Services\PortfolioUploadService;
+use WeCoza\Learners\Models\LearnerProgressionModel;
+use WeCoza\Learners\Repositories\LearnerProgressionRepository;
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -223,6 +225,268 @@ function handle_log_collision_acknowledgement(): void
 }
 
 /**
+ * Fetch paginated, filtered progressions for admin management table
+ *
+ * AJAX action: get_admin_progressions
+ */
+function handle_get_admin_progressions(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized access']);
+            return;
+        }
+
+        // Build validated filters from GET params
+        $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
+        $filters = [];
+
+        if (!empty($_GET['client_id'])) {
+            $filters['client_id'] = intval($_GET['client_id']);
+        }
+        if (!empty($_GET['class_id'])) {
+            $filters['class_id'] = intval($_GET['class_id']);
+        }
+        if (!empty($_GET['product_id'])) {
+            $filters['product_id'] = intval($_GET['product_id']);
+        }
+        if (!empty($_GET['status']) && in_array($_GET['status'], $allowedStatuses, true)) {
+            $filters['status'] = sanitize_key($_GET['status']);
+        }
+
+        $pageSize   = 25;
+        $page       = max(1, isset($_GET['page']) ? intval($_GET['page']) : 1);
+        $offset     = ($page - 1) * $pageSize;
+
+        $service = new ProgressionService();
+        $result  = $service->getProgressionsForAdmin($filters, $pageSize, $offset);
+
+        wp_send_json_success([
+            'data'         => $result['data'],
+            'total'        => $result['total'],
+            'pages'        => $result['pages'],
+            'current_page' => $page,
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
+ * Bulk-complete multiple LP progressions without requiring portfolio files
+ *
+ * Bypasses the portfolio requirement of ProgressionService::markLPComplete() by
+ * calling LearnerProgressionModel::markComplete() directly. This is intentional:
+ * bulk admin operations trade portfolio enforcement for operational speed.
+ *
+ * AJAX action: bulk_complete_progressions
+ */
+function handle_bulk_complete_progressions(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized access']);
+            return;
+        }
+
+        if (!isset($_POST['tracking_ids']) || !is_array($_POST['tracking_ids'])) {
+            throw new Exception('tracking_ids must be a non-empty array.');
+        }
+
+        $trackingIds = array_map('intval', $_POST['tracking_ids']);
+        $trackingIds = array_filter($trackingIds); // remove zeros
+
+        if (empty($trackingIds)) {
+            throw new Exception('No valid tracking IDs provided.');
+        }
+
+        if (count($trackingIds) > 50) {
+            throw new Exception('Maximum 50 progressions can be bulk-completed at once.');
+        }
+
+        $completedBy = get_current_user_id();
+        $completed   = [];
+        $failed      = [];
+
+        foreach ($trackingIds as $id) {
+            try {
+                $model = LearnerProgressionModel::getById($id);
+
+                if (!$model) {
+                    throw new Exception("Progression not found.");
+                }
+
+                if ($model->isCompleted()) {
+                    throw new Exception("LP is already marked as complete.");
+                }
+
+                // Bypass portfolio requirement — direct model call (intentional for bulk admin)
+                if (!$model->markComplete($completedBy)) {
+                    throw new Exception("Failed to update progression record.");
+                }
+
+                $completed[] = $id;
+
+            } catch (Exception $e) {
+                $failed[] = ['id' => $id, 'error' => $e->getMessage()];
+            }
+        }
+
+        wp_send_json_success([
+            'completed' => $completed,
+            'failed'    => $failed,
+            'count'     => count($completed),
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
+ * Retrieve full hours log for a given tracking ID along with basic progression info
+ *
+ * AJAX action: get_progression_hours_log
+ */
+function handle_get_progression_hours_log(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        $trackingId = isset($_GET['tracking_id']) ? intval($_GET['tracking_id']) : 0;
+        if (!$trackingId) {
+            throw new Exception('tracking_id is required.');
+        }
+
+        $progression = LearnerProgressionModel::getById($trackingId);
+        if (!$progression) {
+            throw new Exception('Progression not found.');
+        }
+
+        $repository = new LearnerProgressionRepository();
+        $hoursLog   = $repository->getHoursLog($trackingId);
+
+        wp_send_json_success([
+            'progression' => [
+                'tracking_id'      => $progression->getTrackingId(),
+                'learner_name'     => $progression->getLearnerName(),
+                'product_name'     => $progression->getProductName(),
+                'status'           => $progression->getStatus(),
+                'hours_present'    => $progression->getHoursPresent(),
+                'hours_trained'    => $progression->getHoursTrained(),
+                'product_duration' => $progression->getProductDuration(),
+            ],
+            'hours_log' => $hoursLog,
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
+ * Manually start a new LP for a learner (admin-initiated)
+ *
+ * AJAX action: start_learner_progression
+ */
+function handle_start_learner_progression(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized access']);
+            return;
+        }
+
+        $learnerId = isset($_POST['learner_id']) ? intval($_POST['learner_id']) : 0;
+        if (!$learnerId) {
+            throw new Exception('learner_id is required.');
+        }
+
+        $productId = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+        if (!$productId) {
+            throw new Exception('product_id is required.');
+        }
+
+        $classId = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
+        $notes   = !empty($_POST['notes']) ? sanitize_textarea_field($_POST['notes']) : null;
+
+        $service    = new ProgressionService();
+        $progression = $service->startLearnerProgression($learnerId, $productId, $classId, $notes);
+
+        wp_send_json_success([
+            'tracking_id' => $progression->getTrackingId(),
+            'message'     => 'LP started successfully.',
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
+ * Toggle an LP between in_progress and on_hold states
+ *
+ * AJAX action: toggle_progression_hold
+ */
+function handle_toggle_progression_hold(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized access']);
+            return;
+        }
+
+        $trackingId = isset($_POST['tracking_id']) ? intval($_POST['tracking_id']) : 0;
+        if (!$trackingId) {
+            throw new Exception('tracking_id is required.');
+        }
+
+        $allowedActions = ['hold', 'resume'];
+        $action = isset($_POST['action']) ? sanitize_key($_POST['action']) : '';
+        if (!in_array($action, $allowedActions, true)) {
+            throw new Exception("action must be 'hold' or 'resume'.");
+        }
+
+        $model = LearnerProgressionModel::getById($trackingId);
+        if (!$model) {
+            throw new Exception('Progression not found.');
+        }
+
+        if ($action === 'hold') {
+            if (!$model->isInProgress()) {
+                throw new Exception("Cannot put on hold: LP status is '{$model->getStatus()}', expected 'in_progress'.");
+            }
+            $model->putOnHold('Put on hold by admin');
+        } else {
+            if (!$model->isOnHold()) {
+                throw new Exception("Cannot resume: LP status is '{$model->getStatus()}', expected 'on_hold'.");
+            }
+            $model->resume();
+        }
+
+        wp_send_json_success([
+            'tracking_id' => $trackingId,
+            'new_status'  => $model->getStatus(),
+            'message'     => $action === 'hold'
+                ? 'LP has been put on hold.'
+                : 'LP has been resumed.',
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
  * Register all progression AJAX handlers
  */
 function register_progression_ajax_handlers(): void
@@ -231,6 +495,11 @@ function register_progression_ajax_handlers(): void
     add_action('wp_ajax_upload_progression_portfolio',    __NAMESPACE__ . '\handle_upload_progression_portfolio');
     add_action('wp_ajax_get_learner_progressions',        __NAMESPACE__ . '\handle_get_learner_progressions');
     add_action('wp_ajax_log_lp_collision_acknowledgement', __NAMESPACE__ . '\handle_log_collision_acknowledgement');
+    add_action('wp_ajax_get_admin_progressions',           __NAMESPACE__ . '\handle_get_admin_progressions');
+    add_action('wp_ajax_bulk_complete_progressions',       __NAMESPACE__ . '\handle_bulk_complete_progressions');
+    add_action('wp_ajax_get_progression_hours_log',        __NAMESPACE__ . '\handle_get_progression_hours_log');
+    add_action('wp_ajax_start_learner_progression',        __NAMESPACE__ . '\handle_start_learner_progression');
+    add_action('wp_ajax_toggle_progression_hold',          __NAMESPACE__ . '\handle_toggle_progression_hold');
 }
 
 // Register handlers on init
