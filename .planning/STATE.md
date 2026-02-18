@@ -43,6 +43,10 @@ See: .planning/ROADMAP.md for current milestone detail
 - 44-01: Portfolio file required (not optional) to mark LP complete — enforces data integrity
 - 44-01: validate_portfolio_file() as shared namespace function (DRY) used by both mark-complete and portfolio-upload handlers
 - 44-01: Collision acknowledgement uses wecoza_class_nonce (matches frontend class form context)
+- [Phase 44]: Sorting by last_completion_date on th header — YYYY-MM-DD format sorts correctly via localeCompare
+- [Phase 44]: logCollisionAcknowledgement() uses sendBeacon — fire-and-forget audit trail, never blocks UI
+- [Phase 44]: 44-02: In-place card updates replace page reload — badge, progress bar, admin actions update without navigation
+- [Phase 44]: 44-02: Confirmation modal required before mark-complete to prevent accidental LP completions
 
 ### Pending Todos
 
@@ -66,6 +70,8 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 42 | 02 | 15 min | 2/2 | 2 |
 | 43 | 01 | 10 min | 2/2 | 0 |
 | 44 | 01 | 2 min | 2/2 | 2 |
+| Phase 44 P03 | 3 | 3 tasks | 4 files |
+| Phase 44 P02 | 3 | 2 tasks | 2 files |
 
 ## Session Continuity
 
