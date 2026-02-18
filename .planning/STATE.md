@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 45 of 47 in v5.0 (Admin Management)
-Plan: 1 of 3 in current phase
-Status: Phase 45 plan 01 complete
-Last activity: 2026-02-18 — 45-01 complete (five admin AJAX endpoints added to ProgressionAjaxHandlers.php)
+Plan: 2 of 3 in current phase
+Status: Phase 45 plan 02 complete
+Last activity: 2026-02-18 — 45-02 complete (progression admin shortcode and view template with filter form, table, and three modals)
 
 Progress: 44 phases complete, Phase 45 in progress (95 plans executed)
 
@@ -49,6 +49,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 44]: 44-02: Confirmation modal required before mark-complete to prevent accidental LP completions
 - [Phase 45]: 45-01: Bulk complete calls model directly (not service) to bypass portfolio requirement — intentional admin trade-off documented in code comment
 - [Phase 45]: 45-01: toggle_progression_hold validates current status before action, throws descriptive exception on state mismatch
+- [Phase 45]: wecoza_view() used instead of direct include — matches plugin's view rendering pattern
+- [Phase 45]: 45-02: Filter dropdowns rendered empty, JS populates via AJAX for separation of concerns
+- [Phase 45]: 45-02: Three modals included in static view shell, not dynamically injected — simpler JS wiring
 
 ### Pending Todos
 
@@ -75,11 +78,12 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 44 | 02 | 3 min | 2/2 | 2 |
 | 44 | 03 | 3 min | 3/3 | 4 |
 | 45 | 01 | 2 min | 2/2 | 1 |
+| 45 | 02 | 2 min | 2/2 | 3 |
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 45-01-PLAN.md (five admin AJAX endpoints for LP management)
-Resume file: .planning/phases/45-admin-management/45-01-SUMMARY.md
+Stopped at: Completed 45-02-PLAN.md (progression admin shortcode and view template)
+Resume file: .planning/phases/45-admin-management/45-02-SUMMARY.md
 
-**Next action:** Execute Phase 45 Plan 02
+**Next action:** Execute Phase 45 Plan 03
