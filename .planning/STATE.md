@@ -83,6 +83,7 @@ None.
 | 010 | Convert Bootstrap badges to Phoenix style | 2026-02-05 | 9742c0b | [010-update-bootstrap-badges-to-phoenix-style](./quick/010-update-bootstrap-badges-to-phoenix-style/) |
 | 011 | Improve post-save UX in client capture form | 2026-02-17 | d5cccbe | [11-after-saving-a-new-client-via-wecoza-cap](./quick/11-after-saving-a-new-client-via-wecoza-cap/) |
 | 012 | Improve post-save UX in agent capture form | 2026-02-17 | cdb36ee | [12-after-saving-a-new-agent-via-wecoza-capt](./quick/12-after-saving-a-new-agent-via-wecoza-capt/) |
+| 013 | Notification cards: agent name, acknowledge badge, delete | 2026-02-18 | fd37095 | [13-notification-card-agent-name-display-ack](./quick/13-notification-card-agent-name-display-ack/) |
 
 ## Performance Metrics
 
@@ -94,8 +95,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-17
-Stopped at: Completed 43-01-PLAN.md — DDL fix + human verified; milestone v4.1 Lookup Table Admin shipped
+Last session: 2026-02-18
+Stopped at: Quick Task 13 — notification card enhancements (agent name, badge swap, delete) — awaiting human verify of all 3 features
 Resume file: N/A
 
-**Next action:** Define next milestone with `/gsd:new-milestone`
+**Next action:** Verify notification cards at [wecoza_insert_update_ai_summary] shortcode page, then run schema/add-soft-delete-to-class-events.sql DDL
