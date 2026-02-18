@@ -1410,8 +1410,8 @@ $data["class_data"]["seta"] == $seta["id"]
                                     Postal Code
                                     <i class="bi bi-arrow-down-up ms-1"></i>
                                  </th>
-                                 <th scope="col" class="border-0 sortable-column" data-field="last_course_name" style="cursor: pointer;">
-                                    Last Course
+                                 <th scope="col" class="border-0 sortable-column" data-field="last_completion_date" style="cursor: pointer;">
+                                    Last Completed Course
                                     <i class="bi bi-arrow-down-up ms-1"></i>
                                  </th>
                                  <th scope="col" class="border-0" style="width: 60px;">
@@ -1440,9 +1440,14 @@ $data["class_data"]["seta"] == $seta["id"]
                                               ); ?>">
                                     </div>
                                  </td>
-                                 <td class="py-2 align-middle"><?php echo esc_html(
-                                     $learner["first_name"],
-                                 ); ?></td>
+                                 <td class="py-2 align-middle">
+                                    <?php echo esc_html($learner["first_name"]); ?>
+                                    <?php if (!empty($learner["has_active_lp"])): ?>
+                                    <span class="badge fs-10 badge-phoenix badge-phoenix-warning ms-1" title="Active LP: <?php echo esc_attr($learner["active_course_name"] ?? ''); ?>">
+                                       <i class="bi bi-book"></i>
+                                    </span>
+                                    <?php endif; ?>
+                                 </td>
                                  <td class="py-2 align-middle"><?php echo esc_html(
                                      $learner["second_name"] ?? "",
                                  ); ?></td>
@@ -1485,18 +1490,19 @@ $data["class_data"]["seta"] == $seta["id"]
                                      $learner["postal_code"] ?? "-",
                                  ); ?></td>
                                  <td class="py-2 align-middle">
-                                    <?php if (
-                                        !empty($learner["last_course_name"])
-                                    ): ?>
-                                    <span class="badge fs-10 badge-phoenix badge-phoenix-success" title="Completed: <?php echo esc_attr(
-                                        $learner["last_completion_date"] ?? "",
-                                    ); ?>">
-                                       <?php echo esc_html(
-                                           $learner["last_course_name"],
-                                       ); ?>
-                                    </span>
+                                    <?php if (!empty($learner["last_course_name"])): ?>
+                                    <div>
+                                       <span class="badge fs-10 badge-phoenix badge-phoenix-success">
+                                          <?php echo esc_html($learner["last_course_name"]); ?>
+                                       </span>
+                                       <?php if (!empty($learner["last_completion_date"])): ?>
+                                       <br><small class="text-muted">
+                                          completed <?php echo wp_date('Y-m-d', strtotime($learner["last_completion_date"])); ?>
+                                       </small>
+                                       <?php endif; ?>
+                                    </div>
                                     <?php else: ?>
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted">&mdash;</span>
                                     <?php endif; ?>
                                  </td>
                                  <td class="py-2 align-middle text-center">
