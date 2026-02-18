@@ -7,10 +7,10 @@
 
 ### AJAX Wiring
 
-- [ ] **AJAX-01**: Admin can mark LP as complete via "Mark Complete" button with portfolio upload
-- [ ] **AJAX-02**: Admin can upload additional portfolio files to an existing progression
-- [ ] **AJAX-03**: Frontend can fetch learner progression data without page reload (current LP, history, overall progress)
-- [ ] **AJAX-04**: All three AJAX handlers registered in wecoza-core.php with proper namespace references
+- [x] **AJAX-01**: Admin can mark LP as complete via "Mark Complete" button with portfolio upload
+- [x] **AJAX-02**: Admin can upload additional portfolio files to an existing progression
+- [x] **AJAX-03**: Frontend can fetch learner progression data without page reload (current LP, history, overall progress)
+- [x] **AJAX-04**: All three AJAX handlers registered in wecoza-core.php with proper namespace references
 
 ### Admin Management
 
@@ -39,9 +39,9 @@
 
 ### Class Integration
 
-- [ ] **CLASS-01**: Available Learners table in class form shows "Last Completed Course" column
-- [ ] **CLASS-02**: Collision detection warns when adding learner with active LP to class
-- [ ] **CLASS-03**: Class learner modal shows read-only progression info (current LP, progress bar, status badge)
+- [x] **CLASS-01**: Available Learners table in class form shows "Last Completed Course" column
+- [x] **CLASS-02**: Collision detection warns when adding learner with active LP to class
+- [x] **CLASS-03**: Class learner modal shows read-only progression info (current LP, progress bar, status badge)
 
 ## v6+ Requirements
 
@@ -80,13 +80,13 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AJAX-01 | Phase 44 | Pending |
-| AJAX-02 | Phase 44 | Pending |
-| AJAX-03 | Phase 44 | Pending |
-| AJAX-04 | Phase 44 | Pending |
-| CLASS-01 | Phase 44 | Pending |
-| CLASS-02 | Phase 44 | Pending |
-| CLASS-03 | Phase 44 | Pending |
+| AJAX-01 | Phase 44 | Complete |
+| AJAX-02 | Phase 44 | Complete |
+| AJAX-03 | Phase 44 | Complete |
+| AJAX-04 | Phase 44 | Complete |
+| CLASS-01 | Phase 44 | Complete |
+| CLASS-02 | Phase 44 | Complete |
+| CLASS-03 | Phase 44 | Complete |
 | ADMIN-01 | Phase 45 | Pending |
 | ADMIN-02 | Phase 45 | Pending |
 | ADMIN-03 | Phase 45 | Pending |
