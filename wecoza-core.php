@@ -615,6 +615,19 @@ add_action(
         require_once WECOZA_CORE_PATH .
             "src/Learners/Ajax/LearnerAjaxHandlers.php";
 
+        /*
+        |--------------------------------------------------------------------------
+        | Load Learner Progression AJAX Handlers
+        |--------------------------------------------------------------------------
+        |
+        | AJAX handlers for LP progression operations: mark complete,
+        | portfolio upload, fetch progression data, and collision logging.
+        |
+        */
+
+        require_once WECOZA_CORE_PATH .
+            "src/Learners/Ajax/ProgressionAjaxHandlers.php";
+
         // Debug logging
         if (defined("WP_DEBUG") && WP_DEBUG) {
             // Uncomment for debugging:
