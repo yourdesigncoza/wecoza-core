@@ -39,12 +39,15 @@ if (!defined("ABSPATH")) {
                     <div class="d-flex align-items-start justify-content-between gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <?php if (!$isRead): ?>
-                                <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__(
-                                    "NEW",
-                                    "wecoza-events",
-                                ); ?></span>
-                                <?php endif; ?>
+                                <span data-role="status-badge" data-event-id="<?php echo esc_attr($eventId); ?>">
+                                    <?php if ($isAcknowledged): ?>
+                                        <span class="badge badge-phoenix badge-phoenix-success fs-10">Read</span>
+                                    <?php elseif (!$isRead): ?>
+                                        <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__("NEW", "wecoza-events"); ?></span>
+                                    <?php else: ?>
+                                        <span class="badge badge-phoenix badge-phoenix-info fs-10">Read</span>
+                                    <?php endif; ?>
+                                </span>
                                 <h6 class="mb-0 fw-bold text-body">
                                     <?php echo $summary["class_code"] ?:
                                         esc_html__("N/A", "wecoza-events"); ?>
@@ -57,6 +60,11 @@ if (!defined("ABSPATH")) {
                                         "wecoza-events",
                                     ); ?>
                             </p>
+                            <?php if (!empty($summary["agent_name"])): ?>
+                            <p class="mb-0 fs-10 text-body-tertiary">
+                                <i class="bi bi-person"></i> <?php echo esc_html($summary["agent_name"]); ?>
+                            </p>
+                            <?php endif; ?>
                         </div>
                         <span class="badge <?php echo esc_attr(
                             $summary["operation_badge_class"] ??
@@ -139,6 +147,15 @@ if (!defined("ABSPATH")) {
                                         "Acknowledge",
                                         "wecoza-events",
                                     ); ?>
+                                </button>
+                            <?php endif; ?>
+                            <?php if ($eventId): ?>
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-danger py-0 px-2 fs-10"
+                                    data-role="delete-btn"
+                                    data-event-id="<?php echo esc_attr($eventId); ?>"
+                                    title="<?php echo esc_attr__('Delete notification', 'wecoza-events'); ?>">
+                                    <i class="bi bi-trash"></i>
                                 </button>
                             <?php endif; ?>
                         </div>

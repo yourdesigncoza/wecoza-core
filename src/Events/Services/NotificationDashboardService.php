@@ -30,6 +30,9 @@ final class NotificationDashboardService
 {
     private ClassEventRepository $repository;
 
+    /** @var array<int, string> In-request cache for resolved agent names */
+    private array $agentNameCache = [];
+
     public function __construct(?ClassEventRepository $repository = null)
     {
         $this->repository = $repository ?? new ClassEventRepository();
@@ -84,6 +87,28 @@ final class NotificationDashboardService
     public function getUnreadCount(): int
     {
         return $this->repository->getUnreadCount();
+    }
+
+    /**
+     * Get count of acknowledged events
+     *
+     * @return int Acknowledged count
+     */
+    public function getAcknowledgedCount(): int
+    {
+        return $this->repository->getAcknowledgedCount();
+    }
+
+    /**
+     * Soft-delete a notification recording the WordPress user ID
+     *
+     * @param int $eventId Event ID
+     * @param int $deletedByUserId WordPress user ID performing deletion
+     * @return bool Success
+     */
+    public function deleteNotification(int $eventId, int $deletedByUserId): bool
+    {
+        return $this->repository->softDelete($eventId, $deletedByUserId);
     }
 
     /**
@@ -168,6 +193,9 @@ final class NotificationDashboardService
         $newRow = $eventData['new_row'] ?? [];
         $aiSummary = $event->aiSummary;
 
+        $agentId = (int) ($newRow['class_agent'] ?? 0);
+        $agentName = $agentId > 0 ? $this->resolveAgentName($agentId) : '';
+
         return [
             'event_id' => $event->eventId,
             'event_type' => $event->eventType->value,
@@ -181,6 +209,8 @@ final class NotificationDashboardService
             'class_code' => $newRow['class_code'] ?? '',
             'class_subject' => $newRow['class_subject'] ?? '',
             'class_name' => $this->formatClassName($newRow),
+            'agent_id' => $agentId,
+            'agent_name' => $agentName,
 
             'has_ai_summary' => $aiSummary !== null,
             'ai_summary_text' => $aiSummary['summary'] ?? '',
@@ -217,6 +247,44 @@ final class NotificationDashboardService
     public function transformManyForDisplay(array $events): array
     {
         return array_map([$this, 'transformForDisplay'], $events);
+    }
+
+    /**
+     * Resolve agent name from agents table by agent ID
+     *
+     * Uses an in-request cache to avoid repeated DB queries for the same agent
+     * across multiple notifications.
+     *
+     * @param int $agentId Agent ID from event_data->new_row->class_agent
+     * @return string "First Last" or "Unknown Agent" on failure
+     */
+    private function resolveAgentName(int $agentId): string
+    {
+        if (isset($this->agentNameCache[$agentId])) {
+            return $this->agentNameCache[$agentId];
+        }
+
+        try {
+            $pdo = wecoza_db()->getPdo();
+            $stmt = $pdo->prepare('SELECT first_name, surname FROM agents WHERE agent_id = :id LIMIT 1');
+            if ($stmt && $stmt->execute([':id' => $agentId])) {
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row !== false && $row !== null) {
+                    $name = trim(($row['first_name'] ?? '') . ' ' . ($row['surname'] ?? ''));
+                    $resolved = $name !== '' ? $name : 'Unknown Agent';
+                } else {
+                    $resolved = 'Unknown Agent';
+                }
+            } else {
+                $resolved = 'Unknown Agent';
+            }
+        } catch (\Throwable $e) {
+            $resolved = 'Unknown Agent';
+        }
+
+        $this->agentNameCache[$agentId] = $resolved;
+
+        return $resolved;
     }
 
     /**

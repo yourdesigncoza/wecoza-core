@@ -91,6 +91,7 @@ final class AISummaryPresenter
         $classCode = esc_html($record['class_code'] ?? '');
         $classSubject = esc_html($record['class_subject'] ?? '');
         $aiSummaryText = $record['ai_summary_text'] ?? '';
+        $agentName = esc_html($record['agent_name'] ?? '');
 
         return [
             'event_id' => $eventId,
@@ -99,6 +100,8 @@ final class AISummaryPresenter
             'class_code' => $classCode,
             'class_subject' => $classSubject,
             'class_name' => esc_html($record['class_name'] ?? ''),
+            'agent_id' => $record['agent_id'] ?? null,
+            'agent_name' => $agentName,
 
             'event_type' => $eventType,
             'event_type_label' => $eventTypeConfig['label'],
@@ -142,7 +145,8 @@ final class AISummaryPresenter
                 $eventTypeConfig['label'],
                 $classCode,
                 $classSubject,
-                $aiSummaryText
+                $aiSummaryText,
+                $agentName
             ),
 
             'data_attributes' => $this->buildDataAttributes($eventId, $eventType, $isRead),
@@ -230,19 +234,22 @@ final class AISummaryPresenter
      * @param string $classCode Class code
      * @param string $classSubject Class subject
      * @param string $aiSummary AI summary text
+     * @param string $agentName Resolved agent name
      * @return string Lowercase search index
      */
     private function buildSearchIndex(
         string $eventTypeLabel,
         string $classCode,
         string $classSubject,
-        string $aiSummary
+        string $aiSummary,
+        string $agentName = ''
     ): string {
         $parts = array_filter([
             $eventTypeLabel,
             $classCode,
             $classSubject,
             $aiSummary,
+            $agentName,
         ]);
 
         return strtolower(implode(' ', $parts));

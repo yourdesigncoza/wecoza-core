@@ -11,6 +11,8 @@
 /** @var bool $unreadOnly */
 /** @var bool $showFilters */
 /** @var int $unreadCount */
+/** @var int $totalCount */
+/** @var int $acknowledgedCount */
 /** @var string $nonce */
 echo $assets;
 ?>
@@ -32,9 +34,8 @@ echo $assets;
                         <?php endif; ?>
                     </h4>
                 </div>
-                <?php $count = count($summaries); ?>
-                <span class="badge badge-phoenix fs-10 badge-phoenix-primary">
-                    <?php echo esc_html(sprintf(_n('%d notification', '%d notifications', $count, 'wecoza-events'), $count)); ?>
+                <span class="badge badge-phoenix fs-10 badge-phoenix-primary" data-role="notification-count">
+                    <?php echo esc_html($totalCount); ?> <?php echo esc_html(_n('Notification', 'Notifications', $totalCount, 'wecoza-events')); ?><?php if ($acknowledgedCount > 0): ?>, <?php echo esc_html($acknowledgedCount); ?> Read<?php endif; ?>
                 </span>
             </div>
             <?php if ($showFilters): ?>

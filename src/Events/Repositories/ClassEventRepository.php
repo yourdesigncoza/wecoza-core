@@ -273,8 +273,11 @@ SQL;
      */
     public function getTimeline(int $limit = AppConstants::DEFAULT_PAGE_SIZE, ?int $afterId = null): array
     {
-        // Complex query: cursor-based pagination with optional WHERE
-        $whereClause = $afterId !== null ? 'WHERE event_id < :after_id' : '';
+        // Complex query: cursor-based pagination with soft-delete filter
+        $whereClause = 'WHERE deleted_at IS NULL';
+        if ($afterId !== null) {
+            $whereClause .= ' AND event_id < :after_id';
+        }
 
         $sql = <<<SQL
 SELECT *
@@ -309,17 +312,16 @@ SQL;
     }
 
     /**
-     * Get count of unread events (viewed_at IS NULL)
+     * Get count of unread events (viewed_at IS NULL, not soft-deleted)
      *
      * @return int Unread count
      */
     public function getUnreadCount(): int
     {
-        // Complex query: COUNT with IS NULL condition (not supported by parent::count criteria)
         $sql = <<<SQL
 SELECT COUNT(*)
 FROM class_events
-WHERE viewed_at IS NULL
+WHERE viewed_at IS NULL AND deleted_at IS NULL
 SQL;
 
         $stmt = $this->db->getPdo()->prepare($sql);
@@ -328,5 +330,53 @@ SQL;
         }
 
         return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Get count of acknowledged events (acknowledged_at IS NOT NULL, not soft-deleted)
+     *
+     * @return int Acknowledged count
+     */
+    public function getAcknowledgedCount(): int
+    {
+        $sql = <<<SQL
+SELECT COUNT(*)
+FROM class_events
+WHERE acknowledged_at IS NOT NULL AND deleted_at IS NULL
+SQL;
+
+        $stmt = $this->db->getPdo()->prepare($sql);
+        if (!$stmt || !$stmt->execute()) {
+            return 0;
+        }
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Soft-delete a notification recording who deleted it
+     *
+     * @param int $eventId Event ID to delete
+     * @param int $deletedByUserId WordPress user ID performing the deletion
+     * @return bool True if a row was updated, false otherwise
+     */
+    public function softDelete(int $eventId, int $deletedByUserId): bool
+    {
+        $sql = <<<SQL
+UPDATE class_events
+SET deleted_at = CURRENT_TIMESTAMP,
+    deleted_by = :deleted_by
+WHERE event_id = :event_id AND deleted_at IS NULL
+SQL;
+
+        $stmt = $this->db->getPdo()->prepare($sql);
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bindValue(':deleted_by', $deletedByUserId, PDO::PARAM_INT);
+        $stmt->bindValue(':event_id', $eventId, PDO::PARAM_INT);
+
+        return $stmt->execute() && $stmt->rowCount() > 0;
     }
 }

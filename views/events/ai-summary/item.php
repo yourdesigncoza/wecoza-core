@@ -54,12 +54,15 @@ $readStateClass =
         <div class="d-flex justify-content-between align-items-start">
             <div class="notification-content flex-grow-1">
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <?php if (!$isRead): ?>
-                    <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__(
-                        "NEW",
-                        "wecoza-events",
-                    ); ?></span>
-                    <?php endif; ?>
+                    <span data-role="status-badge" data-event-id="<?php echo $eventId; ?>">
+                        <?php if ($isAcknowledged): ?>
+                            <span class="badge badge-phoenix badge-phoenix-success fs-10">Read</span>
+                        <?php elseif (!$isRead): ?>
+                            <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__("NEW", "wecoza-events"); ?></span>
+                        <?php else: ?>
+                            <span class="badge badge-phoenix badge-phoenix-info fs-10">Read</span>
+                        <?php endif; ?>
+                    </span>
 
                     <span class="badge <?php echo esc_attr(
                         $item["operation_badge_class"] ??
@@ -79,6 +82,11 @@ $readStateClass =
                 <p class="text-body-secondary mb-0 fs-9">
                     <?php echo esc_html($item["class_subject"] ?? ""); ?>
                 </p>
+                <?php if (!empty($item["agent_name"])): ?>
+                <p class="mb-0 fs-10 text-body-tertiary">
+                    <i class="bi bi-person"></i> <?php echo esc_html($item["agent_name"]); ?>
+                </p>
+                <?php endif; ?>
 
                 <small class="text-body-tertiary d-block mt-1 fs-10">
                     <i class="bi bi-clock me-1"></i>
@@ -138,6 +146,15 @@ $readStateClass =
                         "wecoza-events",
                     ); ?>
                 </span>
+                <?php endif; ?>
+                <?php if ($eventId): ?>
+                <button type="button"
+                    class="btn btn-sm btn-outline-danger py-0 px-2 fs-10"
+                    data-role="delete-btn"
+                    data-event-id="<?php echo $eventId; ?>"
+                    title="<?php echo esc_attr__('Delete notification', 'wecoza-events'); ?>">
+                    <i class="bi bi-trash"></i>
+                </button>
                 <?php endif; ?>
             </div>
         </div>

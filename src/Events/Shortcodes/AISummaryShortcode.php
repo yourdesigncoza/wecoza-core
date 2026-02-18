@@ -18,6 +18,7 @@ use function current_user_can;
 use function esc_html;
 use function esc_html__;
 use function filter_input;
+use function get_current_user_id;
 use function shortcode_atts;
 use function sprintf;
 use function strtolower;
@@ -59,6 +60,7 @@ final class AISummaryShortcode
 
         add_action('wp_ajax_wecoza_mark_notification_viewed', [$instance, 'ajaxMarkViewed']);
         add_action('wp_ajax_wecoza_mark_notification_acknowledged', [$instance, 'ajaxMarkAcknowledged']);
+        add_action('wp_ajax_wecoza_delete_notification', [$instance, 'ajaxDeleteNotification']);
     }
 
     public function render(array $atts = [], string $content = '', string $tag = ''): string
@@ -135,6 +137,8 @@ final class AISummaryShortcode
         $summaries = $this->presenter->present($records);
         $instanceId = uniqid('wecoza-ai-summary-');
         $unreadCount = $this->service->getUnreadCount();
+        $totalCount = count($records);
+        $acknowledgedCount = $this->service->getAcknowledgedCount();
 
         return $this->renderer->render('ai-summary/main', [
             'assets' => $this->getAssets(),
@@ -149,6 +153,8 @@ final class AISummaryShortcode
             'unreadOnly' => $unreadOnly,
             'showFilters' => $showFilters,
             'unreadCount' => $unreadCount,
+            'totalCount' => $totalCount,
+            'acknowledgedCount' => $acknowledgedCount,
             'nonce' => wp_create_nonce(self::NONCE_ACTION),
         ]);
     }
@@ -216,9 +222,46 @@ final class AISummaryShortcode
                 'message' => 'Notification acknowledged',
                 'event_id' => $eventId,
                 'unread_count' => $this->service->getUnreadCount(),
+                'acknowledged_count' => $this->service->getAcknowledgedCount(),
             ]);
         } else {
             wp_send_json_error(['message' => 'Failed to acknowledge notification'], 500);
+        }
+    }
+
+    /**
+     * AJAX handler for deleting (soft-deleting) a notification
+     */
+    public function ajaxDeleteNotification(): void
+    {
+        if (!check_ajax_referer(self::NONCE_ACTION, 'nonce', false)) {
+            wp_send_json_error(['message' => 'Invalid nonce'], 403);
+            return;
+        }
+
+        if (!current_user_can('read')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $eventId = filter_input(INPUT_POST, 'event_id', FILTER_VALIDATE_INT);
+        if ($eventId === null || $eventId === false || $eventId <= 0) {
+            wp_send_json_error(['message' => 'Invalid event ID'], 400);
+            return;
+        }
+
+        $wpUserId = get_current_user_id();
+        $success = $this->service->deleteNotification($eventId, $wpUserId);
+
+        if ($success) {
+            wp_send_json_success([
+                'message' => 'Notification deleted',
+                'event_id' => $eventId,
+                'deleted_by' => $wpUserId,
+                'unread_count' => $this->service->getUnreadCount(),
+            ]);
+        } else {
+            wp_send_json_error(['message' => 'Failed to delete notification'], 500);
         }
     }
 
@@ -376,13 +419,67 @@ final class AISummaryShortcode
                                     ackBtn.setAttribute('disabled', 'disabled');
                                     ackBtn.textContent = 'Acknowledged';
                                 }
+                                var statusBadge = item.querySelector('[data-role="status-badge"]');
+                                if (statusBadge) {
+                                    statusBadge.innerHTML = '<span class="badge badge-phoenix badge-phoenix-success fs-10">Read</span>';
+                                }
                             }
                             updateUnreadBadge(container, data.data.unread_count);
+                            updateNotificationCountBadge(container, data.data.acknowledged_count);
                         }
                     })
                     .catch(function(error) {
                         console.error('Failed to acknowledge notification:', error);
                     });
+                }
+
+                function deleteNotification(container, eventId) {
+                    if (!confirm('Delete this notification?')) return;
+                    var nonce = container.getAttribute('data-nonce');
+                    if (!nonce || !eventId) return;
+
+                    var formData = new FormData();
+                    formData.append('action', 'wecoza_delete_notification');
+                    formData.append('nonce', nonce);
+                    formData.append('event_id', eventId);
+
+                    fetch(window.ajaxurl || '/wp-admin/admin-ajax.php', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(function(response) { return response.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            var item = container.querySelector('[data-role="summary-item"][data-event-id="' + eventId + '"]');
+                            if (item) {
+                                item.style.transition = 'opacity 0.3s';
+                                item.style.opacity = '0';
+                                setTimeout(function() {
+                                    item.remove();
+                                    var remaining = container.querySelectorAll('[data-role="summary-item"]').length;
+                                    var ackCount = container.querySelectorAll('.notification-acknowledged').length;
+                                    updateNotificationCountBadge(container, ackCount, remaining);
+                                }, 300);
+                            }
+                            updateUnreadBadge(container, data.data.unread_count);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Failed to delete notification:', error);
+                    });
+                }
+
+                function updateNotificationCountBadge(container, ackCount, total) {
+                    var countBadge = container.querySelector('[data-role="notification-count"]');
+                    if (countBadge) {
+                        var itemCount = total !== undefined
+                            ? total
+                            : container.querySelectorAll('[data-role="summary-item"]').length;
+                        var text = itemCount + (itemCount === 1 ? ' Notification' : ' Notifications');
+                        if (ackCount > 0) text += ', ' + ackCount + ' Read';
+                        countBadge.textContent = text;
+                    }
                 }
 
                 function updateUnreadBadge(container, count) {
@@ -434,6 +531,15 @@ final class AISummaryShortcode
 
                     container.addEventListener('click', function(event) {
                         var target = event.target;
+
+                        var deleteBtn = target.closest('[data-role="delete-btn"]');
+                        if (deleteBtn) {
+                            var eventId = deleteBtn.getAttribute('data-event-id');
+                            if (eventId) {
+                                deleteNotification(container, eventId);
+                            }
+                            return;
+                        }
 
                         if (target.hasAttribute('data-role') && target.getAttribute('data-role') === 'acknowledge-btn') {
                             var eventId = target.getAttribute('data-event-id');
