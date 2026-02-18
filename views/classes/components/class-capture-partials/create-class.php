@@ -6,8 +6,12 @@
 <form id="classes-form" class="needs-validation ydcoza-compact-form" novalidate method="POST" enctype="multipart/form-data">
    <!-- Hidden Auto-generated Class ID -->
    <input type="hidden" id="class_id" name="class_id" value="auto-generated">
-   <input type="hidden" id="redirect_url" name="redirect_url" value="<?php echo esc_attr($data['redirect_url'] ?? ''); ?>">
-   <input type="hidden" id="nonce" name="nonce" value="<?php echo wp_create_nonce('wecoza_class_nonce'); ?>">
+   <input type="hidden" id="redirect_url" name="redirect_url" value="<?php echo esc_attr(
+       $data["redirect_url"] ?? "",
+   ); ?>">
+   <input type="hidden" id="nonce" name="nonce" value="<?php echo wp_create_nonce(
+       "wecoza_class_nonce",
+   ); ?>">
    <!-- ===== Section: Basic Details ===== -->
    <div class="container container-md classes-form ps-0">
       <!-- ===== Section: Basic Details ===== -->
@@ -21,8 +25,10 @@
                <label for="client_id" class="form-label">Client Name (ID) <span class="text-danger">*</span></label>
                <select id="client_id" name="client_id" class="form-select form-select-sm" required>
                   <option value="">Select</option>
-                  <?php foreach ($data['clients'] as $client): ?>
-                  <option value="<?php echo esc_attr($client['id']); ?>"><?php echo esc_html($client['name']); ?></option>
+                  <?php foreach ($data["clients"] as $client): ?>
+                  <option value="<?php echo esc_attr(
+                      $client["id"],
+                  ); ?>"><?php echo esc_html($client["name"]); ?></option>
                   <?php endforeach; ?>
                </select>
                <div class="invalid-feedback">Please select a client.</div>
@@ -34,11 +40,13 @@
                <label for="site_id" class="form-label">Class/Site Name <span class="text-danger">*</span></label>
                <select id="site_id" name="site_id" class="form-select form-select-sm" required>
                   <option value="">Select Site</option>
-                  <?php foreach ($data['clients'] as $client): ?>
-                  <optgroup label="<?php echo esc_attr($client['name']); ?>">
-                     <?php if (isset($data['sites'][$client['id']])): ?>
-                     <?php foreach ($data['sites'][$client['id']] as $site): ?>
-                     <option value="<?php echo esc_attr($site['id']); ?>"><?php echo esc_html($site['name']); ?></option>
+                  <?php foreach ($data["clients"] as $client): ?>
+                  <optgroup label="<?php echo esc_attr($client["name"]); ?>">
+                     <?php if (isset($data["sites"][$client["id"]])): ?>
+                     <?php foreach ($data["sites"][$client["id"]] as $site): ?>
+                     <option value="<?php echo esc_attr(
+                         $site["id"],
+                     ); ?>"><?php echo esc_html($site["name"]); ?></option>
                      <?php endforeach; ?>
                      <?php endif; ?>
                   </optgroup>
@@ -71,8 +79,10 @@
             <label for="class_type" class="form-label">Class Type <span class="text-danger">*</span></label>
             <select id="class_type" name="class_type" class="form-select form-select-sm" required>
                <option value="">Select</option>
-               <?php foreach ($data['class_types'] as $class_type): ?>
-               <option value="<?php echo esc_attr($class_type['id']); ?>"><?php echo esc_html($class_type['name']); ?></option>
+               <?php foreach ($data["class_types"] as $class_type): ?>
+               <option value="<?php echo esc_attr(
+                   $class_type["id"],
+               ); ?>"><?php echo esc_html($class_type["name"]); ?></option>
                <?php endforeach; ?>
             </select>
             <div class="invalid-feedback">Please select the class type.</div>
@@ -222,16 +232,24 @@
                         <select class="form-select form-select-sm day-start-time" data-day="" required>
                            <option value="">Select Time</option>
                            <?php
-                              // Generate time options from 6:00 AM to 8:00 PM in 30-minute increments
-                              $start = strtotime('06:00:00');
-                              $end = strtotime('20:00:00');
-                              $interval = 30 * 60; // 30 minutes in seconds
+                           // Generate time options from 6:00 AM to 8:00 PM in 30-minute increments
+                           $start = strtotime("06:00:00");
+                           $end = strtotime("20:00:00");
+                           $interval = 30 * 60; // 30 minutes in seconds
 
-                              for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = wp_date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
-                              }
-                              ?>
+                           for (
+                               $time = $start;
+                               $time <= $end;
+                               $time += $interval
+                           ) {
+                               $timeStr = wp_date("H:i", $time);
+                               echo '<option value="' .
+                                   $timeStr .
+                                   '">' .
+                                   wp_date("g:i A", $time) .
+                                   "</option>";
+                           }
+                           ?>
                         </select>
                         <div class="invalid-feedback">Please select a start time.</div>
                         <!-- <div class="valid-feedback">Looks good!</div> -->
@@ -241,16 +259,24 @@
                         <select class="form-select form-select-sm day-end-time" data-day="" required>
                            <option value="">Select Time</option>
                            <?php
-                              // Generate time options from 6:30 AM to 8:30 PM in 30-minute increments
-                              $start = strtotime('06:30:00');
-                              $end = strtotime('20:30:00');
-                              $interval = 30 * 60; // 30 minutes in seconds
+                           // Generate time options from 6:30 AM to 8:30 PM in 30-minute increments
+                           $start = strtotime("06:30:00");
+                           $end = strtotime("20:30:00");
+                           $interval = 30 * 60; // 30 minutes in seconds
 
-                              for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = wp_date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
-                              }
-                              ?>
+                           for (
+                               $time = $start;
+                               $time <= $end;
+                               $time += $interval
+                           ) {
+                               $timeStr = wp_date("H:i", $time);
+                               echo '<option value="' .
+                                   $timeStr .
+                                   '">' .
+                                   wp_date("g:i A", $time) .
+                                   "</option>";
+                           }
+                           ?>
                         </select>
                         <div class="invalid-feedback">Please select an end time.</div>
                         <!-- <div class="valid-feedback">Looks good!</div> -->
@@ -469,15 +495,17 @@
       <?php echo section_divider(); ?>
 
    <!-- ===== Section: Funding & Exam Details ===== -->
-   <?php echo section_header('Funding & Exam Details'); ?>
+   <?php echo section_header("Funding & Exam Details"); ?>
    <div class="row">
       <!-- SETA Funded -->
       <div class="col-md-2">
          <label for="seta_funded" class="form-label">SETA Funded? <span class="text-danger">*</span></label>
          <select id="seta_funded" name="seta_funded" class="form-select form-select-sm" required>
             <option value="">Select</option>
-            <?php foreach ($data['yes_no_options'] as $option): ?>
-            <option value="<?php echo $option['id']; ?>"><?php echo $option['name']; ?></option>
+            <?php foreach ($data["yes_no_options"] as $option): ?>
+            <option value="<?php echo $option["id"]; ?>"><?php echo $option[
+    "name"
+]; ?></option>
             <?php endforeach; ?>
          </select>
          <div class="invalid-feedback">Please select if the class is SETA funded.</div>
@@ -488,8 +516,10 @@
          <label for="seta_id" class="form-label">SETA <span class="text-danger">*</span></label>
          <select id="seta_id" name="seta_id" class="form-select form-select-sm">
             <option value="">Select</option>
-            <?php foreach ($data['setas'] as $seta): ?>
-            <option value="<?php echo $seta['id']; ?>"><?php echo $seta['name']; ?></option>
+            <?php foreach ($data["setas"] as $seta): ?>
+            <option value="<?php echo $seta["id"]; ?>"><?php echo $seta[
+    "name"
+]; ?></option>
             <?php endforeach; ?>
          </select>
          <div class="invalid-feedback">Please select a SETA.</div>
@@ -500,8 +530,10 @@
          <label for="exam_class" class="form-label">Exam Class <span class="text-danger">*</span></label>
          <select id="exam_class" name="exam_class" class="form-select form-select-sm" required>
             <option value="">Select</option>
-            <?php foreach ($data['yes_no_options'] as $option): ?>
-            <option value="<?php echo $option['id']; ?>"><?php echo $option['name']; ?></option>
+            <?php foreach ($data["yes_no_options"] as $option): ?>
+            <option value="<?php echo $option["id"]; ?>"><?php echo $option[
+    "name"
+]; ?></option>
             <?php endforeach; ?>
          </select>
          <div class="invalid-feedback">Please select if this is an exam class.</div>
@@ -523,7 +555,7 @@
       <div id="schedule-data-container">
          <!-- These will be populated dynamically via JavaScript -->
       </div>
-      
+
       <!-- Schedule Statistics Section (hidden by default) -->
       <div class="card shadow-none border  d-none" id="schedule-statistics-section" data-component-card="data-component-card">
          <div class="card-header p-3 border-bottom bg-body">
@@ -647,7 +679,9 @@
                            </div>
                      </div>
                      <div class="col-auto">
-                        <small class="text-muted">Showing <span id="learner-showing-count">0</span> of <span id="learner-total-count"><?php echo count($data['learners']); ?></span> learners</small>
+                        <small class="text-muted">Showing <span id="learner-showing-count">0</span> of <span id="learner-total-count"><?php echo count(
+                            $data["learners"],
+                        ); ?></span> learners</small>
                      </div>
                   </div>
                </div>
@@ -703,52 +737,104 @@
                            </tr>
                         </thead>
                         <tbody id="learner-selection-tbody">
-                           <?php foreach ($data['learners'] as $index => $learner): ?>
-                           <tr class="learner-row" data-learner-id="<?php echo $learner['id']; ?>" data-index="<?php echo $index; ?>">
+                           <?php foreach (
+                               $data["learners"]
+                               as $index => $learner
+                           ): ?>
+                           <tr class="learner-row" data-learner-id="<?php echo $learner[
+                               "id"
+                           ]; ?>" data-index="<?php echo $index; ?>">
                               <td class="py-2 align-middle text-center">
                                  <div class="form-check ps-5" style="min-height: auto;">
-                                    <input class="form-check-input learner-checkbox" type="checkbox" 
-                                           value="<?php echo $learner['id']; ?>" 
-                                           data-learner-data="<?php echo htmlspecialchars(json_encode($learner), ENT_QUOTES, 'UTF-8'); ?>">
+                                    <input class="form-check-input learner-checkbox" type="checkbox"
+                                           value="<?php echo $learner["id"]; ?>"
+                                           data-learner-data="<?php echo htmlspecialchars(
+                                               json_encode($learner),
+                                               ENT_QUOTES,
+                                               "UTF-8",
+                                           ); ?>">
                                  </div>
                               </td>
-                              <td class="py-2 align-middle"><?php echo esc_html($learner['first_name']); ?></td>
-                              <td class="py-2 align-middle"><?php echo esc_html($learner['second_name'] ?? ''); ?></td>
-                              <td class="py-2 align-middle"><?php echo esc_html($learner['initials'] ?? ''); ?></td>
-                              <td class="py-2 align-middle fw-medium"><?php echo esc_html($learner['surname']); ?></td>
+                              <td class="py-2 align-middle"><?php echo esc_html(
+                                  $learner["first_name"],
+                              ); ?></td>
+                              <td class="py-2 align-middle"><?php echo esc_html(
+                                  $learner["second_name"] ?? "",
+                              ); ?></td>
+                              <td class="py-2 align-middle"><?php echo esc_html(
+                                  $learner["initials"] ?? "",
+                              ); ?></td>
+                              <td class="py-2 align-middle fw-medium"><?php echo esc_html(
+                                  $learner["surname"],
+                              ); ?></td>
                               <td class="py-2 align-middle">
-                                 <?php if ($learner['id_type'] === 'sa_id' && !empty($learner['id_number'])): ?>
+                                 <?php if (
+                                     $learner["id_type"] === "sa_id" &&
+                                     !empty($learner["id_number"])
+                                 ): ?>
                                  <span class="badge fs-10 badge-phoenix badge-phoenix-primary">
-                                    <?php echo esc_html($learner['id_number']); ?>
+                                    <?php echo esc_html(
+                                        $learner["id_number"],
+                                    ); ?>
                                  </span>
-                                 <?php elseif ($learner['id_type'] === 'passport' && !empty($learner['id_number'])): ?>
+                                 <?php elseif (
+                                     $learner["id_type"] === "passport" &&
+                                     !empty($learner["id_number"])
+                                 ): ?>
                                  <span class="badge fs-10 badge-phoenix badge-phoenix-warning">
-                                    <?php echo esc_html($learner['id_number']); ?>
+                                    <?php echo esc_html(
+                                        $learner["id_number"],
+                                    ); ?>
                                  </span>
                                  <?php else: ?>
                                  <span class="text-muted">-</span>
                                  <?php endif; ?>
                               </td>
-                              <td class="py-2 align-middle"><?php echo esc_html($learner['city_town_name'] ?? '-'); ?></td>
-                              <td class="py-2 align-middle"><?php echo esc_html($learner['province_region_name'] ?? '-'); ?></td>
-                              <td class="py-2 align-middle"><?php echo esc_html($learner['postal_code'] ?? '-'); ?></td>
+                              <td class="py-2 align-middle"><?php echo esc_html(
+                                  $learner["city_town_name"] ?? "-",
+                              ); ?></td>
+                              <td class="py-2 align-middle"><?php echo esc_html(
+                                  $learner["province_region_name"] ?? "-",
+                              ); ?></td>
+                              <td class="py-2 align-middle"><?php echo esc_html(
+                                  $learner["postal_code"] ?? "-",
+                              ); ?></td>
                               <td class="py-2 align-middle">
-                                 <?php if (!empty($learner['last_course_name'])): ?>
-                                 <span class="badge fs-10 badge-phoenix badge-phoenix-success" title="Completed: <?php echo esc_attr($learner['last_completion_date'] ?? ''); ?>">
-                                    <?php echo esc_html($learner['last_course_name']); ?>
+                                 <?php if (
+                                     !empty($learner["last_course_name"])
+                                 ): ?>
+                                 <span class="badge fs-10 badge-phoenix badge-phoenix-success" title="Completed: <?php echo esc_attr(
+                                     $learner["last_completion_date"] ?? "",
+                                 ); ?>">
+                                    <?php echo esc_html(
+                                        $learner["last_course_name"],
+                                    ); ?>
                                  </span>
                                  <?php else: ?>
                                  <span class="text-muted">-</span>
                                  <?php endif; ?>
                               </td>
                               <td class="py-2 align-middle text-center">
-                                 <?php if (!empty($learner['has_active_lp'])): ?>
+                                 <?php if (
+                                     !empty($learner["has_active_lp"])
+                                 ): ?>
                                  <span class="badge fs-10 badge-phoenix badge-phoenix-warning"
-                                       title="<?php echo esc_attr($learner['active_course_name'] . ' (' . $learner['active_progress_pct'] . '% complete)'); ?>"
+                                       title="<?php echo esc_attr(
+                                           $learner["active_course_name"] .
+                                               " (" .
+                                               $learner["active_progress_pct"] .
+                                               "% complete)",
+                                       ); ?>"
                                        data-active-lp="true"
-                                       data-active-course="<?php echo esc_attr($learner['active_course_name']); ?>"
-                                       data-active-progress="<?php echo esc_attr($learner['active_progress_pct']); ?>"
-                                       data-active-class-code="<?php echo esc_attr($learner['active_class_code'] ?? ''); ?>">
+                                       data-active-course="<?php echo esc_attr(
+                                           $learner["active_course_name"],
+                                       ); ?>"
+                                       data-active-progress="<?php echo esc_attr(
+                                           $learner["active_progress_pct"],
+                                       ); ?>"
+                                       data-active-class-code="<?php echo esc_attr(
+                                           $learner["active_class_code"] ?? "",
+                                       ); ?>">
                                     <i class="bi bi-exclamation-triangle"></i>
                                  </span>
                                  <?php else: ?>
@@ -764,9 +850,14 @@
                <!-- Pagination -->
                <div id="classes-pagination" class="d-flex justify-content-between mt-3">
                   <span class="d-none d-sm-inline-block ms-5" data-list-info="data-list-info">
-                     <span id="pagination-start">1</span> to <span id="pagination-end"><?php echo min(10, count($data['learners'])); ?></span>
+                     <span id="pagination-start">1</span> to <span id="pagination-end"><?php echo min(
+                         10,
+                         count($data["learners"]),
+                     ); ?></span>
                      <span class="text-body-tertiary"> Items of </span>
-                     <span id="pagination-total"><?php echo count($data['learners']); ?></span>
+                     <span id="pagination-total"><?php echo count(
+                         $data["learners"],
+                     ); ?></span>
                   </span>
                   <nav aria-label="Classes pagination">
                      <ul class="pagination pagination-sm" id="learner-pagination-ul">
@@ -825,7 +916,7 @@
                <!-- For multi-select with floating labels, we need a custom approach -->
                <div class="">
                   <label for="add_learner" class="form-label">Select Learners</label>
-                  <select id="exam_learner_select" name="exam_learner_select[]" class="form-select form-select-sm" aria-label="Exam learner selection" multiple>
+                  <select id="exam_learner_select" name="exam_learner_select[]" class="form-select form-select-sm" aria-label="Exam learner selection" multiple size="8">
                      <!-- Will be populated dynamically with class learners -->
                   </select>
                   <small class="text-muted">Select learners who will take exams in this class. Hold Ctrl/Cmd to select multiple.</small>
@@ -837,19 +928,17 @@
                </div>
             </div>
             <!-- Exam Learners List -->
-            <div class="col-md-8">
+            <div class="col-md-4">
                <div class="">
                   <div class="form-label mb-2">Learners Taking Exams</div>
                   <div id="exam-learners-list" class="card-body card px-5">
                      <div class="alert alert-subtle-primary" id="no-exam-learners-message">
-                        No exam learners added yet. Select learners from the list and click "Add Selected Exam Learners".
+                        Click "Add Selected Exam Learners".
                      </div>
                      <table class="table table-sm fs-9 d-none" id="exam-learners-table">
                         <thead>
                            <tr>
                               <th>Learner</th>
-                              <th>Level/Module</th>
-                              <th>Status</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
@@ -867,7 +956,7 @@
    </div>
    <?php echo section_divider(); ?>
    <!-- ===== Section: Assignments & Dates ===== -->
-   <?php echo section_header('Agents'); ?>
+   <?php echo section_header("Agents"); ?>
    <!-- Class Agents Section -->
    <div class="mb-4">
       <h6 class="mb-2">Class Agents</h6>
@@ -878,8 +967,10 @@
             <label for="initial_class_agent" class="form-label">Initial Class Agent <span class="text-danger">*</span></label>
             <select id="initial_class_agent" name="initial_class_agent" class="form-select form-select-sm" required>
                <option value="">Select</option>
-               <?php foreach ($data['agents'] as $agent): ?>
-               <option value="<?php echo $agent['id']; ?>"><?php echo $agent['name']; ?></option>
+               <?php foreach ($data["agents"] as $agent): ?>
+               <option value="<?php echo $agent["id"]; ?>"><?php echo $agent[
+    "name"
+]; ?></option>
                <?php endforeach; ?>
             </select>
             <div class="invalid-feedback">Please select the initial class agent.</div>
@@ -895,8 +986,10 @@
             <label for="project_supervisor" class="form-label">Project Supervisor <span class="text-danger">*</span></label>
             <select id="project_supervisor" name="project_supervisor" class="form-select form-select-sm" required>
                <option value="">Select</option>
-               <?php foreach ($data['supervisors'] as $supervisor): ?>
-               <option value="<?php echo $supervisor['id']; ?>"><?php echo $supervisor['name']; ?></option>
+               <?php foreach ($data["supervisors"] as $supervisor): ?>
+               <option value="<?php echo $supervisor[
+                   "id"
+               ]; ?>"><?php echo $supervisor["name"]; ?></option>
                <?php endforeach; ?>
             </select>
             <div class="invalid-feedback">Please select a project supervisor.</div>
@@ -917,8 +1010,10 @@
                <label class="form-label">Backup Agent</label>
                <select name="backup_agent_ids[]" class="form-select form-select-sm backup-agent-select">
                   <option value="">Select</option>
-                  <?php foreach ($data['agents'] as $agent): ?>
-                  <option value="<?php echo $agent['id']; ?>"><?php echo $agent['name']; ?></option>
+                  <?php foreach ($data["agents"] as $agent): ?>
+                  <option value="<?php echo $agent["id"]; ?>"><?php echo $agent[
+    "name"
+]; ?></option>
                   <?php endforeach; ?>
                </select>
                <div class="invalid-feedback">Please s elect a backup agent.</div>
@@ -948,7 +1043,7 @@
       <!-- Submit Button - Mode-aware text -->
       <div class="row mt-4">
          <div class="col-md-3">
-            <?php echo button('Create Draft Class', 'submit', 'primary'); ?>
+            <?php echo button("Create Draft Class", "submit", "primary"); ?>
          </div>
       </div>
    </div>

@@ -689,17 +689,8 @@ class ClassAjaxController extends BaseController
                     );
                 }
             } else {
-                // Dispatch CLASS_INSERT event
+                // Dispatch CLASS_INSERT event (learner_ids already included in $newClassData)
                 EventDispatcher::classCreated($classId, $newClassData);
-
-                // Dispatch LEARNER_ADD events for initial learners
-                $initialLearnerIds = $class->getLearnerIdsOnly();
-                foreach ($initialLearnerIds as $learnerId) {
-                    EventDispatcher::learnerAdded($classId, (int) $learnerId, [
-                        'learner_id' => $learnerId,
-                        'action' => 'initial_assignment',
-                    ]);
-                }
             }
         } catch (\Throwable $e) {
             // Log but don't fail the main operation - notifications are secondary

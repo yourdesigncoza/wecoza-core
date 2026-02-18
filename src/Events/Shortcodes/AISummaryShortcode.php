@@ -361,6 +361,10 @@ final class AISummaryShortcode
                     }
                 }
 
+                function getAjaxUrl(container) {
+                    return container.getAttribute('data-ajax-url') || window.ajaxurl || '/wp-admin/admin-ajax.php';
+                }
+
                 function markAsViewed(container, eventId) {
                     var nonce = container.getAttribute('data-nonce');
                     if (!nonce || !eventId) return;
@@ -370,7 +374,7 @@ final class AISummaryShortcode
                     formData.append('nonce', nonce);
                     formData.append('event_id', eventId);
 
-                    fetch(window.ajaxurl || '/wp-admin/admin-ajax.php', {
+                    fetch(getAjaxUrl(container), {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin'
@@ -401,7 +405,7 @@ final class AISummaryShortcode
                     formData.append('nonce', nonce);
                     formData.append('event_id', eventId);
 
-                    fetch(window.ajaxurl || '/wp-admin/admin-ajax.php', {
+                    fetch(getAjaxUrl(container), {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin'
@@ -416,8 +420,11 @@ final class AISummaryShortcode
                                 item.classList.add('notification-read', 'notification-acknowledged');
                                 var ackBtn = item.querySelector('[data-role="acknowledge-btn"]');
                                 if (ackBtn) {
-                                    ackBtn.setAttribute('disabled', 'disabled');
-                                    ackBtn.textContent = 'Acknowledged';
+                                    var ackSpan = document.createElement('span');
+                                    ackSpan.className = 'btn btn-subtle-warning py-0 px-2 fs-10';
+                                    ackSpan.style.pointerEvents = 'none';
+                                    ackSpan.innerHTML = '<i class="bi bi-check-circle me-1"></i>Acknowledged';
+                                    ackBtn.replaceWith(ackSpan);
                                 }
                                 var statusBadge = item.querySelector('[data-role="status-badge"]');
                                 if (statusBadge) {
@@ -443,7 +450,7 @@ final class AISummaryShortcode
                     formData.append('nonce', nonce);
                     formData.append('event_id', eventId);
 
-                    fetch(window.ajaxurl || '/wp-admin/admin-ajax.php', {
+                    fetch(getAjaxUrl(container), {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin'

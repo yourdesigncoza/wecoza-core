@@ -190,15 +190,15 @@ if (!defined("ABSPATH")) {
                                 </span>
                             <?php endif; ?>
                             <?php if ($isAcknowledged): ?>
-                                <span class="badge badge-phoenix badge-phoenix-success fs-10">
-                                    <i class="bi bi-check-circle"></i> <?php echo esc_html__(
+                                <span class="btn btn-subtle-warning py-0 px-2 fs-10" style="pointer-events:none;">
+                                    <i class="bi bi-check-circle me-1"></i><?php echo esc_html__(
                                         "Acknowledged",
                                         "wecoza-events",
                                     ); ?>
                                 </span>
                             <?php elseif ($eventId): ?>
                                 <button type="button"
-                                    class="btn btn-sm btn-outline-success py-0 px-2 fs-10"
+                                    class="btn btn-subtle-success py-0 px-2 fs-10"
                                     data-role="acknowledge-btn"
                                     data-event-id="<?php echo esc_attr(
                                         $eventId,
@@ -211,7 +211,7 @@ if (!defined("ABSPATH")) {
                             <?php endif; ?>
                             <?php if ($eventId): ?>
                                 <button type="button"
-                                    class="btn btn-sm btn-outline-danger py-0 px-2 fs-10"
+                                    class="btn btn-subtle-danger py-0 px-2 fs-10"
                                     data-role="delete-btn"
                                     data-event-id="<?php echo esc_attr($eventId); ?>"
                                     title="<?php echo esc_attr__('Delete notification', 'wecoza-events'); ?>">

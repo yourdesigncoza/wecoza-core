@@ -14,9 +14,9 @@ $metadata = [
     'Class Subject' => $payload['new_row']['class_subject'] ?? '',
 ];
 $metrics = [
-    'Status' => $summary['status'] ?? 'pending',
-    'Model' => $summary['model'] ?? 'n/a',
-    'Tokens Used' => $summary['tokens_used'] ?? 0,
+    // 'Status' => $summary['status'] ?? 'pending',
+    // 'Model' => $summary['model'] ?? 'n/a',
+    // 'Tokens Used' => $summary['tokens_used'] ?? 0,
     'Processing Time (ms)' => $summary['processing_time_ms'] ?? 0,
     'Attempts' => $summary['attempts'] ?? 0,
     'Error Code' => $summary['error_code'] ?? null,

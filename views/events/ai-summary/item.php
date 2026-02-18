@@ -82,9 +82,19 @@ $readStateClass =
                 <p class="text-body-secondary mb-0 fs-9">
                     <?php echo esc_html($item["class_subject"] ?? ""); ?>
                 </p>
+                <?php if (!empty($item["client_name"])): ?>
+                <p class="mb-0 fs-10 text-body-tertiary">
+                    <i class="bi bi-building me-1"></i><?php echo esc_html($item["client_name"]); ?>
+                </p>
+                <?php endif; ?>
+                <?php if (!empty($item["site_name"])): ?>
+                <p class="mb-0 fs-10 text-body-tertiary">
+                    <i class="bi bi-geo-alt me-1"></i><?php echo esc_html($item["site_name"]); ?><?php if (!empty($item["site_address"])): ?> &mdash; <?php echo esc_html($item["site_address"]); ?><?php endif; ?>
+                </p>
+                <?php endif; ?>
                 <?php if (!empty($item["agent_name"])): ?>
                 <p class="mb-0 fs-10 text-body-tertiary">
-                    <i class="bi bi-person"></i> <?php echo esc_html($item["agent_name"]); ?>
+                    <i class="bi bi-person me-1"></i><?php echo esc_html($item["agent_name"]); ?>
                 </p>
                 <?php endif; ?>
 
@@ -131,7 +141,7 @@ $readStateClass =
 
                 <?php if (!$isAcknowledged): ?>
                 <button type="button"
-                    class="btn btn-sm btn-outline-success py-0 px-2 fs-10"
+                    class="btn btn-subtle-success py-0 px-2 fs-10"
                     data-role="acknowledge-btn"
                     data-event-id="<?php echo $eventId; ?>">
                     <i class="bi bi-check2-circle me-1"></i><?php echo esc_html__(
@@ -140,8 +150,8 @@ $readStateClass =
                     ); ?>
                 </button>
                 <?php else: ?>
-                <span class="badge badge-phoenix badge-phoenix-success fs-10">
-                    <i class="bi bi-check-circle me-1"></i> <?php echo esc_html__(
+                <span class="btn btn-subtle-warning py-0 px-2 fs-10" style="pointer-events:none;">
+                    <i class="bi bi-check-circle me-1"></i><?php echo esc_html__(
                         "Acknowledged",
                         "wecoza-events",
                     ); ?>
@@ -149,7 +159,7 @@ $readStateClass =
                 <?php endif; ?>
                 <?php if ($eventId): ?>
                 <button type="button"
-                    class="btn btn-sm btn-outline-danger py-0 px-2 fs-10"
+                    class="btn btn-subtle-danger py-0 px-2 fs-10"
                     data-role="delete-btn"
                     data-event-id="<?php echo $eventId; ?>"
                     title="<?php echo esc_attr__('Delete notification', 'wecoza-events'); ?>">

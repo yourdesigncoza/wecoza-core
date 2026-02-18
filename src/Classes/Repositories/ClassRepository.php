@@ -579,8 +579,8 @@ class ClassRepository extends BaseRepository
                 'initial_class_agent' => $classModel->getInitialClassAgent(),
                 'initial_agent_start_date' => $classModel->getInitialAgentStartDate(),
                 'project_supervisor_id' => $classModel->getProjectSupervisorId(),
-                'learner_ids' => $classModel->getLearnerIds(),
-                'exam_learners' => $classModel->getExamLearners(),
+                'learner_ids' => self::enrichLearnerIds($classModel->getLearnerIds()),
+                'exam_learners' => self::enrichLearnerIds($classModel->getExamLearners()),
                 'backup_agent_ids' => $classModel->getBackupAgentIds(),
                 'agent_replacements' => $classModel->getAgentReplacements(),
                 'schedule_data' => $classModel->getScheduleData(),
@@ -635,6 +635,58 @@ class ClassRepository extends BaseRepository
         } catch (Exception $e) {
             error_log('WeCoza Core: Error in getSingleClass: ' . $e->getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Enrich learner ID arrays with name data for display.
+     *
+     * Handles two formats:
+     * - Full objects [{id, name, status, level}] — returned as-is
+     * - Plain integer IDs [2, 4, 6] (legacy) — looked up from learners table
+     */
+    private static function enrichLearnerIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Already full objects — return as-is
+        $first = reset($ids);
+        if (is_array($first) && isset($first['id'])) {
+            return $ids;
+        }
+
+        // Plain IDs — look up names from learners table
+        $intIds = array_filter(array_map('intval', $ids), fn($id) => $id > 0);
+        if (empty($intIds)) {
+            return [];
+        }
+
+        try {
+            $db = wecoza_db();
+            $placeholders = implode(',', array_fill(0, count($intIds), '?'));
+            $sql = "SELECT id, first_name, surname FROM learners WHERE id IN ({$placeholders})";
+            $stmt = $db->getPdo()->prepare($sql);
+            $stmt->execute(array_values($intIds));
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $lookup = [];
+            foreach ($rows as $row) {
+                $lookup[(int) $row['id']] = trim($row['first_name'] . ' ' . $row['surname']);
+            }
+
+            return array_map(fn($id) => [
+                'id'     => $id,
+                'name'   => $lookup[$id] ?? 'Unknown',
+                'status' => 'CIC - Currently in Class',
+                'level'  => '',
+            ], $intIds);
+        } catch (\Exception $e) {
+            error_log('WeCoza Core: Error enriching learner IDs: ' . $e->getMessage());
+            return array_map(fn($id) => [
+                'id' => $id, 'name' => 'Learner ID: ' . $id, 'status' => 'CIC - Currently in Class', 'level' => '',
+            ], $intIds);
         }
     }
 

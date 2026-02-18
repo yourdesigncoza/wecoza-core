@@ -92,6 +92,9 @@ final class AISummaryPresenter
         $classSubject = esc_html($record['class_subject'] ?? '');
         $aiSummaryText = $record['ai_summary_text'] ?? '';
         $agentName = esc_html($record['agent_name'] ?? '');
+        $clientName = esc_html($record['client_name'] ?? '');
+        $siteName = esc_html($record['site_name'] ?? '');
+        $siteAddress = esc_html($record['site_address'] ?? '');
 
         return [
             'event_id' => $eventId,
@@ -102,6 +105,9 @@ final class AISummaryPresenter
             'class_name' => esc_html($record['class_name'] ?? ''),
             'agent_id' => $record['agent_id'] ?? null,
             'agent_name' => $agentName,
+            'client_name' => $clientName,
+            'site_name' => $siteName,
+            'site_address' => $siteAddress,
 
             'event_type' => $eventType,
             'event_type_label' => $eventTypeConfig['label'],
@@ -146,7 +152,9 @@ final class AISummaryPresenter
                 $classCode,
                 $classSubject,
                 $aiSummaryText,
-                $agentName
+                $agentName,
+                $clientName,
+                $siteName
             ),
 
             'data_attributes' => $this->buildDataAttributes($eventId, $eventType, $isRead),
@@ -242,7 +250,9 @@ final class AISummaryPresenter
         string $classCode,
         string $classSubject,
         string $aiSummary,
-        string $agentName = ''
+        string $agentName = '',
+        string $clientName = '',
+        string $siteName = ''
     ): string {
         $parts = array_filter([
             $eventTypeLabel,
@@ -250,6 +260,8 @@ final class AISummaryPresenter
             $classSubject,
             $aiSummary,
             $agentName,
+            $clientName,
+            $siteName,
         ]);
 
         return strtolower(implode(' ', $parts));
@@ -302,7 +314,17 @@ final class AISummaryPresenter
                 $line = substr($line, 2);
             }
 
-            $html .= '<li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>' . esc_html($line) . '</li>';
+            // Convert markdown **bold** to <strong> safely:
+            // 1. Escape the entire line first
+            // 2. Then convert escaped bold markers back to HTML tags
+            $escaped = esc_html($line);
+            $formatted = preg_replace(
+                '/\*\*(.+?)\*\*/',
+                '<strong>$1</strong>',
+                $escaped
+            ) ?? $escaped;
+
+            $html .= '<li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>' . $formatted . '</li>';
         }
 
         $html .= '</ul>';

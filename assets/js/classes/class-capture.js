@@ -448,28 +448,11 @@ function showCustomAlert(message) {
             $noExamLearnersMessage.addClass('d-none');
             $examLearnersTable.removeClass('d-none');
 
-            // Add each exam learner to the table
+            // Add each exam learner to the table (level/status inherited from class learners)
             examLearners.forEach(function (learner) {
-                const levelSelectHtml = classes_generate_learner_level_select_html(learner.id, learner.level || '');
-                const statusOptions = [
-                    { value: 'CIC - Currently in Class', text: 'CIC - Currently in Class' },
-                    { value: 'RBE - Removed by Employer', text: 'RBE - Removed by Employer' },
-                    { value: 'DRO - Drop Out', text: 'DRO - Drop Out' }
-                ];
-
-                const statusSelectHtml = `
-                    <select class="form-select form-select-sm exam-learner-status-select" data-learner-id="${learner.id}">
-                        ${statusOptions.map(opt =>
-                    `<option value="${opt.value}" ${learner.status === opt.value ? 'selected' : ''}>${opt.text}</option>`
-                ).join('')}
-                    </select>
-                `;
-
                 const row = `
                     <tr>
                         <td>${learner.name}</td>
-                        <td>${levelSelectHtml}</td>
-                        <td>${statusSelectHtml}</td>
                         <td>
                             <button type="button" class="btn btn-subtle-danger btn-sm remove-exam-learner-btn" data-learner-id="${learner.id}">
                                 <i data-feather="trash-2" style="height:12.8px;width:12.8px;"></i>
@@ -484,25 +467,6 @@ function showCustomAlert(message) {
             // Re-initialize feather icons for new buttons
             if (typeof feather !== 'undefined') {
                 feather.replace();
-            }
-
-            // Auto-populate exam learner levels with current class subject
-            const classSubjectSelect = document.getElementById('class_subject');
-            if (classSubjectSelect && classSubjectSelect.value) {
-                const selectedSubject = classSubjectSelect.value;
-
-                // Find all exam learner level selects and set them to current subject
-                const examLearnerLevelSelects = $examLearnersTbody.find('.learner-level-select');
-
-                examLearnerLevelSelects.each(function () {
-                    const $select = $(this);
-
-                    // Set the select value to current subject
-                    $select.val(selectedSubject);
-
-                    // Trigger change event to ensure any handlers fire
-                    $select.trigger('change');
-                });
             }
 
         }
@@ -530,16 +494,10 @@ function showCustomAlert(message) {
                     return;
                 }
 
-                // Get learner's level and status from class learners data
-                const classLearnersData = JSON.parse($('#class_learners_data').val() || '[]');
-                const classLearner = classLearnersData.find(cl => String(cl.id) === learnerIdStr);
-
-                // Add learner to exam learners array (store as string for consistency)
+                // Add learner to exam learners array (level/status inherited from class learners)
                 const examLearnerData = {
                     id: learnerIdStr,
-                    name: learnerName,
-                    level: classLearner ? classLearner.level : '',
-                    status: classLearner ? classLearner.status : 'CIC - Currently in Class'
+                    name: learnerName
                 };
 
                 examLearners.push(examLearnerData);
@@ -554,48 +512,26 @@ function showCustomAlert(message) {
             $examLearnerSelect.val([]);
         });
 
-        // Handle remove exam learner
-        $(document).on('click', '.remove-exam-learner-btn', function () {
-            const learnerId = $(this).data('learner-id');
-
-            // Convert to string to ensure consistent comparison
+        // Shared removal logic for exam learners (used by both UI and cascading removal)
+        function removeExamLearner(learnerId) {
             const learnerIdStr = String(learnerId);
-
-            // Remove from exam learners array - ensure both IDs are strings for comparison
+            const initialLength = examLearners.length;
             examLearners = examLearners.filter(learner => String(learner.id) !== learnerIdStr);
 
-            // Update display and data
-            updateExamLearnersDisplay();
-            updateExamLearnersData();
-            updateExamLearnerOptions(); // Refresh dropdown to add back removed learner
-
-        });
-
-        // Handle exam learner level change
-        $(document).on('change', '#exam-learners-tbody .learner-level-select', function () {
-            const learnerId = String($(this).data('learner-id'));
-            const newLevel = $(this).val();
-
-            // Find and update the learner's level in the array
-            const learner = examLearners.find(l => String(l.id) === learnerId);
-            if (learner) {
-                learner.level = newLevel;
+            if (examLearners.length < initialLength) {
+                updateExamLearnersDisplay();
                 updateExamLearnersData();
+                updateExamLearnerOptions();
             }
+        }
+
+        // Handle remove exam learner button click
+        $(document).on('click', '.remove-exam-learner-btn', function () {
+            removeExamLearner($(this).data('learner-id'));
         });
 
-        // Handle exam learner status change
-        $(document).on('change', '.exam-learner-status-select', function () {
-            const learnerId = String($(this).data('learner-id'));
-            const newStatus = $(this).val();
-
-            // Find and update the learner's status in the array
-            const learner = examLearners.find(l => String(l.id) === learnerId);
-            if (learner) {
-                learner.status = newStatus;
-                updateExamLearnersData();
-            }
-        });
+        // Expose removal globally for cascading removal from class learners
+        window.classes_remove_exam_learner = removeExamLearner;
 
         // Load existing exam learner data if available (for editing)
         const existingExamData = $examLearnersData.val();
@@ -1607,49 +1543,6 @@ function showCustomAlert(message) {
         });
 
         // console.log('Synchronized exam learner options with', classLearnersData.length, 'class learners');
-    };
-
-    /**
-     * Global function to remove a learner from exam learners when they're removed from class learners
-     * This function can be called from other scripts for cascading removal
-     */
-    window.classes_remove_exam_learner = function (learnerId) {
-        // Check if exam learner functionality is initialized
-        const $examLearnersData = $('#exam_learners');
-
-        if (!$examLearnersData.length) {
-            return; // Exit if exam learners functionality doesn't exist
-        }
-
-        // Get current exam learners data
-        let examLearnersData = JSON.parse($examLearnersData.val() || '[]');
-
-        // Convert to string to ensure consistent comparison
-        const learnerIdStr = String(learnerId);
-
-        // Check if the learner is in the exam learners list
-        const initialLength = examLearnersData.length;
-        examLearnersData = examLearnersData.filter(learner => String(learner.id) !== learnerIdStr);
-
-        if (examLearnersData.length < initialLength) {
-            // Learner was found and removed, update the data
-            $examLearnersData.val(JSON.stringify(examLearnersData));
-
-            // Update exam learner count if it exists
-            if ($('#exam_learner_count').length) {
-                $('#exam_learner_count').val(examLearnersData.length);
-            }
-
-            // Refresh the exam learners display if the table is visible
-            const $examLearnersTable = $('#exam-learners-table');
-            if ($examLearnersTable.is(':visible')) {
-                // Trigger a refresh of the exam learners display
-                // This will be handled by the local updateExamLearnersDisplay function if available
-                $(document).trigger('examLearnersChanged', [examLearnersData]);
-            }
-
-            console.log('Removed learner', learnerIdStr, 'from exam learners (cascading removal)');
-        }
     };
 
     /**

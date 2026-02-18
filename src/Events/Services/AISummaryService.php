@@ -16,6 +16,7 @@ use WeCoza\Events\DTOs\ObfuscatedDataDTO;
 use WeCoza\Events\Enums\SummaryStatus;
 
 use function array_merge;
+use function count;
 use function gmdate;
 use function is_array;
 use function is_wp_error;
@@ -364,29 +365,56 @@ final class AISummaryService
     {
         $operation = strtoupper(trim($operation));
 
-        $summaryContext = [
+        // Identifying fields always included
+        $identifyingFields = [
             'operation' => $operation,
             'changed_at' => $context['changed_at'] ?? null,
             'class_id' => $context['class_id'] ?? null,
-            'class_code' => $newRow['class_code'] ?? null,
-            'class_subject' => $newRow['class_subject'] ?? null,
-            'diff' => $diff,
-            'new_row' => $newRow,
+            'class_code' => $context['new_row']['class_code'] ?? null,
+            'class_subject' => $context['new_row']['class_subject'] ?? null,
+            'learner_count' => is_array($context['new_row']['learner_ids'] ?? null)
+                ? count($context['new_row']['learner_ids'])
+                : 0,
         ];
 
         if ($operation === 'UPDATE') {
-            $summaryContext['old_row'] = $oldRow;
+            // For UPDATE: only send diff + identifying fields — no full row data
+            $summaryContext = array_merge($identifyingFields, [
+                'diff' => $diff,
+            ]);
+        } else {
+            // For INSERT/DELETE: send full new_row for complete picture
+            $summaryContext = array_merge($identifyingFields, [
+                'exam_class' => $context['new_row']['exam_class'] ?? false,
+                'diff' => $diff,
+                'new_row' => $newRow,
+            ]);
         }
 
-        $prompt = sprintf(
-            "Provide a concise summary (maximum five bullet points) explaining the key aspects of the WeCoza class %s. Highlight scheduling, learner, or staffing changes and flag risks requiring follow-up. Reference learners using the aliases provided. Avoid exposing personal data.",
-            strtolower($operation)
-        );
+        $prompt = match ($operation) {
+            'INSERT' => "Summarize this new WeCoza class in 2-3 bullet points covering: class code, subject, schedule pattern, learner count (use the top-level learner_count field), and assigned agent. Then check for ACTUAL issues only — do not flag something as missing if the data is present under a different key name. Only flag: truly empty required fields (class code, agent, start date), zero learners, or scheduling conflicts. If no real issues, state 'No issues detected.' Max 5 bullets total. Use learner aliases instead of real names.",
+            'UPDATE' => "Describe ONLY the changes made to this WeCoza class based on the diff provided. Rules:\n"
+                . "1. ONLY describe fields that actually changed (present in the diff). Do NOT mention any unchanged fields.\n"
+                . "2. For each change, briefly state what changed: old value → new value.\n"
+                . "3. If learner_ids changed, summarize as learners added/removed (use aliases, not real names).\n"
+                . "4. If event_dates changed, highlight date shifts or new events.\n"
+                . "5. Flag CONFIRMED issues only (e.g., start date moved to the past, zero learners after removal).\n"
+                . "6. If no issues, do NOT add an issues bullet.\n"
+                . "7. Max 4 bullets total. Be concise.",
+            default => sprintf(
+                "Summarize this WeCoza class %s in 2-3 bullet points. Reference learners using aliases. Flag only CONFIRMED issues. Max 4 bullets.",
+                strtolower($operation)
+            ),
+        };
+
+        $systemMessage = $operation === 'UPDATE'
+            ? 'You are an assistant helping WeCoza operations understand class changes. ONLY report what changed — never mention unchanged fields. Be brief, factual, and actionable.'
+            : 'You are an assistant helping WeCoza operations understand class changes. Be brief, factual, and actionable.';
 
         $payload = wp_json_encode($summaryContext, JSON_PRETTY_PRINT);
 
         return [
-            ['role' => 'system', 'content' => 'You are an assistant helping WeCoza operations understand class changes. Be brief, factual, and actionable.'],
+            ['role' => 'system', 'content' => $systemMessage],
             ['role' => 'user', 'content' => $prompt . "\n\n" . $payload],
         ];
     }

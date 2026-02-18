@@ -1,31 +1,36 @@
 <!-- Class Details Display Section -->
-<?php
+<?php // Validate and prepare data for update mode
 // Validate and prepare data for update mode
-if (isset($data['class_data']) && $data['class_data']):
+if (isset($data["class_data"]) && $data["class_data"]):
     // Ensure we have proper data structure for clients and sites
-    $clients = $data['clients'] ?? [];
-    $sites = $data['sites'] ?? [];
-    $classData = $data['class_data'];
+
+
+    $clients = $data["clients"] ?? [];
+    $sites = $data["sites"] ?? [];
+    $classData = $data["class_data"];
 
     // Find client name if not already in class data
-    if (empty($classData['client_name']) && !empty($classData['client_id'])) {
+    if (empty($classData["client_name"]) && !empty($classData["client_id"])) {
         foreach ($clients as $client) {
-            if ((int)$client['id'] === (int)$classData['client_id']) {
-                $classData['client_name'] = $client['name'];
+            if ((int) $client["id"] === (int) $classData["client_id"]) {
+                $classData["client_name"] = $client["name"];
                 break;
             }
         }
     }
 
     // Find site name if not already available
-    if (empty($classData['site_name']) && !empty($classData['site_id'])) {
+    if (empty($classData["site_name"]) && !empty($classData["site_id"])) {
         foreach ($sites as $clientSites) {
             foreach ($clientSites as $site) {
-                if ((int)$site['id'] === (int)$classData['site_id']) {
-                    $classData['site_name'] = $site['name'];
+                if ((int) $site["id"] === (int) $classData["site_id"]) {
+                    $classData["site_name"] = $site["name"];
                     // Also get address if not already in class data
-                    if (empty($classData['class_address_line']) && !empty($site['address'])) {
-                        $classData['class_address_line'] = $site['address'];
+                    if (
+                        empty($classData["class_address_line"]) &&
+                        !empty($site["address"])
+                    ) {
+                        $classData["class_address_line"] = $site["address"];
                     }
                     break 2;
                 }
@@ -34,35 +39,47 @@ if (isset($data['class_data']) && $data['class_data']):
     }
 
     // Find agent name if not already in class data
-    if (empty($classData['agent_name']) && !empty($classData['class_agent'])) {
-        $agents = $data['agents'] ?? [];
+    if (empty($classData["agent_name"]) && !empty($classData["class_agent"])) {
+        $agents = $data["agents"] ?? [];
         foreach ($agents as $agent) {
-            if ((int)$agent['id'] === (int)$classData['class_agent']) {
-                $classData['agent_name'] = $agent['name'];
+            if ((int) $agent["id"] === (int) $classData["class_agent"]) {
+                $classData["agent_name"] = $agent["name"];
                 break;
             }
         }
     }
 
     // Find supervisor name if not already in class data
-    if (empty($classData['supervisor_name']) && !empty($classData['project_supervisor_id'])) {
-        $supervisors = $data['supervisors'] ?? [];
+    if (
+        empty($classData["supervisor_name"]) &&
+        !empty($classData["project_supervisor_id"])
+    ) {
+        $supervisors = $data["supervisors"] ?? [];
         foreach ($supervisors as $supervisor) {
-            if ((int)$supervisor['id'] === (int)$classData['project_supervisor_id']) {
-                $classData['supervisor_name'] = $supervisor['name'];
+            if (
+                (int) $supervisor["id"] ===
+                (int) $classData["project_supervisor_id"]
+            ) {
+                $classData["supervisor_name"] = $supervisor["name"];
                 break;
             }
         }
     }
 
     // Process backup agents if needed
-    if (!empty($classData['backup_agent_ids']) && is_string($classData['backup_agent_ids'])) {
-        $classData['backup_agent_ids'] = json_decode($classData['backup_agent_ids'], true);
+    if (
+        !empty($classData["backup_agent_ids"]) &&
+        is_string($classData["backup_agent_ids"])
+    ) {
+        $classData["backup_agent_ids"] = json_decode(
+            $classData["backup_agent_ids"],
+            true,
+        );
     }
 
     // Update the class data with enriched information
-    $data['class_data'] = $classData;
-?>
+    $data["class_data"] = $classData;
+    ?>
 <div class="wecoza-class-details-display mb-4">
     <!-- Top Summary Cards -->
     <div class="card mb-3">
@@ -77,8 +94,12 @@ if (isset($data['class_data']) && $data['class_data']):
                         <div>
                             <p class="fw-bold mb-1">Client</p>
                             <h5 class="fw-bolder text-nowrap">
-                                <?php if (!empty($data['class_data']['client_name'])): ?>
-                                    <?php echo esc_html($data['class_data']['client_name']); ?>
+                                <?php if (
+                                    !empty($data["class_data"]["client_name"])
+                                ): ?>
+                                    <?php echo esc_html(
+                                        $data["class_data"]["client_name"],
+                                    ); ?>
                                 <?php else: ?>
                                     N/A
                                 <?php endif; ?>
@@ -94,7 +115,10 @@ if (isset($data['class_data']) && $data['class_data']):
                         </div>
                         <div>
                             <p class="fw-bold mb-1">Class Type</p>
-                            <h5 class="fw-bolder text-nowrap"><?php echo esc_html($data['class_data']['class_type'] ?? 'Unknown Type'); ?></h5>
+                            <h5 class="fw-bolder text-nowrap"><?php echo esc_html(
+                                $data["class_data"]["class_type"] ??
+                                    "Unknown Type",
+                            ); ?></h5>
                         </div>
                     </div>
                 </div>
@@ -106,7 +130,9 @@ if (isset($data['class_data']) && $data['class_data']):
                         </div>
                         <div>
                             <p class="fw-bold mb-1">Class Subject</p>
-                            <h5 class="fw-bolder text-nowrap"><?php echo esc_html($data['class_data']['class_subject'] ?? 'N/A'); ?></h5>
+                            <h5 class="fw-bolder text-nowrap"><?php echo esc_html(
+                                $data["class_data"]["class_subject"] ?? "N/A",
+                            ); ?></h5>
                         </div>
                     </div>
                 </div>
@@ -118,7 +144,9 @@ if (isset($data['class_data']) && $data['class_data']):
                         </div>
                         <div>
                             <p class="fw-bold mb-1">Class Code</p>
-                            <h5 class="fw-bolder text-nowrap"><?php echo esc_html($data['class_data']['class_code'] ?? 'N/A'); ?></h5>
+                            <h5 class="fw-bolder text-nowrap"><?php echo esc_html(
+                                $data["class_data"]["class_code"] ?? "N/A",
+                            ); ?></h5>
                         </div>
                     </div>
                 </div>
@@ -126,16 +154,23 @@ if (isset($data['class_data']) && $data['class_data']):
         </div>
     </div>
 </div>
-<?php endif; ?>
+<?php
+endif; ?>
 
 <!-- Classes Capture Form -->
 <form id="classes-form" class="needs-validation ydcoza-compact-form" novalidate method="POST" enctype="multipart/form-data">
    <!-- Hidden fields for update mode -->
-   <input type="hidden" id="class_id" name="class_id" value="<?php echo esc_attr($data['class_id'] ?? $_GET['class_id'] ?? ''); ?>">
-   <input type="hidden" id="redirect_url" name="redirect_url" value="<?php echo esc_attr($data['redirect_url'] ?? $_GET['redirect_url'] ?? ''); ?>">
-   <input type="hidden" id="nonce" name="nonce" value="<?php echo wp_create_nonce('wecoza_class_nonce'); ?>">
+   <input type="hidden" id="class_id" name="class_id" value="<?php echo esc_attr(
+       $data["class_id"] ?? ($_GET["class_id"] ?? ""),
+   ); ?>">
+   <input type="hidden" id="redirect_url" name="redirect_url" value="<?php echo esc_attr(
+       $data["redirect_url"] ?? ($_GET["redirect_url"] ?? ""),
+   ); ?>">
+   <input type="hidden" id="nonce" name="nonce" value="<?php echo wp_create_nonce(
+       "wecoza_class_nonce",
+   ); ?>">
    <!-- Debug mode indicator -->
-   <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+   <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
    <input type="hidden" id="debug_mode" name="debug_mode" value="1">
    <?php endif; ?>
 
@@ -160,7 +195,10 @@ if (isset($data['class_data']) && $data['class_data']):
                            </div>
                         </td>
                         <td class="py-2">
-                           <p class="fw-semibold mb-0">#<?php echo esc_html($data['class_data']['class_id'] ?? $data['class_id'] ?? 'N/A'); ?></p>
+                           <p class="fw-semibold mb-0">#<?php echo esc_html(
+                               $data["class_data"]["class_id"] ??
+                                   ($data["class_id"] ?? "N/A"),
+                           ); ?></p>
                         </td>
                      </tr>
                      <!-- Client -->
@@ -175,9 +213,15 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <div class="fw-semibold mb-0">
-                              <?php echo esc_html($data['class_data']['client_name'] ?? 'N/A'); ?>
-                              <?php if (!empty($data['class_data']['client_id'])): ?>
-                                 <div class="fs-9 text-muted">ID: <?php echo esc_html($data['class_data']['client_id']); ?></div>
+                              <?php echo esc_html(
+                                  $data["class_data"]["client_name"] ?? "N/A",
+                              ); ?>
+                              <?php if (
+                                  !empty($data["class_data"]["client_id"])
+                              ): ?>
+                                 <div class="fs-9 text-muted">ID: <?php echo esc_html(
+                                     $data["class_data"]["client_id"],
+                                 ); ?></div>
                               <?php endif; ?>
                            </div>
                         </td>
@@ -194,9 +238,15 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <div class="fw-semibold mb-0">
-                              <?php echo esc_html($data['class_data']['site_name'] ?? 'N/A'); ?>
-                              <?php if (!empty($data['class_data']['site_id'])): ?>
-                                 <div class="fs-9 text-muted">ID: <?php echo esc_html($data['class_data']['site_id']); ?></div>
+                              <?php echo esc_html(
+                                  $data["class_data"]["site_name"] ?? "N/A",
+                              ); ?>
+                              <?php if (
+                                  !empty($data["class_data"]["site_id"])
+                              ): ?>
+                                 <div class="fs-9 text-muted">ID: <?php echo esc_html(
+                                     $data["class_data"]["site_id"],
+                                 ); ?></div>
                               <?php endif; ?>
                            </div>
                         </td>
@@ -210,9 +260,12 @@ if (isset($data['class_data']) && $data['class_data']):
                               </div>
                               <p class="fw-bold mb-0">Address : </p>
                            </div>
-                        </td>                                    
+                        </td>
                         <td class="py-2">
-                           <p class="fw-semibold mb-0"><?php echo esc_html($data['class_data']['class_address_line'] ?? 'N/A'); ?></p>
+                           <p class="fw-semibold mb-0"><?php echo esc_html(
+                               $data["class_data"]["class_address_line"] ??
+                                   "N/A",
+                           ); ?></p>
                         </td>
                      </tr>
                      <!-- Class Type -->
@@ -226,7 +279,9 @@ if (isset($data['class_data']) && $data['class_data']):
                            </div>
                         </td>
                         <td class="py-2">
-                           <p class="fw-semibold mb-0"><?php echo esc_html($data['class_data']['class_type'] ?? 'N/A'); ?></p>
+                           <p class="fw-semibold mb-0"><?php echo esc_html(
+                               $data["class_data"]["class_type"] ?? "N/A",
+                           ); ?></p>
                         </td>
                      </tr>
                      <!-- Class Subject -->
@@ -240,13 +295,15 @@ if (isset($data['class_data']) && $data['class_data']):
                            </div>
                         </td>
                         <td class="py-2">
-                           <p class="fw-semibold mb-0"><?php echo esc_html($data['class_data']['class_subject'] ?? 'N/A'); ?></p>
+                           <p class="fw-semibold mb-0"><?php echo esc_html(
+                               $data["class_data"]["class_subject"] ?? "N/A",
+                           ); ?></p>
                         </td>
                      </tr>
                   </tbody>
                </table>
             </div>
-            
+
             <!-- Right Column -->
             <div class="col-sm-12 col-xxl-6 border-bottom py-3">
                <table class="w-100 table-stats table table-hover table-sm fs-9 mb-0">
@@ -263,8 +320,12 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <p class="fw-semibold mb-0">
-                              <?php if (!empty($data['class_data']['class_duration'])): ?>
-                                 <?php echo esc_html($data['class_data']['class_duration']); ?> hours
+                              <?php if (
+                                  !empty($data["class_data"]["class_duration"])
+                              ): ?>
+                                 <?php echo esc_html(
+                                     $data["class_data"]["class_duration"],
+                                 ); ?> hours
                               <?php else: ?>
                                  <span class="text-muted">N/A</span>
                               <?php endif; ?>
@@ -282,7 +343,9 @@ if (isset($data['class_data']) && $data['class_data']):
                            </div>
                         </td>
                         <td class="py-2">
-                           <p class="fw-semibold mb-0"><?php echo esc_html($data['class_data']['class_code'] ?? 'N/A'); ?></p>
+                           <p class="fw-semibold mb-0"><?php echo esc_html(
+                               $data["class_data"]["class_code"] ?? "N/A",
+                           ); ?></p>
                         </td>
                      </tr>
                      <!-- Original Start Date -->
@@ -297,8 +360,21 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <p class="fw-semibold mb-0">
-                              <?php if (!empty($data['class_data']['original_start_date'])): ?>
-                                 <?php echo esc_html(wp_date('M j, Y', strtotime($data['class_data']['original_start_date']))); ?>
+                              <?php if (
+                                  !empty(
+                                      $data["class_data"]["original_start_date"]
+                                  )
+                              ): ?>
+                                 <?php echo esc_html(
+                                     wp_date(
+                                         "M j, Y",
+                                         strtotime(
+                                             $data["class_data"][
+                                                 "original_start_date"
+                                             ],
+                                         ),
+                                     ),
+                                 ); ?>
                               <?php else: ?>
                                  <span class="text-muted">N/A</span>
                               <?php endif; ?>
@@ -306,7 +382,10 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                      </tr>
                      <!-- Current Agent -->
-                     <?php if (!empty($data['class_data']['agent_name']) || !empty($data['class_data']['class_agent'])): ?>
+                     <?php if (
+                         !empty($data["class_data"]["agent_name"]) ||
+                         !empty($data["class_data"]["class_agent"])
+                     ): ?>
                      <tr>
                         <td class="py-2">
                            <div class="d-flex align-items-center">
@@ -318,16 +397,25 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <div class="fw-semibold mb-0">
-                              <?php echo esc_html($data['class_data']['agent_name'] ?? 'N/A'); ?>
-                              <?php if (!empty($data['class_data']['class_agent'])): ?>
-                                 <div class="fs-9 text-muted">ID: <?php echo esc_html($data['class_data']['class_agent']); ?></div>
+                              <?php echo esc_html(
+                                  $data["class_data"]["agent_name"] ?? "N/A",
+                              ); ?>
+                              <?php if (
+                                  !empty($data["class_data"]["class_agent"])
+                              ): ?>
+                                 <div class="fs-9 text-muted">ID: <?php echo esc_html(
+                                     $data["class_data"]["class_agent"],
+                                 ); ?></div>
                               <?php endif; ?>
                            </div>
                         </td>
                      </tr>
                      <?php endif; ?>
                      <!-- Backup Agents -->
-                     <?php if (!empty($data['class_data']['backup_agent_names']) && is_array($data['class_data']['backup_agent_names'])): ?>
+                     <?php if (
+                         !empty($data["class_data"]["backup_agent_names"]) &&
+                         is_array($data["class_data"]["backup_agent_names"])
+                     ): ?>
                      <tr>
                         <td class="py-2">
                            <div class="d-flex align-items-center">
@@ -339,14 +427,27 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <div class="fw-semibold mb-0">
-                              <span class="badge badge-phoenix fs-10 badge-phoenix-info me-2"><?php echo count($data['class_data']['backup_agent_names']); ?> Backup<?php echo count($data['class_data']['backup_agent_names']) !== 1 ? 's' : ''; ?></span>
+                              <span class="badge badge-phoenix fs-10 badge-phoenix-info me-2"><?php echo count(
+                                  $data["class_data"]["backup_agent_names"],
+                              ); ?> Backup<?php echo count(
+     $data["class_data"]["backup_agent_names"],
+ ) !== 1
+     ? "s"
+     : ""; ?></span>
                               <div class="mt-1">
-                                 <?php foreach ($data['class_data']['backup_agent_names'] as $backupAgent): ?>
+                                 <?php foreach (
+                                     $data["class_data"]["backup_agent_names"]
+                                     as $backupAgent
+                                 ): ?>
                                     <div class="fs-9 mb-1">
                                        <i class="bi bi-person me-1"></i>
-                                       <?php echo esc_html($backupAgent['name'] ?? $backupAgent); ?>
-                                       <?php if (isset($backupAgent['id'])): ?>
-                                          <span class="text-muted">(ID: <?php echo esc_html($backupAgent['id']); ?>)</span>
+                                       <?php echo esc_html(
+                                           $backupAgent["name"] ?? $backupAgent,
+                                       ); ?>
+                                       <?php if (isset($backupAgent["id"])): ?>
+                                          <span class="text-muted">(ID: <?php echo esc_html(
+                                              $backupAgent["id"],
+                                          ); ?>)</span>
                                        <?php endif; ?>
                                     </div>
                                  <?php endforeach; ?>
@@ -356,7 +457,10 @@ if (isset($data['class_data']) && $data['class_data']):
                      </tr>
                      <?php endif; ?>
                      <!-- Supervisor -->
-                     <?php if (!empty($data['class_data']['supervisor_name']) || !empty($data['class_data']['project_supervisor_id'])): ?>
+                     <?php if (
+                         !empty($data["class_data"]["supervisor_name"]) ||
+                         !empty($data["class_data"]["project_supervisor_id"])
+                     ): ?>
                      <tr>
                         <td class="py-2">
                            <div class="d-flex align-items-center">
@@ -368,9 +472,22 @@ if (isset($data['class_data']) && $data['class_data']):
                         </td>
                         <td class="py-2">
                            <div class="fw-semibold mb-0">
-                              <?php echo esc_html($data['class_data']['supervisor_name'] ?? 'N/A'); ?>
-                              <?php if (!empty($data['class_data']['project_supervisor_id'])): ?>
-                                 <div class="fs-9 text-muted">ID: <?php echo esc_html($data['class_data']['project_supervisor_id']); ?></div>
+                              <?php echo esc_html(
+                                  $data["class_data"]["supervisor_name"] ??
+                                      "N/A",
+                              ); ?>
+                              <?php if (
+                                  !empty(
+                                      $data["class_data"][
+                                          "project_supervisor_id"
+                                      ]
+                                  )
+                              ): ?>
+                                 <div class="fs-9 text-muted">ID: <?php echo esc_html(
+                                     $data["class_data"][
+                                         "project_supervisor_id"
+                                     ],
+                                 ); ?></div>
                               <?php endif; ?>
                            </div>
                         </td>
@@ -383,79 +500,123 @@ if (isset($data['class_data']) && $data['class_data']):
       </div>
 
       <!-- Hidden fields for form submission -->
-      <input type="hidden" name="client_id" value="<?php echo esc_attr($data['class_data']['client_id'] ?? ''); ?>">
-      <input type="hidden" name="site_id" value="<?php echo esc_attr($data['class_data']['site_id'] ?? ''); ?>">
-      <input type="hidden" id="class_type" name="class_type" value="<?php echo esc_attr($data['class_data']['class_type'] ?? ''); ?>">
-      <input type="hidden" name="class_code_hidden" value="<?php echo esc_attr($data['class_data']['class_code'] ?? ''); ?>">
-      <input type="hidden" id="class_duration" name="class_duration" value="<?php echo esc_attr($data['class_data']['class_duration'] ?? ''); ?>">
-      <input type="hidden" name="class_start_date" value="<?php echo esc_attr($data['class_data']['original_start_date'] ?? ''); ?>">
-      <input type="hidden" name="class_subject" value="<?php echo esc_attr($data['class_data']['class_subject'] ?? ''); ?>">
+      <input type="hidden" name="client_id" value="<?php echo esc_attr(
+          $data["class_data"]["client_id"] ?? "",
+      ); ?>">
+      <input type="hidden" name="site_id" value="<?php echo esc_attr(
+          $data["class_data"]["site_id"] ?? "",
+      ); ?>">
+      <input type="hidden" id="class_type" name="class_type" value="<?php echo esc_attr(
+          $data["class_data"]["class_type"] ?? "",
+      ); ?>">
+      <input type="hidden" name="class_code_hidden" value="<?php echo esc_attr(
+          $data["class_data"]["class_code"] ?? "",
+      ); ?>">
+      <input type="hidden" id="class_duration" name="class_duration" value="<?php echo esc_attr(
+          $data["class_data"]["class_duration"] ?? "",
+      ); ?>">
+      <input type="hidden" name="class_start_date" value="<?php echo esc_attr(
+          $data["class_data"]["original_start_date"] ?? "",
+      ); ?>">
+      <input type="hidden" name="class_subject" value="<?php echo esc_attr(
+          $data["class_data"]["class_subject"] ?? "",
+      ); ?>">
 
          <?php
          // Extract schedule data for pre-population
-         $scheduleData = $data['class_data']['schedule_data'] ?? [];
-         
+         $scheduleData = $data["class_data"]["schedule_data"] ?? [];
+
          // Handle both string and array formats for schedule data
          if (is_string($scheduleData)) {
              $scheduleData = json_decode($scheduleData, true) ?? [];
          }
-         
-         $schedulePattern = $scheduleData['pattern'] ?? '';
-         $scheduleDays = $scheduleData['selectedDays'] ?? $scheduleData['days'] ?? [];
-         $scheduleStartTime = $scheduleData['start_time'] ?? '';
-         $scheduleEndTime = $scheduleData['end_time'] ?? '';
-         $scheduleStartDate = $scheduleData['start_date'] ?? $scheduleData['startDate'] ?? '';
-         $scheduleEndDate = $scheduleData['end_date'] ?? $scheduleData['endDate'] ?? '';
-         $holidayOverrides = $scheduleData['holiday_overrides'] ?? $scheduleData['holidayOverrides'] ?? [];
-         $timeData = $scheduleData['timeData'] ?? [];
-         $perDayTimes = isset($timeData['perDayTimes']) ? $timeData['perDayTimes'] : [];
+
+         $schedulePattern = $scheduleData["pattern"] ?? "";
+         $scheduleDays =
+             $scheduleData["selectedDays"] ?? ($scheduleData["days"] ?? []);
+         $scheduleStartTime = $scheduleData["start_time"] ?? "";
+         $scheduleEndTime = $scheduleData["end_time"] ?? "";
+         $scheduleStartDate =
+             $scheduleData["start_date"] ?? ($scheduleData["startDate"] ?? "");
+         $scheduleEndDate =
+             $scheduleData["end_date"] ?? ($scheduleData["endDate"] ?? "");
+         $holidayOverrides =
+             $scheduleData["holiday_overrides"] ??
+             ($scheduleData["holidayOverrides"] ?? []);
+         $timeData = $scheduleData["timeData"] ?? [];
+         $perDayTimes = isset($timeData["perDayTimes"])
+             ? $timeData["perDayTimes"]
+             : [];
 
          // Convert holiday overrides to JSON string for the hidden field
-         $holidayOverridesJson = !empty($holidayOverrides) ? json_encode($holidayOverrides) : '';
-         
+         $holidayOverridesJson = !empty($holidayOverrides)
+             ? json_encode($holidayOverrides)
+             : "";
+
          // Debug: Log holiday overrides extraction
-         if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+         if (isset($_GET["debug"]) && $_GET["debug"] === "1") {
              echo "<script>\n";
              echo "console.log('=== Holiday Overrides Debug ===');\n";
-             echo "console.log('Raw schedule data holiday_overrides:', " . json_encode($scheduleData['holiday_overrides'] ?? null) . ");\n";
-             echo "console.log('Raw schedule data holidayOverrides:', " . json_encode($scheduleData['holidayOverrides'] ?? null) . ");\n";
-             echo "console.log('Extracted holidayOverrides:', " . json_encode($holidayOverrides) . ");\n";
-             echo "console.log('Holiday overrides JSON string:', " . json_encode($holidayOverridesJson) . ");\n";
+             echo "console.log('Raw schedule data holiday_overrides:', " .
+                 json_encode($scheduleData["holiday_overrides"] ?? null) .
+                 ");\n";
+             echo "console.log('Raw schedule data holidayOverrides:', " .
+                 json_encode($scheduleData["holidayOverrides"] ?? null) .
+                 ");\n";
+             echo "console.log('Extracted holidayOverrides:', " .
+                 json_encode($holidayOverrides) .
+                 ");\n";
+             echo "console.log('Holiday overrides JSON string:', " .
+                 json_encode($holidayOverridesJson) .
+                 ");\n";
              echo "</script>\n";
          }
-         
+
          // Normalize perDayTimes to JavaScript expected format (camelCase) and filter corrupt data
          if (!empty($perDayTimes)) {
-             $validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+             $validDays = [
+                 "Monday",
+                 "Tuesday",
+                 "Wednesday",
+                 "Thursday",
+                 "Friday",
+                 "Saturday",
+                 "Sunday",
+             ];
              $normalizedPerDayTimes = [];
-             
+
              foreach ($perDayTimes as $day => $times) {
                  // Only process valid day names, skip numeric keys
                  if (in_array($day, $validDays) && is_array($times)) {
                      $normalizedPerDayTimes[$day] = [
-                         'startTime' => $times['start_time'] ?? $times['startTime'] ?? '',
-                         'endTime' => $times['end_time'] ?? $times['endTime'] ?? '',
-                         'duration' => $times['duration'] ?? ''
+                         "startTime" =>
+                             $times["start_time"] ??
+                             ($times["startTime"] ?? ""),
+                         "endTime" =>
+                             $times["end_time"] ?? ($times["endTime"] ?? ""),
+                         "duration" => $times["duration"] ?? "",
                      ];
                  }
              }
-             
+
              $perDayTimes = $normalizedPerDayTimes;
-             
+
              // Update the schedule data with normalized format
-             if (!isset($scheduleData['timeData'])) {
-                 $scheduleData['timeData'] = [];
+             if (!isset($scheduleData["timeData"])) {
+                 $scheduleData["timeData"] = [];
              }
-             $scheduleData['timeData']['perDayTimes'] = $perDayTimes;
-             
-             if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+             $scheduleData["timeData"]["perDayTimes"] = $perDayTimes;
+
+             if (isset($_GET["debug"]) && $_GET["debug"] === "1") {
                  echo "<script>\n";
                  echo "console.log('=== Cleaned Per Day Times ===');\n";
-                 echo "console.log('Normalized perDayTimes:', " . json_encode($perDayTimes) . ");\n";
+                 echo "console.log('Normalized perDayTimes:', " .
+                     json_encode($perDayTimes) .
+                     ");\n";
                  echo "</script>\n";
              }
          }
-         
+
          // Handle legacy data or missing perDayTimes
          if (empty($perDayTimes) && !empty($scheduleDays)) {
              // Check if we have individual day times in the schedule data
@@ -464,35 +625,44 @@ if (isset($data['class_data']) && $data['class_data']):
                  if (isset($scheduleData[$day])) {
                      $foundDayTimes = true;
                      $perDayTimes[$day] = [
-                         'startTime' => $scheduleData[$day]['start_time'] ?? $scheduleData[$day]['start'] ?? '',
-                         'endTime' => $scheduleData[$day]['end_time'] ?? $scheduleData[$day]['end'] ?? '',
-                         'duration' => $scheduleData[$day]['duration'] ?? ''
+                         "startTime" =>
+                             $scheduleData[$day]["start_time"] ??
+                             ($scheduleData[$day]["start"] ?? ""),
+                         "endTime" =>
+                             $scheduleData[$day]["end_time"] ??
+                             ($scheduleData[$day]["end"] ?? ""),
+                         "duration" => $scheduleData[$day]["duration"] ?? "",
                      ];
                  }
              }
-             
+
              // If no individual day times found, use the general start/end times
-             if (!$foundDayTimes && (!empty($scheduleStartTime) || !empty($scheduleEndTime))) {
+             if (
+                 !$foundDayTimes &&
+                 (!empty($scheduleStartTime) || !empty($scheduleEndTime))
+             ) {
                  foreach ($scheduleDays as $day) {
                      $perDayTimes[$day] = [
-                         'startTime' => $scheduleStartTime ?: '',
-                         'endTime' => $scheduleEndTime ?: ''
+                         "startTime" => $scheduleStartTime ?: "",
+                         "endTime" => $scheduleEndTime ?: "",
                      ];
                  }
              }
-             
+
              // Update the schedule data structure
              if (!empty($perDayTimes)) {
-                 if (!isset($scheduleData['timeData'])) {
-                     $scheduleData['timeData'] = [];
+                 if (!isset($scheduleData["timeData"])) {
+                     $scheduleData["timeData"] = [];
                  }
-                 $scheduleData['timeData']['mode'] = 'per-day';
-                 $scheduleData['timeData']['perDayTimes'] = $perDayTimes;
-                 
-                 if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+                 $scheduleData["timeData"]["mode"] = "per-day";
+                 $scheduleData["timeData"]["perDayTimes"] = $perDayTimes;
+
+                 if (isset($_GET["debug"]) && $_GET["debug"] === "1") {
                      echo "<script>\n";
                      echo "console.log('=== Migrated Per Day Times ===');\n";
-                     echo "console.log('Migrated perDayTimes:', " . json_encode($perDayTimes) . ");\n";
+                     echo "console.log('Migrated perDayTimes:', " .
+                         json_encode($perDayTimes) .
+                         ");\n";
                      echo "</script>\n";
                  }
              }
@@ -504,13 +674,18 @@ if (isset($data['class_data']) && $data['class_data']):
          <div class="row">
             <div class="col-md-4 ">
                   <label for="schedule_start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
-                  <input type="date" id="schedule_start_date" name="schedule_start_date" class="form-control form-control-sm" placeholder="YYYY-MM-DD" value="<?php echo esc_attr($scheduleStartDate); ?>" required>
+                  <input type="date" id="schedule_start_date" name="schedule_start_date" class="form-control form-control-sm" placeholder="YYYY-MM-DD" value="<?php echo esc_attr(
+                      $scheduleStartDate,
+                  ); ?>" required>
                   <div class="invalid-feedback">Please select a start date.</div>
                   <div class="valid-feedback">Looks good!</div>
             </div>
          </div>
          <?php echo section_divider(); ?>
-         <?php echo section_header('Class Schedule', 'Update the recurring schedule for this class.'); ?>
+         <?php echo section_header(
+             "Class Schedule",
+             "Update the recurring schedule for this class.",
+         ); ?>
          <!-- Schedule Pattern Selection -->
          <div class="row mb-3">
             <div class="col-md-4 mb-3">
@@ -518,10 +693,22 @@ if (isset($data['class_data']) && $data['class_data']):
                   <label for="schedule_pattern" class="form-label">Schedule Pattern <span class="text-danger">*</span></label>
                   <select id="schedule_pattern" name="schedule_pattern" class="form-select form-select-sm" required>
                      <option value="">Select</option>
-                     <option value="weekly" <?php echo ($schedulePattern == 'weekly') ? 'selected' : ''; ?>>Weekly (Every Week)</option>
-                     <option value="biweekly" <?php echo ($schedulePattern == 'biweekly') ? 'selected' : ''; ?>>Bi-Weekly (Every Two Weeks)</option>
-                     <option value="monthly" <?php echo ($schedulePattern == 'monthly') ? 'selected' : ''; ?>>Monthly</option>
-                     <option value="custom" <?php echo ($schedulePattern == 'custom') ? 'selected' : ''; ?>>Custom</option>
+                     <option value="weekly" <?php echo $schedulePattern ==
+                     "weekly"
+                         ? "selected"
+                         : ""; ?>>Weekly (Every Week)</option>
+                     <option value="biweekly" <?php echo $schedulePattern ==
+                     "biweekly"
+                         ? "selected"
+                         : ""; ?>>Bi-Weekly (Every Two Weeks)</option>
+                     <option value="monthly" <?php echo $schedulePattern ==
+                     "monthly"
+                         ? "selected"
+                         : ""; ?>>Monthly</option>
+                     <option value="custom" <?php echo $schedulePattern ==
+                     "custom"
+                         ? "selected"
+                         : ""; ?>>Custom</option>
                   </select>
                   <div class="invalid-feedback">Please select a schedule pattern.</div>
                   <div class="valid-feedback">Looks good!</div>
@@ -529,20 +716,44 @@ if (isset($data['class_data']) && $data['class_data']):
             </div>
 
             <!-- Day Selection (for weekly/biweekly) -->
-            <div class="col-md-12 mb-3 <?php echo (!in_array($schedulePattern, ['weekly', 'biweekly'])) ? 'd-none' : ''; ?>" id="day-selection-container">
+            <div class="col-md-12 mb-3 <?php echo !in_array($schedulePattern, [
+                "weekly",
+                "biweekly",
+            ])
+                ? "d-none"
+                : ""; ?>" id="day-selection-container">
                <label class="form-label">Days of Week <span class="text-danger">*</span></label>
                <div class="days-checkbox-group">
                   <?php
-                  $weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                  $weekDays = [
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                  ];
                   foreach ($weekDays as $index => $day):
-                     $isChecked = is_array($scheduleDays) && in_array($day, $scheduleDays);
-                     $isFirst = ($index === 0);
-                  ?>
+
+                      $isChecked =
+                          is_array($scheduleDays) &&
+                          in_array($day, $scheduleDays);
+                      $isFirst = $index === 0;
+                      ?>
                   <div class="form-check form-check-inline">
-                     <input class="form-check-input schedule-day-checkbox" type="checkbox" id="schedule_day_<?php echo strtolower($day); ?>" name="schedule_days[]" value="<?php echo $day; ?>" <?php echo $isChecked ? 'checked' : ''; ?> <?php echo $isFirst ? 'required' : ''; ?>>
-                     <label class="form-check-label" for="schedule_day_<?php echo strtolower($day); ?>"><?php echo $day; ?></label>
+                     <input class="form-check-input schedule-day-checkbox" type="checkbox" id="schedule_day_<?php echo strtolower(
+                         $day,
+                     ); ?>" name="schedule_days[]" value="<?php echo $day; ?>" <?php echo $isChecked
+    ? "checked"
+    : ""; ?> <?php echo $isFirst ? "required" : ""; ?>>
+                     <label class="form-check-label" for="schedule_day_<?php echo strtolower(
+                         $day,
+                     ); ?>"><?php echo $day; ?></label>
                   </div>
-                  <?php endforeach; ?>
+                  <?php
+                  endforeach;
+                  ?>
                </div>
                <div class="mt-2">
                   <button type="button" class="btn btn-sm btn-subtle-primary" id="select-all-days">Select All</button>
@@ -574,11 +785,14 @@ if (isset($data['class_data']) && $data['class_data']):
          <div id="single-time-controls" class="row mb-3 d-none">
             <!-- This section is now hidden and will be replaced by per-day controls when days are selected -->
          </div>
-         
+
          <!-- Per-Day Time Controls (shown when multiple days selected) -->
          <div id="per-day-time-controls" class="d-none mt-3 mb-4">
             <div class="">
-               <?php echo section_header('Set Times for Each Day', 'Configure individual start and end times for each selected day.'); ?>
+               <?php echo section_header(
+                   "Set Times for Each Day",
+                   "Configure individual start and end times for each selected day.",
+               ); ?>
             </div>
             <!-- Container for dynamically generated day sections -->
             <div id="per-day-sections-container" class="row g-4">
@@ -599,16 +813,24 @@ if (isset($data['class_data']) && $data['class_data']):
                         <select class="form-select form-select-sm day-start-time" data-day="" required>
                            <option value="">Select</option>
                            <?php
-                              // Generate time options from 6:00 AM to 8:00 PM in 30-minute increments
-                              $start = strtotime('06:00:00');
-                              $end = strtotime('20:00:00');
-                              $interval = 30 * 60; // 30 minutes in seconds
+                           // Generate time options from 6:00 AM to 8:00 PM in 30-minute increments
+                           $start = strtotime("06:00:00");
+                           $end = strtotime("20:00:00");
+                           $interval = 30 * 60; // 30 minutes in seconds
 
-                              for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = wp_date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
-                              }
-                              ?>
+                           for (
+                               $time = $start;
+                               $time <= $end;
+                               $time += $interval
+                           ) {
+                               $timeStr = wp_date("H:i", $time);
+                               echo '<option value="' .
+                                   $timeStr .
+                                   '">' .
+                                   wp_date("g:i A", $time) .
+                                   "</option>";
+                           }
+                           ?>
                         </select>
                         <div class="invalid-feedback">Please select a start time.</div>
                      </div>
@@ -617,16 +839,24 @@ if (isset($data['class_data']) && $data['class_data']):
                         <select class="form-select form-select-sm day-end-time" data-day="" required>
                            <option value="">Select</option>
                            <?php
-                              // Generate time options from 6:30 AM to 8:30 PM in 30-minute increments
-                              $start = strtotime('06:30:00');
-                              $end = strtotime('20:30:00');
-                              $interval = 30 * 60; // 30 minutes in seconds
+                           // Generate time options from 6:30 AM to 8:30 PM in 30-minute increments
+                           $start = strtotime("06:30:00");
+                           $end = strtotime("20:30:00");
+                           $interval = 30 * 60; // 30 minutes in seconds
 
-                              for ($time = $start; $time <= $end; $time += $interval) {
-                                 $timeStr = wp_date('H:i', $time);
-                                 echo '<option value="' . $timeStr . '">' . wp_date('g:i A', $time) . '</option>';
-                              }
-                              ?>
+                           for (
+                               $time = $start;
+                               $time <= $end;
+                               $time += $interval
+                           ) {
+                               $timeStr = wp_date("H:i", $time);
+                               echo '<option value="' .
+                                   $timeStr .
+                                   '">' .
+                                   wp_date("g:i A", $time) .
+                                   "</option>";
+                           }
+                           ?>
                         </select>
                         <div class="invalid-feedback">Please select an end time.</div>
                      </div>
@@ -637,7 +867,10 @@ if (isset($data['class_data']) && $data['class_data']):
          </div>
       <?php echo section_divider(); ?>
          <div class="col-md-4" id="schedule-update-end-date-container">
-            <?php echo section_header('Class End Date', 'If you make any changes to the schedule, you will need to recalculate the end date.'); ?>
+            <?php echo section_header(
+                "Class End Date",
+                "If you make any changes to the schedule, you will need to recalculate the end date.",
+            ); ?>
             <label for="schedule_end_date" class="form-label">Estimated End Date <span class="text-danger">*</span></label>
             <input type="date" id="schedule_end_date" name="schedule_end_date" class="form-control form-control-sm readonly-field" placeholder="YYYY-MM-DD" required>
             <div class="invalid-feedback">Please generate the end date.</div>
@@ -649,7 +882,10 @@ if (isset($data['class_data']) && $data['class_data']):
       <?php echo section_divider(); ?>
          <!-- Exception Dates -->
          <div class="mb-4">
-            <?php echo section_header('Exception Dates', 'Add dates when classes will not occur (e.g. client closed).'); ?>
+            <?php echo section_header(
+                "Exception Dates",
+                "Add dates when classes will not occur (e.g. client closed).",
+            ); ?>
             <!-- Container for all exception date rows -->
             <div id="exception-dates-container" data-populated="false"></div>
 
@@ -697,7 +933,10 @@ if (isset($data['class_data']) && $data['class_data']):
 
          <!-- Public Holidays Section -->
          <div class="mb-4 col-md-8">
-            <?php echo section_header('Public Holidays in Schedule', 'By default, classes are not scheduled on public holidays. The system will only show holidays that conflict with your class schedule (when a holiday falls on a scheduled class day). You can override specific holidays to include them in the schedule.'); ?>
+            <?php echo section_header(
+                "Public Holidays in Schedule",
+                "By default, classes are not scheduled on public holidays. The system will only show holidays that conflict with your class schedule (when a holiday falls on a scheduled class day). You can override specific holidays to include them in the schedule.",
+            ); ?>
 
             <!-- No holidays message -->
             <div id="no-holidays-message" class="bd-callout bd-callout-info">
@@ -752,7 +991,9 @@ if (isset($data['class_data']) && $data['class_data']):
          </template>
 
          <!-- Hidden input to store holiday override data -->
-         <input type="hidden" id="holiday_overrides" name="schedule_data[holiday_overrides]" value="<?php echo esc_attr($holidayOverridesJson); ?>">
+         <input type="hidden" id="holiday_overrides" name="schedule_data[holiday_overrides]" value="<?php echo esc_attr(
+             $holidayOverridesJson,
+         ); ?>">
 
          <!-- Hidden inputs to store schedule data in the format expected by the backend -->
          <div id="schedule-data-container">
@@ -763,7 +1004,10 @@ if (isset($data['class_data']) && $data['class_data']):
 
       <!-- Event Dates Section -->
       <div class="mb-4">
-         <?php echo section_header('Event Dates', 'Add key event dates (does not affect training hours or schedule).'); ?>
+         <?php echo section_header(
+             "Event Dates",
+             "Add key event dates (does not affect training hours or schedule).",
+         ); ?>
 
          <!-- Container for event rows -->
          <div id="event-dates-container"></div>
@@ -816,7 +1060,9 @@ if (isset($data['class_data']) && $data['class_data']):
       </div>
 
       <!-- Hidden input to pass existing event dates to JavaScript -->
-      <input type="hidden" id="existing-event-dates" value="<?php echo esc_attr(json_encode($data['class_data']['event_dates'] ?? [])); ?>">
+      <input type="hidden" id="existing-event-dates" value="<?php echo esc_attr(
+          json_encode($data["class_data"]["event_dates"] ?? []),
+      ); ?>">
 
          <!-- Schedule Statistics Section -->
          <!-- Schedule Statistics Toggle Button -->
@@ -928,26 +1174,34 @@ if (isset($data['class_data']) && $data['class_data']):
       <?php if (!empty($scheduleData)): ?>
       window.existingScheduleData = <?php echo json_encode($scheduleData); ?>;
       <?php endif; ?>
-      
-      <?php
-      // Load public holidays data for the schedule form
-      try {
+
+      <?php // Load public holidays data for the schedule form
+
+try {
           $publicHolidaysController = \WeCoza\Classes\Controllers\PublicHolidaysController::getInstance();
-          $currentYear = wp_date('Y');
+          $currentYear = wp_date("Y");
           $nextYear = $currentYear + 1;
-          
+
           // Get holidays for current and next year to cover class schedules
-          $currentYearHolidays = $publicHolidaysController->getHolidaysForCalendar($currentYear);
-          $nextYearHolidays = $publicHolidaysController->getHolidaysForCalendar($nextYear);
+          $currentYearHolidays = $publicHolidaysController->getHolidaysForCalendar(
+              $currentYear,
+          );
+          $nextYearHolidays = $publicHolidaysController->getHolidaysForCalendar(
+              $nextYear,
+          );
           $allHolidays = array_merge($currentYearHolidays, $nextYearHolidays);
-          
+
           // Make holidays available to JavaScript
-          echo "window.wecozaPublicHolidays = " . json_encode(['events' => $allHolidays]) . ";\n";
+          echo "window.wecozaPublicHolidays = " .
+              json_encode(["events" => $allHolidays]) .
+              ";\n";
       } catch (\Exception $e) {
-          error_log('WeCoza Classes Plugin: Error loading public holidays in update form: ' . $e->getMessage());
+          error_log(
+              "WeCoza Classes Plugin: Error loading public holidays in update form: " .
+                  $e->getMessage(),
+          );
           echo "window.wecozaPublicHolidays = { events: [] }; // Error loading holidays\n";
-      }
-      ?>
+      } ?>
       </script>
 
       <!-- Class Date History Section -->
@@ -992,7 +1246,7 @@ if (isset($data['class_data']) && $data['class_data']):
       <?php echo section_divider(); ?>
 
       <!-- ===== Section: Funding & Exam Details ===== -->
-      <?php echo section_header('Funding & Exam Details'); ?>
+      <?php echo section_header("Funding & Exam Details"); ?>
       <div class="row">
          <!-- SETA Funded -->
          <div class="col-md-2 mb-3">
@@ -1000,8 +1254,14 @@ if (isset($data['class_data']) && $data['class_data']):
                <label for="seta_funded" class="form-label">SETA Funded? <span class="text-danger">*</span></label>
                <select id="seta_funded" name="seta_funded" class="form-select form-select-sm" required>
                   <option value="">Select</option>
-                  <?php foreach ($data['yes_no_options'] as $option): ?>
-                     <option value="<?php echo $option['id']; ?>" <?php echo (isset($data['class_data']['seta_funded']) && $data['class_data']['seta_funded'] == $option['id']) ? 'selected' : ''; ?>><?php echo $option['name']; ?></option>
+                  <?php foreach ($data["yes_no_options"] as $option): ?>
+                     <option value="<?php echo $option[
+                         "id"
+                     ]; ?>" <?php echo isset(
+    $data["class_data"]["seta_funded"],
+) && $data["class_data"]["seta_funded"] == $option["id"]
+    ? "selected"
+    : ""; ?>><?php echo $option["name"]; ?></option>
                   <?php endforeach; ?>
                </select>
                <div class="invalid-feedback">Please select if the class is SETA funded.</div>
@@ -1011,16 +1271,23 @@ if (isset($data['class_data']) && $data['class_data']):
 
          <!-- SETA (conditionally displayed) -->
          <?php
-         $setaFunded = $data['class_data']['seta_funded'] ?? '';
-         $showSeta = ($setaFunded == 'Yes' || $setaFunded == '1');
+         $setaFunded = $data["class_data"]["seta_funded"] ?? "";
+         $showSeta = $setaFunded == "Yes" || $setaFunded == "1";
          ?>
-         <div class="col-md-2 mb-3" id="seta_container" style="display: <?php echo $showSeta ? 'block' : 'none'; ?>;">
+         <div class="col-md-2 mb-3" id="seta_container" style="display: <?php echo $showSeta
+             ? "block"
+             : "none"; ?>;">
             <div class="mb-3">
                <label for="seta_id" class="form-label">SETA <span class="text-danger">*</span></label>
                <select id="seta_id" name="seta_id" class="form-select form-select-sm">
                   <option value="">Select</option>
-                  <?php foreach ($data['setas'] as $seta): ?>
-                     <option value="<?php echo $seta['id']; ?>" <?php echo (isset($data['class_data']['seta']) && $data['class_data']['seta'] == $seta['id']) ? 'selected' : ''; ?>><?php echo $seta['name']; ?></option>
+                  <?php foreach ($data["setas"] as $seta): ?>
+                     <option value="<?php echo $seta[
+                         "id"
+                     ]; ?>" <?php echo isset($data["class_data"]["seta"]) &&
+$data["class_data"]["seta"] == $seta["id"]
+    ? "selected"
+    : ""; ?>><?php echo $seta["name"]; ?></option>
                   <?php endforeach; ?>
                </select>
                <div class="invalid-feedback">Please select a SETA.</div>
@@ -1034,8 +1301,14 @@ if (isset($data['class_data']) && $data['class_data']):
                <label for="exam_class" class="form-label">Exam Class <span class="text-danger">*</span></label>
                <select id="exam_class" name="exam_class" class="form-select form-select-sm" required>
                   <option value="">Select</option>
-                  <?php foreach ($data['yes_no_options'] as $option): ?>
-                     <option value="<?php echo $option['id']; ?>" <?php echo (isset($data['class_data']['exam_class']) && $data['class_data']['exam_class'] == $option['id']) ? 'selected' : ''; ?>><?php echo $option['name']; ?></option>
+                  <?php foreach ($data["yes_no_options"] as $option): ?>
+                     <option value="<?php echo $option[
+                         "id"
+                     ]; ?>" <?php echo isset(
+    $data["class_data"]["exam_class"],
+) && $data["class_data"]["exam_class"] == $option["id"]
+    ? "selected"
+    : ""; ?>><?php echo $option["name"]; ?></option>
                   <?php endforeach; ?>
                </select>
                <div class="invalid-feedback">Please select if this is an exam class.</div>
@@ -1045,14 +1318,18 @@ if (isset($data['class_data']) && $data['class_data']):
 
          <!-- Exam Type (conditionally displayed) -->
          <?php
-         $examClass = $data['class_data']['exam_class'] ?? '';
-         $showExamType = ($examClass == 'Yes' || $examClass == '1');
+         $examClass = $data["class_data"]["exam_class"] ?? "";
+         $showExamType = $examClass == "Yes" || $examClass == "1";
          ?>
          <div class="col-md-2 mb-3">
-            <div id="exam_type_container" style="display: <?php echo $showExamType ? 'block' : 'none'; ?>;">
+            <div id="exam_type_container" style="display: <?php echo $showExamType
+                ? "block"
+                : "none"; ?>;">
                <div class="mb-3">
                   <label for="exam_type" class="form-label">Exam Type</label>
-                  <input type="text" id="exam_type" name="exam_type" class="form-control form-control-sm" placeholder="Enter exam type" value="<?php echo esc_attr($data['class_data']['exam_type'] ?? ''); ?>">
+                  <input type="text" id="exam_type" name="exam_type" class="form-control form-control-sm" placeholder="Enter exam type" value="<?php echo esc_attr(
+                      $data["class_data"]["exam_type"] ?? "",
+                  ); ?>">
                   <div class="invalid-feedback">Please provide the exam type.</div>
                   <div class="valid-feedback">Looks good!</div>
                </div>
@@ -1061,7 +1338,10 @@ if (isset($data['class_data']) && $data['class_data']):
       </div>
 
       <!-- Class Learners Section -->
-      <?php echo section_header('Class Learners <span class="text-danger">*</span>', 'Select learners for this class and manage their status.'); ?>
+      <?php echo section_header(
+          'Class Learners <span class="text-danger">*</span>',
+          "Select learners for this class and manage their status.",
+      ); ?>
       <div class="row mb-4">
          <!-- Learner Selection Table -->
          <div class="col-12">
@@ -1082,7 +1362,9 @@ if (isset($data['class_data']) && $data['class_data']):
                            </div>
                         </div>
                         <div class="col-auto">
-                           <small class="text-muted">Showing <span id="learner-showing-count">0</span> of <span id="learner-total-count"><?php echo count($data['learners']); ?></span> learners</small>
+                           <small class="text-muted">Showing <span id="learner-showing-count">0</span> of <span id="learner-total-count"><?php echo count(
+                               $data["learners"],
+                           ); ?></span> learners</small>
                         </div>
                      </div>
                   </div>
@@ -1138,52 +1420,109 @@ if (isset($data['class_data']) && $data['class_data']):
                               </tr>
                            </thead>
                            <tbody id="learner-selection-tbody">
-                              <?php foreach ($data['learners'] as $index => $learner): ?>
-                              <tr class="learner-row" data-learner-id="<?php echo $learner['id']; ?>" data-index="<?php echo $index; ?>">
+                              <?php foreach (
+                                  $data["learners"]
+                                  as $index => $learner
+                              ): ?>
+                              <tr class="learner-row" data-learner-id="<?php echo $learner[
+                                  "id"
+                              ]; ?>" data-index="<?php echo $index; ?>">
                                  <td class="py-2 align-middle text-center">
                                     <div class="form-check ps-5" style="min-height: auto;">
-                                       <input class="form-check-input learner-checkbox" type="checkbox" 
-                                              value="<?php echo $learner['id']; ?>" 
-                                              data-learner-data="<?php echo htmlspecialchars(json_encode($learner), ENT_QUOTES, 'UTF-8'); ?>">
+                                       <input class="form-check-input learner-checkbox" type="checkbox"
+                                              value="<?php echo $learner[
+                                                  "id"
+                                              ]; ?>"
+                                              data-learner-data="<?php echo htmlspecialchars(
+                                                  json_encode($learner),
+                                                  ENT_QUOTES,
+                                                  "UTF-8",
+                                              ); ?>">
                                     </div>
                                  </td>
-                                 <td class="py-2 align-middle"><?php echo esc_html($learner['first_name']); ?></td>
-                                 <td class="py-2 align-middle"><?php echo esc_html($learner['second_name'] ?? ''); ?></td>
-                                 <td class="py-2 align-middle"><?php echo esc_html($learner['initials'] ?? ''); ?></td>
-                                 <td class="py-2 align-middle fw-medium"><?php echo esc_html($learner['surname']); ?></td>
+                                 <td class="py-2 align-middle"><?php echo esc_html(
+                                     $learner["first_name"],
+                                 ); ?></td>
+                                 <td class="py-2 align-middle"><?php echo esc_html(
+                                     $learner["second_name"] ?? "",
+                                 ); ?></td>
+                                 <td class="py-2 align-middle"><?php echo esc_html(
+                                     $learner["initials"] ?? "",
+                                 ); ?></td>
+                                 <td class="py-2 align-middle fw-medium"><?php echo esc_html(
+                                     $learner["surname"],
+                                 ); ?></td>
                                  <td class="py-2 align-middle">
-                                    <?php if ($learner['id_type'] === 'sa_id' && !empty($learner['id_number'])): ?>
+                                    <?php if (
+                                        $learner["id_type"] === "sa_id" &&
+                                        !empty($learner["id_number"])
+                                    ): ?>
                                     <span class="badge fs-10 badge-phoenix badge-phoenix-primary">
-                                       <?php echo esc_html($learner['id_number']); ?>
+                                       <?php echo esc_html(
+                                           $learner["id_number"],
+                                       ); ?>
                                     </span>
-                                    <?php elseif ($learner['id_type'] === 'passport' && !empty($learner['id_number'])): ?>
+                                    <?php elseif (
+                                        $learner["id_type"] === "passport" &&
+                                        !empty($learner["id_number"])
+                                    ): ?>
                                     <span class="badge fs-10 badge-phoenix badge-phoenix-warning">
-                                       <?php echo esc_html($learner['id_number']); ?>
+                                       <?php echo esc_html(
+                                           $learner["id_number"],
+                                       ); ?>
                                     </span>
                                     <?php else: ?>
                                     <span class="text-muted">-</span>
                                     <?php endif; ?>
                                  </td>
-                                 <td class="py-2 align-middle"><?php echo esc_html($learner['city_town_name'] ?? '-'); ?></td>
-                                 <td class="py-2 align-middle"><?php echo esc_html($learner['province_region_name'] ?? '-'); ?></td>
-                                 <td class="py-2 align-middle"><?php echo esc_html($learner['postal_code'] ?? '-'); ?></td>
+                                 <td class="py-2 align-middle"><?php echo esc_html(
+                                     $learner["city_town_name"] ?? "-",
+                                 ); ?></td>
+                                 <td class="py-2 align-middle"><?php echo esc_html(
+                                     $learner["province_region_name"] ?? "-",
+                                 ); ?></td>
+                                 <td class="py-2 align-middle"><?php echo esc_html(
+                                     $learner["postal_code"] ?? "-",
+                                 ); ?></td>
                                  <td class="py-2 align-middle">
-                                    <?php if (!empty($learner['last_course_name'])): ?>
-                                    <span class="badge fs-10 badge-phoenix badge-phoenix-success" title="Completed: <?php echo esc_attr($learner['last_completion_date'] ?? ''); ?>">
-                                       <?php echo esc_html($learner['last_course_name']); ?>
+                                    <?php if (
+                                        !empty($learner["last_course_name"])
+                                    ): ?>
+                                    <span class="badge fs-10 badge-phoenix badge-phoenix-success" title="Completed: <?php echo esc_attr(
+                                        $learner["last_completion_date"] ?? "",
+                                    ); ?>">
+                                       <?php echo esc_html(
+                                           $learner["last_course_name"],
+                                       ); ?>
                                     </span>
                                     <?php else: ?>
                                     <span class="text-muted">-</span>
                                     <?php endif; ?>
                                  </td>
                                  <td class="py-2 align-middle text-center">
-                                    <?php if (!empty($learner['has_active_lp'])): ?>
+                                    <?php if (
+                                        !empty($learner["has_active_lp"])
+                                    ): ?>
                                     <span class="badge fs-10 badge-phoenix badge-phoenix-warning"
-                                          title="<?php echo esc_attr($learner['active_course_name'] . ' (' . $learner['active_progress_pct'] . '% complete)'); ?>"
+                                          title="<?php echo esc_attr(
+                                              $learner["active_course_name"] .
+                                                  " (" .
+                                                  $learner[
+                                                      "active_progress_pct"
+                                                  ] .
+                                                  "% complete)",
+                                          ); ?>"
                                           data-active-lp="true"
-                                          data-active-course="<?php echo esc_attr($learner['active_course_name']); ?>"
-                                          data-active-progress="<?php echo esc_attr($learner['active_progress_pct']); ?>"
-                                          data-active-class-code="<?php echo esc_attr($learner['active_class_code'] ?? ''); ?>">
+                                          data-active-course="<?php echo esc_attr(
+                                              $learner["active_course_name"],
+                                          ); ?>"
+                                          data-active-progress="<?php echo esc_attr(
+                                              $learner["active_progress_pct"],
+                                          ); ?>"
+                                          data-active-class-code="<?php echo esc_attr(
+                                              $learner["active_class_code"] ??
+                                                  "",
+                                          ); ?>">
                                        <i class="bi bi-exclamation-triangle"></i>
                                     </span>
                                     <?php else: ?>
@@ -1200,9 +1539,14 @@ if (isset($data['class_data']) && $data['class_data']):
                <!-- Pagination -->
                <div id="classes-pagination" class="d-flex justify-content-between mt-3">
                   <span class="d-none d-sm-inline-block ms-5" data-list-info="data-list-info">
-                     <span id="pagination-start">1</span> to <span id="pagination-end"><?php echo min(10, count($data['learners'])); ?></span>
+                     <span id="pagination-start">1</span> to <span id="pagination-end"><?php echo min(
+                         10,
+                         count($data["learners"]),
+                     ); ?></span>
                      <span class="text-body-tertiary"> Items of </span>
-                     <span id="pagination-total"><?php echo count($data['learners']); ?></span>
+                     <span id="pagination-total"><?php echo count(
+                         $data["learners"],
+                     ); ?></span>
                   </span>
                   <nav aria-label="Classes pagination">
                      <ul class="pagination pagination-sm" id="learner-pagination-ul">
@@ -1261,7 +1605,10 @@ if (isset($data['class_data']) && $data['class_data']):
       <div class="row mt-5" id="exam_learners_container" style="display: none;">
       <?php echo section_divider(); ?>
          <div class="col-12">
-            <?php echo section_header('Select Learners Taking Exams', 'Not all learners in an exam class necessarily take exams. Select which learners will take exams.'); ?>
+            <?php echo section_header(
+                "Select Learners Taking Exams",
+                "Not all learners in an exam class necessarily take exams. Select which learners will take exams.",
+            ); ?>
 
             <div class="row mb-4 col-md-9">
                <!-- Exam Learner Selection -->
@@ -1269,7 +1616,7 @@ if (isset($data['class_data']) && $data['class_data']):
                   <!-- For multi-select with floating labels, we need a custom approach -->
                   <div class="mb-3">
                      <label for="add_learner" class="form-label">Select Learners</label>
-                     <select id="exam_learner_select" name="exam_learner_select[]" class="form-select form-select-sm" aria-label="Exam learner selection" multiple>
+                     <select id="exam_learner_select" name="exam_learner_select[]" class="form-select form-select-sm" aria-label="Exam learner selection" multiple size="8">
                         <!-- Will be populated dynamically with class learners -->
                      </select>
                      <div class="form-text">Select learners who will take exams in this class. Hold Ctrl/Cmd to select multiple.</div>
@@ -1282,19 +1629,17 @@ if (isset($data['class_data']) && $data['class_data']):
                </div>
 
                <!-- Exam Learners List -->
-               <div class="col-md-8">
+               <div class="col-md-4">
                   <div class="mb-3">
                      <div class="form-label mb-2">Learners Taking Exams</div>
                      <div id="exam-learners-list" class="card-body card px-5">
                         <div class="alert alert-subtle-primary" id="no-exam-learners-message">
-                           No exam learners added yet. Select learners from the list and click "Add Selected Exam Learners".
+                           Click "Add Selected Exam Learners".
                         </div>
                         <table class="table table-sm fs-9 d-none" id="exam-learners-table">
                            <thead>
                               <tr>
                                  <th>Learner</th>
-                                 <th>Level/Module</th>
-                                 <th>Status</th>
                                  <th>Actions</th>
                               </tr>
                            </thead>
@@ -1313,15 +1658,18 @@ if (isset($data['class_data']) && $data['class_data']):
       </div>
 
       <?php echo section_divider(); ?>
-      <?php echo section_header('Class Notes & QA', 'Add operational notes and quality assurance information for this class.'); ?>
+      <?php echo section_header(
+          "Class Notes & QA",
+          "Add operational notes and quality assurance information for this class.",
+      ); ?>
       <!-- Class Notes & QA Information -->
          <div class="card-body card px-5">
-         
+
          <!-- Add Note Button -->
          <div class="col-md-12">
-           
+
             <!-- Class Notes Container for dynamic display -->
-            <div id="class-notes-container" class="mt-3">               
+            <div id="class-notes-container" class="mt-3">
                <!-- Notes Search and Filter Controls -->
                <div class="notes-controls mb-3">
                   <div class="row g-2 mb-2">
@@ -1358,7 +1706,7 @@ if (isset($data['class_data']) && $data['class_data']):
                            <span class="badge ms-2 badge badge-phoenix badge-phoenix-warning " id="notes-count">0 notes</span>
                         </div>
                      </div>
-                     
+
                      <!-- Priority Legend -->
                      <div class="col-md-8 mt-4">
                         <div class="priority-legend d-flex align-items-center gap-3 flex-wrap">
@@ -1379,7 +1727,7 @@ if (isset($data['class_data']) && $data['class_data']):
                      </div>
                   </div>
                </div>
-               
+
                <!-- Notes Display Area -->
                <div id="notes-display-area">
                   <!-- Loading state -->
@@ -1389,18 +1737,18 @@ if (isset($data['class_data']) && $data['class_data']):
                      </div>
                      <div class="mt-2 text-muted small">Loading notes...</div>
                   </div>
-                  
+
                   <!-- Empty state -->
                   <div id="notes-empty" class="text-center py-4 text-muted">
                      <i class="bi bi-sticky-note display-4 mb-2"></i>
                      <p class="mb-0">No notes yet. Click "Add New Class Note" to get started.</p>
                   </div>
-                  
+
                   <!-- Notes list -->
                   <div id="notes-list">
                      <!-- Notes will be dynamically loaded here -->
                   </div>
-                  
+
                   <!-- No results state -->
                   <div id="notes-no-results" class="text-center py-3 text-muted d-none">
                      <i class="bi bi-search display-4 mb-2"></i>
@@ -1410,7 +1758,7 @@ if (isset($data['class_data']) && $data['class_data']):
                      </button>
                   </div>
                </div>
-               
+
                <!-- Notes Pagination -->
                <nav aria-label="Notes pagination" id="notes-pagination-nav" class="mt-3" style="display: none;">
                   <ul class="pagination pagination-sm justify-content-center" id="notes-pagination">
@@ -1483,20 +1831,28 @@ if (isset($data['class_data']) && $data['class_data']):
          <button type="button" class="btn btn-subtle-primary btn-sm" id="add-qa-visit-btn">
          <i class="bi bi-plus-circle me-1"></i> Add QA Visit Date
          </button>
-         
+
          <!-- Hidden fields for QA visits data -->
          <input type="hidden" id="qa_visits_data" name="qa_visits_data" value="">
-         <input type="hidden" id="qa_latest_documents" name="qa_latest_documents" value="<?php echo esc_attr(json_encode($data['class_data']['qa_reports'] ?? [])); ?>">
+         <input type="hidden" id="qa_latest_documents" name="qa_latest_documents" value="<?php echo esc_attr(
+             json_encode($data["class_data"]["qa_reports"] ?? []),
+         ); ?>">
       </div>
 
       <?php echo section_divider(); ?>
 
       <!-- ===== Section: Assignments & Dates ===== -->
-      <?php echo section_header('Assignments & Dates', 'Assign staff to this class and track agent changes.'); ?>
+      <?php echo section_header(
+          "Assignments & Dates",
+          "Assign staff to this class and track agent changes.",
+      ); ?>
 
       <!-- Class Agents Section -->
       <div class="mb-4">
-         <?php echo section_header('Class Agents', 'Assign the primary class agent. If the agent changes during the class, the history will be tracked.'); ?>
+         <?php echo section_header(
+             "Class Agents",
+             "Assign the primary class agent. If the agent changes during the class, the history will be tracked.",
+         ); ?>
 
          <!-- Initial Class Agent -->
          <div class="row mb-3">
@@ -1505,8 +1861,14 @@ if (isset($data['class_data']) && $data['class_data']):
                   <label for="initial_class_agent" class="form-label">Initial Class Agent <span class="text-danger">*</span></label>
                   <select id="initial_class_agent" name="initial_class_agent" class="form-select form-select-sm" required>
                      <option value="">Select</option>
-                     <?php foreach ($data['agents'] as $agent): ?>
-                        <option value="<?php echo $agent['id']; ?>" <?php echo (isset($data['class_data']['initial_class_agent']) && $data['class_data']['initial_class_agent'] == $agent['id']) ? 'selected' : ''; ?>><?php echo $agent['name']; ?></option>
+                     <?php foreach ($data["agents"] as $agent): ?>
+                        <option value="<?php echo $agent[
+                            "id"
+                        ]; ?>" <?php echo isset(
+    $data["class_data"]["initial_class_agent"],
+) && $data["class_data"]["initial_class_agent"] == $agent["id"]
+    ? "selected"
+    : ""; ?>><?php echo $agent["name"]; ?></option>
                      <?php endforeach; ?>
                   </select>
                   <div class="invalid-feedback">Please select the initial class agent.</div>
@@ -1516,7 +1878,9 @@ if (isset($data['class_data']) && $data['class_data']):
             <div class="col-md-3 mb-3">
                <div class="mb-3">
                   <label for="initial_agent_start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
-                  <input type="date" id="initial_agent_start_date" name="initial_agent_start_date" class="form-control form-control-sm" placeholder="YYYY-MM-DD" value="<?php echo esc_attr($data['class_data']['initial_agent_start_date'] ?? ''); ?>" required>
+                  <input type="date" id="initial_agent_start_date" name="initial_agent_start_date" class="form-control form-control-sm" placeholder="YYYY-MM-DD" value="<?php echo esc_attr(
+                      $data["class_data"]["initial_agent_start_date"] ?? "",
+                  ); ?>" required>
                   <div class="invalid-feedback">Please select the start date.</div>
                   <div class="valid-feedback">Looks good!</div>
                </div>
@@ -1524,8 +1888,11 @@ if (isset($data['class_data']) && $data['class_data']):
          </div>
 
          <!-- Agent Replacements -->
-         <?php echo section_header('Agent Replacements', 'If the class agent changes, add the replacement agent and takeover date here.'); ?>
-         
+         <?php echo section_header(
+             "Agent Replacements",
+             "If the class agent changes, add the replacement agent and takeover date here.",
+         ); ?>
+
          <!-- IMPORTANT: This section handles AGENT REPLACEMENTS (agent_replacements table)
               NOT backup agents (backup_agent_ids field) - these are separate systems:
               - Agent Replacements: Track actual agent changes during class delivery
@@ -1542,8 +1909,10 @@ if (isset($data['class_data']) && $data['class_data']):
                   <label class="form-label">Replacement Agent</label>
                   <select name="replacement_agent_ids[]" class="form-select form-select-sm replacement-agent-select">
                      <option value="">Select</option>
-                     <?php foreach ($data['agents'] as $agent): ?>
-                        <option value="<?php echo $agent['id']; ?>"><?php echo $agent['name']; ?></option>
+                     <?php foreach ($data["agents"] as $agent): ?>
+                        <option value="<?php echo $agent[
+                            "id"
+                        ]; ?>"><?php echo $agent["name"]; ?></option>
                      <?php endforeach; ?>
                   </select>
                   <div class="invalid-feedback">Please select a replacement agent.</div>
@@ -1582,8 +1951,14 @@ if (isset($data['class_data']) && $data['class_data']):
                <label for="project_supervisor" class="form-label">Project Supervisor <span class="text-danger">*</span></label>
                <select id="project_supervisor" name="project_supervisor" class="form-select form-select-sm" required>
                   <option value="">Select</option>
-                  <?php foreach ($data['supervisors'] as $supervisor): ?>
-                     <option value="<?php echo $supervisor['id']; ?>" <?php echo (isset($data['class_data']['project_supervisor_id']) && $data['class_data']['project_supervisor_id'] == $supervisor['id']) ? 'selected' : ''; ?>><?php echo $supervisor['name']; ?></option>
+                  <?php foreach ($data["supervisors"] as $supervisor): ?>
+                     <option value="<?php echo $supervisor[
+                         "id"
+                     ]; ?>" <?php echo isset(
+    $data["class_data"]["project_supervisor_id"],
+) && $data["class_data"]["project_supervisor_id"] == $supervisor["id"]
+    ? "selected"
+    : ""; ?>><?php echo $supervisor["name"]; ?></option>
                   <?php endforeach; ?>
                </select>
                <div class="invalid-feedback">Please select a project supervisor.</div>
@@ -1594,7 +1969,10 @@ if (isset($data['class_data']) && $data['class_data']):
 
       <!-- Backup Agents Section -->
       <div class="mt-4 mb-4">
-         <?php echo section_header('Backup Agents', 'Add backup agents with specific dates when they will be available.'); ?>
+         <?php echo section_header(
+             "Backup Agents",
+             "Add backup agents with specific dates when they will be available.",
+         ); ?>
 
          <!-- Container for all backup agent rows -->
          <div id="backup-agents-container"></div>
@@ -1607,8 +1985,10 @@ if (isset($data['class_data']) && $data['class_data']):
                   <label class="form-label">Backup Agent</label>
                   <select name="backup_agent_ids[]" class="form-select form-select-sm backup-agent-select">
                      <option value="">Select</option>
-                     <?php foreach ($data['agents'] as $agent): ?>
-                        <option value="<?php echo $agent['id']; ?>"><?php echo $agent['name']; ?></option>
+                     <?php foreach ($data["agents"] as $agent): ?>
+                        <option value="<?php echo $agent[
+                            "id"
+                        ]; ?>"><?php echo $agent["name"]; ?></option>
                      <?php endforeach; ?>
                   </select>
                   <div class="invalid-feedback">Please select a backup agent.</div>
@@ -1644,7 +2024,12 @@ if (isset($data['class_data']) && $data['class_data']):
       <!-- Submit Button - Mode-aware text -->
       <div class="row mt-4">
          <div class="col-md-3">
-               <?php echo button('<i class="bi bi-save me-1"></i> Update Class', 'submit', 'primary', ['class' => 'btn-lg']); ?>
+               <?php echo button(
+                   '<i class="bi bi-save me-1"></i> Update Class',
+                   "submit",
+                   "primary",
+                   ["class" => "btn-lg"],
+               ); ?>
          </div>
       </div>
    </div>
@@ -1659,19 +2044,19 @@ if (isset($data['class_data']) && $data['class_data']):
 function validateUpdateForm() {
     const form = document.getElementById('classes-form');
     const errors = [];
-    
+
     // Validate learners (at least one required)
     const learnersData = document.getElementById('class_learners_data');
     if (!learnersData || !learnersData.value || learnersData.value === '[]') {
         errors.push('At least one learner must be added to the class.');
     }
-    
+
     // Validate schedule data
     const schedulePattern = document.getElementById('schedule_pattern');
     if (schedulePattern && !schedulePattern.value) {
         errors.push('Schedule pattern is required.');
     }
-    
+
     // Validate exam learners if exam class
     const examClass = document.getElementById('exam_class');
     const examLearners = document.getElementById('exam_learners');
@@ -1680,7 +2065,7 @@ function validateUpdateForm() {
             errors.push('Exam classes must have at least one exam learner selected.');
         }
     }
-    
+
     // Validate date consistency
     const startDate = document.getElementById('class_start_date');
     const scheduleStartDate = document.getElementById('schedule_start_date');
@@ -1689,16 +2074,16 @@ function validateUpdateForm() {
             errors.push('Schedule start date cannot be before class original start date.');
         }
     }
-    
+
     // Show errors if any
     if (errors.length > 0) {
         const messageContainer = document.getElementById('form-messages');
-        messageContainer.innerHTML = '<div class="alert alert-subtle-danger" role="alert"><strong>Validation Errors:</strong><ul>' + 
+        messageContainer.innerHTML = '<div class="alert alert-subtle-danger" role="alert"><strong>Validation Errors:</strong><ul>' +
             errors.map(e => '<li>' + e + '</li>').join('') + '</ul></div>';
         messageContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return false;
     }
-    
+
     return true;
 }
 
@@ -1719,10 +2104,20 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Pre-populate form data for update mode -->
 <script>
 // Debug: Log the class data
-<?php if (isset($_GET['debug']) && $_GET['debug'] === '1' && isset($data['class_data'])): ?>
-console.log('Update Form - Class Data:', <?php echo json_encode($data['class_data']); ?>);
-console.log('Update Form - Available Class Types:', <?php echo json_encode($data['class_types']); ?>);
-console.log('Update Form - Available Yes/No Options:', <?php echo json_encode($data['yes_no_options']); ?>);
+<?php if (
+    isset($_GET["debug"]) &&
+    $_GET["debug"] === "1" &&
+    isset($data["class_data"])
+): ?>
+console.log('Update Form - Class Data:', <?php echo json_encode(
+    $data["class_data"],
+); ?>);
+console.log('Update Form - Available Class Types:', <?php echo json_encode(
+    $data["class_types"],
+); ?>);
+console.log('Update Form - Available Yes/No Options:', <?php echo json_encode(
+    $data["yes_no_options"],
+); ?>);
 <?php endif; ?>
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1734,20 +2129,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-    
+
     // Make formatFileSize available globally for the QA visits code
     window.formatFileSize = formatFileSize;
-    
+
     // Debug logging for update form
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     console.log('Update Form Debug Mode Active');
     <?php endif; ?>
-    
+
     // Note: Read-only fields have been replaced with a visual display table
     // The form now only contains editable fields
     // Pre-populate learner data if available
-    <?php if (isset($data['class_data']['learner_ids']) && !empty($data['class_data']['learner_ids'])): ?>
-    const learnerData = <?php echo json_encode($data['class_data']['learner_ids']); ?>;
+    <?php if (
+        isset($data["class_data"]["learner_ids"]) &&
+        !empty($data["class_data"]["learner_ids"])
+    ): ?>
+    const learnerData = <?php echo json_encode(
+        $data["class_data"]["learner_ids"],
+    ); ?>;
 
     // Pre-populate the class learners table
     if (learnerData && Array.isArray(learnerData)) {
@@ -1806,8 +2206,13 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 
     // Pre-populate exam learners data if available
-    <?php if (isset($data['class_data']['exam_learners']) && !empty($data['class_data']['exam_learners'])): ?>
-    const examLearnerData = <?php echo json_encode($data['class_data']['exam_learners']); ?>;
+    <?php if (
+        isset($data["class_data"]["exam_learners"]) &&
+        !empty($data["class_data"]["exam_learners"])
+    ): ?>
+    const examLearnerData = <?php echo json_encode(
+        $data["class_data"]["exam_learners"],
+    ); ?>;
 
     // Pre-populate the exam learners table
     if (examLearnerData && Array.isArray(examLearnerData)) {
@@ -1863,18 +2268,18 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 
     // Pre-populate QA visits if available
-    <?php 
-    $qaVisitsData = $data['class_data']['qa_visits'] ?? [];
-    $qaVisits = $qaVisitsData['visits'] ?? [];
+    <?php
+    $qaVisitsData = $data["class_data"]["qa_visits"] ?? [];
+    $qaVisits = $qaVisitsData["visits"] ?? [];
     $hasQaVisits = is_array($qaVisits) && !empty($qaVisits);
-    
-    // Debug logging
-    // error_log('WeCoza Classes Plugin View: QA Visits: ' . print_r($qaVisits, true));
-    // error_log('WeCoza Classes Plugin View: Has QA Visits: ' . ($hasQaVisits ? 'true' : 'false'));
-    ?>
+
+// Debug logging
+// error_log('WeCoza Classes Plugin View: QA Visits: ' . print_r($qaVisits, true));
+// error_log('WeCoza Classes Plugin View: Has QA Visits: ' . ($hasQaVisits ? 'true' : 'false'));
+?>
     <?php if ($hasQaVisits): ?>
     const qaVisits = <?php echo json_encode($qaVisits); ?>;
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     console.log('QA Visits from PHP:', qaVisits);
     <?php endif; ?>
 
@@ -1897,38 +2302,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 const typeSelect = newRow.querySelector('select[name="qa_visit_types[]"]');
                 const officerInput = newRow.querySelector('input[name="qa_officers[]"]');
                 const fileInput = newRow.querySelector('input[name="qa_reports[]"]');
-                
+
                 if (dateInput) {
                     dateInput.value = visit.date.trim();
                 }
-                
+
                 // Populate QA visit type
                 if (typeSelect && visit.type) {
                     typeSelect.value = visit.type;
                 }
-                
+
                 // Populate QA officer
                 if (officerInput && visit.officer) {
                     officerInput.value = visit.officer;
                 }
-                
+
                 // If we have document metadata, populate file information
                 if (visit.document) {
                     const documentInfo = visit.document;
-                    
+
                     // Show existing filename with download link
                     if (documentInfo.filename && fileInput) {
                         // Create a display element for existing file
                         const fileDisplay = document.createElement('div');
                         fileDisplay.className = 'qa-report-file-display';
-                        
+
                         // Store document info as data attribute
                         fileDisplay.setAttribute('data-document-info', JSON.stringify(documentInfo));
-                        
+
                         // Create file info container
                         const fileInfo = document.createElement('div');
                         fileInfo.className = 'file-info';
-                        
+
                         // Create download link
                         const downloadLink = document.createElement('a');
                         downloadLink.href = documentInfo.file_url || '#';
@@ -1936,12 +2341,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         downloadLink.className = 'text-decoration-none';
                         downloadLink.innerHTML = '<i class="bi bi-file-pdf text-danger"></i> ' + documentInfo.filename;
                         downloadLink.title = 'Click to download/view';
-                        
+
                         // Add download attribute for better UX
                         downloadLink.download = documentInfo.filename;
-                        
+
                         fileInfo.appendChild(downloadLink);
-                        
+
                         // Add file size if available
                         if (documentInfo.file_size) {
                             const sizeSpan = document.createElement('span');
@@ -1949,9 +2354,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             sizeSpan.textContent = '(' + formatFileSize(documentInfo.file_size) + ')';
                             fileInfo.appendChild(sizeSpan);
                         }
-                        
+
                         fileDisplay.appendChild(fileInfo);
-                        
+
                         // Create replace button
                         const replaceBtn = document.createElement('button');
                         replaceBtn.type = 'button';
@@ -1960,24 +2365,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         replaceBtn.onclick = function() {
                             // Remove the old file display and metadata
                             fileDisplay.remove();
-                            
+
                             // Show the file input
                             fileInput.style.display = 'block';
-                            
+
                             // Clear the file input value to ensure change event fires
                             fileInput.value = '';
-                            
+
                             // Update the metadata to remove this document
                             if (typeof updateQALatestDocuments === 'function') {
                                 updateQALatestDocuments();
                             }
                         };
-                        
+
                         fileDisplay.appendChild(replaceBtn);
-                        
+
                         // Hide the file input
                         fileInput.style.display = 'none';
-                        
+
                         // Add the file display after the file input
                         fileInput.parentNode.appendChild(fileDisplay);
                     }
@@ -1985,35 +2390,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 qaVisitsContainer.appendChild(newRow);
             });
-            
-            <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+
+            <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
             console.log('Successfully populated ' + qaVisits.length + ' QA visits');
             <?php endif; ?>
-            
+
             // Initialize QA visits data after populating
             if (typeof updateQAVisitsData === 'function') {
                 updateQAVisitsData();
             }
         } else {
-            <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+            <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
             console.error('Could not find QA visits container or template');
             <?php endif; ?>
         }
     } else {
-        <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+        <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
         console.log('No QA visits to populate or invalid data format');
         <?php endif; ?>
     }
     <?php else: ?>
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     console.log('No QA visits available in class data');
-    console.log('QA Visits Data from data:', <?php echo json_encode($data['class_data']['qa_visits'] ?? 'NOT_SET'); ?>);
+    console.log('QA Visits Data from data:', <?php echo json_encode(
+        $data["class_data"]["qa_visits"] ?? "NOT_SET",
+    ); ?>);
     <?php endif; ?>
     <?php endif; ?>
 
     // Pre-populate stop/restart dates if available
-    <?php if (isset($data['class_data']['stop_restart_dates']) && !empty($data['class_data']['stop_restart_dates'])): ?>
-    const stopRestartDates = <?php echo json_encode($data['class_data']['stop_restart_dates']); ?>;
+    <?php if (
+        isset($data["class_data"]["stop_restart_dates"]) &&
+        !empty($data["class_data"]["stop_restart_dates"])
+    ): ?>
+    const stopRestartDates = <?php echo json_encode(
+        $data["class_data"]["stop_restart_dates"],
+    ); ?>;
 
     if (stopRestartDates && Array.isArray(stopRestartDates)) {
         const dateHistoryContainer = document.getElementById('date-history-container');
@@ -2042,9 +2454,14 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 
     // Pre-populate backup agent data if available
-    <?php if (isset($data['class_data']['backup_agent_ids']) && !empty($data['class_data']['backup_agent_ids'])): ?>
-    const backupAgentData = <?php echo json_encode($data['class_data']['backup_agent_ids']); ?>;
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (
+        isset($data["class_data"]["backup_agent_ids"]) &&
+        !empty($data["class_data"]["backup_agent_ids"])
+    ): ?>
+    const backupAgentData = <?php echo json_encode(
+        $data["class_data"]["backup_agent_ids"],
+    ); ?>;
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     console.log('Backup Agent Data:', backupAgentData);
     <?php endif; ?>
 
@@ -2080,7 +2497,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const agentSelect = newRow.querySelector('select[name="backup_agent_ids[]"]');
                 const dateInput = newRow.querySelector('input[name="backup_agent_dates[]"]');
-                
+
                 if (agentSelect && agentData.agent_id) {
                     agentSelect.value = agentData.agent_id;
                 }
@@ -2095,45 +2512,50 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 
     // Pre-populate exception dates if available (with duplicate prevention)
-    <?php if (isset($data['class_data']['schedule_data']['exceptionDates']) && !empty($data['class_data']['schedule_data']['exceptionDates'])): ?>
-    const exceptionDates = <?php echo json_encode($data['class_data']['schedule_data']['exceptionDates']); ?>;
-    
+    <?php if (
+        isset($data["class_data"]["schedule_data"]["exceptionDates"]) &&
+        !empty($data["class_data"]["schedule_data"]["exceptionDates"])
+    ): ?>
+    const exceptionDates = <?php echo json_encode(
+        $data["class_data"]["schedule_data"]["exceptionDates"],
+    ); ?>;
+
     if (exceptionDates && Array.isArray(exceptionDates)) {
         const exceptionDatesContainer = document.getElementById('exception-dates-container');
         const exceptionDateTemplate = document.getElementById('exception-date-row-template');
-        
+
         // Check if container is already populated to prevent duplication
         if (exceptionDatesContainer && exceptionDateTemplate && exceptionDatesContainer.getAttribute('data-populated') === 'false') {
-            <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+            <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
             console.log('PHP: Populating exception dates:', exceptionDates);
             <?php endif; ?>
-            
+
             exceptionDates.forEach(function(exception) {
                 const newRow = exceptionDateTemplate.cloneNode(true);
                 newRow.classList.remove('d-none');
                 newRow.removeAttribute('id');
-                
+
                 const dateInput = newRow.querySelector('input[name="exception_dates[]"]');
                 const reasonSelect = newRow.querySelector('select[name="exception_reasons[]"]');
-                
+
                 if (dateInput && exception.date) {
                     dateInput.value = exception.date;
                 }
                 if (reasonSelect && exception.reason) {
                     reasonSelect.value = exception.reason;
                 }
-                
+
                 exceptionDatesContainer.appendChild(newRow);
             });
-            
+
             // Mark container as populated by PHP
             exceptionDatesContainer.setAttribute('data-populated', 'php');
-            
-            <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+
+            <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
             console.log('PHP: Exception dates container marked as populated');
             <?php endif; ?>
         } else {
-            <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+            <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
             console.log('PHP: Skipping exception dates population - already populated or no container');
             <?php endif; ?>
         }
@@ -2141,16 +2563,21 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 
     // Pre-populate agent replacements if available
-    <?php if (isset($data['class_data']['agent_replacements']) && !empty($data['class_data']['agent_replacements'])): ?>
-    const agentReplacementData = <?php echo json_encode($data['class_data']['agent_replacements']); ?>;
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (
+        isset($data["class_data"]["agent_replacements"]) &&
+        !empty($data["class_data"]["agent_replacements"])
+    ): ?>
+    const agentReplacementData = <?php echo json_encode(
+        $data["class_data"]["agent_replacements"],
+    ); ?>;
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     console.log('Agent Replacement Data:', agentReplacementData);
     <?php endif; ?>
-    
+
     if (agentReplacementData) {
         const agentReplacementsContainer = document.getElementById('agent-replacements-container');
         const agentReplacementTemplate = document.getElementById('agent-replacement-row-template');
-        
+
         if (agentReplacementsContainer && agentReplacementTemplate) {
             // Normalize data structure
             let normalizedData = [];
@@ -2170,17 +2597,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newRow = agentReplacementTemplate.cloneNode(true);
                 newRow.classList.remove('d-none');
                 newRow.removeAttribute('id');
-                
+
                 const agentSelect = newRow.querySelector('select[name="replacement_agent_ids[]"]');
                 const dateInput = newRow.querySelector('input[name="replacement_agent_dates[]"]');
-                
+
                 if (agentSelect && replacement.agent_id) {
                     agentSelect.value = replacement.agent_id;
                 }
                 if (dateInput && replacement.date) {
                     dateInput.value = replacement.date;
                 }
-                
+
                 agentReplacementsContainer.appendChild(newRow);
             });
         }
@@ -2188,38 +2615,45 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 
     // Initialize schedule data for update mode
-    <?php if (isset($data['class_data']['schedule_data']) && !empty($data['class_data']['schedule_data'])): ?>
+    <?php if (
+        isset($data["class_data"]["schedule_data"]) &&
+        !empty($data["class_data"]["schedule_data"])
+    ): ?>
     <?php
     // Use the normalized schedule data that was processed above
     // This ensures we pass the cleaned data with proper camelCase format
     $scheduleDataForJS = $scheduleData; // This now contains the normalized perDayTimes
-    
+
     // Additional debug to verify the data structure
-    if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+    if (isset($_GET["debug"]) && $_GET["debug"] === "1") {
         echo "<script>\n";
         echo "console.log('=== Schedule Data for JS (PHP side) ===');\n";
-        echo "console.log('scheduleDataForJS:', " . json_encode($scheduleDataForJS) . ");\n";
+        echo "console.log('scheduleDataForJS:', " .
+            json_encode($scheduleDataForJS) .
+            ");\n";
         echo "</script>\n";
     }
     ?>
     // Pass schedule data to the scheduling JavaScript
-    window.existingScheduleData = <?php echo json_encode($scheduleDataForJS); ?>;
-    
+    window.existingScheduleData = <?php echo json_encode(
+        $scheduleDataForJS,
+    ); ?>;
+
     // Enhanced debug logging
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     console.log('=== Schedule Data Debug ===');
     console.log('Raw Schedule Data from PHP:', window.existingScheduleData);
     console.log('Schedule Pattern:', window.existingScheduleData?.pattern);
     console.log('Selected Days:', window.existingScheduleData?.selectedDays);
     console.log('Time Data:', window.existingScheduleData?.timeData);
     console.log('Per Day Times:', window.existingScheduleData?.timeData?.perDayTimes);
-    
+
     // Check if perDayTimes exists and has data
     if (window.existingScheduleData?.timeData?.perDayTimes) {
         const perDayTimes = window.existingScheduleData.timeData.perDayTimes;
         console.log('Per Day Times Object:', perDayTimes);
         console.log('Per Day Times Keys:', Object.keys(perDayTimes));
-        
+
         // Log each day's time data
         Object.entries(perDayTimes).forEach(([day, times]) => {
             console.log(`${day} times:`, times);
@@ -2229,16 +2663,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     console.log('=== End Schedule Data Debug ===');
     <?php endif; ?>
-    
+
     // Ensure the schedule form JavaScript can access this data
     if (window.existingScheduleData && typeof window.loadExistingScheduleData === 'function') {
         // The schedule form JS will handle loading this data
         console.log('Schedule data is ready for loading');
     }
     <?php endif; ?>
-    
+
     // Log form submission data in debug mode
-    <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
     const form = document.getElementById('classes-form');
     if (form) {
         form.addEventListener('submit', function(e) {
@@ -2250,34 +2684,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     <?php endif; ?>
-    
+
     // Initialize class subject dropdown with proper type data
-    <?php if (isset($data['class_data']['class_type']) && !empty($data['class_data']['class_type'])): ?>
+    <?php if (
+        isset($data["class_data"]["class_type"]) &&
+        !empty($data["class_data"]["class_type"])
+    ): ?>
     // Since class type is now fixed, we need to load subjects for that type
     setTimeout(function() {
-        const classType = '<?php echo esc_js($data['class_data']['class_type']); ?>';
-        const currentSubject = '<?php echo esc_js($data['class_data']['class_subject'] ?? ''); ?>';
+        const classType = '<?php echo esc_js(
+            $data["class_data"]["class_type"],
+        ); ?>';
+        const currentSubject = '<?php echo esc_js(
+            $data["class_data"]["class_subject"] ?? "",
+        ); ?>';
         const classSubjectSelect = document.getElementById('class_subject');
-        
+
         if (classSubjectSelect && classType) {
             // Trigger loading of subjects for the fixed class type
             // This should be handled by the existing class-capture.js script
             // We just need to ensure the current subject remains selected
-            
+
             // If the subject dropdown needs to be populated based on class type
             // the existing JavaScript should handle it
         }
     }, 100);
     <?php endif; ?>
-    
+
     // Load holiday overrides from hidden field for recalculation
     const holidayOverridesInput = document.getElementById('holiday_overrides');
     if (holidayOverridesInput && holidayOverridesInput.value) {
         try {
             const overrides = JSON.parse(holidayOverridesInput.value);
             window.holidayOverrides = overrides || {};
-            
-            <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+
+            <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
             console.log('Loaded holiday overrides for recalculation:', window.holidayOverrides);
             <?php endif; ?>
         } catch (e) {
@@ -2285,7 +2726,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.holidayOverrides = {};
         }
     }
-    
+
     // ===== Agent Replacement Functionality =====
     // Handle adding new agent replacement rows
     const addAgentReplacementBtn = document.getElementById('add-agent-replacement-btn');
@@ -2293,60 +2734,60 @@ document.addEventListener('DOMContentLoaded', function() {
         addAgentReplacementBtn.addEventListener('click', function() {
             const agentReplacementsContainer = document.getElementById('agent-replacements-container');
             const agentReplacementTemplate = document.getElementById('agent-replacement-row-template');
-            
+
             if (agentReplacementsContainer && agentReplacementTemplate) {
                 // Clone the template row
                 const newRow = agentReplacementTemplate.cloneNode(true);
-                
+
                 // Remove the template class and ID
                 newRow.classList.remove('d-none');
                 newRow.removeAttribute('id');
-                
+
                 // Generate unique IDs for form elements to avoid conflicts
                 const timestamp = Date.now();
                 const agentSelect = newRow.querySelector('select[name="replacement_agent_ids[]"]');
                 const dateInput = newRow.querySelector('input[name="replacement_agent_dates[]"]');
                 const removeBtn = newRow.querySelector('.remove-agent-replacement-btn');
-                
+
                 if (agentSelect) {
                     agentSelect.id = `replacement_agent_${timestamp}`;
                     agentSelect.value = ''; // Reset selection
                 }
-                
+
                 if (dateInput) {
                     dateInput.id = `replacement_date_${timestamp}`;
                     dateInput.value = ''; // Reset value
                 }
-                
+
                 // Add remove functionality to the new row
                 if (removeBtn) {
                     removeBtn.addEventListener('click', function() {
                         newRow.remove();
                     });
                 }
-                
+
                 // Append the new row to the container
                 agentReplacementsContainer.appendChild(newRow);
-                
+
                 // Focus on the first input (agent select)
                 if (agentSelect) {
                     agentSelect.focus();
                 }
-                
-                <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+
+                <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
                 console.log('Added new agent replacement row');
                 <?php endif; ?>
             }
         });
     }
-    
+
     // Handle remove buttons for existing agent replacement rows
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('remove-agent-replacement-btn')) {
             const row = e.target.closest('.agent-replacement-row');
             if (row && !row.id.includes('template')) {
                 row.remove();
-                <?php if (isset($_GET['debug']) && $_GET['debug'] === '1'): ?>
+                <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
                 console.log('Removed agent replacement row');
                 <?php endif; ?>
             }
@@ -2369,8 +2810,10 @@ document.addEventListener('DOMContentLoaded', function() {
          <form id="class-note-form" novalidate>
             <div class="modal-body">
                <input type="hidden" id="note_id" name="note_id" value="">
-               <input type="hidden" id="note_class_id" name="class_id" value="<?php echo esc_attr($data['class_data']['class_id'] ?? ''); ?>">
-               
+               <input type="hidden" id="note_class_id" name="class_id" value="<?php echo esc_attr(
+                   $data["class_data"]["class_id"] ?? "",
+               ); ?>">
+
                <!-- Class Notes -->
                <div class="mb-3">
                   <label for="class_notes" class="form-label">Class Notes <span class="text-danger">*</span></label>
@@ -2384,8 +2827,10 @@ document.addEventListener('DOMContentLoaded', function() {
                      aria-label="Class notes selection"
                   >
                      <option value="" disabled>Select class notes that apply (hold Ctrl/Cmd for multiple)</option>
-                     <?php foreach ($data['class_notes_options'] as $option): ?>
-                        <option value="<?= $option['id'] ?>"><?= $option['name'] ?></option>
+                     <?php foreach ($data["class_notes_options"] as $option): ?>
+                        <option value="<?= $option["id"] ?>"><?= $option[
+    "name"
+] ?></option>
                      <?php endforeach; ?>
                   </select>
                   <div class="form-text">
@@ -2394,7 +2839,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   <div class="invalid-feedback">Please select at least one note.</div>
                   <div class="valid-feedback">Looks good!</div>
                </div>
-               
+
                <!-- Note Content -->
                <div class="mb-3">
                   <label for="note_content" class="form-label">Note Content <span class="text-danger">*</span></label>
@@ -2404,7 +2849,7 @@ document.addEventListener('DOMContentLoaded', function() {
                      <span id="note-char-count">0</span> characters
                   </small>
                </div>
-               
+
                <!-- Priority -->
                <div class="mb-3">
                   <label for="note_priority" class="form-label">Priority <span class="text-danger">*</span></label>
@@ -2416,8 +2861,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   </select>
                   <div class="invalid-feedback">Please select a priority level.</div>
                </div>
-               
-               
+
+
                <!-- File Attachments -->
                <div class="mb-3">
                   <label class="form-label">Attachments</label>
@@ -2444,12 +2889,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                      </div>
                   </div>
-                  
+
                   <!-- File list -->
                   <div id="note-file-list" class="mt-3 fs-9">
                      <!-- Files will be listed here -->
                   </div>
-                  
+
                   <!-- Upload progress -->
                   <div id="upload-progress" class="mt-2 d-none">
                      <div class="progress">
@@ -2460,13 +2905,13 @@ document.addEventListener('DOMContentLoaded', function() {
                      </small>
                   </div>
                </div>
-               
+
                <!-- Auto-save indicator -->
                <div id="auto-save-indicator" class="text-muted small d-none">
                   <i class="bi bi-cloud-check me-1"></i>
                   <span id="auto-save-message">Draft saved</span>
                </div>
-               
+
                <!-- Error messages -->
                <div id="note-error-alert" class="alert alert-subtle-danger d-none" role="alert">
                   <i class="bi bi-exclamation-triangle-fill me-1"></i>
@@ -2500,28 +2945,30 @@ document.addEventListener('DOMContentLoaded', function() {
          </div>
          <form id="qa-form" novalidate>
             <div class="modal-body">
-               <input type="hidden" id="qa_class_id" name="class_id" value="<?php echo esc_attr($data['class_data']['class_id'] ?? ''); ?>">
-               
+               <input type="hidden" id="qa_class_id" name="class_id" value="<?php echo esc_attr(
+                   $data["class_data"]["class_id"] ?? "",
+               ); ?>">
+
                <!-- Question -->
                <div class="mb-3">
                   <label for="qa_question" class="form-label">Question <span class="text-danger">*</span></label>
                   <textarea class="form-control form-control-sm" id="qa_question" name="question" rows="3" required></textarea>
                   <div class="invalid-feedback">Please provide a question.</div>
                </div>
-               
+
                <!-- Question Context -->
                <div class="mb-3">
                   <label for="qa_context" class="form-label">Context/Details</label>
                   <textarea class="form-control form-control-sm" id="qa_context" name="context" rows="2" placeholder="Additional context or details (optional)"></textarea>
                </div>
-               
+
                <!-- Attachment -->
                <div class="mb-3">
                   <label for="qa_attachment" class="form-label">Attachment (optional)</label>
                   <input type="file" class="form-control form-control-sm" id="qa_attachment" name="attachment" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                   <small class="form-text text-muted">Max file size: 5MB</small>
                </div>
-               
+
                <!-- Error messages -->
                <div id="qa-error-alert" class="alert alert-subtle-danger d-none" role="alert">
                   <i class="bi bi-exclamation-triangle-fill me-1"></i>

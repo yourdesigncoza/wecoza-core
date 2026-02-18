@@ -652,6 +652,11 @@ class LearnerSelectionTable {
         // Update learners data field
         this.updateLearnersDataField();
 
+        // Remove from exam learners if they were selected for exams (cascading removal)
+        if (typeof window.classes_remove_exam_learner === 'function') {
+            window.classes_remove_exam_learner(learnerId);
+        }
+
         // Refresh the selection table to update visual states
         this.render();
     }

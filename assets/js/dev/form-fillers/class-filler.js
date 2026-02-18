@@ -245,10 +245,12 @@
 
             // ── 8. Event Dates ─────────────────────────────────────
             // Always add a Deliveries event (form warns if missing)
+            // Always add Exams + Mock Exams since exam_class is set to Yes
             var eventsToAdd = [
                 { type: 'Deliveries', daysOffset: 0 },
                 { type: 'QA Visit', daysOffset: Gen.randomInt(30, 60) },
-                { type: Gen.pickRandom(['Exams', 'Mock Exams', 'Collections']), daysOffset: Gen.randomInt(60, 120) }
+                { type: 'Mock Exams', daysOffset: Gen.randomInt(60, 90) },
+                { type: 'Exams', daysOffset: Gen.randomInt(20, 30) }
             ];
 
             for (var e = 0; e < eventsToAdd.length; e++) {
@@ -456,7 +458,7 @@
             await Gen.delay(800);
 
             console.log('[DevToolbar] ✓ Class form filled comprehensively');
-            console.log('[DevToolbar] Sections: Client, Type/Subject, Schedule, Times, Exceptions(2), Stop/Restart(2), Events(3), SETA, Exam, Agents, Learners(varied), Exam Learners(varied)');
+            console.log('[DevToolbar] Sections: Client, Type/Subject, Schedule, Times, Exceptions(2), Stop/Restart(2), Events(4), SETA, Exam, Agents, Learners(varied), Exam Learners(varied)');
         }
     };
 })();

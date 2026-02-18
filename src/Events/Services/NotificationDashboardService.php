@@ -33,6 +33,12 @@ final class NotificationDashboardService
     /** @var array<int, string> In-request cache for resolved agent names */
     private array $agentNameCache = [];
 
+    /** @var array<int, string> In-request cache for resolved client names */
+    private array $clientNameCache = [];
+
+    /** @var array<int, array{name:string,address:string}> In-request cache for resolved site info */
+    private array $siteInfoCache = [];
+
     public function __construct(?ClassEventRepository $repository = null)
     {
         $this->repository = $repository ?? new ClassEventRepository();
@@ -196,6 +202,12 @@ final class NotificationDashboardService
         $agentId = (int) ($newRow['class_agent'] ?? 0);
         $agentName = $agentId > 0 ? $this->resolveAgentName($agentId) : '';
 
+        $clientId = (int) ($newRow['client_id'] ?? 0);
+        $clientName = $clientId > 0 ? $this->resolveClientName($clientId) : '';
+
+        $siteId = (int) ($newRow['site_id'] ?? 0);
+        $siteInfo = $siteId > 0 ? $this->resolveSiteInfo($siteId) : ['name' => '', 'address' => ''];
+
         return [
             'event_id' => $event->eventId,
             'event_type' => $event->eventType->value,
@@ -211,6 +223,11 @@ final class NotificationDashboardService
             'class_name' => $this->formatClassName($newRow),
             'agent_id' => $agentId,
             'agent_name' => $agentName,
+            'client_id' => $clientId,
+            'client_name' => $clientName,
+            'site_id' => $siteId,
+            'site_name' => $siteInfo['name'],
+            'site_address' => $siteInfo['address'],
 
             'has_ai_summary' => $aiSummary !== null,
             'ai_summary_text' => $aiSummary['summary'] ?? '',
@@ -284,6 +301,73 @@ final class NotificationDashboardService
 
         $this->agentNameCache[$agentId] = $resolved;
 
+        return $resolved;
+    }
+
+    /**
+     * Resolve client name from clients table by client ID
+     *
+     * @param int $clientId Client ID from event_data->new_row->client_id
+     * @return string Client name or empty string on failure
+     */
+    private function resolveClientName(int $clientId): string
+    {
+        if (isset($this->clientNameCache[$clientId])) {
+            return $this->clientNameCache[$clientId];
+        }
+
+        $resolved = '';
+        try {
+            $pdo = wecoza_db()->getPdo();
+            $stmt = $pdo->prepare('SELECT client_name FROM public.clients WHERE client_id = :id LIMIT 1');
+            if ($stmt && $stmt->execute([':id' => $clientId])) {
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row !== false && $row !== null) {
+                    $resolved = trim((string) ($row['client_name'] ?? ''));
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail — name is non-critical
+        }
+
+        $this->clientNameCache[$clientId] = $resolved;
+        return $resolved;
+    }
+
+    /**
+     * Resolve site name and address from sites/locations tables
+     *
+     * @param int $siteId Site ID from event_data->new_row->site_id
+     * @return array{name:string,address:string}
+     */
+    private function resolveSiteInfo(int $siteId): array
+    {
+        if (isset($this->siteInfoCache[$siteId])) {
+            return $this->siteInfoCache[$siteId];
+        }
+
+        $resolved = ['name' => '', 'address' => ''];
+        try {
+            $pdo = wecoza_db()->getPdo();
+            $stmt = $pdo->prepare(
+                'SELECT s.site_name, l.street_address
+                 FROM public.sites s
+                 LEFT JOIN public.locations l ON s.place_id = l.location_id
+                 WHERE s.site_id = :id
+                 LIMIT 1'
+            );
+            if ($stmt && $stmt->execute([':id' => $siteId])) {
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row !== false && $row !== null) {
+                    $resolved['name'] = trim((string) ($row['site_name'] ?? ''));
+                    $resolved['address'] = trim((string) ($row['street_address'] ?? ''));
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail — name is non-critical
+        }
+
+        $this->siteInfoCache[$siteId] = $resolved;
         return $resolved;
     }
 

@@ -82,25 +82,47 @@ class FormDataProcessor
             // Array fields
             $processed['class_notes'] = isset($data['class_notes']) && is_array($data['class_notes']) ? array_map([self::class, 'sanitizeText'], $data['class_notes']) : [];
 
-            // Process learner IDs
-            $learnerIds = [];
+            // Process learners - store full objects [{id, name, level, status}, ...]
+            $learnerObjects = [];
             if (isset($data['class_learners_data']) && is_string($data['class_learners_data']) && !empty($data['class_learners_data'])) {
                 $learnerData = json_decode(stripslashes($data['class_learners_data']), true);
                 if (is_array($learnerData)) {
-                    $learnerIds = array_filter(array_map('intval', $learnerData), fn($id) => $id > 0);
+                    foreach ($learnerData as $item) {
+                        if (is_array($item) && !empty($item['id'])) {
+                            $learnerObjects[] = [
+                                'id'     => intval($item['id']),
+                                'name'   => sanitize_text_field($item['name'] ?? ''),
+                                'status' => sanitize_text_field($item['status'] ?? 'CIC - Currently in Class'),
+                                'level'  => sanitize_text_field($item['level'] ?? ''),
+                            ];
+                        } elseif (is_numeric($item) && intval($item) > 0) {
+                            $learnerObjects[] = ['id' => intval($item), 'name' => '', 'status' => '', 'level' => ''];
+                        }
+                    }
                 }
             }
-            $processed['learner_ids'] = $learnerIds;
+            $processed['learner_ids'] = $learnerObjects;
 
-            // Process exam learners
-            $examLearners = [];
+            // Process exam learners - store full objects [{id, name, level, status}, ...]
+            $examLearnerObjects = [];
             if (isset($data['exam_learners']) && is_string($data['exam_learners']) && !empty($data['exam_learners'])) {
                 $examLearnerData = json_decode(stripslashes($data['exam_learners']), true);
                 if (is_array($examLearnerData)) {
-                    $examLearners = array_filter(array_map('intval', $examLearnerData), fn($id) => $id > 0);
+                    foreach ($examLearnerData as $item) {
+                        if (is_array($item) && !empty($item['id'])) {
+                            $examLearnerObjects[] = [
+                                'id'     => intval($item['id']),
+                                'name'   => sanitize_text_field($item['name'] ?? ''),
+                                'status' => sanitize_text_field($item['status'] ?? 'CIC - Currently in Class'),
+                                'level'  => sanitize_text_field($item['level'] ?? ''),
+                            ];
+                        } elseif (is_numeric($item) && intval($item) > 0) {
+                            $examLearnerObjects[] = ['id' => intval($item), 'name' => '', 'status' => '', 'level' => ''];
+                        }
+                    }
                 }
             }
-            $processed['exam_learners'] = $examLearners;
+            $processed['exam_learners'] = $examLearnerObjects;
 
             // Process backup agents
             $backupAgents = [];

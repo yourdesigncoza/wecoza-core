@@ -16,6 +16,7 @@ use function error_log;
 use function remove_action;
 use function sprintf;
 use function wp_mail;
+use function wecoza_db;
 use function wecoza_log;
 
 /**
@@ -89,7 +90,11 @@ final class NotificationEmailer
             'event_type' => $event->eventType->value,
         ];
 
+        // Resolve IDs to display names for email templates
+        $resolvedNames = $this->resolveDisplayNames($newRow, $event->eventData);
+
         $mailData = $this->presenter->present([
+            'event_type' => $event->eventType->value,
             'operation' => $operation,
             'row' => $rowContext,
             'recipient' => $recipient,
@@ -98,6 +103,8 @@ final class NotificationEmailer
             'diff' => $diff,
             'summary' => $summaryRecord,
             'email_context' => $emailContext,
+            'event_data' => $event->eventData,
+            'resolved_names' => $resolvedNames,
         ]);
 
         $subject = $mailData['subject'];
@@ -150,5 +157,73 @@ final class NotificationEmailer
             'CLASS_DELETE', 'LEARNER_REMOVE' => 'DELETE',
             default => 'UPDATE',
         };
+    }
+
+    /**
+     * Resolve IDs in class data to human-readable names.
+     *
+     * @param array $newRow Class data (may contain client_id, class_agent, site_id)
+     * @param array $eventData Raw event data (for learner events with class_id)
+     * @return array{client_name:string,agent_name:string,site_name:string,site_address:string}
+     */
+    private function resolveDisplayNames(array $newRow, array $eventData): array
+    {
+        $resolved = [
+            'client_name'  => '',
+            'agent_name'   => '',
+            'site_name'    => '',
+            'site_address' => '',
+        ];
+
+        try {
+            $db = wecoza_db();
+            if ($db === null) {
+                return $resolved;
+            }
+
+            // Resolve client name
+            $clientId = (int) ($newRow['client_id'] ?? 0);
+            if ($clientId > 0) {
+                $stmt = $db->prepare('SELECT client_name FROM public.clients WHERE client_id = :id LIMIT 1');
+                $stmt->execute([':id' => $clientId]);
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row) {
+                    $resolved['client_name'] = (string) $row['client_name'];
+                }
+            }
+
+            // Resolve agent name
+            $agentId = (int) ($newRow['class_agent'] ?? 0);
+            if ($agentId > 0) {
+                $stmt = $db->prepare('SELECT first_name, surname FROM public.agents WHERE agent_id = :id LIMIT 1');
+                $stmt->execute([':id' => $agentId]);
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row) {
+                    $resolved['agent_name'] = trim(($row['first_name'] ?? '') . ' ' . ($row['surname'] ?? ''));
+                }
+            }
+
+            // Resolve site name and address
+            $siteId = (int) ($newRow['site_id'] ?? 0);
+            if ($siteId > 0) {
+                $stmt = $db->prepare(
+                    'SELECT s.site_name, l.street_address
+                     FROM public.sites s
+                     LEFT JOIN public.locations l ON s.place_id = l.location_id
+                     WHERE s.site_id = :id
+                     LIMIT 1'
+                );
+                $stmt->execute([':id' => $siteId]);
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row) {
+                    $resolved['site_name']    = (string) ($row['site_name'] ?? '');
+                    $resolved['site_address'] = (string) ($row['street_address'] ?? '');
+                }
+            }
+        } catch (\Throwable $e) {
+            wecoza_log('NotificationEmailer: Failed to resolve display names - ' . $e->getMessage(), 'warning');
+        }
+
+        return $resolved;
     }
 }

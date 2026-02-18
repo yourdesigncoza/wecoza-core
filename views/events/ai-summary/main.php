@@ -16,7 +16,7 @@
 /** @var string $nonce */
 echo $assets;
 ?>
-<div class="wecoza-ai-summary-wrapper" data-instance-id="<?php echo esc_attr($instanceId); ?>" data-nonce="<?php echo esc_attr($nonce); ?>">
+<div class="wecoza-ai-summary-wrapper" data-instance-id="<?php echo esc_attr($instanceId); ?>" data-nonce="<?php echo esc_attr($nonce); ?>" data-ajax-url="<?php echo esc_attr(admin_url('admin-ajax.php')); ?>">
     <div class="card shadow-none my-3 mt-5">
         <div class="card-header p-3 border-bottom">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">

@@ -95,19 +95,19 @@ $controller = $controller ?? null;
                     <div class="scrollbar">
                       <div class="row g-0 flex-nowrap">
                         <div class="col-auto border-end pe-4">
-                          <h6 class="text-body-tertiary">Total Classes : <?php echo $total_count; ?> <div class="badge badge-phoenix fs-10 badge-phoenix-success">+ 11</div></h6>
+                          <h6 class="text-body-tertiary">Total Classes : <?php echo $total_count; ?></h6>
                         </div>
                         <div class="col-auto px-4 border-end">
                           <h6 class="text-body-tertiary">Active Classes : <?php echo $active_count; ?></h6>
                         </div>
                         <div class="col-auto px-4 border-end">
-                          <h6 class="text-body-tertiary">SETA Funded : <?php echo count(array_filter($classes, function($c) { return $c['seta_funded']; })); ?> <div class="badge badge-phoenix fs-10 badge-phoenix-success">+ 5</div></h6>
+                          <h6 class="text-body-tertiary">SETA Funded : <?php echo count(array_filter($classes, function($c) { return $c['seta_funded']; })); ?></h6>
                         </div>
                         <div class="col-auto px-4 border-end">
-                          <h6 class="text-body-tertiary">Exam Classes : <?php echo count(array_filter($classes, function($c) { return $c['exam_class']; })); ?> <div class="badge badge-phoenix fs-10 badge-phoenix-danger">+ 8</div></h6>
+                          <h6 class="text-body-tertiary">Exam Classes : <?php echo count(array_filter($classes, function($c) { return $c['exam_class']; })); ?></h6>
                         </div>
                         <div class="col-auto px-4">
-                          <h6 class="text-body-tertiary">Unique Clients : <?php echo count(array_unique(array_column($classes, 'client_id'))); ?> <div class="badge badge-phoenix fs-10 badge-phoenix-success">- 2</div></h6>
+                          <h6 class="text-body-tertiary">Unique Clients : <?php echo count(array_unique(array_column($classes, 'client_id'))); ?></h6>
                         </div>
                       </div>
                     </div>

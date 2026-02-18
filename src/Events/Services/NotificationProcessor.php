@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use WeCoza\Events\Enums\EventType;
 use WeCoza\Events\Repositories\ClassEventRepository;
 use WeCoza\Events\Support\OpenAIConfig;
 
@@ -80,9 +81,18 @@ final class NotificationProcessor
                     continue;
                 }
 
-                // Check AI eligibility to decide which job to schedule
-                $eligibility = $this->openAIConfig->assessEligibility($eventId);
-                $needsAI = $eligibility['eligible'] !== false;
+                // Skip AI for event types that don't benefit from enrichment
+                $skipAI = $event->eventType === EventType::CLASS_INSERT
+                       || $event->eventType === EventType::LEARNER_ADD
+                       || $event->eventType === EventType::LEARNER_REMOVE
+                       || $event->eventType === EventType::CLASS_DELETE;
+
+                // Check AI eligibility for remaining event types
+                $needsAI = false;
+                if (!$skipAI) {
+                    $eligibility = $this->openAIConfig->assessEligibility($eventId);
+                    $needsAI = $eligibility['eligible'] !== false;
+                }
 
                 if ($needsAI) {
                     // Update status to 'enriching' before scheduling
