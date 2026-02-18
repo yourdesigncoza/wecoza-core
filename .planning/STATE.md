@@ -68,7 +68,7 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: v5.0 roadmap created — 4 phases (44-47), 17 requirements mapped
-Resume file: N/A
+Stopped at: Phase 44 context gathered
+Resume file: .planning/phases/44-ajax-wiring-class-integration/44-CONTEXT.md
 
 **Next action:** `/gsd:plan-phase 44`
