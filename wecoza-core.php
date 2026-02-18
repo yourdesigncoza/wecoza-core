@@ -602,6 +602,10 @@ add_action(
         require_once WECOZA_CORE_PATH .
             "src/Learners/Shortcodes/learners-update-shortcode.php";
 
+        // Progression admin shortcode [wecoza_progression_admin]
+        require_once WECOZA_CORE_PATH .
+            "src/Learners/Shortcodes/progression-admin-shortcode.php";
+
         /*
     |--------------------------------------------------------------------------
     | Load Learners AJAX Handlers
