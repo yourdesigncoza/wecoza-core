@@ -183,7 +183,7 @@ Plans:
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
 | 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
 | 44 | 3/3 | Complete    | 2026-02-18 | - |
-| 45 | 3/3 | Complete   | 2026-02-18 | - |
+| 45 | 3/3 | Complete    | 2026-02-18 | - |
 | 46 | v5.0 | TBD | Not started | - |
 | 47 | v5.0 | TBD | Not started | - |
 
