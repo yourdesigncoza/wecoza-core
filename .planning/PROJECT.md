@@ -65,7 +65,18 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(None — define next milestone with `/gsd:new-milestone`)
+#### Current Milestone: v5.0 Learner Progression
+
+**Goal:** Complete learner LP progression tracking integration, admin management, reporting dashboard with timeline/stats, regulatory exports, and portfolio upload wiring.
+
+**Target features:**
+- Wire up existing progression AJAX handlers (mark complete, portfolio upload, data fetch)
+- Admin progression management panel with filters
+- Learner progression report page with timeline visualization (WEC-165)
+- Regulatory reporting for Umalusi/DHET (monthly progressions, compliance export)
+- Phoenix-styled summary cards (no Chart.js)
+- PDF/Excel export for compliance reports
+- LearnerRepository progression context methods (collision detection, last-course)
 
 ### Out of Scope
 
@@ -186,4 +197,4 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | PHP-to-JS config via embedded JSON script tag | Avoids per-shortcode wp_localize_script registration | ✓ v4.1 |
 
 ---
-*Last updated: 2026-02-17 after v4.1 milestone*
+*Last updated: 2026-02-18 after v5.0 milestone started*

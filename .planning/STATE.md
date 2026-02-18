@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-17)
+See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** Planning next milestone
+**Current focus:** v5.0 Learner Progression — defining requirements
 
 ## Current Position
 
-Phase: 43 — Placement Levels Shortcode
-Plan: 01 COMPLETE — auto-increment DDL applied, end-to-end CRUD verified
-Status: Phase 43 COMPLETE — Milestone v4.1 Lookup Table Admin shipped
-Last activity: 2026-02-17 - Executed 43-01: DDL fix + human verified all 7 CRUD steps
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-18 — Milestone v5.0 started
 
-Progress: 43 phases complete across 8 milestones (89 plans executed), milestone v4.1 Lookup Table Admin shipped
+Progress: 43 phases complete across 8 milestones (89 plans executed)
 
 ## Milestone History
 
@@ -96,7 +96,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Quick Task 13 — notification card enhancements (agent name, badge swap, delete) — awaiting human verify of all 3 features
+Stopped at: Milestone v5.0 Learner Progression — defining requirements
 Resume file: N/A
 
-**Next action:** Verify notification cards at [wecoza_insert_update_ai_summary] shortcode page, then run schema/add-soft-delete-to-class-events.sql DDL
+**Next action:** Define requirements, create roadmap, then `/gsd:plan-phase [N]`
