@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Shortcodes;
 
-use WeCoza\Learners\Controllers\LearnerController;
+use WeCoza\Learners\Services\LearnerService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -30,9 +30,9 @@ function wecoza_single_learner_display_shortcode() {
         return '<div class="alert alert-subtle-warning">No learner ID provided.</div>';
     }
 
-    // Use LearnerController for MVC pattern
-    $controller = new LearnerController();
-    $learnerModel = $controller->getLearner($learner_id);
+    // Use LearnerService for business logic
+    $service = new LearnerService();
+    $learnerModel = $service->getLearner($learner_id);
 
     if (!$learnerModel) {
         return '<div class="alert alert-subtle-danger">Learner not found.</div>';

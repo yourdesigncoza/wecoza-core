@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Shortcodes;
 
-use WeCoza\Learners\Controllers\LearnerController;
+use WeCoza\Learners\Services\LearnerService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -31,8 +31,8 @@ function wecoza_learners_form_shortcode($atts) {
     $error_messages = [];
     $data = [];
 
-    // Use LearnerController for MVC pattern
-    $controller = new LearnerController();
+    // Use LearnerService for business logic
+    $service = new LearnerService();
 
     // Check if form is submitted
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wecoza_learners_form_nonce']) && wp_verify_nonce($_POST['wecoza_learners_form_nonce'], 'submit_learners_form')) {
@@ -93,8 +93,8 @@ function wecoza_learners_form_shortcode($atts) {
             $data['numeracy_level'] = !empty($data['numeracy_level']) ? $data['numeracy_level'] : null;
             $data['communication_level'] = !empty($data['communication_level']) ? $data['communication_level'] : null;
 
-            // Create learner using LearnerController (MVC pattern)
-            $learner = $controller->createLearner($data);
+            // Create learner using LearnerService
+            $learner = $service->createLearner($data);
 
             if ($learner) {
                 $learner_id = $learner->getId();
@@ -102,7 +102,7 @@ function wecoza_learners_form_shortcode($atts) {
 
                 // Handle file uploads if files were submitted
                 if (isset($_FILES['scanned_portfolio']) && !empty($_FILES['scanned_portfolio']['name'][0])) {
-                    $upload_result = $controller->savePortfolios($learner_id, $_FILES['scanned_portfolio']);
+                    $upload_result = $service->savePortfolios($learner_id, $_FILES['scanned_portfolio']);
                     if (!$upload_result['success']) {
                         echo '<div class="alert alert-subtle-danger alert-dismissible fade show ydcoza-notification" role="alert"><button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button><div class="d-flex gap-4"><span><i class="fa-solid fa-circle-exclamation icon-danger"></i></span><div class="d-flex flex-column gap-2"><h6 class="mb-0">ERROR !</h6><p class="mb-0">Some files could not be uploaded: ' . esc_html($upload_result['message']) . '</p></div></div></div>';
                     }
@@ -111,7 +111,7 @@ function wecoza_learners_form_shortcode($atts) {
                 // Save sponsors if any were selected
                 if (!empty($_POST['sponsors']) && is_array($_POST['sponsors'])) {
                     $sponsor_ids = array_map('intval', $_POST['sponsors']);
-                    $controller->saveSponsors($learner_id, $sponsor_ids);
+                    $service->saveSponsors($learner_id, $sponsor_ids);
                 }
             } else {
                 echo '<div class="alert alert-subtle-danger alert-dismissible fade show ydcoza-notification" role="alert"><button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button><div class="d-flex gap-4"><span><i class="fa-solid fa-circle-exclamation icon-danger"></i></span><div class="d-flex flex-column gap-2"><h6 class="mb-0">ERROR !</h6><p class="mb-0">There was an error inserting the learner. Please try again.</p></div></div></div>';

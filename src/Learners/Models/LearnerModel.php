@@ -46,7 +46,12 @@ class LearnerModel extends BaseModel
         'id' => 'int',
         'cityTownId' => 'int',
         'provinceRegionId' => 'int',
+        'highestQualification' => 'int',
+        'numeracyLevel' => 'int',
+        'communicationLevel' => 'int',
+        'employmentStatus' => 'string',
         'employerId' => 'int',
+        'disabilityStatus' => 'string',
     ];
 
     // Database columns mapped to properties
@@ -69,11 +74,11 @@ class LearnerModel extends BaseModel
     protected ?int $cityTownId = null;
     protected ?int $provinceRegionId = null;
     protected ?string $postalCode = null;
-    protected ?string $highestQualification = null;
+    protected ?int $highestQualification = null;
     protected ?string $assessmentStatus = null;
     protected ?string $placementAssessmentDate = null;
-    protected ?string $numeracyLevel = null;
-    protected ?string $communicationLevel = null;
+    protected ?int $numeracyLevel = null;
+    protected ?int $communicationLevel = null;
     protected ?string $employmentStatus = null;
     protected ?int $employerId = null;
     protected ?string $disabilityStatus = null;
@@ -384,12 +389,12 @@ class LearnerModel extends BaseModel
     public function getProvinceRegionId(): ?int { return $this->provinceRegionId; }
     public function getProvinceRegionName(): ?string { return $this->provinceRegionName; }
     public function getPostalCode(): ?string { return $this->postalCode; }
-    public function getHighestQualification(): ?string { return $this->highestQualification; }
+    public function getHighestQualification(): ?int { return $this->highestQualification; }
     public function getHighestQualificationName(): ?string { return $this->highestQualificationName; }
     public function getAssessmentStatus(): ?string { return $this->assessmentStatus; }
     public function getPlacementAssessmentDate(): ?string { return $this->placementAssessmentDate; }
-    public function getNumeracyLevel(): ?string { return $this->numeracyLevel; }
-    public function getCommunicationLevel(): ?string { return $this->communicationLevel; }
+    public function getNumeracyLevel(): ?int { return $this->numeracyLevel; }
+    public function getCommunicationLevel(): ?int { return $this->communicationLevel; }
     public function getEmploymentStatus(): ?string { return $this->employmentStatus; }
     public function getEmployerId(): ?int { return $this->employerId; }
     public function getEmployerName(): ?string { return $this->employerName; }
@@ -423,11 +428,11 @@ class LearnerModel extends BaseModel
     public function setCityTownId(?int $cityTownId): static { $this->cityTownId = $cityTownId; return $this; }
     public function setProvinceRegionId(?int $provinceRegionId): static { $this->provinceRegionId = $provinceRegionId; return $this; }
     public function setPostalCode(?string $postalCode): static { $this->postalCode = $postalCode; return $this; }
-    public function setHighestQualification(?string $highestQualification): static { $this->highestQualification = $highestQualification; return $this; }
+    public function setHighestQualification(?int $highestQualification): static { $this->highestQualification = $highestQualification; return $this; }
     public function setAssessmentStatus(?string $assessmentStatus): static { $this->assessmentStatus = $assessmentStatus; return $this; }
     public function setPlacementAssessmentDate(?string $placementAssessmentDate): static { $this->placementAssessmentDate = $placementAssessmentDate; return $this; }
-    public function setNumeracyLevel(?string $numeracyLevel): static { $this->numeracyLevel = $numeracyLevel; return $this; }
-    public function setCommunicationLevel(?string $communicationLevel): static { $this->communicationLevel = $communicationLevel; return $this; }
+    public function setNumeracyLevel(?int $numeracyLevel): static { $this->numeracyLevel = $numeracyLevel; return $this; }
+    public function setCommunicationLevel(?int $communicationLevel): static { $this->communicationLevel = $communicationLevel; return $this; }
     public function setEmploymentStatus(?string $employmentStatus): static { $this->employmentStatus = $employmentStatus; return $this; }
     public function setEmployerId(?int $employerId): static { $this->employerId = $employerId; return $this; }
     public function setDisabilityStatus(?string $disabilityStatus): static { $this->disabilityStatus = $disabilityStatus; return $this; }

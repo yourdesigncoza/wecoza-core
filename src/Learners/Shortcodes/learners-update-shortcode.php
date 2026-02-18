@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace WeCoza\Learners\Shortcodes;
 
-use WeCoza\Learners\Controllers\LearnerController;
+use WeCoza\Learners\Services\LearnerService;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -39,9 +39,9 @@ function wecoza_learners_update_form_shortcode($atts) {
         return '<div class="alert alert-subtle-danger">Invalid learner ID</div>';
     }
 
-    // Use LearnerController for MVC pattern
-    $controller = new LearnerController();
-    $learnerModel = $controller->getLearner($learner_id);
+    // Use LearnerService for business logic
+    $service = new LearnerService();
+    $learnerModel = $service->getLearner($learner_id);
 
     if (!$learnerModel) {
         return '<div class="alert alert-subtle-danger">Learner not found</div>';
@@ -54,7 +54,7 @@ function wecoza_learners_update_form_shortcode($atts) {
     $learner->highest_qualification = $learnerModel->getHighestQualificationName() ?? $learnerModel->getHighestQualification();
 
     // Fetch dropdown data via controller
-    $dropdownData = $controller->getDropdownData();
+    $dropdownData = $service->getDropdownData();
     $locations = [
         'cities' => $dropdownData['cities'],
         'provinces' => $dropdownData['provinces']
@@ -62,7 +62,7 @@ function wecoza_learners_update_form_shortcode($atts) {
     $employers = $dropdownData['employers'];
     $qualifications = $dropdownData['qualifications'];
     $portfolios = $learnerModel->getPortfolios();
-    $existing_sponsor_ids = $controller->getSponsors($learner_id);
+    $existing_sponsor_ids = $service->getSponsors($learner_id);
 
     // Enqueue learners-app.js for field toggling and validation
     wp_enqueue_script(
@@ -122,16 +122,16 @@ function wecoza_learners_update_form_shortcode($atts) {
         // Proceed only if there are no errors
         if (!$form_error) {
             // Update learner data via controller (MVC pattern)
-            if ($controller->updateLearner($learner_id, $data)) {
+            if ($service->updateLearner($learner_id, $data)) {
                 // Save sponsors (replace all existing with submitted values)
                 $sponsor_ids = !empty($_POST['sponsors']) && is_array($_POST['sponsors'])
                     ? array_map('intval', $_POST['sponsors'])
                     : [];
-                $controller->saveSponsors($learner_id, $sponsor_ids);
+                $service->saveSponsors($learner_id, $sponsor_ids);
 
                 // Handle new file uploads if present
                 if (isset($_FILES['scanned_portfolio']) && !empty($_FILES['scanned_portfolio']['name'][0])) {
-                    $upload_result = $controller->savePortfolios($learner_id, $_FILES['scanned_portfolio']);
+                    $upload_result = $service->savePortfolios($learner_id, $_FILES['scanned_portfolio']);
 
                     if ($upload_result['success']) {
                         echo '<div class="alert alert-subtle-success alert-dismissible fade show" role="alert">
