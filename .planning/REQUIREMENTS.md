@@ -80,34 +80,34 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AJAX-01 | — | Pending |
-| AJAX-02 | — | Pending |
-| AJAX-03 | — | Pending |
-| AJAX-04 | — | Pending |
-| ADMIN-01 | — | Pending |
-| ADMIN-02 | — | Pending |
-| ADMIN-03 | — | Pending |
-| ADMIN-04 | — | Pending |
-| ADMIN-05 | — | Pending |
-| ADMIN-06 | — | Pending |
-| RPT-01 | — | Pending |
-| RPT-02 | — | Pending |
-| RPT-03 | — | Pending |
-| RPT-04 | — | Pending |
-| RPT-05 | — | Pending |
-| RPT-06 | — | Pending |
-| REG-01 | — | Pending |
-| REG-02 | — | Pending |
-| REG-03 | — | Pending |
-| REG-04 | — | Pending |
-| CLASS-01 | — | Pending |
-| CLASS-02 | — | Pending |
-| CLASS-03 | — | Pending |
+| AJAX-01 | Phase 44 | Pending |
+| AJAX-02 | Phase 44 | Pending |
+| AJAX-03 | Phase 44 | Pending |
+| AJAX-04 | Phase 44 | Pending |
+| CLASS-01 | Phase 44 | Pending |
+| CLASS-02 | Phase 44 | Pending |
+| CLASS-03 | Phase 44 | Pending |
+| ADMIN-01 | Phase 45 | Pending |
+| ADMIN-02 | Phase 45 | Pending |
+| ADMIN-03 | Phase 45 | Pending |
+| ADMIN-04 | Phase 45 | Pending |
+| ADMIN-05 | Phase 45 | Pending |
+| ADMIN-06 | Phase 45 | Pending |
+| RPT-01 | Phase 46 | Pending |
+| RPT-02 | Phase 46 | Pending |
+| RPT-03 | Phase 46 | Pending |
+| RPT-04 | Phase 46 | Pending |
+| RPT-05 | Phase 46 | Pending |
+| RPT-06 | Phase 46 | Pending |
+| REG-01 | Phase 47 | Pending |
+| REG-02 | Phase 47 | Pending |
+| REG-03 | Phase 47 | Pending |
+| REG-04 | Phase 47 | Pending |
 
 **Coverage:**
 - v5.0 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23
+- Mapped to phases: 23
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-18*

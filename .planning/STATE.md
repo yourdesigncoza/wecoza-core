@@ -4,17 +4,17 @@
 
 See: .planning/PROJECT.md (updated 2026-02-18)
 
-**Core value:** Single source of truth for all WeCoza functionality — unified plugin architecture
-**Current focus:** v5.0 Learner Progression — defining requirements
+**Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
+**Current focus:** v5.0 Learner Progression — Phase 44 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-18 — Milestone v5.0 started
+Phase: 44 of 47 in v5.0 (AJAX Wiring + Class Integration)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-02-18 — v5.0 roadmap created, phases 44-47 defined
 
-Progress: 43 phases complete across 8 milestones (89 plans executed)
+Progress: 43 phases complete across 9 milestones (90 plans executed)
 
 ## Milestone History
 
@@ -30,7 +30,7 @@ Progress: 43 phases complete across 8 milestones (89 plans executed)
 | v1.1 | Quality & Performance | 2026-02-02 | 8-12 | 13 |
 | v1 | Events Integration | 2026-02-02 | 1-7 | 13 |
 
-See: .planning/MILESTONES.md for full details
+See: .planning/ROADMAP.md for current milestone detail
 
 ## Accumulated Context
 
@@ -38,18 +38,8 @@ See: .planning/MILESTONES.md for full details
 
 - 42-01: LookupTableRepository does not extend BaseRepository — BaseRepository uses static $table, runtime config injection requires standalone class
 - 42-01: TABLES constant lives in LookupTableController; AjaxHandler calls getTableConfig() — single source of truth
-- 42-01: SHORTCODE_MAP constant in controller for clean tag-to-tableKey dispatch
-- 42-02: Used btn-subtle-* over btn-phoenix-* for in-table action buttons; wrapped in btn-group — matches app-wide pattern
-- 42-02: PHP-to-JS config via embedded JSON script tag avoids per-shortcode wp_localize_script registration
-
-### Roadmap Evolution
-
-- Phase 42 added: Lookup Table CRUD Infrastructure + Qualifications Shortcode
-- Phase 43 added: Placement Levels Shortcode
-- Milestone v4.1 created: Lookup Table Admin (Phases 42-43)
-- Phase 42, Plan 01 complete: backend infrastructure (Repository, AjaxHandler, Controller)
-- Phase 42, Plan 02 complete: frontend view template + JS CRUD manager; human verified
-- Phase 43, Plan 01 complete: DDL sequence fix on placement_level_id; all 7 CRUD steps verified; milestone v4.1 shipped
+- 42-02: btn-subtle-* over btn-phoenix-* for in-table action buttons; wrapped in btn-group — matches app-wide pattern
+- v5.0: AJAX handlers exist in docs/learner-progression/progression-ajax-handlers.php — need namespace fix (WeCoza\Services -> WeCoza\Learners\Services) and registration in wecoza-core.php
 
 ### Pending Todos
 
@@ -59,31 +49,13 @@ None.
 
 | Source | Issue | Impact |
 |--------|-------|--------|
-| v1.3 tech debt | AJAX handler needs event_index parameter support | Mark-as-delivered doesn't update event_dates JSONB yet |
-| v1.3 tech debt | Controllers pass deprecated params to service | Harmless but messy |
-| v3.0 FEAT-02 | agent_meta table doesn't exist | Metadata features not available yet |
-| v4.0 tech debt | Address dual-write period active, old columns remain | Must eventually remove old columns (ADDR-06/07) |
-| v4.0 tech debt | Classes module SVC-04 gap | ClassController still has thick methods |
-| v4.0 tech debt | LocationsModel/SitesModel missing type hints | TYPE-02 gap |
-| v4.0 tech debt | Events constants not fully extracted | CONST-04 gap |
+| v5.0 Phase 44 | AJAX handlers have wrong namespaces (WeCoza\Services\*) | Must fix before any progression AJAX works |
+| v5.0 Phase 44 | AJAX handlers not registered in wecoza-core.php | Mark-complete and portfolio upload silently fail |
+| v4.0 tech debt | Address dual-write period active, old columns remain | Must eventually remove old columns |
 
 ### Quick Tasks Completed
 
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 001 | Event notes not showing in Open Tasks view | 2026-02-03 | 02ab22e | [001-event-notes-not-showing-in-tasks](./quick/001-event-notes-not-showing-in-tasks/) |
-| 002 | Add event dates to Open Tasks view | 2026-02-03 | 95b11a2 | [002-add-date-to-open-tasks-view](./quick/002-add-date-to-open-tasks-view/) |
-| 003 | Add Edit Class button to Actions column | 2026-02-05 | d6d5828 | [003-add-edit-class-button-to-actions-column-](./quick/003-add-edit-class-button-to-actions-column-/) |
-| 004 | Fix task metadata and preserve notes on reopen | 2026-02-05 | cab8521 | [004-fix-task-metadata-and-preserve-notes-on-reopen](./quick/004-fix-task-metadata-and-preserve-notes-on-reopen/) |
-| 005 | Filter completed events from form, show in statistics | 2026-02-05 | 7e8956b | [005-filter-completed-events-show-in-statistics](./quick/005-filter-completed-events-show-in-statistics/) |
-| 006 | Add green badge for completed status in Event Dates | 2026-02-05 | 504653f | [006-add-green-badge-for-completed-status](./quick/006-add-green-badge-for-completed-status/) |
-| 007 | Remove Events text, fix Event Dates table columns | 2026-02-05 | b0074ec | [007-remove-events-text-fix-table-columns](./quick/007-remove-events-text-fix-table-columns/) |
-| 008 | Fix Event Dates heading border colspan | 2026-02-05 | 7c997f4 | [008-fix-event-dates-heading-border](./quick/008-fix-event-dates-heading-border/) |
-| 009 | Rename AI Summary/AI Generation Details in email template | 2026-02-05 | ebb2a43 | [009-update-email-template-rename-ai-summary-](./quick/009-update-email-template-rename-ai-summary-/) |
-| 010 | Convert Bootstrap badges to Phoenix style | 2026-02-05 | 9742c0b | [010-update-bootstrap-badges-to-phoenix-style](./quick/010-update-bootstrap-badges-to-phoenix-style/) |
-| 011 | Improve post-save UX in client capture form | 2026-02-17 | d5cccbe | [11-after-saving-a-new-client-via-wecoza-cap](./quick/11-after-saving-a-new-client-via-wecoza-cap/) |
-| 012 | Improve post-save UX in agent capture form | 2026-02-17 | cdb36ee | [12-after-saving-a-new-agent-via-wecoza-capt](./quick/12-after-saving-a-new-agent-via-wecoza-capt/) |
-| 013 | Notification cards: agent name, acknowledge badge, delete | 2026-02-18 | fd37095 | [13-notification-card-agent-name-display-ack](./quick/13-notification-card-agent-name-display-ack/) |
+See: .planning/STATE.md historical section (collapsed in previous session)
 
 ## Performance Metrics
 
@@ -96,7 +68,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Milestone v5.0 Learner Progression — defining requirements
+Stopped at: v5.0 roadmap created — 4 phases (44-47), 17 requirements mapped
 Resume file: N/A
 
-**Next action:** Define requirements, create roadmap, then `/gsd:plan-phase [N]`
+**Next action:** `/gsd:plan-phase 44`
