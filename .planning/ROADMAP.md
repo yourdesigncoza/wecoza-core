@@ -140,7 +140,12 @@ Plans:
   3. Admin clicks the audit icon on any row and sees the full hours log for that progression
   4. Admin can manually start a new LP for a learner by selecting learner + LP from a form within the page
   5. Admin can toggle a progression to On Hold or resume it, and the status badge reflects the change immediately
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 45-01-PLAN.md — AJAX handlers for admin operations (bulk-complete, hours-log, start-LP, hold/resume, admin-fetch)
+- [ ] 45-02-PLAN.md — Shortcode [wecoza_progression_admin] + view template with filters, table, modals
+- [ ] 45-03-PLAN.md — JS wiring for all admin management actions (filters, bulk, audit, start, hold/resume)
 
 #### Phase 46: Learner Progression Report
 **Goal**: Admin can search learners, view their LP timeline, filter by employer, and see Phoenix summary cards — satisfying WEC-165
@@ -178,7 +183,7 @@ Plans:
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
 | 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
 | 44 | 3/3 | Complete    | 2026-02-18 | - |
-| 45 | v5.0 | TBD | Not started | - |
+| 45 | v5.0 | 3 | Planned | - |
 | 46 | v5.0 | TBD | Not started | - |
 | 47 | v5.0 | TBD | Not started | - |
 
