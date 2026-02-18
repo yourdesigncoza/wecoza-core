@@ -442,12 +442,41 @@ class LearnerSelectionTable {
     }
 
     /**
+     * Log collision acknowledgement via sendBeacon (fire-and-forget, non-blocking).
+     * Server-side handler: wp_ajax_log_lp_collision_acknowledgement (registered in wecoza-core.php)
+     */
+    logCollisionAcknowledgement(learnersWithActiveLPs) {
+        const data = {
+            action: 'log_lp_collision_acknowledgement',
+            nonce: document.querySelector('#nonce')?.value || '',
+            learner_ids: learnersWithActiveLPs.map(l => l.id),
+            class_id: document.querySelector('#class_id')?.value || '',
+            acknowledged_by: 'admin',
+            timestamp: new Date().toISOString()
+        };
+
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+            if (Array.isArray(value)) {
+                value.forEach(v => formData.append(key + '[]', v));
+            } else {
+                formData.append(key, value);
+            }
+        });
+
+        navigator.sendBeacon(
+            (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'),
+            formData
+        );
+    }
+
+    /**
      * Show warning modal for learners with active LPs
      */
     showCollisionWarningModal(allSelectedLearners, learnersWithActiveLPs) {
         const esc = window.WeCozaUtils ? window.WeCozaUtils.escapeHtml : this._fallbackEscape;
 
-        // Build the list of learners with active LPs
+        // Build the list of learners with active LPs — show full LP details
         let learnerListHtml = '<ul class="list-unstyled mb-0">';
         learnersWithActiveLPs.forEach(learner => {
             const name = learner.name || `${learner.first_name} ${learner.surname}`;
@@ -456,13 +485,33 @@ class LearnerSelectionTable {
             const classCode = learner.active_class_code || 'No class';
 
             learnerListHtml += `
-                <li class="mb-2 p-2 bg-light rounded">
-                    <strong>${esc(name)}</strong><br>
-                    <small class="text-muted">
-                        Active LP: <span class="badge badge-phoenix badge-phoenix-warning">${esc(courseName)}</span>
-                        (${progress}% complete)<br>
-                        Class: ${esc(classCode)}
-                    </small>
+                <li class="mb-3 p-3 bg-light rounded">
+                    <strong>${esc(name)}</strong>
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Active LP:</small>
+                            <span class="badge badge-phoenix badge-phoenix-warning">${esc(courseName)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Progress:</small>
+                            <span>${progress}%</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 6px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Hours Present:</small>
+                            <span>${esc(String(learner.active_hours_present || 0))} / ${esc(String(learner.active_product_duration || 0))} hrs</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Start Date:</small>
+                            <span>${esc(learner.active_start_date || 'N/A')}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small>Current Class:</small>
+                            <span>${esc(classCode)}</span>
+                        </div>
+                    </div>
                 </li>
             `;
         });
@@ -517,6 +566,8 @@ class LearnerSelectionTable {
         const confirmBtn = document.getElementById('confirmAddWithCollision');
         confirmBtn.addEventListener('click', () => {
             modal.hide();
+            // Log collision acknowledgement for audit trail (fire-and-forget)
+            this.logCollisionAcknowledgement(learnersWithActiveLPs);
             // Mark that we're forcing the override
             this.forceOverride = true;
             this.proceedWithAddingLearners(allSelectedLearners);
