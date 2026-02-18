@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v5.0 Learner Progression — Phase 44 ready to plan
+**Current focus:** v5.0 Learner Progression — Phase 44 in progress (plan 01 complete)
 
 ## Current Position
 
 Phase: 44 of 47 in v5.0 (AJAX Wiring + Class Integration)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-18 — v5.0 roadmap created, phases 44-47 defined
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-18 — 44-01 complete (progression AJAX handlers registered)
 
-Progress: 43 phases complete across 9 milestones (90 plans executed)
+Progress: 43 phases complete across 9 milestones (91 plans executed)
 
 ## Milestone History
 
@@ -40,6 +40,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - 42-01: TABLES constant lives in LookupTableController; AjaxHandler calls getTableConfig() — single source of truth
 - 42-02: btn-subtle-* over btn-phoenix-* for in-table action buttons; wrapped in btn-group — matches app-wide pattern
 - v5.0: AJAX handlers exist in docs/learner-progression/progression-ajax-handlers.php — need namespace fix (WeCoza\Services -> WeCoza\Learners\Services) and registration in wecoza-core.php
+- 44-01: Portfolio file required (not optional) to mark LP complete — enforces data integrity
+- 44-01: validate_portfolio_file() as shared namespace function (DRY) used by both mark-complete and portfolio-upload handlers
+- 44-01: Collision acknowledgement uses wecoza_class_nonce (matches frontend class form context)
 
 ### Pending Todos
 
@@ -49,8 +52,6 @@ None.
 
 | Source | Issue | Impact |
 |--------|-------|--------|
-| v5.0 Phase 44 | AJAX handlers have wrong namespaces (WeCoza\Services\*) | Must fix before any progression AJAX works |
-| v5.0 Phase 44 | AJAX handlers not registered in wecoza-core.php | Mark-complete and portfolio upload silently fail |
 | v4.0 tech debt | Address dual-write period active, old columns remain | Must eventually remove old columns |
 
 ### Quick Tasks Completed
@@ -64,11 +65,12 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 42 | 01 | 2 min | 2/2 | 4 |
 | 42 | 02 | 15 min | 2/2 | 2 |
 | 43 | 01 | 10 min | 2/2 | 0 |
+| 44 | 01 | 2 min | 2/2 | 2 |
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Phase 44 context gathered
-Resume file: .planning/phases/44-ajax-wiring-class-integration/44-CONTEXT.md
+Stopped at: Completed 44-01-PLAN.md (progression AJAX handlers)
+Resume file: .planning/phases/44-ajax-wiring-class-integration/44-01-SUMMARY.md
 
-**Next action:** `/gsd:plan-phase 44`
+**Next action:** Execute 44-02-PLAN.md
