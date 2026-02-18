@@ -74,6 +74,9 @@ function handle_update_learner(): void {
         $intFields = ['city_town_id', 'province_region_id', 'highest_qualification',
                       'numeracy_level', 'communication_level', 'employer_id'];
 
+        // FK reference columns: 0 is not a valid ID - must be NULL when no selection made
+        $nullableIntFkFields = ['highest_qualification', 'numeracy_level', 'communication_level', 'employer_id'];
+
         // Collect and sanitize data in single pass
         $data = [];
         foreach ($fields as $field) {
@@ -81,9 +84,15 @@ function handle_update_learner(): void {
                 continue;
             }
             $value = sanitize_text_field($_POST[$field]);
-            $data[$field] = (in_array($field, $intFields) && $value !== '')
-                ? intval($value)
-                : $value;
+            if (in_array($field, $intFields) && $value !== '') {
+                $intValue = intval($value);
+                // FK columns must be NULL (not 0) when no selection - 0 violates FK constraints
+                $data[$field] = (in_array($field, $nullableIntFkFields) && $intValue === 0)
+                    ? null
+                    : $intValue;
+            } else {
+                $data[$field] = $value;
+            }
         }
 
         $result = get_learner_service()->updateLearner($learner_id, $data);

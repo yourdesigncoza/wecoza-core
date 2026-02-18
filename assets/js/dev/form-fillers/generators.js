@@ -171,11 +171,14 @@ window.WeCozaDevGen = (function () {
         }
         if (el.readOnly && !el.id.match(/initials/i)) return false; // skip readonly except initials
 
-        var nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype, 'value'
-        );
-        if (nativeInputValueSetter && nativeInputValueSetter.set) {
-            nativeInputValueSetter.set.call(el, value);
+        var proto = el instanceof HTMLSelectElement
+            ? window.HTMLSelectElement.prototype
+            : el instanceof HTMLTextAreaElement
+                ? window.HTMLTextAreaElement.prototype
+                : window.HTMLInputElement.prototype;
+        var nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value');
+        if (nativeSetter && nativeSetter.set) {
+            nativeSetter.set.call(el, value);
         } else {
             el.value = value;
         }

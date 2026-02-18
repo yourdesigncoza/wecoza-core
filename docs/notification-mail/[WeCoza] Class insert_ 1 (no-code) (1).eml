@@ -1,0 +1,84 @@
+Return-Path: <laudes.michael@gmail.com>
+Received: from localhost ([102.67.178.186])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48397318a23sm31723825e9.2.2026.02.18.03.24.39
+        for <laudes.michael@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 03:24:40 -0800 (PST)
+Date: Wed, 18 Feb 2026 11:24:37 +0000
+To: laudes.michael@gmail.com
+From: John <laudes.michael@gmail.com>
+Subject: [WeCoza] Class insert: 1 (no-code)
+Message-ID: <VE8WCbpGjdxe0bJN2ppWvEL3bWXqII13Fup41CezlI@localhost>
+X-Mailer: PHPMailer 6.9.3 (https://github.com/PHPMailer/PHPMailer)
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5; color: #1f2933;">
+    <h1 style="font-size: 20px; margin-bottom: 16px;">WeCoza Class Change Notification</h1>
+
+        <section style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Change Metadata</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Operation</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">INSERT</td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Changed At</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">2026-02-18 13:23:40.010011+02</td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Class ID</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">1</td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Class Code</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;"></td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Class Subject</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;"></td>
+                </tr>
+                    </table>
+    </section>
+
+    <section style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Summary</h2>
+                    <div style="background: #f3f4f6; padding: 12px; border-radius: 6px;">
+                - **Operation Type**: An &#039;INSERT&#039; operation was performed, indicating a new entry in the WeCoza class system.<br />
+- **Changed Date**: The record was updated on February 18, 2026, at 1:23 PM (UTC+2).<br />
+- **Class Details**: No specific class code or subject details were provided, which indicates a potential oversight in data entry.<br />
+- **Action Required**: Confirm the new entry&#039;s completeness and ensure relevant details are added to avoid any scheduling or staffing confusion.<br />
+- **Risk**: The absence of information could pose risks in learner planning and resource allocation, requiring follow-up to address potential gaps in communication or documentation.            </div>
+        
+            </section>
+
+    <section style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Generation Details</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Status</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">success</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Model</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">gpt-4o-mini</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Tokens Used</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">285</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Processing Time (ms)</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">3457</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Attempts</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">1</td>
+                </tr>
+                                                    </table>
+    </section>
+
+    <p style="font-size: 12px; color: #6b7280;">If the summary looks incorrect, reply with the log ID and we will investigate.</p>
+</div>
+

@@ -243,8 +243,8 @@ class LearnerRepository extends BaseRepository
             return null;
         }
 
-        // Validate highest_qualification FK if provided
-        if (!empty($filteredData['highest_qualification'])) {
+        // Validate highest_qualification FK if provided (null is allowed; 0 is not a valid ID)
+        if (isset($filteredData['highest_qualification']) && $filteredData['highest_qualification'] !== null) {
             try {
                 $pdo = $this->db->getPdo();
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM learner_qualifications WHERE id = :id");

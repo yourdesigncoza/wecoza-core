@@ -88,7 +88,8 @@ function wecoza_learners_form_shortcode($atts) {
             // Initialize scanned_portfolio as empty string
             $data['scanned_portfolio'] = '';
 
-            // Validate employer_id and numeracy_level
+            // FK reference columns: 0 is not a valid ID - must be NULL when no selection made
+            $data['highest_qualification'] = !empty($data['highest_qualification']) ? $data['highest_qualification'] : null;
             $data['employer_id'] = !empty($data['employer_id']) ? $data['employer_id'] : null;
             $data['numeracy_level'] = !empty($data['numeracy_level']) ? $data['numeracy_level'] : null;
             $data['communication_level'] = !empty($data['communication_level']) ? $data['communication_level'] : null;

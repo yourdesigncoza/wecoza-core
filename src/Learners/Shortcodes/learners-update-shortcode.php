@@ -23,9 +23,6 @@ if (!defined('ABSPATH')) {
 }
 
 function wecoza_learners_update_form_shortcode($atts) {
-    // Retrieve the saved URL for the redirect
-    $redirect_update_url = get_option('wecoza_learners_update_form_url');
-
     // Initialize variables for form errors and data
     $form_error = false;
     $error_messages = [];
@@ -87,6 +84,12 @@ function wecoza_learners_update_form_shortcode($atts) {
             wp_mkdir_p($portfolios_dir);
         }
 
+        // Helper: convert intval result to null when 0 for FK reference columns
+        $nullableInt = static function(string $field): ?int {
+            $val = intval($_POST[$field] ?? 0);
+            return $val === 0 ? null : $val;
+        };
+
         // Sanitize and prepare form inputs
         $data = [
             'id' => $learner_id,
@@ -107,13 +110,14 @@ function wecoza_learners_update_form_shortcode($atts) {
             'city_town_id' => intval($_POST['city_town_id']),
             'province_region_id' => intval($_POST['province_region_id']),
             'postal_code' => sanitize_text_field($_POST['postal_code']),
-            'highest_qualification' => intval($_POST['highest_qualification']),
+            // FK reference columns: 0 is not a valid ID - must be NULL when no selection made
+            'highest_qualification' => $nullableInt('highest_qualification'),
             'assessment_status' => sanitize_text_field($_POST['assessment_status']),
             'placement_assessment_date' => (($d = \DateTime::createFromFormat('Y-m-d', $_POST['placement_assessment_date'] ?? '')) && $d->format('Y-m-d') === $_POST['placement_assessment_date']) ? $d->format('Y-m-d') : null,
-            'numeracy_level' => intval($_POST['numeracy_level']),
-            'communication_level' => intval($_POST['communication_level']),
+            'numeracy_level' => $nullableInt('numeracy_level'),
+            'communication_level' => $nullableInt('communication_level'),
             'employment_status' => isset($_POST['employment_status']) ? (int)filter_var($_POST['employment_status'], FILTER_VALIDATE_BOOLEAN) : 0,
-            'employer_id' => intval($_POST['employer_id']),
+            'employer_id' => $nullableInt('employer_id'),
             'disability_status' => isset($_POST['disability_status']) ? (int)filter_var($_POST['disability_status'], FILTER_VALIDATE_BOOLEAN) : 0,
             'scanned_portfolio' => $learner->scanned_portfolio,
             'updated_at' => current_time('mysql')
@@ -134,27 +138,20 @@ function wecoza_learners_update_form_shortcode($atts) {
                     $upload_result = $service->savePortfolios($learner_id, $_FILES['scanned_portfolio']);
 
                     if ($upload_result['success']) {
-                        echo '<div class="alert alert-subtle-success" role="alert">Learner updated successfully! Files have been uploaded. Redirecting...</div>';
-
-                        echo '<script>
-                            setTimeout(function() {
-                                window.location.href = "' . esc_url($redirect_update_url) . '/?updated=true";
-                            }, 2000);
-                        </script>';
-                        return;
+                        echo '<div class="alert alert-subtle-success" role="alert">Learner updated successfully! Files have been uploaded.</div>';
                     } else {
                         echo '<div class="alert alert-subtle-warning" role="alert">Learner updated, but some files could not be uploaded: ' . esc_html($upload_result['message']) . '</div>';
                     }
                 } else {
-                    echo '<div class="alert alert-subtle-success" role="alert">Learner updated successfully! Redirecting...</div>';
-
-                    echo '<script>
-                        setTimeout(function() {
-                            window.location.href = "' . esc_url($redirect_update_url) . '/?updated=true";
-                        }, 2000);
-                    </script>';
-                    return;
+                    echo '<div class="alert alert-subtle-success" role="alert">Learner updated successfully!</div>';
                 }
+
+                // Re-fetch learner data so the form below reflects updated values
+                $learnerModel = $service->getLearner($learner_id);
+                $learner = (object) $learnerModel->toDbArray(true);
+                $learner->highest_qualification = $learnerModel->getHighestQualificationName() ?? $learnerModel->getHighestQualification();
+                $portfolios = $learnerModel->getPortfolios();
+                $existing_sponsor_ids = $service->getSponsors($learner_id);
             } else {
                 $error_messages[] = 'There was an error updating the learner. Please try again.';
             }
@@ -522,7 +519,7 @@ function wecoza_learners_update_form_shortcode($atts) {
                 </div>
             </div>
             <div class="col-md-3">
-                <div id="employer_field" class="mb-1" <?php echo $learner->employment_status !== 'Employed' ? 'style="display:none;"' : ''; ?>>
+                <div id="employer_field" class="mb-1<?php echo $learner->employment_status !== 'Employed' ? ' d-none' : ''; ?>">
                     <label for="employer_id" class="form-label">Employer <span class="text-danger">*</span></label>
                     <select id="employer_id" name="employer_id" class="form-select form-select-sm">
                         <option value="">Select Employer</option>

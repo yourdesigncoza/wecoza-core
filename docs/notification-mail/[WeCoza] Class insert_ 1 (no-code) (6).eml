@@ -1,0 +1,88 @@
+Return-Path: <laudes.michael@gmail.com>
+Received: from localhost ([102.67.178.186])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796abc8b1sm42445191f8f.23.2026.02.18.03.24.18
+        for <laudes.michael@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 03:24:18 -0800 (PST)
+Date: Wed, 18 Feb 2026 11:24:16 +0000
+To: laudes.michael@gmail.com
+From: John <laudes.michael@gmail.com>
+Subject: [WeCoza] Class insert: 1 (no-code)
+Message-ID: <QUOk5exJSBmSDjwKNO59NR0vdBkSqfh03C11AGaeTQ@localhost>
+X-Mailer: PHPMailer 6.9.3 (https://github.com/PHPMailer/PHPMailer)
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5; color: #1f2933;">
+    <h1 style="font-size: 20px; margin-bottom: 16px;">WeCoza Class Change Notification</h1>
+
+        <section style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Change Metadata</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Operation</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">INSERT</td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Changed At</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">2026-02-18 13:23:39.428094+02</td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Class ID</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">1</td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Class Code</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;"></td>
+                </tr>
+                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Class Subject</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;"></td>
+                </tr>
+                    </table>
+    </section>
+
+    <section style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Summary</h2>
+                    <div style="background: #f3f4f6; padding: 12px; border-radius: 6px;">
+                - **Operation Type**: Class insert operation recorded on February 18, 2026, indicating an addition to class records without any changes to existing data or learner assignments.<br />
+  <br />
+- **Class Details**: No specific class code, subject, or details have been provided in the new entry, which may require clarification for accurate scheduling and planning.<br />
+<br />
+- **Scheduling Impact**: As no changes were made to existing schedules, immediate impact on scheduling is minimal; however, future adjustments may depend on additional details being recorded.<br />
+<br />
+- **Learner and Staffing Changes**: No new learners or staffing assignments were noted in the insert; therefore, current allocations remain unchanged.<br />
+<br />
+- **Follow-Up Risks**: The absence of details in the insert should be flagged for follow-up to ensure clarity on potential future scheduling and impact on learner engagement.            </div>
+        
+            </section>
+
+    <section style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 8px;">Generation Details</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Status</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">success</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Model</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">gpt-4o-mini</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Tokens Used</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">311</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Processing Time (ms)</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">4402</td>
+                </tr>
+                                            <tr>
+                    <th style="text-align: left; padding: 6px; background: #e5e7eb; width: 160px;">Attempts</th>
+                    <td style="padding: 6px; border-bottom: 1px solid #e5e7eb;">1</td>
+                </tr>
+                                                    </table>
+    </section>
+
+    <p style="font-size: 12px; color: #6b7280;">If the summary looks incorrect, reply with the log ID and we will investigate.</p>
+</div>
+

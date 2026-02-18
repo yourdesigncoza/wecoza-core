@@ -58,6 +58,9 @@
 
             Gen.pickRandomOption('#disability_status');
 
+            // ── Assessment Report Upload ─────────────────────
+            Gen.setFileInput('#scanned_portfolio', 'assessment_report_' + person.surname.toLowerCase() + '.pdf');
+
             // ── Assessment Details ─────────────────────────
             Gen.setSelectValue('#assessment_status', 'Assessed');
             // Trigger change to show conditional fields
@@ -88,6 +91,30 @@
             if (empEl && empEl.value === '1') {
                 await Gen.waitForOptions('#employer_id', 3000);
                 Gen.pickRandomOption('#employer_id');
+            }
+
+            // ── Sponsors ──────────────────────────────────
+            var addSponsorBtn = document.querySelector('#add_sponsor_btn');
+            if (addSponsorBtn && window.jQuery) {
+                var sponsorCount = Gen.pickRandom([1, 1, 2]); // 1 or 2 sponsors
+                for (var s = 0; s < sponsorCount; s++) {
+                    jQuery(addSponsorBtn).trigger('click');
+                    await Gen.delay(300);
+                }
+                // Pick random values in each sponsor dropdown
+                var sponsorSelects = document.querySelectorAll('#sponsor_container .sponsor-select');
+                var usedValues = [];
+                sponsorSelects.forEach(function (sel) {
+                    var options = Array.from(sel.options).filter(function (o) {
+                        return o.value && usedValues.indexOf(o.value) === -1;
+                    });
+                    if (options.length) {
+                        var pick = options[Math.floor(Math.random() * options.length)];
+                        sel.value = pick.value;
+                        usedValues.push(pick.value);
+                        jQuery(sel).trigger('change');
+                    }
+                });
             }
 
             console.log('[DevToolbar] Learner form filled');

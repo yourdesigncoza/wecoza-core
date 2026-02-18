@@ -26,7 +26,7 @@ if (!defined("ABSPATH")) {
 |--------------------------------------------------------------------------
 */
 
-define("WECOZA_CORE_VERSION", "1.0.2");
+define("WECOZA_CORE_VERSION", "1.0.3");
 define("WECOZA_CORE_PATH", plugin_dir_path(__FILE__));
 define("WECOZA_CORE_DIR", plugin_dir_path(__FILE__)); // Alias for WECOZA_CORE_PATH
 define("WECOZA_CORE_URL", plugin_dir_url(__FILE__));

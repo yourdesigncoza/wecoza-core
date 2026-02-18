@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Auto-population only happens on button clicks, not subject changes
 
-            if (selectedClassType && selectedSubject) {
+            if (selectedClassType && selectedSubject && classSubjectsData[selectedClassType]) {
                 // Find the selected subject in the data
                 const subjectData = classSubjectsData[selectedClassType].find(
                     subject => subject.id === selectedSubject
