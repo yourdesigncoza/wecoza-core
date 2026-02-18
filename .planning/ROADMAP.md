@@ -123,7 +123,12 @@ See: `.planning/milestones/v4.1-ROADMAP.md`
   3. Progression data loads on the learner view without a page reload via the fetch handler
   4. Available Learners table in class capture shows a "Last Completed Course" column populated from progression history
   5. Adding a learner to a class who already has an active LP surfaces a visible collision warning before confirmation
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 44-01-PLAN.md — Register progression AJAX handlers (mark-complete, portfolio-upload, fetch-data, collision-log)
+- [ ] 44-02-PLAN.md — Enhance learner progressions frontend (confirmation modal, in-place updates, skeleton loading, upload progress)
+- [ ] 44-03-PLAN.md — Class integration UI (Last Completed Course column, collision modal enhancement, learner modal progression display)
 
 #### Phase 45: Admin Management
 **Goal**: Admin can manage all progressions from a single shortcode — filter, bulk-complete, inspect audit trail, start new LPs, and put LPs on hold
@@ -172,7 +177,7 @@ See: `.planning/milestones/v4.1-ROADMAP.md`
 | 31-35 | v3.1 | 8 | Complete | 2026-02-13 |
 | 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
 | 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
-| 44 | v5.0 | TBD | Not started | - |
+| 44 | v5.0 | 3 | Planning | - |
 | 45 | v5.0 | TBD | Not started | - |
 | 46 | v5.0 | TBD | Not started | - |
 | 47 | v5.0 | TBD | Not started | - |
@@ -180,4 +185,4 @@ See: `.planning/milestones/v4.1-ROADMAP.md`
 **Total: 43 phases complete, 90 plans, 9 milestones shipped — v5.0 in progress (phases 44-47)**
 
 ---
-*Last updated: 2026-02-18 after v5.0 roadmap created*
+*Last updated: 2026-02-18 after Phase 44 planning*
