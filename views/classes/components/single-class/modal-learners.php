@@ -155,9 +155,15 @@ try {
                         ?>
                         <td class="align-middle">
                            <?php if ($lpDetails): ?>
-                           <span class="badge fs-10 badge-phoenix badge-phoenix-info" title="Started: <?php echo esc_attr($lpDetails['start_date'] ?? ''); ?>">
-                              <?php echo esc_html($lpDetails['product_name'] ?? 'Unknown'); ?>
-                           </span>
+                           <div>
+                              <span class="badge fs-10 badge-phoenix badge-phoenix-info" title="Started: <?php echo esc_attr($lpDetails['start_date'] ?? ''); ?>">
+                                 <?php echo esc_html($lpDetails['product_name'] ?? 'Unknown'); ?>
+                              </span>
+                              <br>
+                              <small class="text-muted">
+                                 <?php echo esc_html(number_format($lpDetails['hours_present'] ?? 0, 1)); ?> / <?php echo esc_html(number_format($lpDetails['product_duration'] ?? 0, 1)); ?> hrs
+                              </small>
+                           </div>
                            <?php else: ?>
                            <span class="text-muted">None</span>
                            <?php endif; ?>
