@@ -45,7 +45,6 @@ class WipeDataHandler
         'attendance_registers',
         'collections',
         'deliveries',
-        'employers',
         'exams',
         'exam_results',
         'files',
@@ -62,6 +61,7 @@ class WipeDataHandler
      * - products: Learning programmes/qualifications
      * - learner_qualifications: Qualification lookup values
      * - learner_placement_level: Numeracy/communication level lookup values
+     * - employers: Employer/sponsor lookup values
      * - user_roles: Role definitions
      * - user_permissions: Permission mappings
      * - users: User accounts
