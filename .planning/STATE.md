@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v5.0 Learner Progression — Phase 44 in progress (plan 01 complete)
+**Current focus:** v5.0 Learner Progression — Phase 44 complete, ready for Phase 45
 
 ## Current Position
 
 Phase: 44 of 47 in v5.0 (AJAX Wiring + Class Integration)
-Plan: 1 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-18 — 44-01 complete (progression AJAX handlers registered)
+Plan: 3 of 3 in current phase
+Status: Phase 44 complete
+Last activity: 2026-02-18 — 44-03 complete (UI: Last Completed Course column, full collision modal details, class learner modal hours)
 
-Progress: 43 phases complete across 9 milestones (91 plans executed)
+Progress: 44 phases complete across 9 milestones (94 plans executed)
 
 ## Milestone History
 
@@ -70,13 +70,13 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 42 | 02 | 15 min | 2/2 | 2 |
 | 43 | 01 | 10 min | 2/2 | 0 |
 | 44 | 01 | 2 min | 2/2 | 2 |
-| Phase 44 P03 | 3 | 3 tasks | 4 files |
-| Phase 44 P02 | 3 | 2 tasks | 2 files |
+| 44 | 02 | 3 min | 2/2 | 2 |
+| 44 | 03 | 3 min | 3/3 | 4 |
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 44-01-PLAN.md (progression AJAX handlers)
-Resume file: .planning/phases/44-ajax-wiring-class-integration/44-01-SUMMARY.md
+Stopped at: Completed 44-03-PLAN.md (UI polish for class learner selection and modal)
+Resume file: .planning/phases/44-ajax-wiring-class-integration/44-03-SUMMARY.md
 
-**Next action:** Execute 44-02-PLAN.md
+**Next action:** Plan and execute Phase 45
