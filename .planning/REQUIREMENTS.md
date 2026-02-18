@@ -15,11 +15,11 @@
 ### Admin Management
 
 - [ ] **ADMIN-01**: Admin can view all progressions in a filterable table (filter by client, class, LP/product, status)
-- [ ] **ADMIN-02**: Admin can bulk-mark multiple progressions as complete
-- [ ] **ADMIN-03**: Admin can view audit trail (hours log history) for any progression
+- [x] **ADMIN-02**: Admin can bulk-mark multiple progressions as complete
+- [x] **ADMIN-03**: Admin can view audit trail (hours log history) for any progression
 - [ ] **ADMIN-04**: Admin management page accessible via shortcode `[wecoza_progression_admin]`
-- [ ] **ADMIN-05**: Admin can start a new LP for a learner (manual assignment)
-- [ ] **ADMIN-06**: Admin can put an LP on hold or resume it
+- [x] **ADMIN-05**: Admin can start a new LP for a learner (manual assignment)
+- [x] **ADMIN-06**: Admin can put an LP on hold or resume it
 
 ### Learner Report (WEC-165)
 
@@ -88,11 +88,11 @@ Deferred to future milestones.
 | CLASS-02 | Phase 44 | Complete |
 | CLASS-03 | Phase 44 | Complete |
 | ADMIN-01 | Phase 45 | Pending |
-| ADMIN-02 | Phase 45 | Pending |
-| ADMIN-03 | Phase 45 | Pending |
+| ADMIN-02 | Phase 45 | Complete |
+| ADMIN-03 | Phase 45 | Complete |
 | ADMIN-04 | Phase 45 | Pending |
-| ADMIN-05 | Phase 45 | Pending |
-| ADMIN-06 | Phase 45 | Pending |
+| ADMIN-05 | Phase 45 | Complete |
+| ADMIN-06 | Phase 45 | Complete |
 | RPT-01 | Phase 46 | Pending |
 | RPT-02 | Phase 46 | Pending |
 | RPT-03 | Phase 46 | Pending |

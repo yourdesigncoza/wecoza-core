@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v5.0 Learner Progression — Phase 44 complete, ready for Phase 45
+**Current focus:** v5.0 Learner Progression — Phase 45 Admin Management in progress
 
 ## Current Position
 
-Phase: 44 of 47 in v5.0 (AJAX Wiring + Class Integration)
-Plan: 3 of 3 in current phase
-Status: Phase 44 complete
-Last activity: 2026-02-18 — 44-03 complete (UI: Last Completed Course column, full collision modal details, class learner modal hours)
+Phase: 45 of 47 in v5.0 (Admin Management)
+Plan: 1 of 3 in current phase
+Status: Phase 45 plan 01 complete
+Last activity: 2026-02-18 — 45-01 complete (five admin AJAX endpoints added to ProgressionAjaxHandlers.php)
 
-Progress: 44 phases complete across 9 milestones (94 plans executed)
+Progress: 44 phases complete, Phase 45 in progress (95 plans executed)
 
 ## Milestone History
 
@@ -47,6 +47,8 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 44]: logCollisionAcknowledgement() uses sendBeacon — fire-and-forget audit trail, never blocks UI
 - [Phase 44]: 44-02: In-place card updates replace page reload — badge, progress bar, admin actions update without navigation
 - [Phase 44]: 44-02: Confirmation modal required before mark-complete to prevent accidental LP completions
+- [Phase 45]: 45-01: Bulk complete calls model directly (not service) to bypass portfolio requirement — intentional admin trade-off documented in code comment
+- [Phase 45]: 45-01: toggle_progression_hold validates current status before action, throws descriptive exception on state mismatch
 
 ### Pending Todos
 
@@ -72,11 +74,12 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 44 | 01 | 2 min | 2/2 | 2 |
 | 44 | 02 | 3 min | 2/2 | 2 |
 | 44 | 03 | 3 min | 3/3 | 4 |
+| 45 | 01 | 2 min | 2/2 | 1 |
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 44-03-PLAN.md (UI polish for class learner selection and modal)
-Resume file: .planning/phases/44-ajax-wiring-class-integration/44-03-SUMMARY.md
+Stopped at: Completed 45-01-PLAN.md (five admin AJAX endpoints for LP management)
+Resume file: .planning/phases/45-admin-management/45-01-SUMMARY.md
 
-**Next action:** Plan and execute Phase 45
+**Next action:** Execute Phase 45 Plan 02
