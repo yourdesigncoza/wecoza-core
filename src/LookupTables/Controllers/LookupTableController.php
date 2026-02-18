@@ -10,6 +10,7 @@ declare(strict_types=1);
  * Supports the following shortcodes:
  *   [wecoza_manage_qualifications]      — Phase 42
  *   [wecoza_manage_placement_levels]    — Phase 43
+ *   [wecoza_manage_employers]           — Phase 44
  *
  * @package WeCoza\LookupTables\Controllers
  * @since 4.1.0
@@ -53,6 +54,14 @@ class LookupTableController extends BaseController
             'title'      => 'Manage Placement Levels',
             'capability' => 'manage_options',
         ],
+        'employers' => [
+            'table'      => 'employers',
+            'pk'         => 'employer_id',
+            'columns'    => ['employer_name'],
+            'labels'     => ['Employer Name'],
+            'title'      => 'Manage Employers',
+            'capability' => 'manage_options',
+        ],
     ];
 
     /**
@@ -61,6 +70,7 @@ class LookupTableController extends BaseController
     private const SHORTCODE_MAP = [
         'wecoza_manage_qualifications'   => 'qualifications',
         'wecoza_manage_placement_levels' => 'placement_levels',
+        'wecoza_manage_employers'        => 'employers',
     ];
 
     /*
@@ -109,6 +119,7 @@ class LookupTableController extends BaseController
     {
         add_shortcode('wecoza_manage_qualifications', [$this, 'renderManageTable']);
         add_shortcode('wecoza_manage_placement_levels', [$this, 'renderManageTable']);
+        add_shortcode('wecoza_manage_employers', [$this, 'renderManageTable']);
     }
 
     /*
@@ -173,7 +184,8 @@ class LookupTableController extends BaseController
         }
 
         $hasShortcode = has_shortcode($post->post_content, 'wecoza_manage_qualifications')
-                     || has_shortcode($post->post_content, 'wecoza_manage_placement_levels');
+                     || has_shortcode($post->post_content, 'wecoza_manage_placement_levels')
+                     || has_shortcode($post->post_content, 'wecoza_manage_employers');
 
         if (!$hasShortcode) {
             return;
