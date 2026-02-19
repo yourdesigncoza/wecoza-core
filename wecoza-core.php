@@ -272,6 +272,9 @@ add_action(
         if (class_exists(\WeCoza\Feedback\Controllers\FeedbackController::class)) {
             \WeCoza\Feedback\Controllers\FeedbackController::register();
         }
+        if (class_exists(\WeCoza\Feedback\Shortcodes\FeedbackDashboardShortcode::class)) {
+            \WeCoza\Feedback\Shortcodes\FeedbackDashboardShortcode::register();
+        }
 
         // Initialize Shortcode Inspector (Tools > WeCoza Shortcodes)
         if (
