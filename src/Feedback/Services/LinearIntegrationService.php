@@ -332,7 +332,7 @@ GRAPHQL;
             'timeout' => self::TIMEOUT,
             'headers' => [
                 'Content-Type'  => 'application/json',
-                'Authorization' => $this->apiKey,
+                'Authorization' => 'Bearer ' . $this->apiKey,
             ],
             'body' => $body,
         ]);
