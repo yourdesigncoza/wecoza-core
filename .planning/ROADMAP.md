@@ -157,7 +157,12 @@ Plans:
   3. Admin filters by employer/client company and the report collapses to learners from that company only
   4. Multi-learner view groups learners by company with expandable rows showing individual timelines
   5. Phoenix-styled summary cards above the report show totals, completion rates, and average hours at a glance
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 46-01-PLAN.md -- Backend AJAX handler + repository methods for report queries (search, employer filter, summary stats)
+- [ ] 46-02-PLAN.md -- Shortcode [wecoza_learner_progression_report] + view template with summary cards, filters, results container
+- [ ] 46-03-PLAN.md -- JS wiring for search, filter, summary card population, company-grouped accordion, learner timeline rendering
 
 #### Phase 47: Regulatory Export
 **Goal**: Admin can generate a compliance-ready monthly progressions report with date-range filter and download it as CSV
