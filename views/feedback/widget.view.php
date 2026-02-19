@@ -9,15 +9,6 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<!-- Feedback FAB -->
-<button type="button"
-        class="btn btn-phoenix-primary wecoza-feedback-fab"
-        id="wecoza-feedback-fab"
-        title="Send Feedback"
-        aria-label="Send Feedback">
-    <span class="fas fa-comment-dots fa-lg"></span>
-</button>
-
 <!-- Feedback Modal -->
 <div class="modal fade" id="wecoza-feedback-modal" tabindex="-1" aria-labelledby="wecoza-feedback-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg">

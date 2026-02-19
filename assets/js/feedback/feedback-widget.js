@@ -73,12 +73,12 @@
             const ctx = resized.getContext('2d');
             ctx.drawImage(canvas, 0, 0, width, height);
 
-            // Compress to JPEG 60%
-            let base64 = resized.toDataURL('image/jpeg', 0.6);
+            // Compress to JPEG 80%
+            let base64 = resized.toDataURL('image/jpeg', 0.8);
 
             // Check size - if > 2MB, reduce quality
             if (base64.length > MAX_SCREENSHOT_BYTES) {
-                base64 = resized.toDataURL('image/jpeg', 0.4);
+                base64 = resized.toDataURL('image/jpeg', 0.6);
             }
 
             // If still too large, skip screenshot
