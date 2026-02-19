@@ -1899,10 +1899,10 @@ $data["class_data"]["seta"] == $seta["id"]
              "If the class agent changes, add the replacement agent and takeover date here.",
          ); ?>
 
-         <!-- IMPORTANT: This section handles AGENT REPLACEMENTS (agent_replacements table)
-              NOT backup agents (backup_agent_ids field) - these are separate systems:
-              - Agent Replacements: Track actual agent changes during class delivery
-              - Backup Agents: Pre-assigned standby agents for the class -->
+         <!-- NOTE: Agent Replacements UI is preserved for future use.
+              The agent_replacements table was dropped in commit 96b2645.
+              Data submitted here is currently not persisted. -->
+         <!-- Backup Agents (backup_agent_ids JSONB) are a separate, functional feature. -->
 
          <!-- Container for all agent replacement rows -->
          <div id="agent-replacements-container"></div>

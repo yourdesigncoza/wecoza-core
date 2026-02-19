@@ -71,7 +71,7 @@ class ClassRepository extends BaseRepository
             'class_subject', 'class_code', 'class_duration', 'original_start_date',
             'seta_funded', 'seta', 'exam_class', 'exam_type', 'class_agent',
             'initial_class_agent', 'initial_agent_start_date', 'project_supervisor_id',
-            'learner_ids', 'exam_learners', 'backup_agent_ids', 'agent_replacements',
+            'learner_ids', 'exam_learners', 'backup_agent_ids',
             'schedule_data', 'stop_restart_dates', 'event_dates', 'class_notes_data',
             'order_nr', 'created_at', 'updated_at'
         ];
@@ -582,7 +582,6 @@ class ClassRepository extends BaseRepository
                 'learner_ids' => self::enrichLearnerIds($classModel->getLearnerIds()),
                 'exam_learners' => self::enrichLearnerIds($classModel->getExamLearners()),
                 'backup_agent_ids' => $classModel->getBackupAgentIds(),
-                'agent_replacements' => $classModel->getAgentReplacements(),
                 'schedule_data' => $classModel->getScheduleData(),
                 'stop_restart_dates' => $classModel->getStopRestartDates(),
                 'event_dates' => $classModel->getEventDates(),

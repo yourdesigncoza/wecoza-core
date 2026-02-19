@@ -47,7 +47,6 @@ class ClassModel extends BaseModel
     private array $learnerIds = [];
     private array $examLearners = [];
     private array $backupAgentIds = [];
-    private array $agentReplacements = [];
     private array $scheduleData = [];
     private array $stopRestartDates = [];
     private array $classNotesData = [];
@@ -95,17 +94,11 @@ class ClassModel extends BaseModel
         $this->setLearnerIds($this->parseJsonField($data['learner_ids'] ?? $data['learnerIds'] ?? $data['add_learner'] ?? []));
         $this->setExamLearners($this->parseJsonField($data['exam_learners'] ?? $data['examLearners'] ?? []));
         $this->setBackupAgentIds($this->parseJsonField($data['backup_agent_ids'] ?? $data['backupAgentIds'] ?? $data['backup_agent'] ?? []));
-        $this->setAgentReplacements($this->parseJsonField($data['agent_replacements'] ?? $data['agentReplacements'] ?? []));
         $this->setScheduleData($this->parseJsonField($data['schedule_data'] ?? $data['scheduleData'] ?? []));
         $this->setStopRestartDates($this->parseJsonField($data['stop_restart_dates'] ?? []));
         $this->setClassNotesData($this->parseJsonField($data['class_notes_data'] ?? $data['classNotes'] ?? $data['class_notes'] ?? []));
         $this->setEventDates($this->parseJsonField($data['event_dates'] ?? $data['eventDates'] ?? []));
         $this->setOrderNr($data['order_nr'] ?? null);
-
-        // Load agent replacements from database if existing class
-        if ($this->getId()) {
-            $this->setAgentReplacements($this->loadAgentReplacements());
-        }
 
         return $this;
     }
@@ -184,7 +177,6 @@ class ClassModel extends BaseModel
             }
 
             $this->setId($classId);
-            $this->saveAgentReplacements();
 
             $db->commit();
             return true;
@@ -241,8 +233,6 @@ class ClassModel extends BaseModel
             if (!$success) {
                 throw new Exception('Failed to update class');
             }
-
-            $this->saveAgentReplacements();
 
             $db->commit();
             return true;
@@ -388,9 +378,6 @@ class ClassModel extends BaseModel
 
     public function getBackupAgentIds(): array { return $this->backupAgentIds; }
     public function setBackupAgentIds(mixed $backupAgentIds): self { $this->backupAgentIds = is_array($backupAgentIds) ? $backupAgentIds : []; return $this; }
-
-    public function getAgentReplacements(): array { return $this->agentReplacements; }
-    public function setAgentReplacements(mixed $agentReplacements): self { $this->agentReplacements = is_array($agentReplacements) ? $agentReplacements : []; return $this; }
 
     public function getScheduleData(): array { return $this->scheduleData; }
     public function setScheduleData(mixed $scheduleData): self { $this->scheduleData = is_array($scheduleData) ? $scheduleData : []; return $this; }
@@ -544,75 +531,6 @@ class ClassModel extends BaseModel
         }
     }
 
-    private function saveAgentReplacements(): bool
-    {
-        if (empty($this->agentReplacements) || !$this->getId()) {
-            return true;
-        }
-
-        try {
-            $db = wecoza_db();
-
-            $deleteStmt = $db->prepare("DELETE FROM agent_replacements WHERE class_id = ?");
-            $deleteStmt->execute([$this->getId()]);
-
-            $insertStmt = $db->prepare("
-                INSERT INTO agent_replacements (class_id, original_agent_id, replacement_agent_id, start_date)
-                VALUES (?, ?, ?, ?)
-            ");
-
-            foreach ($this->agentReplacements as $replacement) {
-                if (isset($replacement['agent_id']) && isset($replacement['date'])) {
-                    $originalAgentId = $this->getInitialClassAgent() ?: $this->getClassAgent();
-
-                    $insertStmt->execute([
-                        $this->getId(),
-                        $originalAgentId,
-                        $replacement['agent_id'],
-                        $replacement['date']
-                    ]);
-                }
-            }
-
-            return true;
-        } catch (Exception $e) {
-            error_log('WeCoza Core: Error saving agent replacements: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    private function loadAgentReplacements(): array
-    {
-        if (!$this->getId()) {
-            return [];
-        }
-
-        try {
-            $db = wecoza_db();
-            $stmt = $db->prepare("
-                SELECT replacement_agent_id, start_date, reason
-                FROM agent_replacements
-                WHERE class_id = ?
-                ORDER BY start_date ASC
-            ");
-            $stmt->execute([$this->getId()]);
-
-            $replacements = [];
-            while ($row = $stmt->fetch()) {
-                $replacements[] = [
-                    'agent_id' => $row['replacement_agent_id'],
-                    'date' => $row['start_date'],
-                    'reason' => $row['reason']
-                ];
-            }
-
-            return $replacements;
-        } catch (Exception $e) {
-            error_log('WeCoza Core: Error loading agent replacements: ' . $e->getMessage());
-            return [];
-        }
-    }
-
     public function getQAVisits(): array
     {
         if (!$this->getId()) {
@@ -645,7 +563,6 @@ class ClassModel extends BaseModel
             'learner_ids' => $this->getLearnerIds(),
             'exam_learners' => $this->getExamLearners(),
             'backup_agent_ids' => $this->getBackupAgentIds(),
-            'agent_replacements' => $this->getAgentReplacements(),
             'schedule_data' => $this->getScheduleData(),
             'stop_restart_dates' => $this->getStopRestartDates(),
             'class_notes_data' => $this->getClassNotesData(),

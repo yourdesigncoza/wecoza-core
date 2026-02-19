@@ -141,23 +141,6 @@ class FormDataProcessor
             }
             $processed['backup_agent_ids'] = $backupAgents;
 
-            // Process agent replacements
-            $agentReplacements = [];
-            if (isset($data['replacement_agent_ids']) && is_array($data['replacement_agent_ids'])) {
-                $replacementAgentIds = $data['replacement_agent_ids'];
-                $replacementAgentDates = isset($data['replacement_agent_dates']) ? $data['replacement_agent_dates'] : [];
-
-                for ($i = 0; $i < count($replacementAgentIds); $i++) {
-                    if (!empty($replacementAgentIds[$i]) && isset($replacementAgentDates[$i]) && !empty($replacementAgentDates[$i])) {
-                        $agentReplacements[] = [
-                            'agent_id' => intval($replacementAgentIds[$i]),
-                            'date' => $replacementAgentDates[$i]
-                        ];
-                    }
-                }
-            }
-            $processed['agent_replacements'] = $agentReplacements;
-
             // Process schedule data
             $processed['schedule_data'] = self::processJsonField($data, 'schedule_data');
 
@@ -607,7 +590,6 @@ class FormDataProcessor
         if (isset($formData['learner_ids'])) $class->setLearnerIds($formData['learner_ids']);
         if (isset($formData['exam_learners'])) $class->setExamLearners($formData['exam_learners']);
         if (isset($formData['backup_agent_ids'])) $class->setBackupAgentIds($formData['backup_agent_ids']);
-        if (isset($formData['agent_replacements'])) $class->setAgentReplacements($formData['agent_replacements']);
         if (isset($formData['schedule_data'])) $class->setScheduleData($formData['schedule_data']);
         if (isset($formData['stop_restart_dates'])) $class->setStopRestartDates($formData['stop_restart_dates']);
         if (isset($formData['event_dates'])) $class->setEventDates($formData['event_dates']);
