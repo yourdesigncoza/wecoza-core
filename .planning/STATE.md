@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v5.0 Learner Progression — Phase 46 Plan 02 of 3 complete
+**Current focus:** v5.0 Learner Progression — Phase 46 complete (all 3 plans)
 
 ## Current Position
 
 Phase: 46 of 47 in v5.0 (Learner Progression Report)
-Plan: 2 of 3 in current phase
-Status: Phase 46 Plan 02 complete — shortcode and view shell ready for JS (Plan 03)
-Last activity: 2026-02-19 — 46-02 complete (progression report shortcode and view template)
+Plan: 3 of 3 in current phase
+Status: Phase 46 complete — [wecoza_learner_progression_report] shortcode fully functional
+Last activity: 2026-02-19 — 46-03 complete (progression-report.js interactivity module)
 
-Progress: 45 phases complete, 100 plans executed
+Progress: 46 phases complete, 103 plans executed
 
 ## Milestone History
 
@@ -61,6 +61,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 46]: 46-02: Shortcode follows exact progression-admin-shortcode.php pattern for consistency
 - [Phase 46]: 46-02: Employer filter dropdown rendered empty — JS populates from loaded data (matches Phase 45 pattern)
 - [Phase 46]: 46-02: Status pills use button elements with data-status attribute for nav-pill UX pattern
+- [Phase 46]: 46-03: Status pill filtering operates on cached currentData — no server round-trip for UX responsiveness
+- [Phase 46]: 46-03: employerDropdownPopulated guard flag prevents re-population on subsequent searches
+- [Phase 46]: 46-03: Progress bar omitted for completed LPs; timeline sorted descending by start_date
 
 ### Pending Todos
 
@@ -91,11 +94,12 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 45 | 03 | 2 min | 2/2 | 1 |
 | 46 | 01 | 2 min | 2/2 | 2 |
 | 46 | 02 | 2 min | 2/2 | 3 |
+| 46 | 03 | 2 min | 2/2 | 1 |
 
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 46-02-PLAN.md (progression report shortcode and view template)
-Resume file: .planning/phases/46-learner-progression-report/46-02-SUMMARY.md
+Stopped at: Completed 46-03-PLAN.md (progression-report.js full interactivity module)
+Resume file: .planning/phases/46-learner-progression-report/46-03-SUMMARY.md
 
-**Next action:** Execute Phase 46 Plan 03 (progression-report.js)
+**Next action:** Execute Phase 47 (final phase of v5.0 Learner Progression milestone)

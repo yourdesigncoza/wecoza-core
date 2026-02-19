@@ -157,7 +157,7 @@ Plans:
   3. Admin filters by employer/client company and the report collapses to learners from that company only
   4. Multi-learner view groups learners by company with expandable rows showing individual timelines
   5. Phoenix-styled summary cards above the report show totals, completion rates, and average hours at a glance
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 46-01-PLAN.md -- Backend AJAX handler + repository methods for report queries (search, employer filter, summary stats)
@@ -189,7 +189,7 @@ Plans:
 | 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
 | 44 | 3/3 | Complete    | 2026-02-18 | - |
 | 45 | 3/3 | Complete    | 2026-02-18 | - |
-| 46 | 2/3 | In Progress|  | - |
+| 46 | 3/3 | Complete   | 2026-02-19 | - |
 | 47 | v5.0 | TBD | Not started | - |
 
 **Total: 43 phases complete, 90 plans, 9 milestones shipped — v5.0 in progress (phases 44-47)**
