@@ -37,7 +37,7 @@ final class FeedbackController
 
     public function handleSubmit(): void
     {
-        AjaxSecurity::verifyNonce(self::NONCE_ACTION);
+        AjaxSecurity::requireNonce(self::NONCE_ACTION);
 
         $user = wp_get_current_user();
         if (!$user->exists()) {
@@ -118,6 +118,7 @@ final class FeedbackController
                 'follow_up'   => $vaguenessResult['follow_up'],
                 'round'       => 1,
             ]);
+            return;
         }
 
         // Feedback is clear - enrich and push to Linear
@@ -126,7 +127,7 @@ final class FeedbackController
 
     public function handleFollowup(): void
     {
-        AjaxSecurity::verifyNonce(self::NONCE_ACTION);
+        AjaxSecurity::requireNonce(self::NONCE_ACTION);
 
         $user = wp_get_current_user();
         if (!$user->exists()) {
@@ -182,6 +183,7 @@ final class FeedbackController
                 $record['shortcode'],
                 $record['page_url']
             );
+            return;
         }
 
         // Re-check vagueness with conversation history
@@ -208,6 +210,7 @@ final class FeedbackController
                 'follow_up'   => $vaguenessResult['follow_up'],
                 'round'       => $round + 1,
             ]);
+            return;
         }
 
         // Clear - enrich and push
@@ -271,6 +274,7 @@ final class FeedbackController
                 'message'   => 'Feedback submitted, thank you!',
                 'issue_url' => $linearResult['issue_url'],
             ]);
+            return;
         }
 
         // Linear failed - record stays pending for cron retry

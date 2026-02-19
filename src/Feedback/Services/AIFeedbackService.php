@@ -64,10 +64,13 @@ PROMPT;
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
 
         // Include conversation history for multi-round follow-ups
+        // AI asks questions (assistant role), user answers (user role)
         foreach ($conversationHistory as $entry) {
-            $messages[] = ['role' => 'user', 'content' => $entry['user']];
-            if (isset($entry['assistant'])) {
-                $messages[] = ['role' => 'assistant', 'content' => $entry['assistant']];
+            if (isset($entry['question'])) {
+                $messages[] = ['role' => 'assistant', 'content' => $entry['question']];
+            }
+            if (isset($entry['answer'])) {
+                $messages[] = ['role' => 'user', 'content' => $entry['answer']];
             }
         }
 
