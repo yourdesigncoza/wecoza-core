@@ -46,12 +46,30 @@ if (!defined('ABSPATH')) {
                     <td class="align-middle ps-3">
                         <span class="badge badge-phoenix badge-phoenix-success fs-10">New</span>
                     </td>
-                    <?php foreach ($config['columns'] as $col): ?>
+                    <?php foreach ($config['columns'] as $col):
+                        $type = $config['column_types'][$col] ?? 'text';
+                        $selectOpts = $selectOptions[$col] ?? [];
+                    ?>
                         <td class="align-middle">
-                            <input type="text"
-                                   class="form-control form-control-sm lookup-add-input"
-                                   data-column="<?= esc_attr($col) ?>"
-                                   placeholder="Enter <?= esc_attr($col) ?>">
+                            <?php if ($type === 'select'): ?>
+                                <select class="form-select form-select-sm lookup-add-input" data-column="<?= esc_attr($col) ?>">
+                                    <option value="">-- Select --</option>
+                                    <?php foreach ($selectOpts as $opt): ?>
+                                        <option value="<?= esc_attr($opt['value']) ?>"><?= esc_html($opt['label']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php elseif ($type === 'number'): ?>
+                                <input type="number" min="0" class="form-control form-control-sm lookup-add-input"
+                                       data-column="<?= esc_attr($col) ?>" placeholder="0">
+                            <?php elseif ($type === 'boolean'): ?>
+                                <div class="form-check form-switch ms-2">
+                                    <input type="checkbox" class="form-check-input lookup-add-input"
+                                           data-column="<?= esc_attr($col) ?>" checked>
+                                </div>
+                            <?php else: ?>
+                                <input type="text" class="form-control form-control-sm lookup-add-input"
+                                       data-column="<?= esc_attr($col) ?>" placeholder="Enter <?= esc_attr($col) ?>">
+                            <?php endif; ?>
                         </td>
                     <?php endforeach; ?>
                     <td class="align-middle text-end pe-3">
@@ -82,9 +100,11 @@ if (!defined('ABSPATH')) {
 <!-- Hidden JSON config consumed by lookup-table-manager.js -->
 <script type="application/json" id="lookup-config-<?= esc_attr($tableKey) ?>">
 <?= wp_json_encode([
-    'tableKey' => $tableKey,
-    'pk'       => $config['pk'],
-    'columns'  => $config['columns'],
-    'labels'   => $config['labels'],
+    'tableKey'       => $tableKey,
+    'pk'             => $config['pk'],
+    'columns'        => $config['columns'],
+    'labels'         => $config['labels'],
+    'column_types'   => $config['column_types'] ?? (object)[],
+    'select_options' => $selectOptions ?? (object)[],
 ]) ?>
 </script>

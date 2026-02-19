@@ -68,6 +68,72 @@
     }
 
     // ---------------------------------------------------------------------------
+    // Column Type Helpers
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Get column type from config, defaulting to 'text'.
+     */
+    function getColumnType(config, col) {
+        return (config.column_types && config.column_types[col]) || 'text';
+    }
+
+    /**
+     * Escape HTML entities for safe display.
+     */
+    function escHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Create a typed input element for edit mode.
+     *
+     * @param {string} col     Column name
+     * @param {string} type    Column type (text|select|number|boolean)
+     * @param {*}      value   Current value
+     * @param {Object} config  Table config (for select_options)
+     * @return {jQuery} Input element
+     */
+    function createInput(col, type, value, config) {
+        if (type === 'select') {
+            var $sel = $('<select class="form-select form-select-sm lookup-edit-input"></select>')
+                .attr('data-column', col);
+            var opts = (config.select_options && config.select_options[col]) || [];
+            $.each(opts, function (_, opt) {
+                var selected = (String(opt.value) === String(value)) ? ' selected' : '';
+                $sel.append('<option value="' + escHtml(opt.value) + '"' + selected + '>' + escHtml(opt.label) + '</option>');
+            });
+            return $sel;
+        }
+        if (type === 'number') {
+            return $('<input type="number" min="0" class="form-control form-control-sm lookup-edit-input">')
+                .attr('data-column', col).val(value);
+        }
+        if (type === 'boolean') {
+            var checked = (value === true || value === 't' || value === '1' || value === 'true' || value === 1);
+            return $('<div class="form-check form-switch ms-2">')
+                .append($('<input type="checkbox" class="form-check-input lookup-edit-input">')
+                    .attr('data-column', col).prop('checked', checked));
+        }
+        return $('<input type="text" class="form-control form-control-sm lookup-edit-input">')
+            .attr('data-column', col).val(value);
+    }
+
+    /**
+     * Look up the display label for a select column value.
+     */
+    function getSelectLabel(config, col, value) {
+        var opts = (config.select_options && config.select_options[col]) || [];
+        for (var i = 0; i < opts.length; i++) {
+            if (String(opts[i].value) === String(value)) {
+                return opts[i].label;
+            }
+        }
+        return value;
+    }
+
+    // ---------------------------------------------------------------------------
     // Row Rendering
     // ---------------------------------------------------------------------------
 
@@ -76,7 +142,7 @@
      *
      * @param {string} tableKey
      * @param {Array}  items    Array of row objects from the server
-     * @param {Object} config   Table config { pk, columns, labels }
+     * @param {Object} config   Table config { pk, columns, labels, column_types, select_options }
      */
     function renderRows(tableKey, items, config) {
         var $tbody   = $('#lookup-rows-' + tableKey);
@@ -96,7 +162,7 @@
             return;
         }
 
-        // Build and insert rows after the add-row (in reverse so order is preserved)
+        // Build and insert rows after the add-row
         var rows = [];
         $.each(items, function (index, item) {
             var pkValue = item[config.pk];
@@ -107,13 +173,28 @@
             // Row number cell
             $tr.append('<td class="align-middle ps-3">' + rowNum + '</td>');
 
-            // Data cells
+            // Data cells — type-aware display
             $.each(config.columns, function (i, col) {
                 var value = item[col] !== null && item[col] !== undefined ? item[col] : '';
+                var type  = getColumnType(config, col);
                 var $td   = $('<td class="align-middle"></td>')
                     .attr('data-column', col)
                     .attr('data-id', pkValue)
-                    .text(value);
+                    .attr('data-value', value);
+
+                if (type === 'boolean') {
+                    var isTrue = (value === true || value === 't' || value === '1' || value === 'true' || value === 1);
+                    if (isTrue) {
+                        $td.html('<span class="badge badge-phoenix badge-phoenix-success">Yes</span>');
+                    } else {
+                        $td.html('<span class="badge badge-phoenix badge-phoenix-secondary">No</span>');
+                    }
+                } else if (type === 'select') {
+                    $td.text(getSelectLabel(config, col, value));
+                } else {
+                    $td.text(value);
+                }
+
                 $tr.append($td);
             });
 
@@ -147,17 +228,27 @@
 
     $(document).on('click', '.lookup-btn-add', function () {
         var tableKey = $(this).data('table-key');
+        var config   = getConfig(tableKey);
         var $addRow  = $('#lookup-add-row-' + tableKey);
         var data     = {};
         var hasValue = false;
 
         $addRow.find('.lookup-add-input').each(function () {
-            var col = $(this).data('column');
-            var val = $.trim($(this).val());
-            data[col] = val;
-            if (val !== '') {
+            var $input = $(this);
+            var col    = $input.data('column');
+            var type   = getColumnType(config, col);
+            var val;
+
+            if (type === 'boolean') {
+                val = $input.is(':checked') ? '1' : '0';
                 hasValue = true;
+            } else {
+                val = $.trim($input.val());
+                if (val !== '') {
+                    hasValue = true;
+                }
             }
+            data[col] = val;
         });
 
         if (!hasValue) {
@@ -181,8 +272,17 @@
             success: function (response) {
                 showLoading(tableKey, false);
                 if (response.success) {
-                    // Clear add-row inputs
-                    $addRow.find('.lookup-add-input').val('');
+                    // Clear add-row inputs (reset selects to first option, checkboxes to checked)
+                    $addRow.find('.lookup-add-input').each(function () {
+                        var $el = $(this);
+                        if ($el.is(':checkbox')) {
+                            $el.prop('checked', true);
+                        } else if ($el.is('select')) {
+                            $el.prop('selectedIndex', 0);
+                        } else {
+                            $el.val('');
+                        }
+                    });
                     loadRows(tableKey);
                     showAlert(tableKey, 'success', 'Record added successfully.');
                 } else {
@@ -206,17 +306,19 @@
     $(document).on('click', '.lookup-btn-edit', function () {
         var $btn     = $(this);
         var tableKey = $btn.data('table-key');
+        var config   = getConfig(tableKey);
         var id       = $btn.data('id');
         var $row     = $btn.closest('tr');
 
-        // Replace each data cell text with an input
+        // Replace each data cell with a typed input
         $row.find('td[data-column]').each(function () {
-            var col      = $(this).data('column');
-            var current  = $(this).text();
-            var $input   = $('<input type="text" class="form-control form-control-sm lookup-edit-input">')
-                .attr('data-column', col)
-                .val(current);
-            $(this).empty().append($input);
+            var $td     = $(this);
+            var col     = $td.data('column');
+            var type    = getColumnType(config, col);
+            // Use data-value attribute for raw value (preserves original for selects/booleans)
+            var current = $td.attr('data-value') !== undefined ? $td.attr('data-value') : $td.text();
+            var $input  = createInput(col, type, current, config);
+            $td.empty().append($input);
         });
 
         // Swap edit button to save (checkmark)
@@ -241,13 +343,21 @@
     $(document).on('click', '.lookup-btn-save', function () {
         var $btn     = $(this);
         var tableKey = $btn.data('table-key');
+        var config   = getConfig(tableKey);
         var id       = $btn.data('id');
         var $row     = $btn.closest('tr');
         var data     = {};
 
         $row.find('.lookup-edit-input').each(function () {
-            var col    = $(this).data('column');
-            data[col]  = $.trim($(this).val());
+            var $input = $(this);
+            var col    = $input.data('column');
+            var type   = getColumnType(config, col);
+
+            if (type === 'boolean') {
+                data[col] = $input.is(':checked') ? '1' : '0';
+            } else {
+                data[col] = $.trim($input.val());
+            }
         });
 
         showLoading(tableKey, true);

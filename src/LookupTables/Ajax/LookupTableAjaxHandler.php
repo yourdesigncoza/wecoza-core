@@ -120,7 +120,7 @@ class LookupTableAjaxHandler
         AjaxSecurity::requireAuth('lookup_table_nonce', $config['capability']);
 
         // Sanitize only whitelisted columns
-        $data = $this->sanitizeColumns($config['columns']);
+        $data = $this->sanitizeColumns($config);
 
         try {
             $repo  = new LookupTableRepository($config);
@@ -151,7 +151,7 @@ class LookupTableAjaxHandler
         $id = AjaxSecurity::requireValidId($_POST['id'] ?? 0, 'id');
 
         // Sanitize only whitelisted columns
-        $data = $this->sanitizeColumns($config['columns']);
+        $data = $this->sanitizeColumns($config);
 
         try {
             $repo    = new LookupTableRepository($config);
@@ -204,19 +204,35 @@ class LookupTableAjaxHandler
     */
 
     /**
-     * Sanitize POST values for whitelisted column names
+     * Sanitize POST values for whitelisted column names, type-aware.
      *
-     * @param string[] $columns Whitelisted column names from table config
+     * Tables without a `column_types` key default to 'text' for all columns,
+     * preserving backward compatibility.
+     *
+     * @param array $config Full table config (columns, column_types, etc.)
      * @return array Sanitized column => value pairs
      */
-    private function sanitizeColumns(array $columns): array
+    private function sanitizeColumns(array $config): array
     {
-        $data = [];
-        foreach ($columns as $column) {
-            if (isset($_POST[$column])) {
-                $data[$column] = wecoza_sanitize_value($_POST[$column], 'string');
+        $data  = [];
+        $types = $config['column_types'] ?? [];
+
+        foreach ($config['columns'] as $column) {
+            if (!isset($_POST[$column])) {
+                continue;
             }
+
+            $type = $types[$column] ?? 'text';
+            $data[$column] = match ($type) {
+                'number'  => wecoza_sanitize_value($_POST[$column], 'int'),
+                'select'  => is_numeric($_POST[$column])
+                    ? wecoza_sanitize_value($_POST[$column], 'int')
+                    : wecoza_sanitize_value($_POST[$column], 'string'),
+                'boolean' => in_array($_POST[$column], ['1', 'true', 'on'], true) ? 'true' : 'false',
+                default   => wecoza_sanitize_value($_POST[$column], 'string'),
+            };
         }
+
         return $data;
     }
 }

@@ -59,10 +59,11 @@ class LookupTableRepository
      */
     public function findAll(): array
     {
-        $table = $this->quoteIdentifier($this->config['table']);
-        $pk    = $this->quoteIdentifier($this->config['pk']);
+        $table   = $this->quoteIdentifier($this->config['table']);
+        $pk      = $this->quoteIdentifier($this->config['pk']);
+        $orderBy = $this->config['order_by'] ?? "{$pk} ASC";
 
-        $sql = "SELECT * FROM {$table} ORDER BY {$pk} ASC";
+        $sql = "SELECT * FROM {$table} ORDER BY {$orderBy}";
 
         try {
             $pdo  = $this->db->getPdo();

@@ -62,6 +62,53 @@ class LookupTableController extends BaseController
             'title'      => 'Manage Employers',
             'capability' => 'manage_options',
         ],
+        'class_subjects' => [
+            'table'      => 'class_type_subjects',
+            'pk'         => 'class_type_subject_id',
+            'columns'    => ['class_type_id', 'subject_code', 'subject_name', 'subject_duration', 'display_order', 'is_active'],
+            'labels'     => ['Class Type', 'Code', 'Subject Name', 'Duration (hrs)', 'Order', 'Active'],
+            'column_types' => [
+                'class_type_id'    => 'select',
+                'subject_duration' => 'number',
+                'display_order'    => 'number',
+                'is_active'        => 'boolean',
+            ],
+            'column_options' => [
+                'class_type_id' => [
+                    'table' => 'class_types',
+                    'pk'    => 'class_type_id',
+                    'label' => 'class_type_name',
+                    'order' => 'display_order ASC',
+                ],
+            ],
+            'order_by'   => '(SELECT class_type_name FROM class_types WHERE class_types.class_type_id = class_type_subjects.class_type_id) ASC, subject_name ASC',
+            'title'      => 'Manage Class Subjects',
+            'capability' => 'manage_options',
+        ],
+        'class_types' => [
+            'table'      => 'class_types',
+            'pk'         => 'class_type_id',
+            'columns'    => ['class_type_code', 'class_type_name', 'subject_selection_mode', 'progression_total_hours', 'display_order', 'is_active'],
+            'labels'     => ['Code', 'Name', 'Subject Mode', 'Progression Hrs', 'Order', 'Active'],
+            'column_types' => [
+                'subject_selection_mode'  => 'select',
+                'progression_total_hours' => 'number',
+                'display_order'           => 'number',
+                'is_active'               => 'boolean',
+            ],
+            'column_options' => [
+                'subject_selection_mode' => [
+                    'options' => [
+                        ['value' => 'own',          'label' => 'Own Subjects'],
+                        ['value' => 'all_subjects', 'label' => 'All Subjects'],
+                        ['value' => 'progression',  'label' => 'Progression'],
+                    ],
+                ],
+            ],
+            'order_by'   => 'class_type_code ASC',
+            'title'      => 'Manage Class Types',
+            'capability' => 'manage_options',
+        ],
     ];
 
     /**
@@ -71,6 +118,8 @@ class LookupTableController extends BaseController
         'wecoza_manage_qualifications'   => 'qualifications',
         'wecoza_manage_placement_levels' => 'placement_levels',
         'wecoza_manage_employers'        => 'employers',
+        'wecoza_manage_class_subjects'   => 'class_subjects',
+        'wecoza_manage_class_types'      => 'class_types',
     ];
 
     /*
@@ -91,6 +140,43 @@ class LookupTableController extends BaseController
     public static function getTableConfig(string $key): ?array
     {
         return self::TABLES[$key] ?? null;
+    }
+
+    /**
+     * Fetch select options — supports both FK table lookups and static option lists.
+     *
+     * FK table format:   ['table'=>..., 'pk'=>..., 'label'=>..., 'order'=>...]
+     * Static format:     ['options'=> [['value'=>..., 'label'=>...], ...] ]
+     *
+     * @param array $optionConfig
+     * @return array Array of ['value'=>..., 'label'=>...]
+     */
+    public static function getSelectOptions(array $optionConfig): array
+    {
+        // Static options — return directly
+        if (isset($optionConfig['options'])) {
+            return $optionConfig['options'];
+        }
+
+        // FK table lookup
+        $db    = wecoza_db();
+        $table = $optionConfig['table'];
+        $pk    = $optionConfig['pk'];
+        $label = $optionConfig['label'];
+        $order = $optionConfig['order'] ?? $label . ' ASC';
+
+        $sql  = "SELECT {$pk}, {$label} FROM {$table} ORDER BY {$order}";
+        $stmt = $db->query($sql);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $options = [];
+        foreach ($rows as $row) {
+            $options[] = [
+                'value' => $row[$pk],
+                'label' => $row[$label],
+            ];
+        }
+        return $options;
     }
 
     /*
@@ -120,6 +206,8 @@ class LookupTableController extends BaseController
         add_shortcode('wecoza_manage_qualifications', [$this, 'renderManageTable']);
         add_shortcode('wecoza_manage_placement_levels', [$this, 'renderManageTable']);
         add_shortcode('wecoza_manage_employers', [$this, 'renderManageTable']);
+        add_shortcode('wecoza_manage_class_subjects', [$this, 'renderManageTable']);
+        add_shortcode('wecoza_manage_class_types', [$this, 'renderManageTable']);
     }
 
     /*
@@ -156,10 +244,19 @@ class LookupTableController extends BaseController
             return '<div class="alert alert-warning">You do not have permission to manage this table.</div>';
         }
 
+        // Resolve column_options into actual select option lists
+        $selectOptions = [];
+        if (!empty($config['column_options'])) {
+            foreach ($config['column_options'] as $col => $optionConfig) {
+                $selectOptions[$col] = self::getSelectOptions($optionConfig);
+            }
+        }
+
         return $this->render('lookup-tables/manage', [
-            'tableKey' => $tableKey,
-            'config'   => $config,
-            'nonce'    => wp_create_nonce('lookup_table_nonce'),
+            'tableKey'      => $tableKey,
+            'config'        => $config,
+            'selectOptions' => $selectOptions,
+            'nonce'         => wp_create_nonce('lookup_table_nonce'),
         ]);
     }
 
@@ -185,7 +282,9 @@ class LookupTableController extends BaseController
 
         $hasShortcode = has_shortcode($post->post_content, 'wecoza_manage_qualifications')
                      || has_shortcode($post->post_content, 'wecoza_manage_placement_levels')
-                     || has_shortcode($post->post_content, 'wecoza_manage_employers');
+                     || has_shortcode($post->post_content, 'wecoza_manage_employers')
+                     || has_shortcode($post->post_content, 'wecoza_manage_class_subjects')
+                     || has_shortcode($post->post_content, 'wecoza_manage_class_types');
 
         if (!$hasShortcode) {
             return;
