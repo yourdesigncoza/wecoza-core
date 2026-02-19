@@ -24,6 +24,8 @@ final class SettingsPage
     private const API_OPTIONS = [
         'wecoza_google_maps_api_key',
         'wecoza_openai_api_key',
+        'wecoza_linear_api_key',
+        'wecoza_linear_team_id',
     ];
 
     // Notifications section
@@ -97,9 +99,13 @@ final class SettingsPage
 
         self::registerPasswordPreserve($group, 'wecoza_google_maps_api_key');
         self::registerPasswordPreserve($group, 'wecoza_openai_api_key');
+        self::registerPasswordPreserve($group, 'wecoza_linear_api_key');
+        self::registerText($group, 'wecoza_linear_team_id');
 
         add_settings_field('wecoza_google_maps_api_key', __('Google Maps API Key', 'wecoza'), [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_google_maps_api_key']);
         add_settings_field('wecoza_openai_api_key',      __('OpenAI API Key', 'wecoza'),      [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_openai_api_key']);
+        add_settings_field('wecoza_linear_api_key',      __('Linear API Key', 'wecoza'),      [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_linear_api_key']);
+        add_settings_field('wecoza_linear_team_id',      __('Linear Team ID', 'wecoza'),      [self::class, 'renderTextField'],     $page, self::API_SECTION, ['name' => 'wecoza_linear_team_id', 'placeholder' => 'UUID from Linear Settings > Teams']);
 
         // ── Notifications ───────────────────────────────────────────────
         add_settings_section(

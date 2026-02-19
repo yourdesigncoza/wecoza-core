@@ -48,18 +48,23 @@
             const fab = document.getElementById('wecoza-feedback-fab');
             if (fab) fab.style.display = 'none';
 
-            const canvas = await html2canvas(document.body, {
+            const canvas = await html2canvas(document.documentElement, {
                 useCORS: true,
                 allowTaint: true,
                 logging: false,
                 scale: 1,
-                windowWidth: Math.min(document.body.scrollWidth, 1920)
+                x: 0,
+                y: window.scrollY,
+                width: window.innerWidth,
+                height: window.innerHeight,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight
             });
 
             if (fab) fab.style.display = '';
 
-            // Resize to max 1280px wide
-            const maxWidth = 1280;
+            // Resize to max 1920px wide (keeps full viewport width at 1x)
+            const maxWidth = 1920;
             let width = canvas.width;
             let height = canvas.height;
             if (width > maxWidth) {
@@ -71,12 +76,19 @@
             resized.width = width;
             resized.height = height;
             const ctx = resized.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(canvas, 0, 0, width, height);
 
-            // Compress to JPEG 80%
-            let base64 = resized.toDataURL('image/jpeg', 0.8);
+            // Try JPEG at 90% quality first
+            let base64 = resized.toDataURL('image/jpeg', 0.9);
 
-            // Check size - if > 2MB, reduce quality
+            // If > 2MB, reduce to 75%
+            if (base64.length > MAX_SCREENSHOT_BYTES) {
+                base64 = resized.toDataURL('image/jpeg', 0.75);
+            }
+
+            // If still too large, reduce further
             if (base64.length > MAX_SCREENSHOT_BYTES) {
                 base64 = resized.toDataURL('image/jpeg', 0.6);
             }

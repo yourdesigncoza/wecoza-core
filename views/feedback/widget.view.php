@@ -102,7 +102,7 @@ if (!defined('ABSPATH')) {
 </div>
 
 <!-- Toast Container -->
-<div class="position-fixed bottom-0 end-0 p-3 wecoza-feedback-toast-container" style="z-index: 1090;">
+<div class="position-fixed top-0 end-0 p-3 wecoza-feedback-toast-container" style="z-index: 1090;">
     <div class="toast align-items-center border-0" id="wecoza-feedback-toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body" id="wecoza-feedback-toast-body"></div>
