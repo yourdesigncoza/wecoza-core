@@ -6,7 +6,6 @@ namespace WeCoza\Feedback\Controllers;
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\Feedback\Repositories\FeedbackRepository;
 use WeCoza\Feedback\Services\AIFeedbackService;
-use WeCoza\Feedback\Services\LinearIntegrationService;
 
 final class FeedbackController
 {
@@ -16,16 +15,13 @@ final class FeedbackController
 
     private FeedbackRepository $repository;
     private AIFeedbackService $aiService;
-    private LinearIntegrationService $linearService;
 
     public function __construct(
         ?FeedbackRepository $repository = null,
-        ?AIFeedbackService $aiService = null,
-        ?LinearIntegrationService $linearService = null
+        ?AIFeedbackService $aiService = null
     ) {
-        $this->repository    = $repository ?? new FeedbackRepository();
-        $this->aiService     = $aiService ?? new AIFeedbackService();
-        $this->linearService = $linearService ?? new LinearIntegrationService();
+        $this->repository = $repository ?? new FeedbackRepository();
+        $this->aiService  = $aiService ?? new AIFeedbackService();
     }
 
     public static function register(?self $controller = null): void
@@ -76,20 +72,19 @@ final class FeedbackController
             $screenshotPath = $this->saveScreenshot($_POST['screenshot']);
         }
 
-        // Save to database first (safety net)
+        // Save to database
         $feedbackId = $this->repository->insert([
-            'user_id'       => $user->ID,
-            'user_email'    => $user->user_email,
-            'category'      => $category,
-            'feedback_text' => $feedbackText,
-            'page_url'      => $pageUrl,
-            'page_title'    => $pageTitle,
-            'shortcode'     => $shortcode,
-            'url_params'    => $urlParams,
-            'browser_info'  => $browserInfo,
-            'viewport'      => $viewport,
+            'user_id'         => $user->ID,
+            'user_email'      => $user->user_email,
+            'category'        => $category,
+            'feedback_text'   => $feedbackText,
+            'page_url'        => $pageUrl,
+            'page_title'      => $pageTitle,
+            'shortcode'       => $shortcode,
+            'url_params'      => $urlParams,
+            'browser_info'    => $browserInfo,
+            'viewport'        => $viewport,
             'screenshot_path' => $screenshotPath,
-            'sync_status'   => 'pending',
         ]);
 
         if ($feedbackId === null) {
@@ -105,7 +100,6 @@ final class FeedbackController
         );
 
         if (!$vaguenessResult['is_clear'] && $vaguenessResult['follow_up']) {
-            // Store initial conversation state
             $conversation = [['question' => $vaguenessResult['follow_up']]];
             $this->repository->update($feedbackId, [
                 'ai_conversation' => wp_json_encode($conversation),
@@ -121,8 +115,8 @@ final class FeedbackController
             return;
         }
 
-        // Feedback is clear - enrich and push to Linear
-        $this->enrichAndSync($feedbackId, $feedbackText, $category, $shortcode, $pageUrl);
+        // Feedback is clear - enrich and save
+        $this->enrichAndSave($feedbackId, $feedbackText, $category, $shortcode, $pageUrl);
     }
 
     public function handleFollowup(): void
@@ -142,7 +136,6 @@ final class FeedbackController
             wp_send_json_error(['message' => 'Invalid follow-up data'], 400);
         }
 
-        // Fetch existing record
         $record = $this->repository->findById($feedbackId);
         if (!$record || (int) $record['user_id'] !== $user->ID) {
             wp_send_json_error(['message' => 'Feedback not found'], 404);
@@ -154,7 +147,6 @@ final class FeedbackController
             $conversation = [];
         }
 
-        // Add user's answer to the last entry
         $lastIdx = count($conversation) - 1;
         if ($lastIdx >= 0) {
             $conversation[$lastIdx]['answer'] = $answer;
@@ -176,13 +168,7 @@ final class FeedbackController
                 'updated_at'      => date('Y-m-d H:i:s'),
             ]);
 
-            $this->enrichAndSync(
-                $feedbackId,
-                $fullText,
-                $record['category'],
-                $record['shortcode'],
-                $record['page_url']
-            );
+            $this->enrichAndSave($feedbackId, $fullText, $record['category'], $record['shortcode'], $record['page_url']);
             return;
         }
 
@@ -196,7 +182,6 @@ final class FeedbackController
         );
 
         if (!$vaguenessResult['is_clear'] && $vaguenessResult['follow_up']) {
-            // Add new follow-up question
             $conversation[] = ['question' => $vaguenessResult['follow_up']];
             $this->repository->update($feedbackId, [
                 'ai_conversation' => wp_json_encode($conversation),
@@ -213,33 +198,26 @@ final class FeedbackController
             return;
         }
 
-        // Clear - enrich and push
+        // Clear - enrich and save
         $this->repository->update($feedbackId, [
             'ai_conversation' => wp_json_encode($conversation),
             'feedback_text'   => $fullText,
             'updated_at'      => date('Y-m-d H:i:s'),
         ]);
 
-        $this->enrichAndSync(
-            $feedbackId,
-            $fullText,
-            $record['category'],
-            $record['shortcode'],
-            $record['page_url']
-        );
+        $this->enrichAndSave($feedbackId, $fullText, $record['category'], $record['shortcode'], $record['page_url']);
     }
 
     /**
-     * Enrich feedback via AI, push to Linear, return success response.
+     * Enrich feedback via AI and save results.
      */
-    private function enrichAndSync(
+    private function enrichAndSave(
         int $feedbackId,
         string $feedbackText,
         string $category,
         ?string $shortcode,
         ?string $pageUrl
     ): void {
-        // AI enrichment
         $record = $this->repository->findById($feedbackId);
         $conversation = json_decode($record['ai_conversation'] ?? '[]', true);
 
@@ -251,36 +229,11 @@ final class FeedbackController
             is_array($conversation) ? $conversation : []
         );
 
-        // Update record with AI results
         $this->repository->update($feedbackId, [
-            'ai_generated_title'   => $enrichment['title'],
+            'ai_generated_title'    => $enrichment['title'],
             'ai_suggested_priority' => $enrichment['priority'],
-            'updated_at'           => date('Y-m-d H:i:s'),
+            'updated_at'            => date('Y-m-d H:i:s'),
         ]);
-
-        // Push to Linear
-        $record = $this->repository->findById($feedbackId);
-        $linearResult = $this->linearService->createIssue($record);
-
-        if ($linearResult['success']) {
-            $this->repository->markSynced(
-                $feedbackId,
-                $linearResult['issue_id'],
-                $linearResult['issue_url']
-            );
-
-            wp_send_json_success([
-                'status'    => 'submitted',
-                'message'   => 'Feedback submitted, thank you!',
-                'issue_url' => $linearResult['issue_url'],
-            ]);
-            return;
-        }
-
-        // Linear failed - record stays pending for cron retry
-        $this->repository->markFailed($feedbackId, $linearResult['error'] ?? 'Unknown error');
-
-        wecoza_log("Feedback #{$feedbackId} Linear sync failed, queued for retry: " . ($linearResult['error'] ?? 'Unknown'), 'warning');
 
         wp_send_json_success([
             'status'  => 'submitted',
@@ -293,7 +246,6 @@ final class FeedbackController
      */
     private function saveScreenshot(string $base64Data): ?string
     {
-        // Strip data URI prefix if present
         if (str_contains($base64Data, ',')) {
             $base64Data = explode(',', $base64Data, 2)[1];
         }
@@ -304,13 +256,11 @@ final class FeedbackController
             return null;
         }
 
-        // Size check
         if (strlen($decoded) > self::MAX_SCREENSHOT_BYTES) {
             wecoza_log('FeedbackController: Screenshot exceeds 2MB limit');
             return null;
         }
 
-        // MIME type validation
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($decoded);
         if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/webp'], true)) {
@@ -318,7 +268,6 @@ final class FeedbackController
             return null;
         }
 
-        // Create upload directory
         $uploadsDir = wp_upload_dir();
         $feedbackDir = $uploadsDir['basedir'] . '/wecoza-feedback/' . date('Y/m');
 

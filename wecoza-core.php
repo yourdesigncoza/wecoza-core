@@ -331,24 +331,6 @@ add_action(
             (new \WeCoza\Dev\DevToolbarController())->register();
         }
 
-        // Feedback Sync Cron - 15-minute interval
-        add_filter("cron_schedules", function (array $schedules): array {
-            $schedules["every_fifteen_minutes"] = [
-                "interval" => 900,
-                "display"  => __("Every 15 Minutes", "wecoza-core"),
-            ];
-            return $schedules;
-        });
-
-        add_action("wecoza_feedback_retry_sync", function () {
-            try {
-                $service = new \WeCoza\Feedback\Services\FeedbackSyncService();
-                $service->retryFailedSubmissions();
-            } catch (\Exception $e) {
-                wecoza_log("Feedback sync retry failed: " . $e->getMessage(), "error");
-            }
-        });
-
         // Action Scheduler Performance Tuning
         add_filter("action_scheduler_queue_runner_time_limit", function () {
             return 120; // 120 seconds for AI enrichment processing
@@ -762,11 +744,6 @@ register_activation_hook(__FILE__, function () {
         wp_schedule_event(time(), "hourly", "wecoza_process_notifications");
     }
 
-    // Schedule feedback sync retry cron
-    if (!wp_next_scheduled("wecoza_feedback_retry_sync")) {
-        wp_schedule_event(time(), "every_fifteen_minutes", "wecoza_feedback_retry_sync");
-    }
-
     /**
      * Fires when WeCoza Core is activated.
      *
@@ -818,12 +795,6 @@ register_deactivation_hook(__FILE__, function () {
             $legacyEmailTimestamp,
             "wecoza_email_notifications_process",
         );
-    }
-
-    // Unschedule feedback sync retry cron
-    $feedbackTimestamp = wp_next_scheduled("wecoza_feedback_retry_sync");
-    if ($feedbackTimestamp) {
-        wp_unschedule_event($feedbackTimestamp, "wecoza_feedback_retry_sync");
     }
 
     /**
