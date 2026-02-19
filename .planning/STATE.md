@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v5.0 Learner Progression — Phase 45 Admin Management complete
+**Current focus:** v5.0 Learner Progression — Phase 46 Plan 02 of 3 complete
 
 ## Current Position
 
-Phase: 45 of 47 in v5.0 (Admin Management)
-Plan: 3 of 3 in current phase — Phase 45 COMPLETE
-Status: Phase 45 all plans complete
-Last activity: 2026-02-18 — 45-03 complete (progression-admin.js full admin management JS module)
+Phase: 46 of 47 in v5.0 (Learner Progression Report)
+Plan: 2 of 3 in current phase
+Status: Phase 46 Plan 02 complete — shortcode and view shell ready for JS (Plan 03)
+Last activity: 2026-02-19 — 46-02 complete (progression report shortcode and view template)
 
-Progress: 45 phases complete, 98 plans executed
+Progress: 45 phases complete, 100 plans executed
 
 ## Milestone History
 
@@ -55,6 +55,12 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 45]: 45-03: Filter dropdowns populated from first load data — avoids new endpoint, limitation documented for large datasets
 - [Phase 45]: 45-03: handleMarkSingleComplete reuses bulk_complete_progressions action with single-element array — DRY
 - [Phase 45]: 45-03: handleToggleHold updates row in-place (badge + dropdown) without full table reload for instant UX
+- [Phase 46]: 46-01: findForReport uses explicit PDO::PARAM_INT/STR binding — dynamic filter set requires per-param type binding
+- [Phase 46]: 46-01: getReportSummaryStats uses PostgreSQL FILTER(WHERE ...) conditional aggregation — single-pass, avoids subqueries
+- [Phase 46]: 46-01: employer JOIN via learners.employer_id (not classes) — report is learner-centric
+- [Phase 46]: 46-02: Shortcode follows exact progression-admin-shortcode.php pattern for consistency
+- [Phase 46]: 46-02: Employer filter dropdown rendered empty — JS populates from loaded data (matches Phase 45 pattern)
+- [Phase 46]: 46-02: Status pills use button elements with data-status attribute for nav-pill UX pattern
 
 ### Pending Todos
 
@@ -83,11 +89,13 @@ See: .planning/STATE.md historical section (collapsed in previous session)
 | 45 | 01 | 2 min | 2/2 | 1 |
 | 45 | 02 | 2 min | 2/2 | 3 |
 | 45 | 03 | 2 min | 2/2 | 1 |
+| 46 | 01 | 2 min | 2/2 | 2 |
+| 46 | 02 | 2 min | 2/2 | 3 |
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Completed 45-03-PLAN.md (progression-admin.js full admin management module)
-Resume file: .planning/phases/45-admin-management/45-03-SUMMARY.md
+Last session: 2026-02-19
+Stopped at: Completed 46-02-PLAN.md (progression report shortcode and view template)
+Resume file: .planning/phases/46-learner-progression-report/46-02-SUMMARY.md
 
-**Next action:** Execute Phase 46
+**Next action:** Execute Phase 46 Plan 03 (progression-report.js)

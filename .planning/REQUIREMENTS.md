@@ -23,12 +23,12 @@
 
 ### Learner Report (WEC-165)
 
-- [ ] **RPT-01**: User can search for a learner by name or ID on the progression report page
-- [ ] **RPT-02**: User can view individual learner timeline showing LP progression (level, class, date)
-- [ ] **RPT-03**: User can filter learners by employer/client company
-- [ ] **RPT-04**: User can view multiple learners grouped by company with individual timelines
-- [ ] **RPT-05**: User can see Phoenix-styled summary cards (total learners, completion rate, avg progress, active LPs)
-- [ ] **RPT-06**: Report page accessible via shortcode `[wecoza_learner_progression_report]`
+- [x] **RPT-01**: User can search for a learner by name or ID on the progression report page
+- [x] **RPT-02**: User can view individual learner timeline showing LP progression (level, class, date)
+- [x] **RPT-03**: User can filter learners by employer/client company
+- [x] **RPT-04**: User can view multiple learners grouped by company with individual timelines
+- [x] **RPT-05**: User can see Phoenix-styled summary cards (total learners, completion rate, avg progress, active LPs)
+- [x] **RPT-06**: Report page accessible via shortcode `[wecoza_learner_progression_report]`
 
 ### Regulatory Reporting
 
@@ -93,12 +93,12 @@ Deferred to future milestones.
 | ADMIN-04 | Phase 45 | Complete |
 | ADMIN-05 | Phase 45 | Complete |
 | ADMIN-06 | Phase 45 | Complete |
-| RPT-01 | Phase 46 | Pending |
-| RPT-02 | Phase 46 | Pending |
-| RPT-03 | Phase 46 | Pending |
-| RPT-04 | Phase 46 | Pending |
-| RPT-05 | Phase 46 | Pending |
-| RPT-06 | Phase 46 | Pending |
+| RPT-01 | Phase 46 | Complete |
+| RPT-02 | Phase 46 | Complete |
+| RPT-03 | Phase 46 | Complete |
+| RPT-04 | Phase 46 | Complete |
+| RPT-05 | Phase 46 | Complete |
+| RPT-06 | Phase 46 | Complete |
 | REG-01 | Phase 47 | Pending |
 | REG-02 | Phase 47 | Pending |
 | REG-03 | Phase 47 | Pending |
