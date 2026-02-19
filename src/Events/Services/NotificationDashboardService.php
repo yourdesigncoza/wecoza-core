@@ -229,6 +229,12 @@ final class NotificationDashboardService
             'site_name' => $siteInfo['name'],
             'site_address' => $siteInfo['address'],
 
+            'start_date' => $newRow['start_date'] ?? '',
+            'end_date' => $newRow['end_date'] ?? '',
+            'class_type' => $newRow['class_type'] ?? '',
+            'schedule_pattern' => $newRow['schedule_pattern'] ?? '',
+            'learner_count' => $this->countLearners($newRow),
+
             'has_ai_summary' => $aiSummary !== null,
             'ai_summary_text' => $aiSummary['summary'] ?? '',
             'ai_summary_status' => $aiSummary['status'] ?? null,
@@ -264,6 +270,22 @@ final class NotificationDashboardService
     public function transformManyForDisplay(array $events): array
     {
         return array_map([$this, 'transformForDisplay'], $events);
+    }
+
+    /**
+     * Count learners from event data
+     *
+     * @param array<string, mixed> $newRow
+     * @return int
+     */
+    private function countLearners(array $newRow): int
+    {
+        $learnerIds = $newRow['learner_ids'] ?? [];
+        if (is_string($learnerIds)) {
+            $decoded = json_decode($learnerIds, true);
+            $learnerIds = is_array($decoded) ? $decoded : [];
+        }
+        return is_array($learnerIds) ? count($learnerIds) : 0;
     }
 
     /**

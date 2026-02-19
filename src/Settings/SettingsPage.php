@@ -31,6 +31,7 @@ final class SettingsPage
     private const NOTIFY_OPTIONS  = [
         'wecoza_notification_class_created',
         'wecoza_notification_class_updated',
+        'wecoza_notification_class_deleted',
         'wecoza_notification_material_delivery',
     ];
 
@@ -113,10 +114,12 @@ final class SettingsPage
 
         self::registerEmail($group, 'wecoza_notification_class_created');
         self::registerEmail($group, 'wecoza_notification_class_updated');
+        self::registerEmail($group, 'wecoza_notification_class_deleted');
         self::registerEmail($group, 'wecoza_notification_material_delivery');
 
         add_settings_field('wecoza_notification_class_created',    __('New Class Created (notify email)', 'wecoza'),  [self::class, 'renderEmailField'], $page, self::NOTIFY_SECTION, ['name' => 'wecoza_notification_class_created',    'placeholder' => 'created@example.com']);
         add_settings_field('wecoza_notification_class_updated',    __('Class Updated (notify email)', 'wecoza'),      [self::class, 'renderEmailField'], $page, self::NOTIFY_SECTION, ['name' => 'wecoza_notification_class_updated',    'placeholder' => 'updated@example.com']);
+        add_settings_field('wecoza_notification_class_deleted',     __('Class Deleted (notify email)', 'wecoza'),     [self::class, 'renderEmailField'], $page, self::NOTIFY_SECTION, ['name' => 'wecoza_notification_class_deleted',     'placeholder' => 'deleted@example.com']);
         add_settings_field('wecoza_notification_material_delivery', __('Material Delivery (notify email)', 'wecoza'), [self::class, 'renderEmailField'], $page, self::NOTIFY_SECTION, ['name' => 'wecoza_notification_material_delivery', 'placeholder' => 'materials@example.com']);
     }
 

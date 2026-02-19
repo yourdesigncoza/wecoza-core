@@ -6,16 +6,22 @@
  *   - new_row: Final class state at deletion
  *   - row: {event_id, class_id, changed_at, event_type}
  */
-$payload = $payload ?? [];
-$newRow  = $payload['new_row'] ?? [];
+$payload       = $payload ?? [];
+$newRow        = $payload['new_row'] ?? [];
+$resolvedNames = $payload['resolved_names'] ?? [];
 
 $details = [
-    'Class Code'  => $newRow['class_code'] ?? '',
-    'Subject'     => $newRow['class_subject'] ?? '',
-    'Status'      => $newRow['class_status'] ?? '',
-    'Start Date'  => $newRow['start_date'] ?? '',
-    'End Date'    => $newRow['end_date'] ?? '',
-    'Class Type'  => $newRow['class_type'] ?? '',
+    'Class Code'   => $newRow['class_code'] ?? '',
+    'Subject'      => $newRow['class_subject'] ?? '',
+    'Class Type'   => $newRow['class_type'] ?? '',
+    'Status'       => $newRow['class_status'] ?? '',
+    'Start Date'   => $newRow['start_date'] ?? '',
+    'End Date'     => $newRow['end_date'] ?? '',
+    'Schedule'     => $newRow['schedule_pattern'] ?? '',
+    'Client'       => $resolvedNames['client_name'] ?? '',
+    'Site'         => $resolvedNames['site_name'] ?? '',
+    'Site Address' => $resolvedNames['site_address'] ?? '',
+    'Agent'        => $resolvedNames['agent_name'] ?? '',
 ];
 
 // Count learners

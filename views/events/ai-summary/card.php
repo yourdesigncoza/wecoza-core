@@ -8,7 +8,7 @@
 if (!defined("ABSPATH")) {
     exit();
 } ?>
-<div class="timeline-scroll-wrapper" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
+<div class="timeline-scroll-wrapper" style="max-height: 640px; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
     <div class="row g-3">
         <?php foreach ($summaries as $summary): ?>
         <?php
@@ -39,11 +39,16 @@ if (!defined("ABSPATH")) {
                     <div class="d-flex align-items-start justify-content-between gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span data-role="status-badge" data-event-id="<?php echo esc_attr($eventId); ?>">
+                                <span data-role="status-badge" data-event-id="<?php echo esc_attr(
+                                    $eventId,
+                                ); ?>">
                                     <?php if ($isAcknowledged): ?>
                                         <span class="badge badge-phoenix badge-phoenix-success fs-10">Read</span>
                                     <?php elseif (!$isRead): ?>
-                                        <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__("NEW", "wecoza-events"); ?></span>
+                                        <span class="badge badge-phoenix badge-phoenix-primary fs-10"><?php echo esc_html__(
+                                            "NEW",
+                                            "wecoza-events",
+                                        ); ?></span>
                                     <?php else: ?>
                                         <span class="badge badge-phoenix badge-phoenix-info fs-10">Read</span>
                                     <?php endif; ?>
@@ -60,9 +65,30 @@ if (!defined("ABSPATH")) {
                                         "wecoza-events",
                                     ); ?>
                             </p>
+                            <?php if (!empty($summary["client_name"])): ?>
+                            <p class="mb-0 fs-10 text-body-tertiary">
+                                <i class="bi bi-building me-1"></i><?php echo esc_html(
+                                    $summary["client_name"],
+                                ); ?>
+                            </p>
+                            <?php endif; ?>
+                            <?php if (!empty($summary["site_name"])): ?>
+                            <p class="mb-0 fs-10 text-body-tertiary">
+                                <i class="bi bi-geo-alt me-1"></i><?php
+                                echo esc_html($summary["site_name"]);
+                                if (
+                                    !empty($summary["site_address"])
+                                ): ?> &mdash; <?php echo esc_html(
+     $summary["site_address"],
+ );endif;
+                                ?>
+                            </p>
+                            <?php endif; ?>
                             <?php if (!empty($summary["agent_name"])): ?>
                             <p class="mb-0 fs-10 text-body-tertiary">
-                                <i class="bi bi-person"></i> <?php echo esc_html($summary["agent_name"]); ?>
+                                <i class="bi bi-person me-1"></i><?php echo esc_html(
+                                    $summary["agent_name"],
+                                ); ?>
                             </p>
                             <?php endif; ?>
                         </div>
@@ -76,7 +102,7 @@ if (!defined("ABSPATH")) {
                         </span>
                     </div>
                 </div>
-                <div class="card-body" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
+                <div class="card-body" style="max-height: 110px; overflow-y: auto; overflow-x: hidden;">
                     <?php if ($summary["has_summary"]): ?>
                         <div class="fs-9 text-body">
                             <?php echo wp_kses_post(
@@ -84,53 +110,55 @@ if (!defined("ABSPATH")) {
                             ); ?>
                         </div>
                     <?php else: ?>
+                        <?php $detailRows = array_filter([
+                            "Class Type" => $summary["class_type"] ?? "",
+                            "Start Date" => $summary["start_date"] ?? "",
+                            "End Date" => $summary["end_date"] ?? "",
+                            "Schedule" => $summary["schedule_pattern"] ?? "",
+                            "Learners" =>
+                                ($summary["learner_count"] ?? 0) > 0
+                                    ? (string) $summary["learner_count"]
+                                    : "",
+                        ]); ?>
+                        <?php if (!empty($detailRows)): ?>
+                        <div class="fs-9 text-body">
+                            <ul class="list-unstyled mb-0">
+                                <?php foreach (
+                                    $detailRows
+                                    as $label => $value
+                                ): ?>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong><?php echo esc_html(
+                                    $label,
+                                ); ?>:</strong> <?php echo esc_html(
+    $value,
+); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                        <?php else: ?>
                         <p class="text-body-secondary fs-9 fst-italic mb-0">
                             <?php echo esc_html__(
                                 "No summary available for this change.",
                                 "wecoza-events",
                             ); ?>
                         </p>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
-                <div class="card-footer bg-body-tertiary border-top">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 fs-10 text-body-secondary">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-clock"></i>
-                            <span><?php echo esc_html(
+                <div class="card-footer bg-body-tertiary border-top py-2">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="fs-10 text-body-secondary">
+                            <i class="bi bi-clock me-1"></i><?php echo esc_html(
                                 $summary["created_at_formatted"] ??
                                     ($summary["changed_at_formatted"] ?? ""),
-                            ); ?></span>
-                        </div>
-                        <?php if (!empty($summary["summary_model"])): ?>
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-cpu"></i>
-                                <span>AI-Generated</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge <?php echo esc_attr(
-                                $summary["summary_status_badge_class"] ??
-                                    "badge-phoenix-secondary",
-                            ); ?> py-0 px-2 fs-10">
-                                <?php echo esc_html(
-                                    strtoupper(
-                                        $summary["summary_status"] ?? "unknown",
-                                    ),
-                                ); ?>
-                            </span>
-                            <?php if (!empty($summary["tokens_used"])): ?>
-                                <span class="fs-10 text-body-secondary">
-                                    <i class="bi bi-coin"></i> <?php echo esc_html(
-                                        number_format($summary["tokens_used"]),
-                                    ); ?>
-                                </span>
+                            ); ?>
+                            <?php if (!empty($summary["summary_model"])): ?>
+                                <span class="ms-2"><i class="bi bi-cpu me-1"></i>AI</span>
                             <?php endif; ?>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
+                        </span>
+                        <div class="btn-group" role="group">
                             <?php if ($isAcknowledged): ?>
-                                <span class="btn btn-subtle-warning py-0 px-2 fs-10" style="pointer-events:none;">
+                                <span class="btn btn-sm btn-subtle-warning" style="pointer-events:none;">
                                     <i class="bi bi-check-circle me-1"></i><?php echo esc_html__(
                                         "Acknowledged",
                                         "wecoza-events",
@@ -138,7 +166,7 @@ if (!defined("ABSPATH")) {
                                 </span>
                             <?php elseif ($eventId): ?>
                                 <button type="button"
-                                    class="btn btn-subtle-success py-0 px-2 fs-10"
+                                    class="btn btn-sm btn-subtle-success"
                                     data-role="acknowledge-btn"
                                     data-event-id="<?php echo esc_attr(
                                         $eventId,
@@ -151,10 +179,15 @@ if (!defined("ABSPATH")) {
                             <?php endif; ?>
                             <?php if ($eventId): ?>
                                 <button type="button"
-                                    class="btn btn-subtle-danger py-0 px-2 fs-10"
+                                    class="btn btn-sm btn-subtle-danger"
                                     data-role="delete-btn"
-                                    data-event-id="<?php echo esc_attr($eventId); ?>"
-                                    title="<?php echo esc_attr__('Delete notification', 'wecoza-events'); ?>">
+                                    data-event-id="<?php echo esc_attr(
+                                        $eventId,
+                                    ); ?>"
+                                    title="<?php echo esc_attr__(
+                                        "Delete notification",
+                                        "wecoza-events",
+                                    ); ?>">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             <?php endif; ?>

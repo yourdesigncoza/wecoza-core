@@ -421,7 +421,7 @@ final class AISummaryShortcode
                                 var ackBtn = item.querySelector('[data-role="acknowledge-btn"]');
                                 if (ackBtn) {
                                     var ackSpan = document.createElement('span');
-                                    ackSpan.className = 'btn btn-subtle-warning py-0 px-2 fs-10';
+                                    ackSpan.className = 'btn btn-subtle-warning';
                                     ackSpan.style.pointerEvents = 'none';
                                     ackSpan.innerHTML = '<i class="bi bi-check-circle me-1"></i>Acknowledged';
                                     ackBtn.replaceWith(ackSpan);

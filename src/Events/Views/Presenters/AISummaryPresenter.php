@@ -109,6 +109,12 @@ final class AISummaryPresenter
             'site_name' => $siteName,
             'site_address' => $siteAddress,
 
+            'start_date' => esc_html($record['start_date'] ?? ''),
+            'end_date' => esc_html($record['end_date'] ?? ''),
+            'class_type' => esc_html($record['class_type'] ?? ''),
+            'schedule_pattern' => esc_html($record['schedule_pattern'] ?? ''),
+            'learner_count' => (int) ($record['learner_count'] ?? 0),
+
             'event_type' => $eventType,
             'event_type_label' => $eventTypeConfig['label'],
             'event_type_badge_class' => $eventTypeConfig['badge_class'],

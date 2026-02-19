@@ -45,6 +45,7 @@ final class NotificationSettings
     private const LEGACY_OPTIONS = [
         'INSERT' => 'wecoza_notification_class_created',
         'UPDATE' => 'wecoza_notification_class_updated',
+        'DELETE' => 'wecoza_notification_class_deleted',
     ];
 
     /**
