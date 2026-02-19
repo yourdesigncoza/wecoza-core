@@ -20,7 +20,6 @@ foreach ($items as $item) {
         $counts['open']++;
     }
 }
-// Recount from unfiltered - we only have filtered items, so use the filtered count
 $totalLabel = match ($filter) {
     'open'     => $counts['all'] . ' Open',
     'resolved' => $counts['all'] . ' Resolved',
@@ -59,19 +58,17 @@ $totalLabel = match ($filter) {
             </div>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table table-hover mb-0 fs-9">
+                <table class="table table-hover mb-0 fs-9 wecoza-feedback-table">
                     <thead>
                         <tr>
-                            <?php if ($isAdmin): ?>
-                                <th class="text-center" style="width: 50px;">Done</th>
-                            <?php endif; ?>
                             <th>Title</th>
-                            <th style="width: 100px;">Category</th>
-                            <th style="width: 80px;">Priority</th>
-                            <th style="width: 140px;">Page</th>
-                            <th style="width: 130px;">User</th>
-                            <th style="width: 60px;">Img</th>
-                            <th style="width: 120px;">Date</th>
+                            <th style="width: 90px;">Category</th>
+                            <th style="width: 70px;">Priority</th>
+                            <th style="width: 50px;">Img</th>
+                            <th style="width: 110px;">Date</th>
+                            <?php if ($isAdmin): ?>
+                                <th class="text-center" style="width: 45px;">Done</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,31 +98,45 @@ $totalLabel = match ($filter) {
                                     $item['screenshot_path']
                                 );
                             }
+                            $conversation = [];
+                            if (!empty($item['ai_conversation'])) {
+                                $decoded = is_string($item['ai_conversation'])
+                                    ? json_decode($item['ai_conversation'], true)
+                                    : $item['ai_conversation'];
+                                if (is_array($decoded)) {
+                                    $conversation = $decoded;
+                                }
+                            }
+                            $urlParams = [];
+                            if (!empty($item['url_params'])) {
+                                $decoded = is_string($item['url_params'])
+                                    ? json_decode($item['url_params'], true)
+                                    : $item['url_params'];
+                                if (is_array($decoded)) {
+                                    $urlParams = $decoded;
+                                }
+                            }
+                            $rowId = (int) $item['id'];
                         ?>
-                            <tr class="<?= $isResolved ? 'opacity-50' : '' ?>" id="feedback-row-<?= (int) $item['id'] ?>">
-                                <?php if ($isAdmin): ?>
-                                    <td class="text-center align-middle">
-                                        <button type="button"
-                                                class="btn btn-sm p-0 border-0 wecoza-feedback-resolve-btn"
-                                                data-feedback-id="<?= (int) $item['id'] ?>"
-                                                title="<?= $isResolved ? 'Mark as open' : 'Mark as resolved' ?>">
-                                            <?php if ($isResolved): ?>
-                                                <span class="fas fa-check-circle text-success fs-7"></span>
-                                            <?php else: ?>
-                                                <span class="far fa-circle text-body-tertiary fs-7"></span>
-                                            <?php endif; ?>
-                                        </button>
-                                    </td>
-                                <?php endif; ?>
+                            <!-- Summary Row -->
+                            <tr class="<?= $isResolved ? 'opacity-50' : '' ?> wecoza-feedback-summary-row"
+                                id="feedback-row-<?= $rowId ?>"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#feedback-detail-<?= $rowId ?>"
+                                aria-expanded="false"
+                                role="button">
                                 <td class="align-middle">
+                                    <span class="fas fa-chevron-right fa-xs text-body-tertiary me-1 wecoza-feedback-chevron"></span>
                                     <strong class="<?= $isResolved ? 'text-decoration-line-through' : '' ?>">
                                         <?= esc_html($item['ai_generated_title'] ?: substr($item['feedback_text'], 0, 60)) ?>
                                     </strong>
-                                    <?php if ($isResolved && !empty($item['resolved_at'])): ?>
-                                        <br><small class="text-body-tertiary">
-                                            Resolved <?= esc_html(date('M j', strtotime($item['resolved_at']))) ?>
-                                        </small>
-                                    <?php endif; ?>
+                                    <br>
+                                    <small class="text-body-tertiary ms-3">
+                                        <?= esc_html(explode('@', $item['user_email'])[0]) ?>
+                                        <?php if (!empty($item['shortcode'])): ?>
+                                            &middot; <?= esc_html($item['shortcode']) ?>
+                                        <?php endif; ?>
+                                    </small>
                                 </td>
                                 <td class="align-middle">
                                     <span class="badge badge-phoenix badge-phoenix-<?= $categoryBadge ?>">
@@ -137,26 +148,119 @@ $totalLabel = match ($filter) {
                                         <?= esc_html($item['ai_suggested_priority'] ?? 'Medium') ?>
                                     </span>
                                 </td>
-                                <td class="align-middle">
-                                    <small class="text-truncate d-block" style="max-width: 140px;" title="<?= esc_attr($item['page_url'] ?? '') ?>">
-                                        <?= esc_html($item['page_title'] ?: 'N/A') ?>
-                                    </small>
-                                </td>
-                                <td class="align-middle">
-                                    <small><?= esc_html(explode('@', $item['user_email'])[0]) ?></small>
-                                </td>
                                 <td class="align-middle text-center">
                                     <?php if ($screenshotUrl): ?>
-                                        <a href="<?= esc_url($screenshotUrl) ?>" target="_blank" title="View screenshot">
-                                            <img src="<?= esc_url($screenshotUrl) ?>" alt="Screenshot"
-                                                 class="rounded" style="width: 40px; height: 28px; object-fit: cover;">
-                                        </a>
+                                        <img src="<?= esc_url($screenshotUrl) ?>" alt="Screenshot"
+                                             class="rounded" style="width: 40px; height: 28px; object-fit: cover;">
                                     <?php else: ?>
                                         <span class="text-body-tertiary">-</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="align-middle">
                                     <small><?= esc_html(date('M j, H:i', strtotime($item['created_at']))) ?></small>
+                                </td>
+                                <?php if ($isAdmin): ?>
+                                    <td class="text-center align-middle" onclick="event.stopPropagation();">
+                                        <button type="button"
+                                                class="btn btn-sm p-0 border-0 wecoza-feedback-resolve-btn"
+                                                data-feedback-id="<?= $rowId ?>"
+                                                title="<?= $isResolved ? 'Mark as open' : 'Mark as resolved' ?>">
+                                            <?php if ($isResolved): ?>
+                                                <span class="fas fa-check-circle text-success fs-7"></span>
+                                            <?php else: ?>
+                                                <span class="far fa-circle text-body-tertiary fs-7"></span>
+                                            <?php endif; ?>
+                                        </button>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+                            <!-- Detail Row (collapsible) -->
+                            <tr class="wecoza-feedback-detail-row">
+                                <td colspan="<?= $isAdmin ? 6 : 5 ?>" class="p-0 border-0">
+                                    <div class="collapse" id="feedback-detail-<?= $rowId ?>">
+                                        <div class="px-4 py-3 bg-body-tertiary border-top">
+                                            <div class="row g-3">
+                                                <!-- Left: Feedback text + conversation -->
+                                                <div class="col-md-<?= $screenshotUrl ? '8' : '12' ?>">
+                                                    <h6 class="fs-9 fw-bold text-body-secondary mb-1">Feedback</h6>
+                                                    <p class="mb-2 fs-9"><?= nl2br(esc_html($item['feedback_text'])) ?></p>
+
+                                                    <?php if (!empty($conversation)): ?>
+                                                        <h6 class="fs-9 fw-bold text-body-secondary mb-1 mt-3">AI Conversation</h6>
+                                                        <?php foreach ($conversation as $round): ?>
+                                                            <div class="mb-2 fs-9">
+                                                                <div class="text-body-secondary">
+                                                                    <span class="fas fa-robot fa-xs me-1"></span>
+                                                                    <?= esc_html($round['question'] ?? '') ?>
+                                                                </div>
+                                                                <?php if (!empty($round['answer'])): ?>
+                                                                    <div class="ms-3">
+                                                                        <span class="fas fa-user fa-xs me-1 text-body-tertiary"></span>
+                                                                        <?= esc_html($round['answer']) ?>
+                                                                    </div>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+
+                                                    <!-- Metadata -->
+                                                    <div class="mt-3 fs-10 text-body-tertiary">
+                                                        <div class="row g-2">
+                                                            <div class="col-sm-6">
+                                                                <span class="fw-semibold">Page:</span>
+                                                                <?= esc_html($item['page_title'] ?: 'N/A') ?>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <span class="fw-semibold">URL:</span>
+                                                                <a href="<?= esc_url($item['page_url'] ?? '') ?>" target="_blank" class="text-body-tertiary">
+                                                                    <?= esc_html($item['page_url'] ?? 'N/A') ?>
+                                                                </a>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <span class="fw-semibold">Shortcode:</span>
+                                                                <?= esc_html($item['shortcode'] ?: 'N/A') ?>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <span class="fw-semibold">User:</span>
+                                                                <?= esc_html($item['user_email']) ?>
+                                                            </div>
+                                                            <?php if (!empty($urlParams)): ?>
+                                                                <div class="col-sm-6">
+                                                                    <span class="fw-semibold">URL Params:</span>
+                                                                    <?= esc_html(json_encode($urlParams, JSON_UNESCAPED_SLASHES)) ?>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                            <div class="col-sm-6">
+                                                                <span class="fw-semibold">Browser:</span>
+                                                                <?= esc_html($item['browser_info'] ?? 'N/A') ?>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <span class="fw-semibold">Viewport:</span>
+                                                                <?= esc_html($item['viewport'] ?? 'N/A') ?>
+                                                            </div>
+                                                            <?php if ($isResolved && !empty($item['resolved_at'])): ?>
+                                                                <div class="col-sm-6">
+                                                                    <span class="fw-semibold">Resolved:</span>
+                                                                    <?= esc_html(date('M j, Y H:i', strtotime($item['resolved_at']))) ?>
+                                                                    by <?= esc_html($item['resolved_by'] ?? '') ?>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Right: Screenshot -->
+                                                <?php if ($screenshotUrl): ?>
+                                                    <div class="col-md-4">
+                                                        <h6 class="fs-9 fw-bold text-body-secondary mb-1">Screenshot</h6>
+                                                        <a href="<?= esc_url($screenshotUrl) ?>" target="_blank">
+                                                            <img src="<?= esc_url($screenshotUrl) ?>" alt="Screenshot"
+                                                                 class="rounded border w-100" style="max-height: 300px; object-fit: contain;">
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
