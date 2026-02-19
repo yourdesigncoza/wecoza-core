@@ -516,6 +516,202 @@ class LearnerProgressionRepository extends BaseRepository
     }
 
     /**
+     * Fetch all progression rows for the report page (5-table JOIN with employer).
+     *
+     * Supported filters:
+     *   - search (string): matches learner full name (ILIKE) or learner ID (if numeric)
+     *   - employer_id (int): filter by employer
+     *   - status (string): filter by lpt.status
+     *
+     * Results are ordered by employer_name, learner surname, start_date DESC.
+     */
+    public function findForReport(array $filters = []): array
+    {
+        // Complex query: 5-table JOIN (lpt + products + learners + classes + employers) with dynamic filters
+        $sql = "
+            SELECT
+                lpt.*,
+                p.product_name,
+                p.product_duration,
+                CONCAT(l.first_name, ' ', l.surname) AS learner_name,
+                l.id AS learner_id,
+                c.class_code,
+                emp.employer_name,
+                emp.employer_id
+            FROM learner_lp_tracking lpt
+            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN learners l ON lpt.learner_id = l.id
+            LEFT JOIN classes c ON lpt.class_id = c.class_id
+            LEFT JOIN employers emp ON l.employer_id = emp.employer_id
+        ";
+
+        $conditions = [];
+        $params     = [];
+        $paramTypes = [];
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            if (is_numeric($search)) {
+                $conditions[]             = "l.id = :search_id";
+                $params['search_id']      = (int) $search;
+                $paramTypes['search_id']  = PDO::PARAM_INT;
+            } else {
+                $conditions[]             = "CONCAT(l.first_name, ' ', l.surname) ILIKE :search_name";
+                $params['search_name']    = '%' . $search . '%';
+                $paramTypes['search_name'] = PDO::PARAM_STR;
+            }
+        }
+
+        if (!empty($filters['employer_id'])) {
+            $conditions[]                   = "l.employer_id = :employer_id";
+            $params['employer_id']          = (int) $filters['employer_id'];
+            $paramTypes['employer_id']      = PDO::PARAM_INT;
+        }
+
+        if (!empty($filters['status'])) {
+            $conditions[]              = "lpt.status = :status";
+            $params['status']          = $filters['status'];
+            $paramTypes['status']      = PDO::PARAM_STR;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $sql .= " ORDER BY emp.employer_name, l.surname, lpt.start_date DESC";
+
+        try {
+            $pdo  = $this->db->getPdo();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $key => $value) {
+                $stmt->bindValue(":$key", $value, $paramTypes[$key]);
+            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findForReport error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Return aggregate statistics for the report page.
+     *
+     * Applies the same filter logic as findForReport but returns a single stats row:
+     *   - total_learners, total_progressions, completed_count, in_progress_count, on_hold_count
+     *   - avg_progress (avg hours_present/product_duration*100, capped at 100, non-completed only)
+     *   - completion_rate (completed_count / total_progressions * 100)
+     */
+    public function getReportSummaryStats(array $filters = []): array
+    {
+        // Complex query: same 5-table JOIN as findForReport with conditional aggregation (PostgreSQL FILTER)
+        $sql = "
+            SELECT
+                COUNT(DISTINCT lpt.learner_id)                                                  AS total_learners,
+                COUNT(*)                                                                        AS total_progressions,
+                COUNT(*) FILTER (WHERE lpt.status = 'completed')                               AS completed_count,
+                COUNT(*) FILTER (WHERE lpt.status = 'in_progress')                             AS in_progress_count,
+                COUNT(*) FILTER (WHERE lpt.status = 'on_hold')                                 AS on_hold_count,
+                COALESCE(
+                    AVG(
+                        LEAST(
+                            CASE
+                                WHEN lpt.status != 'completed' AND NULLIF(p.product_duration, 0) IS NOT NULL
+                                    THEN (lpt.hours_present / p.product_duration::float) * 100
+                                ELSE NULL
+                            END,
+                            100
+                        )
+                    ),
+                    0
+                )                                                                               AS avg_progress
+            FROM learner_lp_tracking lpt
+            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN learners l ON lpt.learner_id = l.id
+            LEFT JOIN classes c ON lpt.class_id = c.class_id
+            LEFT JOIN employers emp ON l.employer_id = emp.employer_id
+        ";
+
+        $conditions = [];
+        $params     = [];
+        $paramTypes = [];
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            if (is_numeric($search)) {
+                $conditions[]             = "l.id = :search_id";
+                $params['search_id']      = (int) $search;
+                $paramTypes['search_id']  = PDO::PARAM_INT;
+            } else {
+                $conditions[]             = "CONCAT(l.first_name, ' ', l.surname) ILIKE :search_name";
+                $params['search_name']    = '%' . $search . '%';
+                $paramTypes['search_name'] = PDO::PARAM_STR;
+            }
+        }
+
+        if (!empty($filters['employer_id'])) {
+            $conditions[]              = "l.employer_id = :employer_id";
+            $params['employer_id']     = (int) $filters['employer_id'];
+            $paramTypes['employer_id'] = PDO::PARAM_INT;
+        }
+
+        if (!empty($filters['status'])) {
+            $conditions[]          = "lpt.status = :status";
+            $params['status']      = $filters['status'];
+            $paramTypes['status']  = PDO::PARAM_STR;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $zeroed = [
+            'total_learners'     => 0,
+            'total_progressions' => 0,
+            'completed_count'    => 0,
+            'in_progress_count'  => 0,
+            'on_hold_count'      => 0,
+            'avg_progress'       => 0.0,
+            'completion_rate'    => 0.0,
+        ];
+
+        try {
+            $pdo  = $this->db->getPdo();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $key => $value) {
+                $stmt->bindValue(":$key", $value, $paramTypes[$key]);
+            }
+
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return $zeroed;
+            }
+
+            $total       = (int) $row['total_progressions'];
+            $completed   = (int) $row['completed_count'];
+            $rate        = $total > 0 ? round(($completed / $total) * 100, 1) : 0.0;
+
+            return [
+                'total_learners'     => (int)   $row['total_learners'],
+                'total_progressions' => $total,
+                'completed_count'    => $completed,
+                'in_progress_count'  => (int)   $row['in_progress_count'],
+                'on_hold_count'      => (int)   $row['on_hold_count'],
+                'avg_progress'       => round((float) $row['avg_progress'], 1),
+                'completion_rate'    => $rate,
+            ];
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository getReportSummaryStats error: " . $e->getMessage());
+            return $zeroed;
+        }
+    }
+
+    /**
      * Save portfolio file record
      */
     public function savePortfolioFile(int $trackingId, array $fileData): ?int
