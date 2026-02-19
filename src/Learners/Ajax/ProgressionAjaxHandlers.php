@@ -487,6 +487,89 @@ function handle_toggle_progression_hold(): void
 }
 
 /**
+ * Return employer-grouped learner progression data for the report page.
+ *
+ * Accepts GET params: search, employer_id, status.
+ * Returns { groups: [...], summary: {...} }.
+ *
+ * AJAX action: get_progression_report
+ */
+function handle_get_progression_report(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized access']);
+            return;
+        }
+
+        // Build validated filters from GET params
+        $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
+        $filters         = [];
+
+        if (!empty($_GET['search'])) {
+            $filters['search'] = sanitize_text_field($_GET['search']);
+        }
+
+        if (!empty($_GET['employer_id'])) {
+            $filters['employer_id'] = intval($_GET['employer_id']);
+        }
+
+        if (!empty($_GET['status']) && in_array($_GET['status'], $allowedStatuses, true)) {
+            $filters['status'] = sanitize_key($_GET['status']);
+        }
+
+        $repository = new LearnerProgressionRepository();
+        $data       = $repository->findForReport($filters);
+        $stats      = $repository->getReportSummaryStats($filters);
+
+        // Group flat rows by employer, then by learner within each employer
+        $grouped = [];
+
+        foreach ($data as $row) {
+            $employerId   = $row['employer_id'] ?? 0;
+            $employerName = $row['employer_name'] ?? 'Unassigned';
+
+            if (!isset($grouped[$employerId])) {
+                $grouped[$employerId] = [
+                    'employer_id'   => $employerId,
+                    'employer_name' => $employerName,
+                    'learners'      => [],
+                ];
+            }
+
+            $learnerId = $row['learner_id'];
+
+            if (!isset($grouped[$employerId]['learners'][$learnerId])) {
+                $grouped[$employerId]['learners'][$learnerId] = [
+                    'learner_id'   => $learnerId,
+                    'learner_name' => $row['learner_name'],
+                    'progressions' => [],
+                ];
+            }
+
+            $grouped[$employerId]['learners'][$learnerId]['progressions'][] = $row;
+        }
+
+        // Re-index learners arrays to sequential JSON arrays
+        foreach ($grouped as &$group) {
+            $group['learners'] = array_values($group['learners']);
+        }
+        unset($group);
+        $grouped = array_values($grouped);
+
+        wp_send_json_success([
+            'groups'  => $grouped,
+            'summary' => $stats,
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
  * Register all progression AJAX handlers
  */
 function register_progression_ajax_handlers(): void
@@ -500,6 +583,7 @@ function register_progression_ajax_handlers(): void
     add_action('wp_ajax_get_progression_hours_log',        __NAMESPACE__ . '\handle_get_progression_hours_log');
     add_action('wp_ajax_start_learner_progression',        __NAMESPACE__ . '\handle_start_learner_progression');
     add_action('wp_ajax_toggle_progression_hold',          __NAMESPACE__ . '\handle_toggle_progression_hold');
+    add_action('wp_ajax_get_progression_report',           __NAMESPACE__ . '\handle_get_progression_report');
 }
 
 // Register handlers on init
