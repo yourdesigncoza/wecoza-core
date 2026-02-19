@@ -207,7 +207,7 @@
     function wipeData(toolbar) {
         var confirmed = window.confirm(
             'This will DELETE ALL WeCoza transactional data and reset IDs.\n' +
-            'Reference tables (locations, products, class_types) will be preserved.\n\n' +
+            'Reference tables (locations, class_types, class_type_subjects) will be preserved.\n\n' +
             'This cannot be undone. Continue?'
         );
 

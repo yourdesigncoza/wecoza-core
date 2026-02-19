@@ -157,11 +157,11 @@ try {
                            <?php if ($lpDetails): ?>
                            <div>
                               <span class="badge fs-10 badge-phoenix badge-phoenix-info" title="Started: <?php echo esc_attr($lpDetails['start_date'] ?? ''); ?>">
-                                 <?php echo esc_html($lpDetails['product_name'] ?? 'Unknown'); ?>
+                                 <?php echo esc_html($lpDetails['subject_name'] ?? 'Unknown'); ?>
                               </span>
                               <br>
                               <small class="text-muted">
-                                 <?php echo esc_html(number_format($lpDetails['hours_present'] ?? 0, 1)); ?> / <?php echo esc_html(number_format($lpDetails['product_duration'] ?? 0, 1)); ?> hrs
+                                 <?php echo esc_html(number_format($lpDetails['hours_present'] ?? 0, 1)); ?> / <?php echo esc_html(number_format($lpDetails['subject_duration'] ?? 0, 1)); ?> hrs
                               </small>
                            </div>
                            <?php else: ?>
@@ -180,7 +180,7 @@ try {
                               }
                               $hoursPresent = $lpDetails['hours_present'] ?? 0;
                               $hoursTrained = $lpDetails['hours_trained'] ?? 0;
-                              $productDuration = $lpDetails['product_duration'] ?? 0;
+                              $productDuration = $lpDetails['subject_duration'] ?? 0;
                            ?>
                            <div class="d-flex flex-column align-items-end">
                               <div class="progress mb-1" style="width: 80px; height: 6px;">

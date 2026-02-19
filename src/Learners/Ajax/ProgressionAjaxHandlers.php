@@ -249,8 +249,8 @@ function handle_get_admin_progressions(): void
         if (!empty($_GET['class_id'])) {
             $filters['class_id'] = intval($_GET['class_id']);
         }
-        if (!empty($_GET['product_id'])) {
-            $filters['product_id'] = intval($_GET['product_id']);
+        if (!empty($_GET['class_type_subject_id'])) {
+            $filters['class_type_subject_id'] = intval($_GET['class_type_subject_id']);
         }
         if (!empty($_GET['status']) && in_array($_GET['status'], $allowedStatuses, true)) {
             $filters['status'] = sanitize_key($_GET['status']);
@@ -375,11 +375,11 @@ function handle_get_progression_hours_log(): void
             'progression' => [
                 'tracking_id'      => $progression->getTrackingId(),
                 'learner_name'     => $progression->getLearnerName(),
-                'product_name'     => $progression->getProductName(),
+                'subject_name'     => $progression->getSubjectName(),
                 'status'           => $progression->getStatus(),
                 'hours_present'    => $progression->getHoursPresent(),
                 'hours_trained'    => $progression->getHoursTrained(),
-                'product_duration' => $progression->getProductDuration(),
+                'subject_duration' => $progression->getSubjectDuration(),
             ],
             'hours_log' => $hoursLog,
         ]);
@@ -409,16 +409,16 @@ function handle_start_learner_progression(): void
             throw new Exception('learner_id is required.');
         }
 
-        $productId = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
-        if (!$productId) {
-            throw new Exception('product_id is required.');
+        $classTypeSubjectId = isset($_POST['class_type_subject_id']) ? intval($_POST['class_type_subject_id']) : 0;
+        if (!$classTypeSubjectId) {
+            throw new Exception('class_type_subject_id is required.');
         }
 
         $classId = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
         $notes   = !empty($_POST['notes']) ? sanitize_textarea_field($_POST['notes']) : null;
 
         $service    = new ProgressionService();
-        $progression = $service->startLearnerProgression($learnerId, $productId, $classId, $notes);
+        $progression = $service->startLearnerProgression($learnerId, $classTypeSubjectId, $classId, $notes);
 
         wp_send_json_success([
             'tracking_id' => $progression->getTrackingId(),

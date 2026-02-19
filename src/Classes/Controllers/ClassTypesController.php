@@ -199,6 +199,39 @@ class ClassTypesController
         }
     }
 
+    /**
+     * Look up integer class_type_subject_id from varchar subject_code.
+     *
+     * Bridges classes.class_subject (varchar) to learner_lp_tracking.class_type_subject_id (int).
+     *
+     * @param  string $subjectCode  e.g. "BA2LP1", "COMM", "NL4"
+     * @return int|null  The class_type_subject_id or null if not found
+     */
+    public static function getSubjectIdByCode(string $subjectCode): ?int
+    {
+        $subjectCode = sanitize_text_field($subjectCode);
+        if ($subjectCode === '' || strlen($subjectCode) > 20) {
+            return null;
+        }
+
+        try {
+            $db = wecoza_db();
+            $stmt = $db->query(
+                "SELECT class_type_subject_id
+                 FROM public.class_type_subjects
+                 WHERE subject_code = ? AND is_active = TRUE
+                 LIMIT 1",
+                [$subjectCode]
+            );
+            $row = $stmt->fetch();
+            return $row ? (int) $row['class_type_subject_id'] : null;
+
+        } catch (\Exception $e) {
+            error_log('WeCoza Core ClassTypes: getSubjectIdByCode error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
     // ── private helpers ──────────────────────────────────────────
 
     private static function getAllSubjectsGrouped(): array

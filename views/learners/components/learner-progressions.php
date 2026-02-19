@@ -84,7 +84,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                             <div>
                                 <h6 class="mb-0">
                                     <i class="bi bi-graph-up-arrow me-2 text-primary"></i>
-                                    <?php echo esc_html($currentLP['product_name']); ?>
+                                    <?php echo esc_html($currentLP['subject_name']); ?>
                                 </h6>
                                 <small class="text-muted">
                                     <?php if ($currentLP['class_code']): ?>
@@ -109,7 +109,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                          aria-valuenow="<?php echo $progressPercentage; ?>"
                                          aria-valuemin="0"
                                          aria-valuemax="100">
-                                        <?php echo esc_html($currentLP['hours_present']); ?> / <?php echo esc_html($currentLP['product_duration']); ?> hrs
+                                        <?php echo esc_html($currentLP['hours_present']); ?> / <?php echo esc_html($currentLP['subject_duration']); ?> hrs
                                     </div>
                                 </div>
                                 <?php if ($currentLP['is_hours_complete']): ?>
@@ -151,10 +151,10 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                     <button type="button"
                                             class="btn btn-outline-success mark-complete-btn"
                                             data-tracking-id="<?php echo esc_attr($currentLP['tracking_id']); ?>"
-                                            data-product-name="<?php echo esc_attr($currentLP['product_name']); ?>"
+                                            data-subject-name="<?php echo esc_attr($currentLP['subject_name']); ?>"
                                             data-progress-pct="<?php echo esc_attr(round($progressPercentage, 1)); ?>"
                                             data-hours-present="<?php echo esc_attr($currentLP['hours_present']); ?>"
-                                            data-product-duration="<?php echo esc_attr($currentLP['product_duration']); ?>">
+                                            data-subject-duration="<?php echo esc_attr($currentLP['subject_duration']); ?>">
                                         <i class="bi bi-check-circle me-1"></i> Mark Complete
                                     </button>
 
@@ -269,7 +269,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                             <i class="bi bi-check-lg text-white"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <h6 class="mb-1"><?php echo esc_html($lp['product_name']); ?></h6>
+                                            <h6 class="mb-1"><?php echo esc_html($lp['subject_name']); ?></h6>
                                             <div class="text-muted small">
                                                 <span>
                                                     <i class="bi bi-calendar3 me-1"></i>
@@ -278,7 +278,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                                 </span>
                                                 <span class="ms-3">
                                                     <i class="bi bi-clock me-1"></i>
-                                                    <?php echo number_format($lp['hours_present'], 1); ?> / <?php echo number_format($lp['product_duration'], 1); ?> hrs
+                                                    <?php echo number_format($lp['hours_present'], 1); ?> / <?php echo number_format($lp['subject_duration'], 1); ?> hrs
                                                 </span>
                                             </div>
                                         </div>

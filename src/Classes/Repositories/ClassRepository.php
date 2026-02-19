@@ -199,8 +199,8 @@ class ClassRepository extends BaseRepository
      * Get all learners with location and progression context (cached)
      *
      * Includes:
-     * - Last completed course (product name, completion date)
-     * - Current active LP (product_id, product_name, progress %, class_id)
+     * - Last completed course (subject name, completion date)
+     * - Current active LP (class_type_subject_id, subject_name, progress %, class_id)
      */
     public static function getLearners(): array
     {
@@ -219,11 +219,11 @@ class ClassRepository extends BaseRepository
                 WITH last_completed AS (
                     SELECT DISTINCT ON (lpt.learner_id)
                         lpt.learner_id,
-                        lpt.product_id AS last_product_id,
-                        p.product_name AS last_course_name,
+                        lpt.class_type_subject_id AS last_subject_id,
+                        cts.subject_name AS last_course_name,
                         lpt.completion_date AS last_completion_date
                     FROM learner_lp_tracking lpt
-                    LEFT JOIN products p ON lpt.product_id = p.product_id
+                    LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
                     WHERE lpt.status = 'completed'
                     ORDER BY lpt.learner_id, lpt.completion_date DESC
                 ),
@@ -231,20 +231,20 @@ class ClassRepository extends BaseRepository
                     SELECT
                         lpt.learner_id,
                         lpt.tracking_id AS active_tracking_id,
-                        lpt.product_id AS active_product_id,
-                        p.product_name AS active_course_name,
-                        p.product_duration AS active_product_duration,
+                        lpt.class_type_subject_id AS active_subject_id,
+                        cts.subject_name AS active_course_name,
+                        cts.subject_duration AS active_subject_duration,
                         lpt.class_id AS active_class_id,
                         c.class_code AS active_class_code,
                         lpt.hours_present AS active_hours_present,
                         lpt.start_date AS active_start_date,
                         CASE
-                            WHEN p.product_duration > 0 THEN
-                                LEAST(100, ROUND((lpt.hours_present / p.product_duration) * 100, 1))
+                            WHEN cts.subject_duration > 0 THEN
+                                LEAST(100, ROUND((lpt.hours_present / cts.subject_duration) * 100, 1))
                             ELSE 0
                         END AS active_progress_pct
                     FROM learner_lp_tracking lpt
-                    LEFT JOIN products p ON lpt.product_id = p.product_id
+                    LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
                     LEFT JOIN classes c ON lpt.class_id = c.class_id
                     WHERE lpt.status = 'in_progress'
                 )
@@ -264,12 +264,12 @@ class ClassRepository extends BaseRepository
                     lc.last_course_name,
                     lc.last_completion_date,
                     alp.active_tracking_id,
-                    alp.active_product_id,
+                    alp.active_subject_id,
                     alp.active_course_name,
                     alp.active_class_id,
                     alp.active_class_code,
                     alp.active_hours_present,
-                    alp.active_product_duration,
+                    alp.active_subject_duration,
                     alp.active_progress_pct,
                     alp.active_start_date,
                     CASE WHEN alp.active_tracking_id IS NOT NULL THEN true ELSE false END AS has_active_lp
@@ -321,12 +321,12 @@ class ClassRepository extends BaseRepository
                     'last_completion_date' => sanitize_text_field($row['last_completion_date'] ?? ''),
                     'has_active_lp' => (bool)($row['has_active_lp'] ?? false),
                     'active_tracking_id' => $row['active_tracking_id'] ? (int)$row['active_tracking_id'] : null,
-                    'active_product_id' => $row['active_product_id'] ? (int)$row['active_product_id'] : null,
+                    'active_subject_id' => $row['active_subject_id'] ? (int)$row['active_subject_id'] : null,
                     'active_course_name' => sanitize_text_field($row['active_course_name'] ?? ''),
                     'active_class_id' => $row['active_class_id'] ? (int)$row['active_class_id'] : null,
                     'active_class_code' => sanitize_text_field($row['active_class_code'] ?? ''),
                     'active_hours_present' => $row['active_hours_present'] ? (float)$row['active_hours_present'] : 0,
-                    'active_product_duration' => $row['active_product_duration'] ? (float)$row['active_product_duration'] : 0,
+                    'active_subject_duration' => $row['active_subject_duration'] ? (float)$row['active_subject_duration'] : 0,
                     'active_progress_pct' => $row['active_progress_pct'] ? (float)$row['active_progress_pct'] : 0,
                     'active_start_date' => sanitize_text_field($row['active_start_date'] ?? '')
                 ];

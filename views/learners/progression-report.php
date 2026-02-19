@@ -28,7 +28,7 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- Main Content (hidden until JS loads data) -->
-    <div id="report-content" style="display: none;">
+    <div id="report-content" class="d-none">
 
         <!-- Header Row -->
         <div class="row mb-3 align-items-center">

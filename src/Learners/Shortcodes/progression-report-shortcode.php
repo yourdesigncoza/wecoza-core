@@ -35,9 +35,7 @@ function wecoza_progression_report_shortcode(): string {
         'nonce'   => wp_create_nonce('learners_nonce'),
     ]);
 
-    ob_start();
-    wecoza_view('learners/progression-report', []);
-    return ob_get_clean();
+    return wecoza_view('learners/progression-report', []);
 }
 
 // Register shortcode

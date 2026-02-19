@@ -41,18 +41,21 @@ class LearnerProgressionRepository extends BaseRepository
      */
     private function baseQuery(): string
     {
-        // Complex query: 4-table JOIN for full progression context
+        // Complex query: 5-table JOIN for full progression context (includes client via class)
         return "
             SELECT
                 lpt.*,
-                p.product_name,
-                p.product_duration,
+                cts.subject_name,
+                cts.subject_duration,
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
-                c.class_code
+                c.class_code,
+                cl.client_id,
+                cl.client_name
             FROM learner_lp_tracking lpt
-            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
             LEFT JOIN classes c ON lpt.class_id = c.class_id
+            LEFT JOIN clients cl ON c.client_id = cl.client_id
         ";
     }
 
@@ -162,13 +165,13 @@ class LearnerProgressionRepository extends BaseRepository
     }
 
     /**
-     * Find progressions by product
+     * Find progressions by class type subject
      */
-    public function findByProduct(int $productId, ?string $status = null): array
+    public function findByClassTypeSubject(int $classTypeSubjectId, ?string $status = null): array
     {
-        // Complex query: base query + product filter with optional status (uses baseQuery JOINs)
-        $sql = $this->baseQuery() . " WHERE lpt.product_id = :product_id";
-        $params = ['product_id' => $productId];
+        // Complex query: base query + subject filter with optional status (uses baseQuery JOINs)
+        $sql = $this->baseQuery() . " WHERE lpt.class_type_subject_id = :class_type_subject_id";
+        $params = ['class_type_subject_id' => $classTypeSubjectId];
 
         if ($status) {
             $sql .= " AND lpt.status = :status";
@@ -181,7 +184,7 @@ class LearnerProgressionRepository extends BaseRepository
             $stmt = $this->db->query($sql, $params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerProgressionRepository findByProduct error: " . $e->getMessage());
+            error_log("WeCoza Core: LearnerProgressionRepository findByClassTypeSubject error: " . $e->getMessage());
             return [];
         }
     }
@@ -193,7 +196,7 @@ class LearnerProgressionRepository extends BaseRepository
     {
         // Complex query: custom column whitelist with transaction and cache clear
         $columns = [
-            'learner_id', 'product_id', 'class_id',
+            'learner_id', 'class_type_subject_id', 'class_id',
             'hours_trained', 'hours_present', 'hours_absent',
             'status', 'start_date', 'notes',
             'created_at', 'updated_at'
@@ -295,7 +298,7 @@ class LearnerProgressionRepository extends BaseRepository
     {
         // Complex query: operates on learner_hours_log table (not $table)
         $columns = [
-            'learner_id', 'product_id', 'class_id', 'tracking_id',
+            'learner_id', 'class_type_subject_id', 'class_id', 'tracking_id',
             'log_date', 'hours_trained', 'hours_present',
             'source', 'session_id', 'created_by', 'notes'
         ];
@@ -343,11 +346,11 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function getHoursLogForLearner(int $learnerId, ?string $startDate = null, ?string $endDate = null): array
     {
-        // Complex query: JOIN learner_hours_log + products with date range filter
+        // Complex query: JOIN learner_hours_log + class_type_subjects with date range filter
         $sql = "
-            SELECT lhl.*, p.product_name
+            SELECT lhl.*, cts.subject_name
             FROM learner_hours_log lhl
-            LEFT JOIN products p ON lhl.product_id = p.product_id
+            LEFT JOIN class_type_subjects cts ON lhl.class_type_subject_id = cts.class_type_subject_id
             WHERE lhl.learner_id = :learner_id
         ";
         $params = ['learner_id' => $learnerId];
@@ -384,12 +387,12 @@ class LearnerProgressionRepository extends BaseRepository
         $sql = "
             SELECT
                 lpt.*,
-                p.product_name,
+                cts.subject_name,
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
                 c.class_code,
                 cl.client_name
             FROM learner_lp_tracking lpt
-            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
             LEFT JOIN classes c ON lpt.class_id = c.class_id
             LEFT JOIN clients cl ON c.client_id = cl.client_id
@@ -421,7 +424,6 @@ class LearnerProgressionRepository extends BaseRepository
         $params = [];
 
         if (!empty($filters['client_id'])) {
-            $sql = str_replace('LEFT JOIN classes c', 'LEFT JOIN classes c LEFT JOIN clients cl ON c.client_id = cl.client_id', $sql);
             $conditions[] = "cl.client_id = :client_id";
             $params['client_id'] = $filters['client_id'];
         }
@@ -431,9 +433,9 @@ class LearnerProgressionRepository extends BaseRepository
             $params['class_id'] = $filters['class_id'];
         }
 
-        if (!empty($filters['product_id'])) {
-            $conditions[] = "lpt.product_id = :product_id";
-            $params['product_id'] = $filters['product_id'];
+        if (!empty($filters['class_type_subject_id'])) {
+            $conditions[] = "lpt.class_type_subject_id = :class_type_subject_id";
+            $params['class_type_subject_id'] = $filters['class_type_subject_id'];
         }
 
         if (!empty($filters['status'])) {
@@ -477,13 +479,14 @@ class LearnerProgressionRepository extends BaseRepository
     public function countWithFilters(array $filters = []): int
     {
         // Complex query: dynamic JOIN + multi-criteria COUNT
-        $sql = "SELECT COUNT(*) FROM learner_lp_tracking lpt";
+        $sql = "SELECT COUNT(*) FROM learner_lp_tracking lpt
+                LEFT JOIN classes c ON lpt.class_id = c.class_id
+                LEFT JOIN clients cl ON c.client_id = cl.client_id";
         $conditions = [];
         $params = [];
 
         if (!empty($filters['client_id'])) {
-            $sql .= " LEFT JOIN classes c ON lpt.class_id = c.class_id";
-            $conditions[] = "c.client_id = :client_id";
+            $conditions[] = "cl.client_id = :client_id";
             $params['client_id'] = $filters['client_id'];
         }
 
@@ -492,9 +495,9 @@ class LearnerProgressionRepository extends BaseRepository
             $params['class_id'] = $filters['class_id'];
         }
 
-        if (!empty($filters['product_id'])) {
-            $conditions[] = "lpt.product_id = :product_id";
-            $params['product_id'] = $filters['product_id'];
+        if (!empty($filters['class_type_subject_id'])) {
+            $conditions[] = "lpt.class_type_subject_id = :class_type_subject_id";
+            $params['class_type_subject_id'] = $filters['class_type_subject_id'];
         }
 
         if (!empty($filters['status'])) {
@@ -527,19 +530,19 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function findForReport(array $filters = []): array
     {
-        // Complex query: 5-table JOIN (lpt + products + learners + classes + employers) with dynamic filters
+        // Complex query: 5-table JOIN (lpt + class_type_subjects + learners + classes + employers) with dynamic filters
         $sql = "
             SELECT
                 lpt.*,
-                p.product_name,
-                p.product_duration,
+                cts.subject_name,
+                cts.subject_duration,
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
                 l.id AS learner_id,
                 c.class_code,
                 emp.employer_name,
                 emp.employer_id
             FROM learner_lp_tracking lpt
-            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
             LEFT JOIN classes c ON lpt.class_id = c.class_id
             LEFT JOIN employers emp ON l.employer_id = emp.employer_id
@@ -601,7 +604,7 @@ class LearnerProgressionRepository extends BaseRepository
      *
      * Applies the same filter logic as findForReport but returns a single stats row:
      *   - total_learners, total_progressions, completed_count, in_progress_count, on_hold_count
-     *   - avg_progress (avg hours_present/product_duration*100, capped at 100, non-completed only)
+     *   - avg_progress (avg hours_present/subject_duration*100, capped at 100, non-completed only)
      *   - completion_rate (completed_count / total_progressions * 100)
      */
     public function getReportSummaryStats(array $filters = []): array
@@ -618,8 +621,8 @@ class LearnerProgressionRepository extends BaseRepository
                     AVG(
                         LEAST(
                             CASE
-                                WHEN lpt.status != 'completed' AND NULLIF(p.product_duration, 0) IS NOT NULL
-                                    THEN (lpt.hours_present / p.product_duration::float) * 100
+                                WHEN lpt.status != 'completed' AND NULLIF(cts.subject_duration, 0) IS NOT NULL
+                                    THEN (lpt.hours_present / cts.subject_duration::float) * 100
                                 ELSE NULL
                             END,
                             100
@@ -628,7 +631,7 @@ class LearnerProgressionRepository extends BaseRepository
                     0
                 )                                                                               AS avg_progress
             FROM learner_lp_tracking lpt
-            LEFT JOIN products p ON lpt.product_id = p.product_id
+            LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
             LEFT JOIN classes c ON lpt.class_id = c.class_id
             LEFT JOIN employers emp ON l.employer_id = emp.employer_id

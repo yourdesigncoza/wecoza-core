@@ -40,10 +40,10 @@ class LearnerProgressionModel extends BaseModel
     protected static array $casts = [
         'trackingId' => 'int',
         'learnerId' => 'int',
-        'productId' => 'int',
+        'classTypeSubjectId' => 'int',
         'classId' => 'int',
         'markedCompleteBy' => 'int',
-        'productDuration' => 'int',
+        'subjectDuration' => 'int',
         'hoursTrained' => 'float',
         'hoursPresent' => 'float',
         'hoursAbsent' => 'float',
@@ -52,7 +52,7 @@ class LearnerProgressionModel extends BaseModel
     // Core tracking fields
     protected ?int $trackingId = null;
     protected int $learnerId = 0;
-    protected int $productId = 0;
+    protected int $classTypeSubjectId = 0;
     protected ?int $classId = null;
 
     // Hours tracking (three-way)
@@ -79,9 +79,9 @@ class LearnerProgressionModel extends BaseModel
     protected ?string $createdAt = null;
     protected ?string $updatedAt = null;
 
-    // Joined fields (from products table)
-    protected ?string $productName = null;
-    protected ?int $productDuration = null;
+    // Joined fields (from class_type_subjects table)
+    protected ?string $subjectName = null;
+    protected ?int $subjectDuration = null;
 
     // Joined fields (from learners table)
     protected ?string $learnerName = null;
@@ -157,11 +157,11 @@ class LearnerProgressionModel extends BaseModel
     }
 
     /**
-     * Get progressions by product
+     * Get progressions by class type subject
      */
-    public static function getByProduct(int $productId, ?string $status = null): array
+    public static function getByClassTypeSubject(int $classTypeSubjectId, ?string $status = null): array
     {
-        $results = self::getRepository()->findByProduct($productId, $status);
+        $results = self::getRepository()->findByClassTypeSubject($classTypeSubjectId, $status);
         return array_map(fn($row) => new static($row), $results);
     }
 
@@ -176,10 +176,10 @@ class LearnerProgressionModel extends BaseModel
      */
     public function getProgressPercentage(): float
     {
-        if (!$this->productDuration || $this->productDuration <= 0) {
+        if (!$this->subjectDuration || $this->subjectDuration <= 0) {
             return 0;
         }
-        return min(100, round(($this->hoursPresent / $this->productDuration) * 100, 1));
+        return min(100, round(($this->hoursPresent / $this->subjectDuration) * 100, 1));
     }
 
     /**
@@ -195,7 +195,7 @@ class LearnerProgressionModel extends BaseModel
      */
     public function isHoursComplete(): bool
     {
-        return $this->productDuration && $this->hoursPresent >= $this->productDuration;
+        return $this->subjectDuration && $this->hoursPresent >= $this->subjectDuration;
     }
 
     /**
@@ -320,7 +320,7 @@ class LearnerProgressionModel extends BaseModel
 
         self::getRepository()->logHours([
             'learner_id' => $this->learnerId,
-            'product_id' => $this->productId,
+            'class_type_subject_id' => $this->classTypeSubjectId,
             'class_id' => $this->classId,
             'tracking_id' => $this->trackingId,
             'log_date' => wp_date('Y-m-d'),
@@ -358,7 +358,7 @@ class LearnerProgressionModel extends BaseModel
         $data = [
             'tracking_id' => $this->trackingId,
             'learner_id' => $this->learnerId,
-            'product_id' => $this->productId,
+            'class_type_subject_id' => $this->classTypeSubjectId,
             'class_id' => $this->classId,
             'hours_trained' => $this->hoursTrained,
             'hours_present' => $this->hoursPresent,
@@ -390,7 +390,7 @@ class LearnerProgressionModel extends BaseModel
         return [
             'trackingId' => $this->trackingId,
             'learnerId' => $this->learnerId,
-            'productId' => $this->productId,
+            'classTypeSubjectId' => $this->classTypeSubjectId,
             'classId' => $this->classId,
             'hoursTrained' => $this->hoursTrained,
             'hoursPresent' => $this->hoursPresent,
@@ -406,8 +406,8 @@ class LearnerProgressionModel extends BaseModel
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,
             // Joined fields
-            'productName' => $this->productName,
-            'productDuration' => $this->productDuration,
+            'subjectName' => $this->subjectName,
+            'subjectDuration' => $this->subjectDuration,
             'learnerName' => $this->learnerName,
             'classCode' => $this->classCode,
             // Computed fields
@@ -425,7 +425,7 @@ class LearnerProgressionModel extends BaseModel
 
     public function getTrackingId(): ?int { return $this->trackingId; }
     public function getLearnerId(): int { return $this->learnerId; }
-    public function getProductId(): int { return $this->productId; }
+    public function getClassTypeSubjectId(): int { return $this->classTypeSubjectId; }
     public function getClassId(): ?int { return $this->classId; }
     public function getHoursTrained(): float { return $this->hoursTrained; }
     public function getHoursPresent(): float { return $this->hoursPresent; }
@@ -440,8 +440,8 @@ class LearnerProgressionModel extends BaseModel
     public function getNotes(): ?string { return $this->notes; }
     public function getCreatedAt(): ?string { return $this->createdAt; }
     public function getUpdatedAt(): ?string { return $this->updatedAt; }
-    public function getProductName(): ?string { return $this->productName; }
-    public function getProductDuration(): ?int { return $this->productDuration; }
+    public function getSubjectName(): ?string { return $this->subjectName; }
+    public function getSubjectDuration(): ?int { return $this->subjectDuration; }
     public function getLearnerName(): ?string { return $this->learnerName; }
     public function getClassCode(): ?string { return $this->classCode; }
 
@@ -452,7 +452,7 @@ class LearnerProgressionModel extends BaseModel
     */
 
     public function setLearnerId(int $learnerId): static { $this->learnerId = $learnerId; return $this; }
-    public function setProductId(int $productId): static { $this->productId = $productId; return $this; }
+    public function setClassTypeSubjectId(int $classTypeSubjectId): static { $this->classTypeSubjectId = $classTypeSubjectId; return $this; }
     public function setClassId(?int $classId): static { $this->classId = $classId; return $this; }
     public function setHoursTrained(float $hours): static { $this->hoursTrained = $hours; return $this; }
     public function setHoursPresent(float $hours): static { $this->hoursPresent = $hours; return $this; }

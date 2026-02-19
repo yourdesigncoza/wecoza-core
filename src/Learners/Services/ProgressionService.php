@@ -35,20 +35,20 @@ class ProgressionService
      * Start a new LP for a learner
      *
      * @param int $learnerId
-     * @param int $productId
+     * @param int $classTypeSubjectId
      * @param int|null $classId
      * @param string|null $notes
      * @param bool $forceOverride If true, puts existing LP on hold instead of throwing
      * @return LearnerProgressionModel
      * @throws Exception if learner already has an in-progress LP and $forceOverride is false
      */
-    public function startLearnerProgression(int $learnerId, int $productId, ?int $classId = null, ?string $notes = null, bool $forceOverride = false): LearnerProgressionModel
+    public function startLearnerProgression(int $learnerId, int $classTypeSubjectId, ?int $classId = null, ?string $notes = null, bool $forceOverride = false): LearnerProgressionModel
     {
         $current = LearnerProgressionModel::getCurrentForLearner($learnerId);
 
         if ($current) {
             if (!$forceOverride) {
-                throw new Exception("Learner already has an in-progress LP: " . $current->getProductName());
+                throw new Exception("Learner already has an in-progress LP: " . $current->getSubjectName());
             }
 
             // Put current LP on hold
@@ -58,7 +58,7 @@ class ProgressionService
 
         $progression = new LearnerProgressionModel([
             'learner_id' => $learnerId,
-            'product_id' => $productId,
+            'class_type_subject_id' => $classTypeSubjectId,
             'class_id' => $classId,
             'status' => 'in_progress',
             'start_date' => wp_date('Y-m-d'),
@@ -91,8 +91,8 @@ class ProgressionService
         return [
             'has_collision' => true,
             'tracking_id' => $current->getTrackingId(),
-            'product_id' => $current->getProductId(),
-            'product_name' => $current->getProductName(),
+            'class_type_subject_id' => $current->getClassTypeSubjectId(),
+            'subject_name' => $current->getSubjectName(),
             'class_id' => $current->getClassId(),
             'class_code' => $current->getClassCode(),
             'progress_percentage' => $current->getProgressPercentage(),
@@ -108,12 +108,12 @@ class ProgressionService
      * Returns a result array instead of throwing exceptions.
      *
      * @param int $learnerId
-     * @param int $productId
+     * @param int $classTypeSubjectId
      * @param int $classId
      * @param bool $forceOverride
      * @return array Result with 'success', 'progression', 'warning', 'collision_data'
      */
-    public function createLPForClassAssignment(int $learnerId, int $productId, int $classId, bool $forceOverride = false): array
+    public function createLPForClassAssignment(int $learnerId, int $classTypeSubjectId, int $classId, bool $forceOverride = false): array
     {
         $collision = $this->checkForActiveLPCollision($learnerId);
 
@@ -122,7 +122,7 @@ class ProgressionService
             return [
                 'success' => false,
                 'warning' => true,
-                'message' => "Learner has an active LP: " . $collision['product_name'],
+                'message' => "Learner has an active LP: " . $collision['subject_name'],
                 'collision_data' => $collision,
                 'progression' => null,
             ];
@@ -131,10 +131,10 @@ class ProgressionService
         try {
             $notes = "Auto-created on class assignment. Class ID: {$classId}";
             if ($collision && $forceOverride) {
-                $notes .= " (Previous LP put on hold: " . $collision['product_name'] . ")";
+                $notes .= " (Previous LP put on hold: " . $collision['subject_name'] . ")";
             }
 
-            $progression = $this->startLearnerProgression($learnerId, $productId, $classId, $notes, $forceOverride);
+            $progression = $this->startLearnerProgression($learnerId, $classTypeSubjectId, $classId, $notes, $forceOverride);
 
             return [
                 'success' => true,
@@ -157,10 +157,10 @@ class ProgressionService
     /**
      * Assign LP to late starter (manual assignment)
      */
-    public function assignLPToLateStarter(int $learnerId, int $productId, int $classId, ?string $notes = null): LearnerProgressionModel
+    public function assignLPToLateStarter(int $learnerId, int $classTypeSubjectId, int $classId, ?string $notes = null): LearnerProgressionModel
     {
         $noteText = "Late starter - manually assigned. " . ($notes ?? '');
-        return $this->startLearnerProgression($learnerId, $productId, $classId, trim($noteText));
+        return $this->startLearnerProgression($learnerId, $classTypeSubjectId, $classId, trim($noteText));
     }
 
     /**
@@ -208,14 +208,14 @@ class ProgressionService
 
         $sql = "
             INSERT INTO learner_progressions
-            (learner_id, from_product_id, to_product_id, progression_date, notes)
-            VALUES (:learner_id, :product_id, :product_id, :date, :notes)
+            (learner_id, from_subject_id, to_subject_id, progression_date, notes)
+            VALUES (:learner_id, :subject_id, :subject_id, :date, :notes)
         ";
 
         try {
             $db->query($sql, [
                 'learner_id' => $progression->getLearnerId(),
-                'product_id' => $progression->getProductId(),
+                'subject_id' => $progression->getClassTypeSubjectId(),
                 'date' => wp_date('Y-m-d'),
                 'notes' => 'LP completed: ' . ($progression->getNotes() ?? '')
             ]);
@@ -276,7 +276,7 @@ class ProgressionService
         $totalLPs = count($progressions);
 
         foreach ($progressions as $progression) {
-            $duration = $progression->getProductDuration() ?? 0;
+            $duration = $progression->getSubjectDuration() ?? 0;
             $totalEnrolledHours += $duration;
 
             if ($progression->isCompleted()) {
@@ -313,8 +313,8 @@ class ProgressionService
 
         return [
             'tracking_id' => $progression->getTrackingId(),
-            'product_name' => $progression->getProductName(),
-            'product_duration' => $progression->getProductDuration(),
+            'subject_name' => $progression->getSubjectName(),
+            'subject_duration' => $progression->getSubjectDuration(),
             'hours_trained' => $progression->getHoursTrained(),
             'hours_present' => $progression->getHoursPresent(),
             'hours_absent' => $progression->getHoursAbsent(),
@@ -335,11 +335,11 @@ class ProgressionService
         return array_map(function($p) {
             return [
                 'tracking_id' => $p->getTrackingId(),
-                'product_name' => $p->getProductName(),
+                'subject_name' => $p->getSubjectName(),
                 'start_date' => $p->getStartDate(),
                 'completion_date' => $p->getCompletionDate(),
                 'hours_present' => $p->getHoursPresent(),
-                'product_duration' => $p->getProductDuration(),
+                'subject_duration' => $p->getSubjectDuration(),
             ];
         }, $progressions);
     }

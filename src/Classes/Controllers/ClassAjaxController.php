@@ -553,10 +553,16 @@ class ClassAjaxController extends BaseController
             'details' => [],
         ];
 
-        // Get the product_id (class subject) from the class
-        $productId = $class->getClassSubject(); // This should return the product_id
-        if (!$productId) {
-            $results['details'][] = 'No product/course assigned to class - LP creation skipped';
+        // Look up the integer class_type_subject_id from the varchar subject code
+        $subjectCode = $class->getClassSubject();
+        if (!$subjectCode) {
+            $results['details'][] = 'No subject assigned to class - LP creation skipped';
+            return $results;
+        }
+
+        $classTypeSubjectId = ClassTypesController::getSubjectIdByCode($subjectCode);
+        if (!$classTypeSubjectId) {
+            $results['details'][] = "No valid subject found for code '{$subjectCode}' - LP creation skipped";
             return $results;
         }
 
@@ -614,7 +620,7 @@ class ClassAjaxController extends BaseController
             try {
                 $lpResult = $progressionService->createLPForClassAssignment(
                     (int) $learnerId,
-                    (int) $productId,
+                    $classTypeSubjectId,
                     $class->getId(),
                     $forceOverride
                 );

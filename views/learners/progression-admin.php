@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- Main Content (hidden until JS loads data) -->
-    <div id="progression-admin-content" style="display: none;">
+    <div id="progression-admin-content" class="d-none">
 
         <!-- Header Row: Title + Start New LP button -->
         <div class="row mb-3 align-items-center">
@@ -59,7 +59,7 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fs-9 mb-1">Learning Programme</label>
-                        <select id="filter-product" class="form-select form-select-sm">
+                        <select id="filter-subject" class="form-select form-select-sm">
                             <option value="">All LPs</option>
                         </select>
                     </div>
@@ -148,10 +148,10 @@ if (!defined('ABSPATH')) {
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="start-lp-product">
+                            <label class="form-label" for="start-lp-subject">
                                 Learning Programme <span class="text-danger">*</span>
                             </label>
-                            <select id="start-lp-product" class="form-select" required>
+                            <select id="start-lp-subject" class="form-select" required>
                                 <option value="">Select LP...</option>
                             </select>
                         </div>

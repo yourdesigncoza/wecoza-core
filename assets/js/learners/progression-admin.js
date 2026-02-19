@@ -20,7 +20,7 @@
     let filterOptionsCache = {
         clients:  [],
         classes:  [],
-        products: [],
+        subjects: [],
         learners: [],
     };
 
@@ -59,7 +59,7 @@
 
                     // Populate filter dropdowns from first full load
                     if (currentPage === 1 && !currentFilters.client_id &&
-                        !currentFilters.class_id && !currentFilters.product_id &&
+                        !currentFilters.class_id && !currentFilters.class_type_subject_id &&
                         !currentFilters.status) {
                         buildFilterOptionsFromData(meta.data || []);
                         populateFilterDropdowns();
@@ -84,16 +84,16 @@
      * Show loading spinner, hide content area.
      */
     function showLoading() {
-        $('#progression-admin-loading').show();
-        $('#progression-admin-content').hide();
+        $('#progression-admin-loading').removeClass('d-none');
+        $('#progression-admin-content').addClass('d-none');
     }
 
     /**
      * Hide loading spinner, reveal content area.
      */
     function hideLoading() {
-        $('#progression-admin-loading').hide();
-        $('#progression-admin-content').show();
+        $('#progression-admin-loading').addClass('d-none');
+        $('#progression-admin-content').removeClass('d-none');
     }
 
     /**
@@ -135,7 +135,7 @@
             $tr.append($('<td>').text(row.learner_name || ''));
 
             // Col 3: LP name
-            $tr.append($('<td>').text(row.product_name || ''));
+            $tr.append($('<td>').text(row.subject_name || ''));
 
             // Col 4: Class code
             $tr.append($('<td>').text(row.class_code || '\u2014'));
@@ -149,7 +149,7 @@
             $tr.append($statusTd);
 
             // Col 6: Progress bar
-            const duration   = parseFloat(row.product_duration) || 0;
+            const duration   = parseFloat(row.subject_duration) || 0;
             const present    = parseFloat(row.hours_present) || 0;
             const pct        = duration > 0 ? Math.min(100, Math.round((present / duration) * 100)) : 0;
             const $progressTd = $('<td>').css('min-width', '120px');
@@ -317,7 +317,7 @@
     function buildFilterOptionsFromData(rows) {
         const clients  = {};
         const classes  = {};
-        const products = {};
+        const subjects = {};
         const learners = {};
 
         rows.forEach(function(row) {
@@ -327,8 +327,8 @@
             if (row.class_id && row.class_code && !classes[row.class_id]) {
                 classes[row.class_id] = row.class_code;
             }
-            if (row.product_id && row.product_name && !products[row.product_id]) {
-                products[row.product_id] = row.product_name;
+            if (row.class_type_subject_id && row.subject_name && !subjects[row.class_type_subject_id]) {
+                subjects[row.class_type_subject_id] = row.subject_name;
             }
             if (row.learner_id && row.learner_name && !learners[row.learner_id]) {
                 learners[row.learner_id] = row.learner_name;
@@ -337,7 +337,7 @@
 
         filterOptionsCache.clients  = Object.entries(clients).map(function([id, name]) { return { id: id, name: name }; });
         filterOptionsCache.classes  = Object.entries(classes).map(function([id, name]) { return { id: id, name: name }; });
-        filterOptionsCache.products = Object.entries(products).map(function([id, name]) { return { id: id, name: name }; });
+        filterOptionsCache.subjects = Object.entries(subjects).map(function([id, name]) { return { id: id, name: name }; });
         filterOptionsCache.learners = Object.entries(learners).map(function([id, name]) { return { id: id, name: name }; });
     }
 
@@ -347,7 +347,7 @@
     function populateFilterDropdowns() {
         populateSelect('#filter-client',  filterOptionsCache.clients,  'All Clients');
         populateSelect('#filter-class',   filterOptionsCache.classes,   'All Classes');
-        populateSelect('#filter-product', filterOptionsCache.products,  'All LPs');
+        populateSelect('#filter-subject', filterOptionsCache.subjects,  'All LPs');
     }
 
     /**
@@ -374,15 +374,15 @@
     }
 
     /**
-     * Populate Start LP modal selects (learners, products, classes).
+     * Populate Start LP modal selects (learners, subjects, classes).
      * Uses cache from first load; falls back to AJAX if cache is empty.
      */
     function populateStartLPModal() {
         // Learners select
         populateSelect('#start-lp-learner', filterOptionsCache.learners, 'Select Learner...');
 
-        // Products select
-        populateSelect('#start-lp-product', filterOptionsCache.products, 'Select LP...');
+        // Subjects select
+        populateSelect('#start-lp-subject', filterOptionsCache.subjects, 'Select LP...');
 
         // Classes select
         populateSelect('#start-lp-class', filterOptionsCache.classes, 'No class');
@@ -402,7 +402,7 @@
                     if (response.success && response.data && response.data.data) {
                         buildFilterOptionsFromData(response.data.data);
                         populateSelect('#start-lp-learner', filterOptionsCache.learners, 'Select Learner...');
-                        populateSelect('#start-lp-product', filterOptionsCache.products, 'Select LP...');
+                        populateSelect('#start-lp-subject', filterOptionsCache.subjects, 'Select LP...');
                         populateSelect('#start-lp-class',   filterOptionsCache.classes,  'No class');
                     }
                 }
@@ -420,7 +420,7 @@
         currentFilters = {
             client_id:  $('#filter-client').val()  || '',
             class_id:   $('#filter-class').val()   || '',
-            product_id: $('#filter-product').val() || '',
+            class_type_subject_id: $('#filter-subject').val() || '',
             status:     $('#filter-status').val()  || '',
         };
         // Strip empty keys to keep request clean
@@ -621,13 +621,13 @@
         $('<strong>').text(data.learner_name || '').appendTo($row);
 
         $('<span>').addClass('badge badge-phoenix badge-phoenix-info ms-2')
-            .text(data.product_name || '').appendTo($row);
+            .text(data.subject_name || '').appendTo($row);
 
         $('<span>').addClass('badge badge-phoenix ' + statusBadgeClass(data.status))
             .text(statusLabel(data.status)).appendTo($row);
 
         $('<span>').addClass('text-muted ms-2 fs-9')
-            .text('Hours: ' + (data.hours_present || 0) + ' / ' + (data.product_duration || 0) + ' present')
+            .text('Hours: ' + (data.hours_present || 0) + ' / ' + (data.subject_duration || 0) + ' present')
             .appendTo($row);
 
         $summary.append($row);
@@ -698,13 +698,13 @@
      */
     function handleStartNewLPSubmit() {
         const learnerId = $('#start-lp-learner').val();
-        const productId = $('#start-lp-product').val();
+        const classTypeSubjectId = $('#start-lp-subject').val();
 
         if (!learnerId) {
             showAlert('#start-lp-alert', 'Please select a learner.', 'danger');
             return;
         }
-        if (!productId) {
+        if (!classTypeSubjectId) {
             showAlert('#start-lp-alert', 'Please select a Learning Programme.', 'danger');
             return;
         }
@@ -722,7 +722,7 @@
                 action:     'start_learner_progression',
                 nonce:      config.nonce,
                 learner_id: learnerId,
-                product_id: productId,
+                class_type_subject_id: classTypeSubjectId,
                 class_id:   $('#start-lp-class').val()  || '',
                 notes:      $('#start-lp-notes').val()  || '',
             },

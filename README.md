@@ -335,7 +335,7 @@ Manages learner records including personal information, qualifications, employme
 - LP (Learning Programme) progression tracking
 - Portfolio upload management
 - Hours tracking (trained, present, absent)
-- Progress calculation from hours vs product duration
+- Progress calculation from hours vs subject duration
 - Single active LP enforcement per learner
 
 **LP Progression Statuses:** `in_progress`, `completed`, `on_hold`
@@ -661,6 +661,28 @@ wp wecoza version
 # AI Summary status (Events module)
 wp wecoza ai-summary status
 ```
+
+## Learner Journey (Process Flow)
+
+```
+1. INTAKE        → assessed at numeracy "Level 3"       (learner_placement_level)
+                   assessed at communication "Level 2"  (learner_placement_level)
+
+2. CLASS ASSIGN  → placed in class studying "NL4"       (class_type_subjects)
+                   LP created tracking hours toward 240h duration
+
+3. PROGRESSION   → hours logged against "NL4" subject   (class_type_subjects)
+                   progress = hours_present / subject_duration
+```
+
+**Key lookup tables:**
+
+| Table | Purpose | Used by |
+|-------|---------|---------|
+| `learner_placement_level` | Assessment levels (NQF) for numeracy/communication | `learners.numeracy_level`, `learners.communication_level` |
+| `class_type_subjects` | Subjects studied (COMM, NUM, NL4, BA2LP1, etc.) with duration | `learner_lp_tracking`, `learner_hours_log`, class forms |
+
+These tables serve different purposes: placement levels capture **pre-class assessment results**, while class type subjects define **what learners study** and drive LP progress tracking.
 
 ## Database Schema
 

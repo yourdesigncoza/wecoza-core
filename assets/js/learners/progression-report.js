@@ -92,16 +92,16 @@
      * Show loading spinner, hide report content.
      */
     function showLoading() {
-        $('#report-loading').show();
-        $('#report-content').hide();
+        $('#report-loading').removeClass('d-none');
+        $('#report-content').addClass('d-none');
     }
 
     /**
      * Hide loading spinner, reveal report content.
      */
     function hideLoading() {
-        $('#report-loading').hide();
-        $('#report-content').show();
+        $('#report-loading').addClass('d-none');
+        $('#report-content').removeClass('d-none');
     }
 
     // =========================================================
@@ -312,7 +312,7 @@
 
         sorted.forEach(function(prog) {
             const status      = prog.status || 'in_progress';
-            const duration    = parseFloat(prog.product_duration) || 0;
+            const duration    = parseFloat(prog.subject_duration) || 0;
             const hoursPresent = parseFloat(prog.hours_present)    || 0;
             const progressPct = duration > 0
                 ? Math.min(100, Math.round((hoursPresent / duration) * 100))
@@ -341,7 +341,7 @@
             const $colContent = $('<div>').addClass('col');
 
             const $titleRow = $('<div>').addClass('d-flex justify-content-between mb-1');
-            $('<h6>').addClass('fs-9 mb-0').text(prog.product_name || 'Unknown LP').appendTo($titleRow);
+            $('<h6>').addClass('fs-9 mb-0').text(prog.subject_name || 'Unknown LP').appendTo($titleRow);
             $('<span>').addClass('badge badge-phoenix badge-phoenix-' + statusBadgeClass(status) + ' fs-10')
                 .text(statusLabel(status)).appendTo($titleRow);
 
@@ -350,7 +350,7 @@
             $meta.append($('<span>').addClass('mx-1').html('&middot;'));
             $meta.append($('<span>').text(dateRange));
             $meta.append($('<span>').addClass('mx-1').html('&middot;'));
-            $meta.append($('<span>').text('Hours: ' + hoursPresent + '/' + (prog.product_duration || '?')));
+            $meta.append($('<span>').text('Hours: ' + hoursPresent + '/' + (prog.subject_duration || '?')));
 
             $colContent.append($titleRow).append($meta);
 

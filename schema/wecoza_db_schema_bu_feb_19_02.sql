@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict OTVgfNd2iZ8rniKSNjR7AkO5Aecwr4Xps07dhRlp0OcF8t9tei237slqMTrWODb
+\restrict Vgt0T9Nrz8F9L5XGAgmBebMJghbHuvaLTGbfwjzWDINqDDben1SOEoo3AIABpDh
 
 -- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 18.2 (Ubuntu 18.2-1.pgdg22.04+1)
 
--- Started on 2026-02-17 15:37:55 SAST
+-- Started on 2026-02-19 13:38:03 SAST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -32,7 +32,7 @@ CREATE SCHEMA archive;
 ALTER SCHEMA archive OWNER TO "John";
 
 --
--- TOC entry 4137 (class 0 OID 0)
+-- TOC entry 4064 (class 0 OID 0)
 -- Dependencies: 7
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
 --
@@ -51,7 +51,7 @@ CREATE SCHEMA wecoza_events;
 ALTER SCHEMA wecoza_events OWNER TO "John";
 
 --
--- TOC entry 4139 (class 0 OID 0)
+-- TOC entry 4066 (class 0 OID 0)
 -- Dependencies: 6
 -- Name: SCHEMA wecoza_events; Type: COMMENT; Schema: -; Owner: John
 --
@@ -60,7 +60,7 @@ COMMENT ON SCHEMA wecoza_events IS 'WeCoza Events Plugin schema for notification
 
 
 --
--- TOC entry 315 (class 1255 OID 17282)
+-- TOC entry 304 (class 1255 OID 17282)
 -- Name: fn_sites_same_client(); Type: FUNCTION; Schema: public; Owner: John
 --
 
@@ -93,7 +93,7 @@ END$$;
 ALTER FUNCTION public.fn_sites_same_client() OWNER TO "John";
 
 --
--- TOC entry 316 (class 1255 OID 17284)
+-- TOC entry 305 (class 1255 OID 17284)
 -- Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: John
 --
 
@@ -110,8 +110,8 @@ $$;
 ALTER FUNCTION public.update_updated_at_column() OWNER TO "John";
 
 --
--- TOC entry 4140 (class 0 OID 0)
--- Dependencies: 316
+-- TOC entry 4067 (class 0 OID 0)
+-- Dependencies: 305
 -- Name: FUNCTION update_updated_at_column(); Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -119,7 +119,7 @@ COMMENT ON FUNCTION public.update_updated_at_column() IS 'Generic trigger functi
 
 
 --
--- TOC entry 317 (class 1255 OID 17285)
+-- TOC entry 306 (class 1255 OID 17285)
 -- Name: get_dashboard_statistics(); Type: FUNCTION; Schema: wecoza_events; Owner: John
 --
 
@@ -142,7 +142,7 @@ $$;
 ALTER FUNCTION wecoza_events.get_dashboard_statistics() OWNER TO "John";
 
 --
--- TOC entry 318 (class 1255 OID 17286)
+-- TOC entry 307 (class 1255 OID 17286)
 -- Name: get_pending_notifications(integer); Type: FUNCTION; Schema: wecoza_events; Owner: John
 --
 
@@ -171,7 +171,7 @@ $$;
 ALTER FUNCTION wecoza_events.get_pending_notifications(limit_count integer) OWNER TO "John";
 
 --
--- TOC entry 319 (class 1255 OID 17287)
+-- TOC entry 308 (class 1255 OID 17287)
 -- Name: get_unprocessed_events(integer); Type: FUNCTION; Schema: wecoza_events; Owner: John
 --
 
@@ -199,7 +199,7 @@ $$;
 ALTER FUNCTION wecoza_events.get_unprocessed_events(limit_count integer) OWNER TO "John";
 
 --
--- TOC entry 320 (class 1255 OID 17288)
+-- TOC entry 309 (class 1255 OID 17288)
 -- Name: update_updated_at_column(); Type: FUNCTION; Schema: wecoza_events; Owner: John
 --
 
@@ -237,7 +237,7 @@ CREATE TABLE public.agent_absences (
 ALTER TABLE public.agent_absences OWNER TO "John";
 
 --
--- TOC entry 4141 (class 0 OID 0)
+-- TOC entry 4068 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: TABLE agent_absences; Type: COMMENT; Schema: public; Owner: John
 --
@@ -246,7 +246,7 @@ COMMENT ON TABLE public.agent_absences IS 'Records instances when agents are abs
 
 
 --
--- TOC entry 4142 (class 0 OID 0)
+-- TOC entry 4069 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: COLUMN agent_absences.absence_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -255,7 +255,7 @@ COMMENT ON COLUMN public.agent_absences.absence_id IS 'Unique internal absence I
 
 
 --
--- TOC entry 4143 (class 0 OID 0)
+-- TOC entry 4070 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: COLUMN agent_absences.agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -264,7 +264,7 @@ COMMENT ON COLUMN public.agent_absences.agent_id IS 'Reference to the absent age
 
 
 --
--- TOC entry 4144 (class 0 OID 0)
+-- TOC entry 4071 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: COLUMN agent_absences.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -273,7 +273,7 @@ COMMENT ON COLUMN public.agent_absences.class_id IS 'Reference to the class affe
 
 
 --
--- TOC entry 4145 (class 0 OID 0)
+-- TOC entry 4072 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: COLUMN agent_absences.absence_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -282,7 +282,7 @@ COMMENT ON COLUMN public.agent_absences.absence_date IS 'Date of the agent''s ab
 
 
 --
--- TOC entry 4146 (class 0 OID 0)
+-- TOC entry 4073 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: COLUMN agent_absences.reason; Type: COMMENT; Schema: public; Owner: John
 --
@@ -291,7 +291,7 @@ COMMENT ON COLUMN public.agent_absences.reason IS 'Reason for the agent''s absen
 
 
 --
--- TOC entry 4147 (class 0 OID 0)
+-- TOC entry 4074 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: COLUMN agent_absences.reported_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -316,7 +316,7 @@ CREATE SEQUENCE public.agent_absences_absence_id_seq
 ALTER SEQUENCE public.agent_absences_absence_id_seq OWNER TO "John";
 
 --
--- TOC entry 4148 (class 0 OID 0)
+-- TOC entry 4075 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: agent_absences_absence_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -325,7 +325,7 @@ ALTER SEQUENCE public.agent_absences_absence_id_seq OWNED BY public.agent_absenc
 
 
 --
--- TOC entry 312 (class 1259 OID 24744)
+-- TOC entry 300 (class 1259 OID 24744)
 -- Name: agent_meta; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -341,7 +341,7 @@ CREATE TABLE public.agent_meta (
 ALTER TABLE public.agent_meta OWNER TO "John";
 
 --
--- TOC entry 311 (class 1259 OID 24743)
+-- TOC entry 299 (class 1259 OID 24743)
 -- Name: agent_meta_meta_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -357,8 +357,8 @@ CREATE SEQUENCE public.agent_meta_meta_id_seq
 ALTER SEQUENCE public.agent_meta_meta_id_seq OWNER TO "John";
 
 --
--- TOC entry 4149 (class 0 OID 0)
--- Dependencies: 311
+-- TOC entry 4076 (class 0 OID 0)
+-- Dependencies: 299
 -- Name: agent_meta_meta_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -381,7 +381,7 @@ CREATE TABLE public.agent_notes (
 ALTER TABLE public.agent_notes OWNER TO "John";
 
 --
--- TOC entry 4150 (class 0 OID 0)
+-- TOC entry 4077 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: TABLE agent_notes; Type: COMMENT; Schema: public; Owner: John
 --
@@ -390,7 +390,7 @@ COMMENT ON TABLE public.agent_notes IS 'Stores historical notes and remarks abou
 
 
 --
--- TOC entry 4151 (class 0 OID 0)
+-- TOC entry 4078 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: COLUMN agent_notes.note_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -399,7 +399,7 @@ COMMENT ON COLUMN public.agent_notes.note_id IS 'Unique internal note ID';
 
 
 --
--- TOC entry 4152 (class 0 OID 0)
+-- TOC entry 4079 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: COLUMN agent_notes.agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -408,7 +408,7 @@ COMMENT ON COLUMN public.agent_notes.agent_id IS 'Reference to the agent';
 
 
 --
--- TOC entry 4153 (class 0 OID 0)
+-- TOC entry 4080 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: COLUMN agent_notes.note; Type: COMMENT; Schema: public; Owner: John
 --
@@ -417,7 +417,7 @@ COMMENT ON COLUMN public.agent_notes.note IS 'Content of the note regarding the 
 
 
 --
--- TOC entry 4154 (class 0 OID 0)
+-- TOC entry 4081 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: COLUMN agent_notes.note_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -442,7 +442,7 @@ CREATE SEQUENCE public.agent_notes_note_id_seq
 ALTER SEQUENCE public.agent_notes_note_id_seq OWNER TO "John";
 
 --
--- TOC entry 4155 (class 0 OID 0)
+-- TOC entry 4082 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: agent_notes_note_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -471,7 +471,7 @@ CREATE TABLE public.agent_orders (
 ALTER TABLE public.agent_orders OWNER TO "John";
 
 --
--- TOC entry 4156 (class 0 OID 0)
+-- TOC entry 4083 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: TABLE agent_orders; Type: COMMENT; Schema: public; Owner: John
 --
@@ -480,7 +480,7 @@ COMMENT ON TABLE public.agent_orders IS 'Stores order information related to age
 
 
 --
--- TOC entry 4157 (class 0 OID 0)
+-- TOC entry 4084 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.order_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -489,7 +489,7 @@ COMMENT ON COLUMN public.agent_orders.order_id IS 'Unique internal order ID';
 
 
 --
--- TOC entry 4158 (class 0 OID 0)
+-- TOC entry 4085 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -498,7 +498,7 @@ COMMENT ON COLUMN public.agent_orders.agent_id IS 'Reference to the agent';
 
 
 --
--- TOC entry 4159 (class 0 OID 0)
+-- TOC entry 4086 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -507,7 +507,7 @@ COMMENT ON COLUMN public.agent_orders.class_id IS 'Reference to the class';
 
 
 --
--- TOC entry 4160 (class 0 OID 0)
+-- TOC entry 4087 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.order_number; Type: COMMENT; Schema: public; Owner: John
 --
@@ -516,7 +516,7 @@ COMMENT ON COLUMN public.agent_orders.order_number IS 'Valid order number associ
 
 
 --
--- TOC entry 4161 (class 0 OID 0)
+-- TOC entry 4088 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.class_time; Type: COMMENT; Schema: public; Owner: John
 --
@@ -525,7 +525,7 @@ COMMENT ON COLUMN public.agent_orders.class_time IS 'Time when the class is sche
 
 
 --
--- TOC entry 4162 (class 0 OID 0)
+-- TOC entry 4089 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.class_days; Type: COMMENT; Schema: public; Owner: John
 --
@@ -534,7 +534,7 @@ COMMENT ON COLUMN public.agent_orders.class_days IS 'Days when the class is sche
 
 
 --
--- TOC entry 4163 (class 0 OID 0)
+-- TOC entry 4090 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.order_hours; Type: COMMENT; Schema: public; Owner: John
 --
@@ -543,7 +543,7 @@ COMMENT ON COLUMN public.agent_orders.order_hours IS 'Number of hours linked to 
 
 
 --
--- TOC entry 4164 (class 0 OID 0)
+-- TOC entry 4091 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.created_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -552,7 +552,7 @@ COMMENT ON COLUMN public.agent_orders.created_at IS 'Timestamp when the order re
 
 
 --
--- TOC entry 4165 (class 0 OID 0)
+-- TOC entry 4092 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: COLUMN agent_orders.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -577,7 +577,7 @@ CREATE SEQUENCE public.agent_orders_order_id_seq
 ALTER SEQUENCE public.agent_orders_order_id_seq OWNER TO "John";
 
 --
--- TOC entry 4166 (class 0 OID 0)
+-- TOC entry 4093 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: agent_orders_order_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -604,7 +604,7 @@ CREATE TABLE public.agent_replacements (
 ALTER TABLE public.agent_replacements OWNER TO "John";
 
 --
--- TOC entry 4167 (class 0 OID 0)
+-- TOC entry 4094 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: TABLE agent_replacements; Type: COMMENT; Schema: public; Owner: John
 --
@@ -613,7 +613,7 @@ COMMENT ON TABLE public.agent_replacements IS 'Records instances of agent replac
 
 
 --
--- TOC entry 4168 (class 0 OID 0)
+-- TOC entry 4095 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.replacement_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -622,7 +622,7 @@ COMMENT ON COLUMN public.agent_replacements.replacement_id IS 'Unique internal r
 
 
 --
--- TOC entry 4169 (class 0 OID 0)
+-- TOC entry 4096 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -631,7 +631,7 @@ COMMENT ON COLUMN public.agent_replacements.class_id IS 'Reference to the class'
 
 
 --
--- TOC entry 4170 (class 0 OID 0)
+-- TOC entry 4097 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.original_agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -640,7 +640,7 @@ COMMENT ON COLUMN public.agent_replacements.original_agent_id IS 'Reference to t
 
 
 --
--- TOC entry 4171 (class 0 OID 0)
+-- TOC entry 4098 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.replacement_agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -649,7 +649,7 @@ COMMENT ON COLUMN public.agent_replacements.replacement_agent_id IS 'Reference t
 
 
 --
--- TOC entry 4172 (class 0 OID 0)
+-- TOC entry 4099 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.start_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -658,7 +658,7 @@ COMMENT ON COLUMN public.agent_replacements.start_date IS 'Date when the replace
 
 
 --
--- TOC entry 4173 (class 0 OID 0)
+-- TOC entry 4100 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.end_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -667,7 +667,7 @@ COMMENT ON COLUMN public.agent_replacements.end_date IS 'Date when the replaceme
 
 
 --
--- TOC entry 4174 (class 0 OID 0)
+-- TOC entry 4101 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: COLUMN agent_replacements.reason; Type: COMMENT; Schema: public; Owner: John
 --
@@ -692,7 +692,7 @@ CREATE SEQUENCE public.agent_replacements_replacement_id_seq
 ALTER SEQUENCE public.agent_replacements_replacement_id_seq OWNER TO "John";
 
 --
--- TOC entry 4175 (class 0 OID 0)
+-- TOC entry 4102 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: agent_replacements_replacement_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -769,7 +769,7 @@ CREATE TABLE public.agents (
 ALTER TABLE public.agents OWNER TO "John";
 
 --
--- TOC entry 4176 (class 0 OID 0)
+-- TOC entry 4103 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: TABLE agents; Type: COMMENT; Schema: public; Owner: John
 --
@@ -778,7 +778,7 @@ COMMENT ON TABLE public.agents IS 'Stores information about agents (instructors 
 
 
 --
--- TOC entry 4177 (class 0 OID 0)
+-- TOC entry 4104 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -787,7 +787,7 @@ COMMENT ON COLUMN public.agents.agent_id IS 'Unique internal agent ID';
 
 
 --
--- TOC entry 4178 (class 0 OID 0)
+-- TOC entry 4105 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.first_name; Type: COMMENT; Schema: public; Owner: John
 --
@@ -796,7 +796,7 @@ COMMENT ON COLUMN public.agents.first_name IS 'Agent''s first name';
 
 
 --
--- TOC entry 4179 (class 0 OID 0)
+-- TOC entry 4106 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.initials; Type: COMMENT; Schema: public; Owner: John
 --
@@ -805,7 +805,7 @@ COMMENT ON COLUMN public.agents.initials IS 'Agent''s initials';
 
 
 --
--- TOC entry 4180 (class 0 OID 0)
+-- TOC entry 4107 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.surname; Type: COMMENT; Schema: public; Owner: John
 --
@@ -814,7 +814,7 @@ COMMENT ON COLUMN public.agents.surname IS 'Agent''s surname';
 
 
 --
--- TOC entry 4181 (class 0 OID 0)
+-- TOC entry 4108 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.gender; Type: COMMENT; Schema: public; Owner: John
 --
@@ -823,7 +823,7 @@ COMMENT ON COLUMN public.agents.gender IS 'Agent''s gender';
 
 
 --
--- TOC entry 4182 (class 0 OID 0)
+-- TOC entry 4109 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.race; Type: COMMENT; Schema: public; Owner: John
 --
@@ -832,7 +832,7 @@ COMMENT ON COLUMN public.agents.race IS 'Agent''s race; options include ''Africa
 
 
 --
--- TOC entry 4183 (class 0 OID 0)
+-- TOC entry 4110 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.sa_id_no; Type: COMMENT; Schema: public; Owner: John
 --
@@ -841,7 +841,7 @@ COMMENT ON COLUMN public.agents.sa_id_no IS 'Agent''s South African ID number';
 
 
 --
--- TOC entry 4184 (class 0 OID 0)
+-- TOC entry 4111 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.passport_number; Type: COMMENT; Schema: public; Owner: John
 --
@@ -850,7 +850,7 @@ COMMENT ON COLUMN public.agents.passport_number IS 'Agent''s passport number if 
 
 
 --
--- TOC entry 4185 (class 0 OID 0)
+-- TOC entry 4112 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.tel_number; Type: COMMENT; Schema: public; Owner: John
 --
@@ -859,7 +859,7 @@ COMMENT ON COLUMN public.agents.tel_number IS 'Agent''s primary telephone number
 
 
 --
--- TOC entry 4186 (class 0 OID 0)
+-- TOC entry 4113 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.email_address; Type: COMMENT; Schema: public; Owner: John
 --
@@ -868,7 +868,7 @@ COMMENT ON COLUMN public.agents.email_address IS 'Agent''s email address';
 
 
 --
--- TOC entry 4187 (class 0 OID 0)
+-- TOC entry 4114 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.residential_address_line; Type: COMMENT; Schema: public; Owner: John
 --
@@ -877,7 +877,7 @@ COMMENT ON COLUMN public.agents.residential_address_line IS 'Agent''s residentia
 
 
 --
--- TOC entry 4188 (class 0 OID 0)
+-- TOC entry 4115 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.residential_suburb; Type: COMMENT; Schema: public; Owner: John
 --
@@ -886,7 +886,7 @@ COMMENT ON COLUMN public.agents.residential_suburb IS 'Agent''s residential subu
 
 
 --
--- TOC entry 4189 (class 0 OID 0)
+-- TOC entry 4116 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.residential_postal_code; Type: COMMENT; Schema: public; Owner: John
 --
@@ -895,7 +895,7 @@ COMMENT ON COLUMN public.agents.residential_postal_code IS 'Postal code of the a
 
 
 --
--- TOC entry 4190 (class 0 OID 0)
+-- TOC entry 4117 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.preferred_working_area_1; Type: COMMENT; Schema: public; Owner: John
 --
@@ -904,7 +904,7 @@ COMMENT ON COLUMN public.agents.preferred_working_area_1 IS 'Agent''s first pref
 
 
 --
--- TOC entry 4191 (class 0 OID 0)
+-- TOC entry 4118 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.preferred_working_area_2; Type: COMMENT; Schema: public; Owner: John
 --
@@ -913,7 +913,7 @@ COMMENT ON COLUMN public.agents.preferred_working_area_2 IS 'Agent''s second pre
 
 
 --
--- TOC entry 4192 (class 0 OID 0)
+-- TOC entry 4119 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.preferred_working_area_3; Type: COMMENT; Schema: public; Owner: John
 --
@@ -922,7 +922,7 @@ COMMENT ON COLUMN public.agents.preferred_working_area_3 IS 'Agent''s third pref
 
 
 --
--- TOC entry 4193 (class 0 OID 0)
+-- TOC entry 4120 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.highest_qualification; Type: COMMENT; Schema: public; Owner: John
 --
@@ -931,7 +931,7 @@ COMMENT ON COLUMN public.agents.highest_qualification IS 'Highest qualification 
 
 
 --
--- TOC entry 4194 (class 0 OID 0)
+-- TOC entry 4121 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.sace_number; Type: COMMENT; Schema: public; Owner: John
 --
@@ -940,7 +940,7 @@ COMMENT ON COLUMN public.agents.sace_number IS 'Agent''s SACE (South African Cou
 
 
 --
--- TOC entry 4195 (class 0 OID 0)
+-- TOC entry 4122 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.sace_registration_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -949,7 +949,7 @@ COMMENT ON COLUMN public.agents.sace_registration_date IS 'Date when the agent''
 
 
 --
--- TOC entry 4196 (class 0 OID 0)
+-- TOC entry 4123 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.sace_expiry_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -958,7 +958,7 @@ COMMENT ON COLUMN public.agents.sace_expiry_date IS 'Expiry date of the agent''s
 
 
 --
--- TOC entry 4197 (class 0 OID 0)
+-- TOC entry 4124 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.quantum_assessment; Type: COMMENT; Schema: public; Owner: John
 --
@@ -967,7 +967,7 @@ COMMENT ON COLUMN public.agents.quantum_assessment IS 'Agent''s competence score
 
 
 --
--- TOC entry 4198 (class 0 OID 0)
+-- TOC entry 4125 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.agent_training_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -976,7 +976,7 @@ COMMENT ON COLUMN public.agents.agent_training_date IS 'Date when the agent rece
 
 
 --
--- TOC entry 4199 (class 0 OID 0)
+-- TOC entry 4126 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.bank_name; Type: COMMENT; Schema: public; Owner: John
 --
@@ -985,7 +985,7 @@ COMMENT ON COLUMN public.agents.bank_name IS 'Name of the agent''s bank';
 
 
 --
--- TOC entry 4200 (class 0 OID 0)
+-- TOC entry 4127 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.bank_branch_code; Type: COMMENT; Schema: public; Owner: John
 --
@@ -994,7 +994,7 @@ COMMENT ON COLUMN public.agents.bank_branch_code IS 'Branch code of the agent''s
 
 
 --
--- TOC entry 4201 (class 0 OID 0)
+-- TOC entry 4128 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.bank_account_number; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1003,7 +1003,7 @@ COMMENT ON COLUMN public.agents.bank_account_number IS 'Agent''s bank account nu
 
 
 --
--- TOC entry 4202 (class 0 OID 0)
+-- TOC entry 4129 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.signed_agreement_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1012,7 +1012,7 @@ COMMENT ON COLUMN public.agents.signed_agreement_date IS 'Date when the agent si
 
 
 --
--- TOC entry 4203 (class 0 OID 0)
+-- TOC entry 4130 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.agent_notes; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1021,7 +1021,7 @@ COMMENT ON COLUMN public.agents.agent_notes IS 'Notes regarding the agent''s per
 
 
 --
--- TOC entry 4204 (class 0 OID 0)
+-- TOC entry 4131 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.created_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1030,7 +1030,7 @@ COMMENT ON COLUMN public.agents.created_at IS 'Timestamp when the agent record w
 
 
 --
--- TOC entry 4205 (class 0 OID 0)
+-- TOC entry 4132 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1039,7 +1039,7 @@ COMMENT ON COLUMN public.agents.updated_at IS 'Timestamp when the agent record w
 
 
 --
--- TOC entry 4206 (class 0 OID 0)
+-- TOC entry 4133 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.title; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1048,7 +1048,7 @@ COMMENT ON COLUMN public.agents.title IS 'Agent''s title (Mr, Mrs, Ms, etc)';
 
 
 --
--- TOC entry 4207 (class 0 OID 0)
+-- TOC entry 4134 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.id_type; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1057,7 +1057,7 @@ COMMENT ON COLUMN public.agents.id_type IS 'Type of identification: sa_id or pas
 
 
 --
--- TOC entry 4208 (class 0 OID 0)
+-- TOC entry 4135 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.address_line_2; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1066,7 +1066,7 @@ COMMENT ON COLUMN public.agents.address_line_2 IS 'Additional address informatio
 
 
 --
--- TOC entry 4209 (class 0 OID 0)
+-- TOC entry 4136 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.criminal_record_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1075,7 +1075,7 @@ COMMENT ON COLUMN public.agents.criminal_record_date IS 'Date of criminal record
 
 
 --
--- TOC entry 4210 (class 0 OID 0)
+-- TOC entry 4137 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.criminal_record_file; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1084,7 +1084,7 @@ COMMENT ON COLUMN public.agents.criminal_record_file IS 'Path to criminal record
 
 
 --
--- TOC entry 4211 (class 0 OID 0)
+-- TOC entry 4138 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.province; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1093,7 +1093,7 @@ COMMENT ON COLUMN public.agents.province IS 'Province where the agent resides';
 
 
 --
--- TOC entry 4212 (class 0 OID 0)
+-- TOC entry 4139 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.city; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1102,7 +1102,7 @@ COMMENT ON COLUMN public.agents.city IS 'City where the agent resides';
 
 
 --
--- TOC entry 4213 (class 0 OID 0)
+-- TOC entry 4140 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.phase_registered; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1111,7 +1111,7 @@ COMMENT ON COLUMN public.agents.phase_registered IS 'Educational phase the agent
 
 
 --
--- TOC entry 4214 (class 0 OID 0)
+-- TOC entry 4141 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.subjects_registered; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1120,7 +1120,7 @@ COMMENT ON COLUMN public.agents.subjects_registered IS 'Subjects the agent is re
 
 
 --
--- TOC entry 4215 (class 0 OID 0)
+-- TOC entry 4142 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.account_holder; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1129,7 +1129,7 @@ COMMENT ON COLUMN public.agents.account_holder IS 'Name of the bank account hold
 
 
 --
--- TOC entry 4216 (class 0 OID 0)
+-- TOC entry 4143 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.account_type; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1138,7 +1138,7 @@ COMMENT ON COLUMN public.agents.account_type IS 'Type of bank account (Savings, 
 
 
 --
--- TOC entry 4217 (class 0 OID 0)
+-- TOC entry 4144 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.status; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1147,7 +1147,7 @@ COMMENT ON COLUMN public.agents.status IS 'Current status of the agent';
 
 
 --
--- TOC entry 4218 (class 0 OID 0)
+-- TOC entry 4145 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.created_by; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1156,7 +1156,7 @@ COMMENT ON COLUMN public.agents.created_by IS 'User ID who created the record';
 
 
 --
--- TOC entry 4219 (class 0 OID 0)
+-- TOC entry 4146 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.updated_by; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1165,7 +1165,7 @@ COMMENT ON COLUMN public.agents.updated_by IS 'User ID who last updated the reco
 
 
 --
--- TOC entry 4220 (class 0 OID 0)
+-- TOC entry 4147 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN agents.second_name; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1190,7 +1190,7 @@ CREATE SEQUENCE public.agents_agent_id_seq
 ALTER SEQUENCE public.agents_agent_id_seq OWNER TO "John";
 
 --
--- TOC entry 4221 (class 0 OID 0)
+-- TOC entry 4148 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: agents_agent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -1216,7 +1216,7 @@ CREATE TABLE public.attendance_registers (
 ALTER TABLE public.attendance_registers OWNER TO "John";
 
 --
--- TOC entry 4222 (class 0 OID 0)
+-- TOC entry 4149 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: TABLE attendance_registers; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1225,7 +1225,7 @@ COMMENT ON TABLE public.attendance_registers IS 'Records attendance registers fo
 
 
 --
--- TOC entry 4223 (class 0 OID 0)
+-- TOC entry 4150 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: COLUMN attendance_registers.register_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1234,7 +1234,7 @@ COMMENT ON COLUMN public.attendance_registers.register_id IS 'Unique internal at
 
 
 --
--- TOC entry 4224 (class 0 OID 0)
+-- TOC entry 4151 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: COLUMN attendance_registers.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1243,7 +1243,7 @@ COMMENT ON COLUMN public.attendance_registers.class_id IS 'Reference to the clas
 
 
 --
--- TOC entry 4225 (class 0 OID 0)
+-- TOC entry 4152 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: COLUMN attendance_registers.date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1252,7 +1252,7 @@ COMMENT ON COLUMN public.attendance_registers.date IS 'Date of the attendance';
 
 
 --
--- TOC entry 4226 (class 0 OID 0)
+-- TOC entry 4153 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: COLUMN attendance_registers.agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1261,7 +1261,7 @@ COMMENT ON COLUMN public.attendance_registers.agent_id IS 'Reference to the agen
 
 
 --
--- TOC entry 4227 (class 0 OID 0)
+-- TOC entry 4154 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: COLUMN attendance_registers.created_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1270,7 +1270,7 @@ COMMENT ON COLUMN public.attendance_registers.created_at IS 'Timestamp when the 
 
 
 --
--- TOC entry 4228 (class 0 OID 0)
+-- TOC entry 4155 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: COLUMN attendance_registers.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1295,7 +1295,7 @@ CREATE SEQUENCE public.attendance_registers_register_id_seq
 ALTER SEQUENCE public.attendance_registers_register_id_seq OWNER TO "John";
 
 --
--- TOC entry 4229 (class 0 OID 0)
+-- TOC entry 4156 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: attendance_registers_register_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -1320,7 +1320,7 @@ CREATE TABLE public.class_agents (
 ALTER TABLE public.class_agents OWNER TO "John";
 
 --
--- TOC entry 4230 (class 0 OID 0)
+-- TOC entry 4157 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: TABLE class_agents; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1329,7 +1329,7 @@ COMMENT ON TABLE public.class_agents IS 'Associates agents with classes they fac
 
 
 --
--- TOC entry 4231 (class 0 OID 0)
+-- TOC entry 4158 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN class_agents.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1338,7 +1338,7 @@ COMMENT ON COLUMN public.class_agents.class_id IS 'Reference to the class';
 
 
 --
--- TOC entry 4232 (class 0 OID 0)
+-- TOC entry 4159 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN class_agents.agent_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1347,7 +1347,7 @@ COMMENT ON COLUMN public.class_agents.agent_id IS 'Reference to the agent facili
 
 
 --
--- TOC entry 4233 (class 0 OID 0)
+-- TOC entry 4160 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN class_agents.start_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1356,7 +1356,7 @@ COMMENT ON COLUMN public.class_agents.start_date IS 'Date when the agent started
 
 
 --
--- TOC entry 4234 (class 0 OID 0)
+-- TOC entry 4161 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN class_agents.end_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1365,7 +1365,7 @@ COMMENT ON COLUMN public.class_agents.end_date IS 'Date when the agent stopped f
 
 
 --
--- TOC entry 4235 (class 0 OID 0)
+-- TOC entry 4162 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN class_agents.role; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1374,7 +1374,7 @@ COMMENT ON COLUMN public.class_agents.role IS 'Role of the agent in the class (e
 
 
 --
--- TOC entry 310 (class 1259 OID 24717)
+-- TOC entry 298 (class 1259 OID 24717)
 -- Name: class_events; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -1392,6 +1392,8 @@ CREATE TABLE public.class_events (
     sent_at timestamp with time zone,
     viewed_at timestamp with time zone,
     acknowledged_at timestamp with time zone,
+    deleted_at timestamp with time zone,
+    deleted_by integer,
     CONSTRAINT chk_entity_type CHECK (((entity_type)::text = ANY ((ARRAY['class'::character varying, 'learner'::character varying])::text[]))),
     CONSTRAINT chk_event_type CHECK (((event_type)::text = ANY ((ARRAY['CLASS_INSERT'::character varying, 'CLASS_UPDATE'::character varying, 'CLASS_DELETE'::character varying, 'LEARNER_ADD'::character varying, 'LEARNER_REMOVE'::character varying, 'LEARNER_UPDATE'::character varying, 'STATUS_CHANGE'::character varying])::text[]))),
     CONSTRAINT chk_notification_status CHECK (((notification_status)::text = ANY ((ARRAY['pending'::character varying, 'enriching'::character varying, 'sending'::character varying, 'sent'::character varying, 'failed'::character varying])::text[])))
@@ -1401,8 +1403,8 @@ CREATE TABLE public.class_events (
 ALTER TABLE public.class_events OWNER TO "John";
 
 --
--- TOC entry 4236 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4163 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: TABLE class_events; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1410,8 +1412,8 @@ COMMENT ON TABLE public.class_events IS 'Application-level event storage for WeC
 
 
 --
--- TOC entry 4237 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4164 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.event_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1419,8 +1421,8 @@ COMMENT ON COLUMN public.class_events.event_id IS 'Auto-incrementing primary key
 
 
 --
--- TOC entry 4238 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4165 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.event_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1428,8 +1430,8 @@ COMMENT ON COLUMN public.class_events.event_type IS 'Type of event: CLASS_INSERT
 
 
 --
--- TOC entry 4239 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4166 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.entity_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1437,8 +1439,8 @@ COMMENT ON COLUMN public.class_events.entity_type IS 'Entity being tracked: clas
 
 
 --
--- TOC entry 4240 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4167 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.entity_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1446,8 +1448,8 @@ COMMENT ON COLUMN public.class_events.entity_id IS 'ID of the entity (class_id o
 
 
 --
--- TOC entry 4241 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4168 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.user_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1455,8 +1457,8 @@ COMMENT ON COLUMN public.class_events.user_id IS 'WordPress user ID who triggere
 
 
 --
--- TOC entry 4242 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4169 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.event_data; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1464,8 +1466,8 @@ COMMENT ON COLUMN public.class_events.event_data IS 'JSONB payload containing ne
 
 
 --
--- TOC entry 4243 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4170 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.ai_summary; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1473,8 +1475,8 @@ COMMENT ON COLUMN public.class_events.ai_summary IS 'AI-generated summary of the
 
 
 --
--- TOC entry 4244 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4171 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.notification_status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1482,8 +1484,8 @@ COMMENT ON COLUMN public.class_events.notification_status IS 'Workflow status: p
 
 
 --
--- TOC entry 4245 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4172 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1491,8 +1493,8 @@ COMMENT ON COLUMN public.class_events.created_at IS 'When the event was captured
 
 
 --
--- TOC entry 4246 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4173 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.enriched_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1500,8 +1502,8 @@ COMMENT ON COLUMN public.class_events.enriched_at IS 'When AI enrichment complet
 
 
 --
--- TOC entry 4247 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4174 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.sent_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1509,8 +1511,8 @@ COMMENT ON COLUMN public.class_events.sent_at IS 'When notification was delivere
 
 
 --
--- TOC entry 4248 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4175 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.viewed_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1518,8 +1520,8 @@ COMMENT ON COLUMN public.class_events.viewed_at IS 'When user viewed the notific
 
 
 --
--- TOC entry 4249 (class 0 OID 0)
--- Dependencies: 310
+-- TOC entry 4176 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN class_events.acknowledged_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -1527,7 +1529,7 @@ COMMENT ON COLUMN public.class_events.acknowledged_at IS 'When user acknowledged
 
 
 --
--- TOC entry 309 (class 1259 OID 24716)
+-- TOC entry 297 (class 1259 OID 24716)
 -- Name: class_events_event_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -1543,8 +1545,8 @@ CREATE SEQUENCE public.class_events_event_id_seq
 ALTER SEQUENCE public.class_events_event_id_seq OWNER TO "John";
 
 --
--- TOC entry 4250 (class 0 OID 0)
--- Dependencies: 309
+-- TOC entry 4177 (class 0 OID 0)
+-- Dependencies: 297
 -- Name: class_events_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -1573,7 +1575,7 @@ CREATE TABLE public.class_material_tracking (
 ALTER TABLE public.class_material_tracking OWNER TO "John";
 
 --
--- TOC entry 4251 (class 0 OID 0)
+-- TOC entry 4178 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: TABLE class_material_tracking; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1582,7 +1584,7 @@ COMMENT ON TABLE public.class_material_tracking IS 'Tracks material delivery not
 
 
 --
--- TOC entry 4252 (class 0 OID 0)
+-- TOC entry 4179 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1591,7 +1593,7 @@ COMMENT ON COLUMN public.class_material_tracking.id IS 'Unique tracking record I
 
 
 --
--- TOC entry 4253 (class 0 OID 0)
+-- TOC entry 4180 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1600,7 +1602,7 @@ COMMENT ON COLUMN public.class_material_tracking.class_id IS 'Reference to the c
 
 
 --
--- TOC entry 4254 (class 0 OID 0)
+-- TOC entry 4181 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.notification_type; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1609,7 +1611,7 @@ COMMENT ON COLUMN public.class_material_tracking.notification_type IS 'Notificat
 
 
 --
--- TOC entry 4255 (class 0 OID 0)
+-- TOC entry 4182 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.notification_sent_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1618,7 +1620,7 @@ COMMENT ON COLUMN public.class_material_tracking.notification_sent_at IS 'Timest
 
 
 --
--- TOC entry 4256 (class 0 OID 0)
+-- TOC entry 4183 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.materials_delivered_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1627,7 +1629,7 @@ COMMENT ON COLUMN public.class_material_tracking.materials_delivered_at IS 'Time
 
 
 --
--- TOC entry 4257 (class 0 OID 0)
+-- TOC entry 4184 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.delivery_status; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1636,7 +1638,7 @@ COMMENT ON COLUMN public.class_material_tracking.delivery_status IS 'Current del
 
 
 --
--- TOC entry 4258 (class 0 OID 0)
+-- TOC entry 4185 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.created_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1645,7 +1647,7 @@ COMMENT ON COLUMN public.class_material_tracking.created_at IS 'Record creation 
 
 
 --
--- TOC entry 4259 (class 0 OID 0)
+-- TOC entry 4186 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN class_material_tracking.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1670,7 +1672,7 @@ CREATE SEQUENCE public.class_material_tracking_id_seq
 ALTER SEQUENCE public.class_material_tracking_id_seq OWNER TO "John";
 
 --
--- TOC entry 4260 (class 0 OID 0)
+-- TOC entry 4187 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: class_material_tracking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -1694,7 +1696,7 @@ CREATE TABLE public.class_notes (
 ALTER TABLE public.class_notes OWNER TO "John";
 
 --
--- TOC entry 4261 (class 0 OID 0)
+-- TOC entry 4188 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: TABLE class_notes; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1703,7 +1705,7 @@ COMMENT ON TABLE public.class_notes IS 'Stores historical notes and remarks abou
 
 
 --
--- TOC entry 4262 (class 0 OID 0)
+-- TOC entry 4189 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN class_notes.note_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1712,7 +1714,7 @@ COMMENT ON COLUMN public.class_notes.note_id IS 'Unique internal note ID';
 
 
 --
--- TOC entry 4263 (class 0 OID 0)
+-- TOC entry 4190 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN class_notes.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1721,7 +1723,7 @@ COMMENT ON COLUMN public.class_notes.class_id IS 'Reference to the class';
 
 
 --
--- TOC entry 4264 (class 0 OID 0)
+-- TOC entry 4191 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN class_notes.note; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1730,7 +1732,7 @@ COMMENT ON COLUMN public.class_notes.note IS 'Content of the note regarding the 
 
 
 --
--- TOC entry 4265 (class 0 OID 0)
+-- TOC entry 4192 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN class_notes.note_date; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1755,7 +1757,7 @@ CREATE SEQUENCE public.class_notes_note_id_seq
 ALTER SEQUENCE public.class_notes_note_id_seq OWNER TO "John";
 
 --
--- TOC entry 4266 (class 0 OID 0)
+-- TOC entry 4193 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: class_notes_note_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -1780,7 +1782,7 @@ CREATE TABLE public.class_schedules (
 ALTER TABLE public.class_schedules OWNER TO "John";
 
 --
--- TOC entry 4267 (class 0 OID 0)
+-- TOC entry 4194 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: TABLE class_schedules; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1789,7 +1791,7 @@ COMMENT ON TABLE public.class_schedules IS 'Stores scheduling information for cl
 
 
 --
--- TOC entry 4268 (class 0 OID 0)
+-- TOC entry 4195 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: COLUMN class_schedules.schedule_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1798,7 +1800,7 @@ COMMENT ON COLUMN public.class_schedules.schedule_id IS 'Unique internal schedul
 
 
 --
--- TOC entry 4269 (class 0 OID 0)
+-- TOC entry 4196 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: COLUMN class_schedules.class_id; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1807,7 +1809,7 @@ COMMENT ON COLUMN public.class_schedules.class_id IS 'Reference to the class';
 
 
 --
--- TOC entry 4270 (class 0 OID 0)
+-- TOC entry 4197 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: COLUMN class_schedules.day_of_week; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1816,7 +1818,7 @@ COMMENT ON COLUMN public.class_schedules.day_of_week IS 'Day of the week when th
 
 
 --
--- TOC entry 4271 (class 0 OID 0)
+-- TOC entry 4198 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: COLUMN class_schedules.start_time; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1825,7 +1827,7 @@ COMMENT ON COLUMN public.class_schedules.start_time IS 'Class start time';
 
 
 --
--- TOC entry 4272 (class 0 OID 0)
+-- TOC entry 4199 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: COLUMN class_schedules.end_time; Type: COMMENT; Schema: public; Owner: John
 --
@@ -1850,7 +1852,7 @@ CREATE SEQUENCE public.class_schedules_schedule_id_seq
 ALTER SEQUENCE public.class_schedules_schedule_id_seq OWNER TO "John";
 
 --
--- TOC entry 4273 (class 0 OID 0)
+-- TOC entry 4200 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: class_schedules_schedule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
@@ -1859,47 +1861,7 @@ ALTER SEQUENCE public.class_schedules_schedule_id_seq OWNED BY public.class_sche
 
 
 --
--- TOC entry 236 (class 1259 OID 17373)
--- Name: class_subjects; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.class_subjects (
-    class_id integer NOT NULL,
-    product_id integer NOT NULL
-);
-
-
-ALTER TABLE public.class_subjects OWNER TO "John";
-
---
--- TOC entry 4274 (class 0 OID 0)
--- Dependencies: 236
--- Name: TABLE class_subjects; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.class_subjects IS 'Associates classes with the subjects or products being taught';
-
-
---
--- TOC entry 4275 (class 0 OID 0)
--- Dependencies: 236
--- Name: COLUMN class_subjects.class_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.class_subjects.class_id IS 'Reference to the class';
-
-
---
--- TOC entry 4276 (class 0 OID 0)
--- Dependencies: 236
--- Name: COLUMN class_subjects.product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.class_subjects.product_id IS 'Reference to the subject or product taught in the class';
-
-
---
--- TOC entry 302 (class 1259 OID 24601)
+-- TOC entry 290 (class 1259 OID 24601)
 -- Name: class_type_subjects; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -1919,7 +1881,7 @@ CREATE TABLE public.class_type_subjects (
 ALTER TABLE public.class_type_subjects OWNER TO "John";
 
 --
--- TOC entry 301 (class 1259 OID 24600)
+-- TOC entry 289 (class 1259 OID 24600)
 -- Name: class_type_subjects_class_type_subject_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -1935,8 +1897,8 @@ CREATE SEQUENCE public.class_type_subjects_class_type_subject_id_seq
 ALTER SEQUENCE public.class_type_subjects_class_type_subject_id_seq OWNER TO "John";
 
 --
--- TOC entry 4277 (class 0 OID 0)
--- Dependencies: 301
+-- TOC entry 4201 (class 0 OID 0)
+-- Dependencies: 289
 -- Name: class_type_subjects_class_type_subject_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -1944,7 +1906,7 @@ ALTER SEQUENCE public.class_type_subjects_class_type_subject_id_seq OWNED BY pub
 
 
 --
--- TOC entry 300 (class 1259 OID 24584)
+-- TOC entry 288 (class 1259 OID 24584)
 -- Name: class_types; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -1965,7 +1927,7 @@ CREATE TABLE public.class_types (
 ALTER TABLE public.class_types OWNER TO "John";
 
 --
--- TOC entry 299 (class 1259 OID 24583)
+-- TOC entry 287 (class 1259 OID 24583)
 -- Name: class_types_class_type_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -1981,8 +1943,8 @@ CREATE SEQUENCE public.class_types_class_type_id_seq
 ALTER SEQUENCE public.class_types_class_type_id_seq OWNER TO "John";
 
 --
--- TOC entry 4278 (class 0 OID 0)
--- Dependencies: 299
+-- TOC entry 4202 (class 0 OID 0)
+-- Dependencies: 287
 -- Name: class_types_class_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -1990,7 +1952,7 @@ ALTER SEQUENCE public.class_types_class_type_id_seq OWNED BY public.class_types.
 
 
 --
--- TOC entry 237 (class 1259 OID 17376)
+-- TOC entry 236 (class 1259 OID 17376)
 -- Name: classes; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -2029,8 +1991,8 @@ CREATE TABLE public.classes (
 ALTER TABLE public.classes OWNER TO "John";
 
 --
--- TOC entry 4279 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4203 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: TABLE classes; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2038,8 +2000,8 @@ COMMENT ON TABLE public.classes IS 'Stores information about classes, including 
 
 
 --
--- TOC entry 4280 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4204 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.class_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2047,8 +2009,8 @@ COMMENT ON COLUMN public.classes.class_id IS 'Unique internal class ID';
 
 
 --
--- TOC entry 4281 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4205 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.client_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2056,8 +2018,8 @@ COMMENT ON COLUMN public.classes.client_id IS 'Reference to the client associate
 
 
 --
--- TOC entry 4282 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4206 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.class_address_line; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2065,8 +2027,8 @@ COMMENT ON COLUMN public.classes.class_address_line IS 'Street address where the
 
 
 --
--- TOC entry 4283 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4207 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.class_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2074,8 +2036,8 @@ COMMENT ON COLUMN public.classes.class_type IS 'Type of class; determines the ''
 
 
 --
--- TOC entry 4284 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4208 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.original_start_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2083,8 +2045,8 @@ COMMENT ON COLUMN public.classes.original_start_date IS 'Original start date of 
 
 
 --
--- TOC entry 4285 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4209 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.seta_funded; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2092,8 +2054,8 @@ COMMENT ON COLUMN public.classes.seta_funded IS 'Indicates if the project is SET
 
 
 --
--- TOC entry 4286 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4210 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.seta; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2101,8 +2063,8 @@ COMMENT ON COLUMN public.classes.seta IS 'Name of the SETA (Sector Education and
 
 
 --
--- TOC entry 4287 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4211 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.exam_class; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2110,8 +2072,8 @@ COMMENT ON COLUMN public.classes.exam_class IS 'Indicates if this is an exam pro
 
 
 --
--- TOC entry 4288 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4212 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.exam_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2119,8 +2081,8 @@ COMMENT ON COLUMN public.classes.exam_type IS 'Type of exam associated with the 
 
 
 --
--- TOC entry 4289 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4213 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.project_supervisor_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2128,8 +2090,8 @@ COMMENT ON COLUMN public.classes.project_supervisor_id IS 'Reference to the proj
 
 
 --
--- TOC entry 4290 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4214 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2137,8 +2099,8 @@ COMMENT ON COLUMN public.classes.created_at IS 'Timestamp when the class record 
 
 
 --
--- TOC entry 4291 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4215 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2146,8 +2108,8 @@ COMMENT ON COLUMN public.classes.updated_at IS 'Timestamp when the class record 
 
 
 --
--- TOC entry 4292 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4216 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: COLUMN classes.exam_learners; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2156,7 +2118,7 @@ COMMENT ON COLUMN public.classes.exam_learners IS 'JSON array storing exam learn
 
 
 --
--- TOC entry 238 (class 1259 OID 17389)
+-- TOC entry 237 (class 1259 OID 17389)
 -- Name: classes_class_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -2172,8 +2134,8 @@ CREATE SEQUENCE public.classes_class_id_seq
 ALTER SEQUENCE public.classes_class_id_seq OWNER TO "John";
 
 --
--- TOC entry 4293 (class 0 OID 0)
--- Dependencies: 238
+-- TOC entry 4217 (class 0 OID 0)
+-- Dependencies: 237
 -- Name: classes_class_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -2181,7 +2143,7 @@ ALTER SEQUENCE public.classes_class_id_seq OWNED BY public.classes.class_id;
 
 
 --
--- TOC entry 239 (class 1259 OID 17390)
+-- TOC entry 238 (class 1259 OID 17390)
 -- Name: client_communications; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -2200,8 +2162,8 @@ CREATE TABLE public.client_communications (
 ALTER TABLE public.client_communications OWNER TO "John";
 
 --
--- TOC entry 4294 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4218 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: TABLE client_communications; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2209,8 +2171,8 @@ COMMENT ON TABLE public.client_communications IS 'Stores records of communicatio
 
 
 --
--- TOC entry 4295 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4219 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.communication_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2218,8 +2180,8 @@ COMMENT ON COLUMN public.client_communications.communication_id IS 'Unique inter
 
 
 --
--- TOC entry 4296 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4220 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.client_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2227,8 +2189,8 @@ COMMENT ON COLUMN public.client_communications.client_id IS 'Reference to the cl
 
 
 --
--- TOC entry 4297 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4221 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.communication_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2236,8 +2198,8 @@ COMMENT ON COLUMN public.client_communications.communication_type IS 'Type of co
 
 
 --
--- TOC entry 4298 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4222 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.subject; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2245,8 +2207,8 @@ COMMENT ON COLUMN public.client_communications.subject IS 'Subject of the commun
 
 
 --
--- TOC entry 4299 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4223 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.content; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2254,8 +2216,8 @@ COMMENT ON COLUMN public.client_communications.content IS 'Content or summary of
 
 
 --
--- TOC entry 4300 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4224 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.communication_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2263,8 +2225,8 @@ COMMENT ON COLUMN public.client_communications.communication_date IS 'Date and t
 
 
 --
--- TOC entry 4301 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4225 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: COLUMN client_communications.user_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2272,7 +2234,7 @@ COMMENT ON COLUMN public.client_communications.user_id IS 'Reference to the user
 
 
 --
--- TOC entry 240 (class 1259 OID 17396)
+-- TOC entry 239 (class 1259 OID 17396)
 -- Name: client_communications_communication_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -2288,8 +2250,8 @@ CREATE SEQUENCE public.client_communications_communication_id_seq
 ALTER SEQUENCE public.client_communications_communication_id_seq OWNER TO "John";
 
 --
--- TOC entry 4302 (class 0 OID 0)
--- Dependencies: 240
+-- TOC entry 4226 (class 0 OID 0)
+-- Dependencies: 239
 -- Name: client_communications_communication_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -2297,7 +2259,7 @@ ALTER SEQUENCE public.client_communications_communication_id_seq OWNED BY public
 
 
 --
--- TOC entry 241 (class 1259 OID 17397)
+-- TOC entry 240 (class 1259 OID 17397)
 -- Name: clients; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -2324,8 +2286,8 @@ CREATE TABLE public.clients (
 ALTER TABLE public.clients OWNER TO "John";
 
 --
--- TOC entry 4303 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4227 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: TABLE clients; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2333,8 +2295,8 @@ COMMENT ON TABLE public.clients IS 'Stores information about clients (companies 
 
 
 --
--- TOC entry 4304 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4228 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.client_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2342,8 +2304,8 @@ COMMENT ON COLUMN public.clients.client_id IS 'Unique internal client ID';
 
 
 --
--- TOC entry 4305 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4229 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.client_name; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2351,8 +2313,8 @@ COMMENT ON COLUMN public.clients.client_name IS 'Name of the client company or o
 
 
 --
--- TOC entry 4306 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4230 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.company_registration_number; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2360,8 +2322,8 @@ COMMENT ON COLUMN public.clients.company_registration_number IS 'Company registr
 
 
 --
--- TOC entry 4307 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4231 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.seta; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2369,8 +2331,8 @@ COMMENT ON COLUMN public.clients.seta IS 'SETA the client belongs to';
 
 
 --
--- TOC entry 4308 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4232 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.client_status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2378,8 +2340,8 @@ COMMENT ON COLUMN public.clients.client_status IS 'Current status of the client 
 
 
 --
--- TOC entry 4309 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4233 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.financial_year_end; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2387,8 +2349,8 @@ COMMENT ON COLUMN public.clients.financial_year_end IS 'Date of the client''s fi
 
 
 --
--- TOC entry 4310 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4234 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.bbbee_verification_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2396,8 +2358,8 @@ COMMENT ON COLUMN public.clients.bbbee_verification_date IS 'Date of the client'
 
 
 --
--- TOC entry 4311 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4235 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2405,8 +2367,8 @@ COMMENT ON COLUMN public.clients.created_at IS 'Timestamp when the client record
 
 
 --
--- TOC entry 4312 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4236 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2414,8 +2376,8 @@ COMMENT ON COLUMN public.clients.updated_at IS 'Timestamp when the client record
 
 
 --
--- TOC entry 4313 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4237 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.main_client_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2424,8 +2386,8 @@ main client for sub-client relationships (NULL for main clients)';
 
 
 --
--- TOC entry 4314 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4238 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.contact_person; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2433,8 +2395,8 @@ COMMENT ON COLUMN public.clients.contact_person IS 'Primary contact person name 
 
 
 --
--- TOC entry 4315 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4239 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.contact_person_email; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2442,8 +2404,8 @@ COMMENT ON COLUMN public.clients.contact_person_email IS 'Primary contact person
 
 
 --
--- TOC entry 4316 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4240 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.contact_person_cellphone; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2451,8 +2413,8 @@ COMMENT ON COLUMN public.clients.contact_person_cellphone IS 'Primary contact pe
 
 
 --
--- TOC entry 4317 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4241 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.contact_person_tel; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2460,8 +2422,8 @@ COMMENT ON COLUMN public.clients.contact_person_tel IS 'Primary contact person l
 
 
 --
--- TOC entry 4318 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4242 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: COLUMN clients.contact_person_position; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2469,7 +2431,7 @@ COMMENT ON COLUMN public.clients.contact_person_position IS 'Primary contact per
 
 
 --
--- TOC entry 242 (class 1259 OID 17404)
+-- TOC entry 241 (class 1259 OID 17404)
 -- Name: clients_client_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -2485,8 +2447,8 @@ CREATE SEQUENCE public.clients_client_id_seq
 ALTER SEQUENCE public.clients_client_id_seq OWNER TO "John";
 
 --
--- TOC entry 4319 (class 0 OID 0)
--- Dependencies: 242
+-- TOC entry 4243 (class 0 OID 0)
+-- Dependencies: 241
 -- Name: clients_client_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -2494,7 +2456,7 @@ ALTER SEQUENCE public.clients_client_id_seq OWNED BY public.clients.client_id;
 
 
 --
--- TOC entry 243 (class 1259 OID 17405)
+-- TOC entry 242 (class 1259 OID 17405)
 -- Name: collections; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -2512,8 +2474,8 @@ CREATE TABLE public.collections (
 ALTER TABLE public.collections OWNER TO "John";
 
 --
--- TOC entry 4320 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4244 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: TABLE collections; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2521,8 +2483,8 @@ COMMENT ON TABLE public.collections IS 'Records collections made from classes';
 
 
 --
--- TOC entry 4321 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4245 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.collection_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2530,8 +2492,8 @@ COMMENT ON COLUMN public.collections.collection_id IS 'Unique internal collectio
 
 
 --
--- TOC entry 4322 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4246 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.class_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2539,8 +2501,8 @@ COMMENT ON COLUMN public.collections.class_id IS 'Reference to the class';
 
 
 --
--- TOC entry 4323 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4247 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.collection_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2548,8 +2510,8 @@ COMMENT ON COLUMN public.collections.collection_date IS 'Date when the collectio
 
 
 --
--- TOC entry 4324 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4248 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.items; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2557,8 +2519,8 @@ COMMENT ON COLUMN public.collections.items IS 'Items collected from the class';
 
 
 --
--- TOC entry 4325 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4249 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2566,8 +2528,8 @@ COMMENT ON COLUMN public.collections.status IS 'Collection status (e.g., ''Pendi
 
 
 --
--- TOC entry 4326 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4250 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2575,8 +2537,8 @@ COMMENT ON COLUMN public.collections.created_at IS 'Timestamp when the collectio
 
 
 --
--- TOC entry 4327 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4251 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: COLUMN collections.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2584,7 +2546,7 @@ COMMENT ON COLUMN public.collections.updated_at IS 'Timestamp when the collectio
 
 
 --
--- TOC entry 244 (class 1259 OID 17412)
+-- TOC entry 243 (class 1259 OID 17412)
 -- Name: collections_collection_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -2600,8 +2562,8 @@ CREATE SEQUENCE public.collections_collection_id_seq
 ALTER SEQUENCE public.collections_collection_id_seq OWNER TO "John";
 
 --
--- TOC entry 4328 (class 0 OID 0)
--- Dependencies: 244
+-- TOC entry 4252 (class 0 OID 0)
+-- Dependencies: 243
 -- Name: collections_collection_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -2609,7 +2571,7 @@ ALTER SEQUENCE public.collections_collection_id_seq OWNED BY public.collections.
 
 
 --
--- TOC entry 245 (class 1259 OID 17413)
+-- TOC entry 244 (class 1259 OID 17413)
 -- Name: deliveries; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -2627,8 +2589,8 @@ CREATE TABLE public.deliveries (
 ALTER TABLE public.deliveries OWNER TO "John";
 
 --
--- TOC entry 4329 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4253 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: TABLE deliveries; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2636,8 +2598,8 @@ COMMENT ON TABLE public.deliveries IS 'Records deliveries made to classes';
 
 
 --
--- TOC entry 4330 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4254 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.delivery_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2645,8 +2607,8 @@ COMMENT ON COLUMN public.deliveries.delivery_id IS 'Unique internal delivery ID'
 
 
 --
--- TOC entry 4331 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4255 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.class_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2654,8 +2616,8 @@ COMMENT ON COLUMN public.deliveries.class_id IS 'Reference to the class';
 
 
 --
--- TOC entry 4332 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4256 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.delivery_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2663,8 +2625,8 @@ COMMENT ON COLUMN public.deliveries.delivery_date IS 'Date when the delivery is 
 
 
 --
--- TOC entry 4333 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4257 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.items; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2672,8 +2634,8 @@ COMMENT ON COLUMN public.deliveries.items IS 'Items included in the delivery';
 
 
 --
--- TOC entry 4334 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4258 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2681,8 +2643,8 @@ COMMENT ON COLUMN public.deliveries.status IS 'Delivery status (e.g., ''Pending'
 
 
 --
--- TOC entry 4335 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4259 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2690,8 +2652,8 @@ COMMENT ON COLUMN public.deliveries.created_at IS 'Timestamp when the delivery r
 
 
 --
--- TOC entry 4336 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 4260 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: COLUMN deliveries.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2699,7 +2661,7 @@ COMMENT ON COLUMN public.deliveries.updated_at IS 'Timestamp when the delivery r
 
 
 --
--- TOC entry 246 (class 1259 OID 17421)
+-- TOC entry 245 (class 1259 OID 17421)
 -- Name: deliveries_delivery_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -2715,8 +2677,8 @@ CREATE SEQUENCE public.deliveries_delivery_id_seq
 ALTER SEQUENCE public.deliveries_delivery_id_seq OWNER TO "John";
 
 --
--- TOC entry 4337 (class 0 OID 0)
--- Dependencies: 246
+-- TOC entry 4261 (class 0 OID 0)
+-- Dependencies: 245
 -- Name: deliveries_delivery_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -2724,7 +2686,7 @@ ALTER SEQUENCE public.deliveries_delivery_id_seq OWNED BY public.deliveries.deli
 
 
 --
--- TOC entry 247 (class 1259 OID 17422)
+-- TOC entry 246 (class 1259 OID 17422)
 -- Name: employers; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -2739,8 +2701,8 @@ CREATE TABLE public.employers (
 ALTER TABLE public.employers OWNER TO "John";
 
 --
--- TOC entry 4338 (class 0 OID 0)
--- Dependencies: 247
+-- TOC entry 4262 (class 0 OID 0)
+-- Dependencies: 246
 -- Name: TABLE employers; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2748,8 +2710,8 @@ COMMENT ON TABLE public.employers IS 'Stores information about employers or spon
 
 
 --
--- TOC entry 4339 (class 0 OID 0)
--- Dependencies: 247
+-- TOC entry 4263 (class 0 OID 0)
+-- Dependencies: 246
 -- Name: COLUMN employers.employer_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2757,8 +2719,8 @@ COMMENT ON COLUMN public.employers.employer_id IS 'Unique internal employer ID';
 
 
 --
--- TOC entry 4340 (class 0 OID 0)
--- Dependencies: 247
+-- TOC entry 4264 (class 0 OID 0)
+-- Dependencies: 246
 -- Name: COLUMN employers.employer_name; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2766,8 +2728,8 @@ COMMENT ON COLUMN public.employers.employer_name IS 'Name of the employer or spo
 
 
 --
--- TOC entry 4341 (class 0 OID 0)
--- Dependencies: 247
+-- TOC entry 4265 (class 0 OID 0)
+-- Dependencies: 246
 -- Name: COLUMN employers.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2775,8 +2737,8 @@ COMMENT ON COLUMN public.employers.created_at IS 'Timestamp when the employer re
 
 
 --
--- TOC entry 4342 (class 0 OID 0)
--- Dependencies: 247
+-- TOC entry 4266 (class 0 OID 0)
+-- Dependencies: 246
 -- Name: COLUMN employers.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -2784,7 +2746,7 @@ COMMENT ON COLUMN public.employers.updated_at IS 'Timestamp when the employer re
 
 
 --
--- TOC entry 248 (class 1259 OID 17427)
+-- TOC entry 247 (class 1259 OID 17427)
 -- Name: employers_employer_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -2800,8 +2762,8 @@ CREATE SEQUENCE public.employers_employer_id_seq
 ALTER SEQUENCE public.employers_employer_id_seq OWNER TO "John";
 
 --
--- TOC entry 4343 (class 0 OID 0)
--- Dependencies: 248
+-- TOC entry 4267 (class 0 OID 0)
+-- Dependencies: 247
 -- Name: employers_employer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -2809,287 +2771,7 @@ ALTER SEQUENCE public.employers_employer_id_seq OWNED BY public.employers.employ
 
 
 --
--- TOC entry 249 (class 1259 OID 17428)
--- Name: exam_results; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.exam_results (
-    result_id integer NOT NULL,
-    exam_id integer,
-    learner_id integer,
-    subject character varying(100),
-    mock_exam_number integer,
-    score numeric(5,2),
-    result character varying(20),
-    exam_date date,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
-ALTER TABLE public.exam_results OWNER TO "John";
-
---
--- TOC entry 4344 (class 0 OID 0)
--- Dependencies: 249
--- Name: TABLE exam_results; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.exam_results IS 'Stores detailed exam results for learners';
-
-
---
--- TOC entry 4345 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.result_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.result_id IS 'Unique internal exam result ID';
-
-
---
--- TOC entry 4346 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.exam_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.exam_id IS 'Reference to the exam';
-
-
---
--- TOC entry 4347 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.learner_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.learner_id IS 'Reference to the learner';
-
-
---
--- TOC entry 4348 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.subject; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.subject IS 'Subject of the exam';
-
-
---
--- TOC entry 4349 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.mock_exam_number; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.mock_exam_number IS 'Number of the mock exam (e.g., 1, 2, 3)';
-
-
---
--- TOC entry 4350 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.score; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.score IS 'Learner''s score in the exam';
-
-
---
--- TOC entry 4351 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.result; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.result IS 'Exam result (e.g., ''Pass'', ''Fail'')';
-
-
---
--- TOC entry 4352 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.exam_date; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.exam_date IS 'Date when the exam was taken';
-
-
---
--- TOC entry 4353 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.created_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.created_at IS 'Timestamp when the exam result was created';
-
-
---
--- TOC entry 4354 (class 0 OID 0)
--- Dependencies: 249
--- Name: COLUMN exam_results.updated_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exam_results.updated_at IS 'Timestamp when the exam result was last updated';
-
-
---
--- TOC entry 250 (class 1259 OID 17433)
--- Name: exam_results_result_id_seq; Type: SEQUENCE; Schema: public; Owner: John
---
-
-CREATE SEQUENCE public.exam_results_result_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.exam_results_result_id_seq OWNER TO "John";
-
---
--- TOC entry 4355 (class 0 OID 0)
--- Dependencies: 250
--- Name: exam_results_result_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
---
-
-ALTER SEQUENCE public.exam_results_result_id_seq OWNED BY public.exam_results.result_id;
-
-
---
--- TOC entry 251 (class 1259 OID 17434)
--- Name: exams; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.exams (
-    exam_id integer NOT NULL,
-    learner_id integer,
-    product_id integer,
-    exam_date date,
-    exam_type character varying(50),
-    score numeric(5,2),
-    result character varying(20),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
-ALTER TABLE public.exams OWNER TO "John";
-
---
--- TOC entry 4356 (class 0 OID 0)
--- Dependencies: 251
--- Name: TABLE exams; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.exams IS 'Stores exam results for learners';
-
-
---
--- TOC entry 4357 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.exam_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.exam_id IS 'Unique internal exam ID';
-
-
---
--- TOC entry 4358 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.learner_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.learner_id IS 'Reference to the learner';
-
-
---
--- TOC entry 4359 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.product_id IS 'Reference to the product or subject';
-
-
---
--- TOC entry 4360 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.exam_date; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.exam_date IS 'Date when the exam was taken';
-
-
---
--- TOC entry 4361 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.exam_type; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.exam_type IS 'Type of exam (e.g., ''Mock'', ''Final'')';
-
-
---
--- TOC entry 4362 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.score; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.score IS 'Learner''s score in the exam';
-
-
---
--- TOC entry 4363 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.result; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.result IS 'Exam result (e.g., ''Pass'', ''Fail'')';
-
-
---
--- TOC entry 4364 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.created_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.created_at IS 'Timestamp when the exam record was created';
-
-
---
--- TOC entry 4365 (class 0 OID 0)
--- Dependencies: 251
--- Name: COLUMN exams.updated_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.exams.updated_at IS 'Timestamp when the exam record was last updated';
-
-
---
--- TOC entry 252 (class 1259 OID 17439)
--- Name: exams_exam_id_seq; Type: SEQUENCE; Schema: public; Owner: John
---
-
-CREATE SEQUENCE public.exams_exam_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.exams_exam_id_seq OWNER TO "John";
-
---
--- TOC entry 4366 (class 0 OID 0)
--- Dependencies: 252
--- Name: exams_exam_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
---
-
-ALTER SEQUENCE public.exams_exam_id_seq OWNED BY public.exams.exam_id;
-
-
---
--- TOC entry 253 (class 1259 OID 17440)
+-- TOC entry 248 (class 1259 OID 17440)
 -- Name: files; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3106,8 +2788,8 @@ CREATE TABLE public.files (
 ALTER TABLE public.files OWNER TO "John";
 
 --
--- TOC entry 4367 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4268 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: TABLE files; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3115,8 +2797,8 @@ COMMENT ON TABLE public.files IS 'Stores references to files associated with var
 
 
 --
--- TOC entry 4368 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4269 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN files.file_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3124,8 +2806,8 @@ COMMENT ON COLUMN public.files.file_id IS 'Unique internal file ID';
 
 
 --
--- TOC entry 4369 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4270 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN files.owner_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3133,8 +2815,8 @@ COMMENT ON COLUMN public.files.owner_type IS 'Type of entity that owns the file 
 
 
 --
--- TOC entry 4370 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4271 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN files.owner_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3142,8 +2824,8 @@ COMMENT ON COLUMN public.files.owner_id IS 'ID of the owner entity';
 
 
 --
--- TOC entry 4371 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4272 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN files.file_path; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3151,8 +2833,8 @@ COMMENT ON COLUMN public.files.file_path IS 'File path or URL to the stored file
 
 
 --
--- TOC entry 4372 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4273 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN files.file_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3160,8 +2842,8 @@ COMMENT ON COLUMN public.files.file_type IS 'Type of file (e.g., ''Scanned Portf
 
 
 --
--- TOC entry 4373 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4274 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN files.uploaded_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3169,7 +2851,7 @@ COMMENT ON COLUMN public.files.uploaded_at IS 'Timestamp when the file was uploa
 
 
 --
--- TOC entry 254 (class 1259 OID 17444)
+-- TOC entry 249 (class 1259 OID 17444)
 -- Name: files_file_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3185,8 +2867,8 @@ CREATE SEQUENCE public.files_file_id_seq
 ALTER SEQUENCE public.files_file_id_seq OWNER TO "John";
 
 --
--- TOC entry 4374 (class 0 OID 0)
--- Dependencies: 254
+-- TOC entry 4275 (class 0 OID 0)
+-- Dependencies: 249
 -- Name: files_file_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3194,7 +2876,7 @@ ALTER SEQUENCE public.files_file_id_seq OWNED BY public.files.file_id;
 
 
 --
--- TOC entry 255 (class 1259 OID 17445)
+-- TOC entry 250 (class 1259 OID 17445)
 -- Name: history; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3212,8 +2894,8 @@ CREATE TABLE public.history (
 ALTER TABLE public.history OWNER TO "John";
 
 --
--- TOC entry 4375 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4276 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: TABLE history; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3221,8 +2903,8 @@ COMMENT ON TABLE public.history IS 'Records historical changes and actions perfo
 
 
 --
--- TOC entry 4376 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4277 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.history_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3230,8 +2912,8 @@ COMMENT ON COLUMN public.history.history_id IS 'Unique internal history ID';
 
 
 --
--- TOC entry 4377 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4278 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.entity_type; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3239,8 +2921,8 @@ COMMENT ON COLUMN public.history.entity_type IS 'Type of entity the history reco
 
 
 --
--- TOC entry 4378 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4279 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.entity_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3248,8 +2930,8 @@ COMMENT ON COLUMN public.history.entity_id IS 'ID of the entity';
 
 
 --
--- TOC entry 4379 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4280 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.action; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3257,8 +2939,8 @@ COMMENT ON COLUMN public.history.action IS 'Type of action performed (e.g., ''Cr
 
 
 --
--- TOC entry 4380 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4281 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.changes; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3266,8 +2948,8 @@ COMMENT ON COLUMN public.history.changes IS 'Details of the changes made, stored
 
 
 --
--- TOC entry 4381 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4282 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.action_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3275,8 +2957,8 @@ COMMENT ON COLUMN public.history.action_date IS 'Timestamp when the action occur
 
 
 --
--- TOC entry 4382 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4283 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: COLUMN history.user_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3284,7 +2966,7 @@ COMMENT ON COLUMN public.history.user_id IS 'Reference to the user who performed
 
 
 --
--- TOC entry 256 (class 1259 OID 17451)
+-- TOC entry 251 (class 1259 OID 17451)
 -- Name: history_history_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3300,8 +2982,8 @@ CREATE SEQUENCE public.history_history_id_seq
 ALTER SEQUENCE public.history_history_id_seq OWNER TO "John";
 
 --
--- TOC entry 4383 (class 0 OID 0)
--- Dependencies: 256
+-- TOC entry 4284 (class 0 OID 0)
+-- Dependencies: 251
 -- Name: history_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3309,7 +2991,7 @@ ALTER SEQUENCE public.history_history_id_seq OWNED BY public.history.history_id;
 
 
 --
--- TOC entry 257 (class 1259 OID 17452)
+-- TOC entry 252 (class 1259 OID 17452)
 -- Name: latest_document; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3328,14 +3010,14 @@ CREATE TABLE public.latest_document (
 ALTER TABLE public.latest_document OWNER TO "John";
 
 --
--- TOC entry 306 (class 1259 OID 24656)
+-- TOC entry 294 (class 1259 OID 24656)
 -- Name: learner_hours_log; Type: TABLE; Schema: public; Owner: John
 --
 
 CREATE TABLE public.learner_hours_log (
     log_id integer NOT NULL,
     learner_id integer NOT NULL,
-    product_id integer NOT NULL,
+    class_type_subject_id integer NOT NULL,
     class_id integer,
     tracking_id integer,
     log_date date NOT NULL,
@@ -3353,8 +3035,8 @@ CREATE TABLE public.learner_hours_log (
 ALTER TABLE public.learner_hours_log OWNER TO "John";
 
 --
--- TOC entry 4384 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 4285 (class 0 OID 0)
+-- Dependencies: 294
 -- Name: TABLE learner_hours_log; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3362,8 +3044,8 @@ COMMENT ON TABLE public.learner_hours_log IS 'Audit trail for hours logged. Sour
 
 
 --
--- TOC entry 4385 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 4286 (class 0 OID 0)
+-- Dependencies: 294
 -- Name: COLUMN learner_hours_log.source; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3371,7 +3053,7 @@ COMMENT ON COLUMN public.learner_hours_log.source IS 'schedule = auto from class
 
 
 --
--- TOC entry 305 (class 1259 OID 24655)
+-- TOC entry 293 (class 1259 OID 24655)
 -- Name: learner_hours_log_log_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3387,8 +3069,8 @@ CREATE SEQUENCE public.learner_hours_log_log_id_seq
 ALTER SEQUENCE public.learner_hours_log_log_id_seq OWNER TO "John";
 
 --
--- TOC entry 4386 (class 0 OID 0)
--- Dependencies: 305
+-- TOC entry 4287 (class 0 OID 0)
+-- Dependencies: 293
 -- Name: learner_hours_log_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3396,14 +3078,14 @@ ALTER SEQUENCE public.learner_hours_log_log_id_seq OWNED BY public.learner_hours
 
 
 --
--- TOC entry 304 (class 1259 OID 24623)
+-- TOC entry 292 (class 1259 OID 24623)
 -- Name: learner_lp_tracking; Type: TABLE; Schema: public; Owner: John
 --
 
 CREATE TABLE public.learner_lp_tracking (
     tracking_id integer NOT NULL,
     learner_id integer NOT NULL,
-    product_id integer NOT NULL,
+    class_type_subject_id integer NOT NULL,
     class_id integer,
     hours_trained numeric(10,2) DEFAULT 0,
     hours_present numeric(10,2) DEFAULT 0,
@@ -3425,8 +3107,8 @@ CREATE TABLE public.learner_lp_tracking (
 ALTER TABLE public.learner_lp_tracking OWNER TO "John";
 
 --
--- TOC entry 4387 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 4288 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: TABLE learner_lp_tracking; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3434,8 +3116,8 @@ COMMENT ON TABLE public.learner_lp_tracking IS 'Tracks current LP status per lea
 
 
 --
--- TOC entry 4388 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 4289 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: COLUMN learner_lp_tracking.hours_trained; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3443,8 +3125,8 @@ COMMENT ON COLUMN public.learner_lp_tracking.hours_trained IS 'Hours from class 
 
 
 --
--- TOC entry 4389 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 4290 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: COLUMN learner_lp_tracking.hours_present; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3452,8 +3134,8 @@ COMMENT ON COLUMN public.learner_lp_tracking.hours_present IS 'Hours from facili
 
 
 --
--- TOC entry 4390 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 4291 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: COLUMN learner_lp_tracking.hours_absent; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3461,8 +3143,8 @@ COMMENT ON COLUMN public.learner_lp_tracking.hours_absent IS 'Calculated: hours_
 
 
 --
--- TOC entry 4391 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 4292 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: COLUMN learner_lp_tracking.status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3470,7 +3152,7 @@ COMMENT ON COLUMN public.learner_lp_tracking.status IS 'in_progress = currently 
 
 
 --
--- TOC entry 303 (class 1259 OID 24622)
+-- TOC entry 291 (class 1259 OID 24622)
 -- Name: learner_lp_tracking_tracking_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3486,8 +3168,8 @@ CREATE SEQUENCE public.learner_lp_tracking_tracking_id_seq
 ALTER SEQUENCE public.learner_lp_tracking_tracking_id_seq OWNER TO "John";
 
 --
--- TOC entry 4392 (class 0 OID 0)
--- Dependencies: 303
+-- TOC entry 4293 (class 0 OID 0)
+-- Dependencies: 291
 -- Name: learner_lp_tracking_tracking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3495,7 +3177,7 @@ ALTER SEQUENCE public.learner_lp_tracking_tracking_id_seq OWNED BY public.learne
 
 
 --
--- TOC entry 258 (class 1259 OID 17459)
+-- TOC entry 253 (class 1259 OID 17459)
 -- Name: learner_placement_level; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3509,8 +3191,8 @@ CREATE TABLE public.learner_placement_level (
 ALTER TABLE public.learner_placement_level OWNER TO "John";
 
 --
--- TOC entry 4393 (class 0 OID 0)
--- Dependencies: 258
+-- TOC entry 4294 (class 0 OID 0)
+-- Dependencies: 253
 -- Name: TABLE learner_placement_level; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3518,7 +3200,31 @@ COMMENT ON TABLE public.learner_placement_level IS 'Stores Learners Placement Le
 
 
 --
--- TOC entry 259 (class 1259 OID 17464)
+-- TOC entry 303 (class 1259 OID 26956)
+-- Name: learner_placement_level_placement_level_id_seq; Type: SEQUENCE; Schema: public; Owner: John
+--
+
+CREATE SEQUENCE public.learner_placement_level_placement_level_id_seq
+    START WITH 27
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.learner_placement_level_placement_level_id_seq OWNER TO "John";
+
+--
+-- TOC entry 4295 (class 0 OID 0)
+-- Dependencies: 303
+-- Name: learner_placement_level_placement_level_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
+--
+
+ALTER SEQUENCE public.learner_placement_level_placement_level_id_seq OWNED BY public.learner_placement_level.placement_level_id;
+
+
+--
+-- TOC entry 254 (class 1259 OID 17464)
 -- Name: learner_portfolios; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3533,7 +3239,7 @@ CREATE TABLE public.learner_portfolios (
 ALTER TABLE public.learner_portfolios OWNER TO "John";
 
 --
--- TOC entry 260 (class 1259 OID 17468)
+-- TOC entry 255 (class 1259 OID 17468)
 -- Name: learner_portfolios_portfolio_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3549,8 +3255,8 @@ CREATE SEQUENCE public.learner_portfolios_portfolio_id_seq
 ALTER SEQUENCE public.learner_portfolios_portfolio_id_seq OWNER TO "John";
 
 --
--- TOC entry 4394 (class 0 OID 0)
--- Dependencies: 260
+-- TOC entry 4296 (class 0 OID 0)
+-- Dependencies: 255
 -- Name: learner_portfolios_portfolio_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3558,67 +3264,7 @@ ALTER SEQUENCE public.learner_portfolios_portfolio_id_seq OWNED BY public.learne
 
 
 --
--- TOC entry 261 (class 1259 OID 17469)
--- Name: learner_products; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.learner_products (
-    learner_id integer NOT NULL,
-    product_id integer NOT NULL,
-    start_date date,
-    end_date date
-);
-
-
-ALTER TABLE public.learner_products OWNER TO "John";
-
---
--- TOC entry 4395 (class 0 OID 0)
--- Dependencies: 261
--- Name: TABLE learner_products; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.learner_products IS 'Associates learners with the products they are enrolled in';
-
-
---
--- TOC entry 4396 (class 0 OID 0)
--- Dependencies: 261
--- Name: COLUMN learner_products.learner_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_products.learner_id IS 'Reference to the learner';
-
-
---
--- TOC entry 4397 (class 0 OID 0)
--- Dependencies: 261
--- Name: COLUMN learner_products.product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_products.product_id IS 'Reference to the product the learner is enrolled in';
-
-
---
--- TOC entry 4398 (class 0 OID 0)
--- Dependencies: 261
--- Name: COLUMN learner_products.start_date; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_products.start_date IS 'Start date of the learner''s enrollment in the product';
-
-
---
--- TOC entry 4399 (class 0 OID 0)
--- Dependencies: 261
--- Name: COLUMN learner_products.end_date; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_products.end_date IS 'End date of the learner''s enrollment in the product';
-
-
---
--- TOC entry 308 (class 1259 OID 24689)
+-- TOC entry 296 (class 1259 OID 24689)
 -- Name: learner_progression_portfolios; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3637,8 +3283,8 @@ CREATE TABLE public.learner_progression_portfolios (
 ALTER TABLE public.learner_progression_portfolios OWNER TO "John";
 
 --
--- TOC entry 4400 (class 0 OID 0)
--- Dependencies: 308
+-- TOC entry 4297 (class 0 OID 0)
+-- Dependencies: 296
 -- Name: TABLE learner_progression_portfolios; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3646,7 +3292,7 @@ COMMENT ON TABLE public.learner_progression_portfolios IS 'Portfolio files uploa
 
 
 --
--- TOC entry 307 (class 1259 OID 24688)
+-- TOC entry 295 (class 1259 OID 24688)
 -- Name: learner_progression_portfolios_file_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3662,8 +3308,8 @@ CREATE SEQUENCE public.learner_progression_portfolios_file_id_seq
 ALTER SEQUENCE public.learner_progression_portfolios_file_id_seq OWNER TO "John";
 
 --
--- TOC entry 4401 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 4298 (class 0 OID 0)
+-- Dependencies: 295
 -- Name: learner_progression_portfolios_file_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3671,112 +3317,7 @@ ALTER SEQUENCE public.learner_progression_portfolios_file_id_seq OWNED BY public
 
 
 --
--- TOC entry 262 (class 1259 OID 17472)
--- Name: learner_progressions; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.learner_progressions (
-    progression_id integer NOT NULL,
-    learner_id integer,
-    from_product_id integer,
-    to_product_id integer,
-    progression_date date,
-    notes text
-);
-
-
-ALTER TABLE public.learner_progressions OWNER TO "John";
-
---
--- TOC entry 4402 (class 0 OID 0)
--- Dependencies: 262
--- Name: TABLE learner_progressions; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.learner_progressions IS 'Tracks the progression of learners between products';
-
-
---
--- TOC entry 4403 (class 0 OID 0)
--- Dependencies: 262
--- Name: COLUMN learner_progressions.progression_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_progressions.progression_id IS 'Unique internal progression ID';
-
-
---
--- TOC entry 4404 (class 0 OID 0)
--- Dependencies: 262
--- Name: COLUMN learner_progressions.learner_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_progressions.learner_id IS 'Reference to the learner';
-
-
---
--- TOC entry 4405 (class 0 OID 0)
--- Dependencies: 262
--- Name: COLUMN learner_progressions.from_product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_progressions.from_product_id IS 'Reference to the initial product';
-
-
---
--- TOC entry 4406 (class 0 OID 0)
--- Dependencies: 262
--- Name: COLUMN learner_progressions.to_product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_progressions.to_product_id IS 'Reference to the new product after progression';
-
-
---
--- TOC entry 4407 (class 0 OID 0)
--- Dependencies: 262
--- Name: COLUMN learner_progressions.progression_date; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_progressions.progression_date IS 'Date when the learner progressed to the new product';
-
-
---
--- TOC entry 4408 (class 0 OID 0)
--- Dependencies: 262
--- Name: COLUMN learner_progressions.notes; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.learner_progressions.notes IS 'Additional notes regarding the progression';
-
-
---
--- TOC entry 263 (class 1259 OID 17477)
--- Name: learner_progressions_progression_id_seq; Type: SEQUENCE; Schema: public; Owner: John
---
-
-CREATE SEQUENCE public.learner_progressions_progression_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.learner_progressions_progression_id_seq OWNER TO "John";
-
---
--- TOC entry 4409 (class 0 OID 0)
--- Dependencies: 263
--- Name: learner_progressions_progression_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
---
-
-ALTER SEQUENCE public.learner_progressions_progression_id_seq OWNED BY public.learner_progressions.progression_id;
-
-
---
--- TOC entry 264 (class 1259 OID 17478)
+-- TOC entry 256 (class 1259 OID 17478)
 -- Name: learner_qualifications; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3789,8 +3330,8 @@ CREATE TABLE public.learner_qualifications (
 ALTER TABLE public.learner_qualifications OWNER TO "John";
 
 --
--- TOC entry 4410 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 4299 (class 0 OID 0)
+-- Dependencies: 256
 -- Name: TABLE learner_qualifications; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3798,8 +3339,8 @@ COMMENT ON TABLE public.learner_qualifications IS 'Table containing a list of po
 
 
 --
--- TOC entry 4411 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 4300 (class 0 OID 0)
+-- Dependencies: 256
 -- Name: COLUMN learner_qualifications.qualification; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3807,7 +3348,7 @@ COMMENT ON COLUMN public.learner_qualifications.qualification IS 'Name of the qu
 
 
 --
--- TOC entry 265 (class 1259 OID 17481)
+-- TOC entry 257 (class 1259 OID 17481)
 -- Name: learner_qualifications_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3823,8 +3364,8 @@ CREATE SEQUENCE public.learner_qualifications_id_seq
 ALTER SEQUENCE public.learner_qualifications_id_seq OWNER TO "John";
 
 --
--- TOC entry 4412 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 4301 (class 0 OID 0)
+-- Dependencies: 257
 -- Name: learner_qualifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3832,7 +3373,7 @@ ALTER SEQUENCE public.learner_qualifications_id_seq OWNED BY public.learner_qual
 
 
 --
--- TOC entry 314 (class 1259 OID 24762)
+-- TOC entry 302 (class 1259 OID 24762)
 -- Name: learner_sponsors; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3847,7 +3388,7 @@ CREATE TABLE public.learner_sponsors (
 ALTER TABLE public.learner_sponsors OWNER TO "John";
 
 --
--- TOC entry 313 (class 1259 OID 24761)
+-- TOC entry 301 (class 1259 OID 24761)
 -- Name: learner_sponsors_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -3863,8 +3404,8 @@ CREATE SEQUENCE public.learner_sponsors_id_seq
 ALTER SEQUENCE public.learner_sponsors_id_seq OWNER TO "John";
 
 --
--- TOC entry 4413 (class 0 OID 0)
--- Dependencies: 313
+-- TOC entry 4302 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: learner_sponsors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -3872,7 +3413,7 @@ ALTER SEQUENCE public.learner_sponsors_id_seq OWNED BY public.learner_sponsors.i
 
 
 --
--- TOC entry 266 (class 1259 OID 17482)
+-- TOC entry 258 (class 1259 OID 17482)
 -- Name: learners; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -3912,8 +3453,8 @@ CREATE TABLE public.learners (
 ALTER TABLE public.learners OWNER TO "John";
 
 --
--- TOC entry 4414 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4303 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: TABLE learners; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3921,8 +3462,8 @@ COMMENT ON TABLE public.learners IS 'Stores personal, educational, and assessmen
 
 
 --
--- TOC entry 4415 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4304 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3930,8 +3471,8 @@ COMMENT ON COLUMN public.learners.id IS 'Unique internal learner ID';
 
 
 --
--- TOC entry 4416 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4305 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.first_name; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3939,8 +3480,8 @@ COMMENT ON COLUMN public.learners.first_name IS 'Learner''s first name';
 
 
 --
--- TOC entry 4417 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4306 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.initials; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3948,8 +3489,8 @@ COMMENT ON COLUMN public.learners.initials IS 'Learner''s initials';
 
 
 --
--- TOC entry 4418 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4307 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.surname; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3957,8 +3498,8 @@ COMMENT ON COLUMN public.learners.surname IS 'Learner''s surname';
 
 
 --
--- TOC entry 4419 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4308 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.gender; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3966,8 +3507,8 @@ COMMENT ON COLUMN public.learners.gender IS 'Learner''s gender';
 
 
 --
--- TOC entry 4420 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4309 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.race; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3975,8 +3516,8 @@ COMMENT ON COLUMN public.learners.race IS 'Learner''s race; options include ''Af
 
 
 --
--- TOC entry 4421 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4310 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.sa_id_no; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3984,8 +3525,8 @@ COMMENT ON COLUMN public.learners.sa_id_no IS 'Learner''s South African ID numbe
 
 
 --
--- TOC entry 4422 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4311 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.passport_number; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -3993,8 +3534,8 @@ COMMENT ON COLUMN public.learners.passport_number IS 'Learner''s passport number
 
 
 --
--- TOC entry 4423 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4312 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.tel_number; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4002,8 +3543,8 @@ COMMENT ON COLUMN public.learners.tel_number IS 'Learner''s primary telephone nu
 
 
 --
--- TOC entry 4424 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4313 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.alternative_tel_number; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4011,8 +3552,8 @@ COMMENT ON COLUMN public.learners.alternative_tel_number IS 'Learner''s alternat
 
 
 --
--- TOC entry 4425 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4314 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.email_address; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4020,8 +3561,8 @@ COMMENT ON COLUMN public.learners.email_address IS 'Learner''s email address';
 
 
 --
--- TOC entry 4426 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4315 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.address_line_1; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4029,8 +3570,8 @@ COMMENT ON COLUMN public.learners.address_line_1 IS 'First line of learner''s ph
 
 
 --
--- TOC entry 4427 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4316 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.address_line_2; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4038,8 +3579,8 @@ COMMENT ON COLUMN public.learners.address_line_2 IS 'Second line of learner''s p
 
 
 --
--- TOC entry 4428 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4317 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.city_town_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4047,8 +3588,8 @@ COMMENT ON COLUMN public.learners.city_town_id IS 'Reference to the city or town
 
 
 --
--- TOC entry 4429 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4318 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.province_region_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4056,8 +3597,8 @@ COMMENT ON COLUMN public.learners.province_region_id IS 'Reference to the provin
 
 
 --
--- TOC entry 4430 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4319 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.postal_code; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4065,8 +3606,8 @@ COMMENT ON COLUMN public.learners.postal_code IS 'Postal code of the learner''s 
 
 
 --
--- TOC entry 4431 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4320 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.assessment_status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4074,8 +3615,8 @@ COMMENT ON COLUMN public.learners.assessment_status IS 'Assessment status; indic
 
 
 --
--- TOC entry 4432 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4321 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.placement_assessment_date; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4083,8 +3624,8 @@ COMMENT ON COLUMN public.learners.placement_assessment_date IS 'Date when the le
 
 
 --
--- TOC entry 4433 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4322 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.numeracy_level; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4092,8 +3633,8 @@ COMMENT ON COLUMN public.learners.numeracy_level IS 'Learner''s initial placemen
 
 
 --
--- TOC entry 4434 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4323 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.employment_status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4101,8 +3642,8 @@ COMMENT ON COLUMN public.learners.employment_status IS 'Indicates if the learner
 
 
 --
--- TOC entry 4435 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4324 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.employer_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4110,8 +3651,8 @@ COMMENT ON COLUMN public.learners.employer_id IS 'Reference to the learner''s em
 
 
 --
--- TOC entry 4436 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4325 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.disability_status; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4119,8 +3660,8 @@ COMMENT ON COLUMN public.learners.disability_status IS 'Indicates if the learner
 
 
 --
--- TOC entry 4437 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4326 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.scanned_portfolio; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4128,8 +3669,8 @@ COMMENT ON COLUMN public.learners.scanned_portfolio IS 'File path or URL to the 
 
 
 --
--- TOC entry 4438 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4327 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4137,8 +3678,8 @@ COMMENT ON COLUMN public.learners.created_at IS 'Timestamp when the learner reco
 
 
 --
--- TOC entry 4439 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4328 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4146,8 +3687,8 @@ COMMENT ON COLUMN public.learners.updated_at IS 'Timestamp when the learner reco
 
 
 --
--- TOC entry 4440 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 4329 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: COLUMN learners.highest_qualification; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4155,7 +3696,7 @@ COMMENT ON COLUMN public.learners.highest_qualification IS 'Foreign key referenc
 
 
 --
--- TOC entry 267 (class 1259 OID 17489)
+-- TOC entry 259 (class 1259 OID 17489)
 -- Name: learners_learner_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4171,8 +3712,8 @@ CREATE SEQUENCE public.learners_learner_id_seq
 ALTER SEQUENCE public.learners_learner_id_seq OWNER TO "John";
 
 --
--- TOC entry 4441 (class 0 OID 0)
--- Dependencies: 267
+-- TOC entry 4330 (class 0 OID 0)
+-- Dependencies: 259
 -- Name: learners_learner_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4180,7 +3721,7 @@ ALTER SEQUENCE public.learners_learner_id_seq OWNED BY public.learners.id;
 
 
 --
--- TOC entry 268 (class 1259 OID 17490)
+-- TOC entry 260 (class 1259 OID 17490)
 -- Name: locations; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4202,8 +3743,8 @@ CREATE TABLE public.locations (
 ALTER TABLE public.locations OWNER TO "John";
 
 --
--- TOC entry 4442 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4331 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: TABLE locations; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4211,8 +3752,8 @@ COMMENT ON TABLE public.locations IS 'Stores geographical location data for addr
 
 
 --
--- TOC entry 4443 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4332 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.location_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4220,8 +3761,8 @@ COMMENT ON COLUMN public.locations.location_id IS 'Unique internal location ID';
 
 
 --
--- TOC entry 4444 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4333 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.suburb; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4229,8 +3770,8 @@ COMMENT ON COLUMN public.locations.suburb IS 'Suburb name';
 
 
 --
--- TOC entry 4445 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4334 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.town; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4238,8 +3779,8 @@ COMMENT ON COLUMN public.locations.town IS 'Town name';
 
 
 --
--- TOC entry 4446 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4335 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.province; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4247,8 +3788,8 @@ COMMENT ON COLUMN public.locations.province IS 'Province name';
 
 
 --
--- TOC entry 4447 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4336 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.postal_code; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4256,8 +3797,8 @@ COMMENT ON COLUMN public.locations.postal_code IS 'Postal code';
 
 
 --
--- TOC entry 4448 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4337 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.longitude; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4265,8 +3806,8 @@ COMMENT ON COLUMN public.locations.longitude IS 'Geographical longitude coordina
 
 
 --
--- TOC entry 4449 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4338 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.latitude; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4274,8 +3815,8 @@ COMMENT ON COLUMN public.locations.latitude IS 'Geographical latitude coordinate
 
 
 --
--- TOC entry 4450 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4339 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4283,8 +3824,8 @@ COMMENT ON COLUMN public.locations.created_at IS 'Timestamp when the location re
 
 
 --
--- TOC entry 4451 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4340 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4292,8 +3833,8 @@ COMMENT ON COLUMN public.locations.updated_at IS 'Timestamp when the location re
 
 
 --
--- TOC entry 4452 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 4341 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: COLUMN locations.street_address; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4301,7 +3842,7 @@ COMMENT ON COLUMN public.locations.street_address IS 'Street address line for th
 
 
 --
--- TOC entry 269 (class 1259 OID 17498)
+-- TOC entry 261 (class 1259 OID 17498)
 -- Name: locations_location_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4317,8 +3858,8 @@ CREATE SEQUENCE public.locations_location_id_seq
 ALTER SEQUENCE public.locations_location_id_seq OWNER TO "John";
 
 --
--- TOC entry 4453 (class 0 OID 0)
--- Dependencies: 269
+-- TOC entry 4342 (class 0 OID 0)
+-- Dependencies: 261
 -- Name: locations_location_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4326,307 +3867,7 @@ ALTER SEQUENCE public.locations_location_id_seq OWNED BY public.locations.locati
 
 
 --
--- TOC entry 270 (class 1259 OID 17499)
--- Name: products; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.products (
-    product_id integer NOT NULL,
-    product_name character varying(100),
-    product_duration integer,
-    learning_area character varying(100),
-    learning_area_duration integer,
-    reporting_structure text,
-    product_notes text,
-    product_rules text,
-    product_flags text,
-    parent_product_id integer,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
-ALTER TABLE public.products OWNER TO "John";
-
---
--- TOC entry 4454 (class 0 OID 0)
--- Dependencies: 270
--- Name: TABLE products; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.products IS 'Stores information about educational products or courses';
-
-
---
--- TOC entry 4455 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.product_id IS 'Unique internal product ID';
-
-
---
--- TOC entry 4456 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.product_name; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.product_name IS 'Name of the product or course';
-
-
---
--- TOC entry 4457 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.product_duration; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.product_duration IS 'Total duration of the product in hours';
-
-
---
--- TOC entry 4458 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.learning_area; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.learning_area IS 'Learning areas covered by the product (e.g., ''Communication'', ''Numeracy'')';
-
-
---
--- TOC entry 4459 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.learning_area_duration; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.learning_area_duration IS 'Duration of each learning area in hours';
-
-
---
--- TOC entry 4460 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.reporting_structure; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.reporting_structure IS 'Structure of progress reports for the product';
-
-
---
--- TOC entry 4461 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.product_notes; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.product_notes IS 'Notes or additional information about the product';
-
-
---
--- TOC entry 4462 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.product_rules; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.product_rules IS 'Rules or guidelines associated with the product';
-
-
---
--- TOC entry 4463 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.product_flags; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.product_flags IS 'Flags or alerts for the product (e.g., attendance thresholds)';
-
-
---
--- TOC entry 4464 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.parent_product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.parent_product_id IS 'Reference to a parent product for hierarchical structuring';
-
-
---
--- TOC entry 4465 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.created_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.created_at IS 'Timestamp when the product record was created';
-
-
---
--- TOC entry 4466 (class 0 OID 0)
--- Dependencies: 270
--- Name: COLUMN products.updated_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.products.updated_at IS 'Timestamp when the product record was last updated';
-
-
---
--- TOC entry 271 (class 1259 OID 17506)
--- Name: products_product_id_seq; Type: SEQUENCE; Schema: public; Owner: John
---
-
-CREATE SEQUENCE public.products_product_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.products_product_id_seq OWNER TO "John";
-
---
--- TOC entry 4467 (class 0 OID 0)
--- Dependencies: 271
--- Name: products_product_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
---
-
-ALTER SEQUENCE public.products_product_id_seq OWNED BY public.products.product_id;
-
-
---
--- TOC entry 272 (class 1259 OID 17507)
--- Name: progress_reports; Type: TABLE; Schema: public; Owner: John
---
-
-CREATE TABLE public.progress_reports (
-    report_id integer NOT NULL,
-    class_id integer,
-    learner_id integer,
-    product_id integer,
-    progress_percentage numeric(5,2),
-    report_date date,
-    remarks text,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
-ALTER TABLE public.progress_reports OWNER TO "John";
-
---
--- TOC entry 4468 (class 0 OID 0)
--- Dependencies: 272
--- Name: TABLE progress_reports; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON TABLE public.progress_reports IS 'Stores progress reports for learners in specific classes and products';
-
-
---
--- TOC entry 4469 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.report_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.report_id IS 'Unique internal progress report ID';
-
-
---
--- TOC entry 4470 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.class_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.class_id IS 'Reference to the class';
-
-
---
--- TOC entry 4471 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.learner_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.learner_id IS 'Reference to the learner';
-
-
---
--- TOC entry 4472 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.product_id; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.product_id IS 'Reference to the product or subject';
-
-
---
--- TOC entry 4473 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.progress_percentage; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.progress_percentage IS 'Learner''s progress percentage in the product';
-
-
---
--- TOC entry 4474 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.report_date; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.report_date IS 'Date when the progress report was generated';
-
-
---
--- TOC entry 4475 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.remarks; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.remarks IS 'Additional remarks or comments';
-
-
---
--- TOC entry 4476 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.created_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.created_at IS 'Timestamp when the progress report was created';
-
-
---
--- TOC entry 4477 (class 0 OID 0)
--- Dependencies: 272
--- Name: COLUMN progress_reports.updated_at; Type: COMMENT; Schema: public; Owner: John
---
-
-COMMENT ON COLUMN public.progress_reports.updated_at IS 'Timestamp when the progress report was last updated';
-
-
---
--- TOC entry 273 (class 1259 OID 17514)
--- Name: progress_reports_report_id_seq; Type: SEQUENCE; Schema: public; Owner: John
---
-
-CREATE SEQUENCE public.progress_reports_report_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.progress_reports_report_id_seq OWNER TO "John";
-
---
--- TOC entry 4478 (class 0 OID 0)
--- Dependencies: 273
--- Name: progress_reports_report_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
---
-
-ALTER SEQUENCE public.progress_reports_report_id_seq OWNED BY public.progress_reports.report_id;
-
-
---
--- TOC entry 274 (class 1259 OID 17515)
+-- TOC entry 262 (class 1259 OID 17515)
 -- Name: qa_visits; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4645,7 +3886,7 @@ CREATE TABLE public.qa_visits (
 ALTER TABLE public.qa_visits OWNER TO "John";
 
 --
--- TOC entry 275 (class 1259 OID 17522)
+-- TOC entry 263 (class 1259 OID 17522)
 -- Name: qa_visits_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4661,8 +3902,8 @@ CREATE SEQUENCE public.qa_visits_id_seq
 ALTER SEQUENCE public.qa_visits_id_seq OWNER TO "John";
 
 --
--- TOC entry 4479 (class 0 OID 0)
--- Dependencies: 275
+-- TOC entry 4343 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: qa_visits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4670,7 +3911,7 @@ ALTER SEQUENCE public.qa_visits_id_seq OWNED BY public.latest_document.id;
 
 
 --
--- TOC entry 276 (class 1259 OID 17523)
+-- TOC entry 264 (class 1259 OID 17523)
 -- Name: qa_visits_id_seq1; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4686,8 +3927,8 @@ CREATE SEQUENCE public.qa_visits_id_seq1
 ALTER SEQUENCE public.qa_visits_id_seq1 OWNER TO "John";
 
 --
--- TOC entry 4480 (class 0 OID 0)
--- Dependencies: 276
+-- TOC entry 4344 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: qa_visits_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4695,7 +3936,7 @@ ALTER SEQUENCE public.qa_visits_id_seq1 OWNED BY public.qa_visits.id;
 
 
 --
--- TOC entry 277 (class 1259 OID 17524)
+-- TOC entry 265 (class 1259 OID 17524)
 -- Name: sites; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4713,8 +3954,8 @@ CREATE TABLE public.sites (
 ALTER TABLE public.sites OWNER TO "John";
 
 --
--- TOC entry 4481 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 4345 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: TABLE sites; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4722,8 +3963,8 @@ COMMENT ON TABLE public.sites IS 'Stores information about client sites with hie
 
 
 --
--- TOC entry 4482 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 4346 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: COLUMN sites.site_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4731,8 +3972,8 @@ COMMENT ON COLUMN public.sites.site_id IS 'Unique site ID';
 
 
 --
--- TOC entry 4483 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 4347 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: COLUMN sites.client_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4740,8 +3981,8 @@ COMMENT ON COLUMN public.sites.client_id IS 'Reference to the client this site b
 
 
 --
--- TOC entry 4484 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 4348 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: COLUMN sites.site_name; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4749,8 +3990,8 @@ COMMENT ON COLUMN public.sites.site_name IS 'Name of the site';
 
 
 --
--- TOC entry 4485 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 4349 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: COLUMN sites.parent_site_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4758,8 +3999,8 @@ COMMENT ON COLUMN public.sites.parent_site_id IS 'Reference to parent site for h
 
 
 --
--- TOC entry 4486 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 4350 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: COLUMN sites.place_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4767,7 +4008,7 @@ COMMENT ON COLUMN public.sites.place_id IS 'Foreign key to locations table conta
 
 
 --
--- TOC entry 278 (class 1259 OID 17529)
+-- TOC entry 266 (class 1259 OID 17529)
 -- Name: sites_address_audit; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4788,7 +4029,7 @@ CREATE TABLE public.sites_address_audit (
 ALTER TABLE public.sites_address_audit OWNER TO "John";
 
 --
--- TOC entry 279 (class 1259 OID 17534)
+-- TOC entry 267 (class 1259 OID 17534)
 -- Name: sites_migration_backup; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4809,7 +4050,7 @@ CREATE TABLE public.sites_migration_backup (
 ALTER TABLE public.sites_migration_backup OWNER TO "John";
 
 --
--- TOC entry 280 (class 1259 OID 17539)
+-- TOC entry 268 (class 1259 OID 17539)
 -- Name: sites_site_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4825,8 +4066,8 @@ CREATE SEQUENCE public.sites_site_id_seq
 ALTER SEQUENCE public.sites_site_id_seq OWNER TO "John";
 
 --
--- TOC entry 4487 (class 0 OID 0)
--- Dependencies: 280
+-- TOC entry 4351 (class 0 OID 0)
+-- Dependencies: 268
 -- Name: sites_site_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4834,7 +4075,7 @@ ALTER SEQUENCE public.sites_site_id_seq OWNED BY public.sites.site_id;
 
 
 --
--- TOC entry 281 (class 1259 OID 17540)
+-- TOC entry 269 (class 1259 OID 17540)
 -- Name: user_permissions; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4848,8 +4089,8 @@ CREATE TABLE public.user_permissions (
 ALTER TABLE public.user_permissions OWNER TO "John";
 
 --
--- TOC entry 4488 (class 0 OID 0)
--- Dependencies: 281
+-- TOC entry 4352 (class 0 OID 0)
+-- Dependencies: 269
 -- Name: TABLE user_permissions; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4857,8 +4098,8 @@ COMMENT ON TABLE public.user_permissions IS 'Grants specific permissions to user
 
 
 --
--- TOC entry 4489 (class 0 OID 0)
--- Dependencies: 281
+-- TOC entry 4353 (class 0 OID 0)
+-- Dependencies: 269
 -- Name: COLUMN user_permissions.permission_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4866,8 +4107,8 @@ COMMENT ON COLUMN public.user_permissions.permission_id IS 'Unique internal perm
 
 
 --
--- TOC entry 4490 (class 0 OID 0)
--- Dependencies: 281
+-- TOC entry 4354 (class 0 OID 0)
+-- Dependencies: 269
 -- Name: COLUMN user_permissions.user_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4875,8 +4116,8 @@ COMMENT ON COLUMN public.user_permissions.user_id IS 'Reference to the user';
 
 
 --
--- TOC entry 4491 (class 0 OID 0)
--- Dependencies: 281
+-- TOC entry 4355 (class 0 OID 0)
+-- Dependencies: 269
 -- Name: COLUMN user_permissions.permission; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4884,7 +4125,7 @@ COMMENT ON COLUMN public.user_permissions.permission IS 'Specific permission gra
 
 
 --
--- TOC entry 282 (class 1259 OID 17543)
+-- TOC entry 270 (class 1259 OID 17543)
 -- Name: user_permissions_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4900,8 +4141,8 @@ CREATE SEQUENCE public.user_permissions_permission_id_seq
 ALTER SEQUENCE public.user_permissions_permission_id_seq OWNER TO "John";
 
 --
--- TOC entry 4492 (class 0 OID 0)
--- Dependencies: 282
+-- TOC entry 4356 (class 0 OID 0)
+-- Dependencies: 270
 -- Name: user_permissions_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4909,7 +4150,7 @@ ALTER SEQUENCE public.user_permissions_permission_id_seq OWNED BY public.user_pe
 
 
 --
--- TOC entry 283 (class 1259 OID 17544)
+-- TOC entry 271 (class 1259 OID 17544)
 -- Name: user_roles; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -4923,8 +4164,8 @@ CREATE TABLE public.user_roles (
 ALTER TABLE public.user_roles OWNER TO "John";
 
 --
--- TOC entry 4493 (class 0 OID 0)
--- Dependencies: 283
+-- TOC entry 4357 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: TABLE user_roles; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4932,8 +4173,8 @@ COMMENT ON TABLE public.user_roles IS 'Defines roles and associated permissions 
 
 
 --
--- TOC entry 4494 (class 0 OID 0)
--- Dependencies: 283
+-- TOC entry 4358 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: COLUMN user_roles.role_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4941,8 +4182,8 @@ COMMENT ON COLUMN public.user_roles.role_id IS 'Unique internal role ID';
 
 
 --
--- TOC entry 4495 (class 0 OID 0)
--- Dependencies: 283
+-- TOC entry 4359 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: COLUMN user_roles.role_name; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4950,8 +4191,8 @@ COMMENT ON COLUMN public.user_roles.role_name IS 'Name of the role (e.g., ''Admi
 
 
 --
--- TOC entry 4496 (class 0 OID 0)
--- Dependencies: 283
+-- TOC entry 4360 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: COLUMN user_roles.permissions; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -4959,7 +4200,7 @@ COMMENT ON COLUMN public.user_roles.permissions IS 'Permissions associated with 
 
 
 --
--- TOC entry 284 (class 1259 OID 17549)
+-- TOC entry 272 (class 1259 OID 17549)
 -- Name: user_roles_role_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -4975,8 +4216,8 @@ CREATE SEQUENCE public.user_roles_role_id_seq
 ALTER SEQUENCE public.user_roles_role_id_seq OWNER TO "John";
 
 --
--- TOC entry 4497 (class 0 OID 0)
--- Dependencies: 284
+-- TOC entry 4361 (class 0 OID 0)
+-- Dependencies: 272
 -- Name: user_roles_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -4984,7 +4225,7 @@ ALTER SEQUENCE public.user_roles_role_id_seq OWNED BY public.user_roles.role_id;
 
 
 --
--- TOC entry 285 (class 1259 OID 17550)
+-- TOC entry 273 (class 1259 OID 17550)
 -- Name: users; Type: TABLE; Schema: public; Owner: John
 --
 
@@ -5004,8 +4245,8 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO "John";
 
 --
--- TOC entry 4498 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4362 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: TABLE users; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5013,8 +4254,8 @@ COMMENT ON TABLE public.users IS 'Stores system user information';
 
 
 --
--- TOC entry 4499 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4363 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.user_id; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5022,8 +4263,8 @@ COMMENT ON COLUMN public.users.user_id IS 'Unique internal user ID';
 
 
 --
--- TOC entry 4500 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4364 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.first_name; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5031,8 +4272,8 @@ COMMENT ON COLUMN public.users.first_name IS 'User''s first name';
 
 
 --
--- TOC entry 4501 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4365 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.surname; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5040,8 +4281,8 @@ COMMENT ON COLUMN public.users.surname IS 'User''s surname';
 
 
 --
--- TOC entry 4502 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4366 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.email; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5049,8 +4290,8 @@ COMMENT ON COLUMN public.users.email IS 'User''s email address';
 
 
 --
--- TOC entry 4503 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4367 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.cellphone_number; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5058,8 +4299,8 @@ COMMENT ON COLUMN public.users.cellphone_number IS 'User''s cellphone number';
 
 
 --
--- TOC entry 4504 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4368 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.role; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5067,8 +4308,8 @@ COMMENT ON COLUMN public.users.role IS 'User''s role in the system, e.g., ''Admi
 
 
 --
--- TOC entry 4505 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4369 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.password_hash; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5076,8 +4317,8 @@ COMMENT ON COLUMN public.users.password_hash IS 'Hashed password for user authen
 
 
 --
--- TOC entry 4506 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4370 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.created_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5085,8 +4326,8 @@ COMMENT ON COLUMN public.users.created_at IS 'Timestamp when the user record was
 
 
 --
--- TOC entry 4507 (class 0 OID 0)
--- Dependencies: 285
+-- TOC entry 4371 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: COLUMN users.updated_at; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -5094,7 +4335,7 @@ COMMENT ON COLUMN public.users.updated_at IS 'Timestamp when the user record was
 
 
 --
--- TOC entry 286 (class 1259 OID 17557)
+-- TOC entry 274 (class 1259 OID 17557)
 -- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: John
 --
 
@@ -5110,8 +4351,8 @@ CREATE SEQUENCE public.users_user_id_seq
 ALTER SEQUENCE public.users_user_id_seq OWNER TO "John";
 
 --
--- TOC entry 4508 (class 0 OID 0)
--- Dependencies: 286
+-- TOC entry 4372 (class 0 OID 0)
+-- Dependencies: 274
 -- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: John
 --
 
@@ -5119,7 +4360,7 @@ ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
 
 
 --
--- TOC entry 287 (class 1259 OID 17558)
+-- TOC entry 275 (class 1259 OID 17558)
 -- Name: v_client_head_sites; Type: VIEW; Schema: public; Owner: John
 --
 
@@ -5147,7 +4388,7 @@ CREATE VIEW public.v_client_head_sites AS
 ALTER VIEW public.v_client_head_sites OWNER TO "John";
 
 --
--- TOC entry 288 (class 1259 OID 17563)
+-- TOC entry 276 (class 1259 OID 17563)
 -- Name: v_client_sub_sites; Type: VIEW; Schema: public; Owner: John
 --
 
@@ -5176,7 +4417,7 @@ CREATE VIEW public.v_client_sub_sites AS
 ALTER VIEW public.v_client_sub_sites OWNER TO "John";
 
 --
--- TOC entry 289 (class 1259 OID 17568)
+-- TOC entry 277 (class 1259 OID 17568)
 -- Name: audit_log; Type: TABLE; Schema: wecoza_events; Owner: John
 --
 
@@ -5197,8 +4438,8 @@ CREATE TABLE wecoza_events.audit_log (
 ALTER TABLE wecoza_events.audit_log OWNER TO "John";
 
 --
--- TOC entry 4509 (class 0 OID 0)
--- Dependencies: 289
+-- TOC entry 4373 (class 0 OID 0)
+-- Dependencies: 277
 -- Name: TABLE audit_log; Type: COMMENT; Schema: wecoza_events; Owner: John
 --
 
@@ -5206,7 +4447,7 @@ COMMENT ON TABLE wecoza_events.audit_log IS 'Security and operation audit trail'
 
 
 --
--- TOC entry 290 (class 1259 OID 17576)
+-- TOC entry 278 (class 1259 OID 17576)
 -- Name: audit_log_id_seq; Type: SEQUENCE; Schema: wecoza_events; Owner: John
 --
 
@@ -5222,8 +4463,8 @@ CREATE SEQUENCE wecoza_events.audit_log_id_seq
 ALTER SEQUENCE wecoza_events.audit_log_id_seq OWNER TO "John";
 
 --
--- TOC entry 4510 (class 0 OID 0)
--- Dependencies: 290
+-- TOC entry 4374 (class 0 OID 0)
+-- Dependencies: 278
 -- Name: audit_log_id_seq; Type: SEQUENCE OWNED BY; Schema: wecoza_events; Owner: John
 --
 
@@ -5231,7 +4472,7 @@ ALTER SEQUENCE wecoza_events.audit_log_id_seq OWNED BY wecoza_events.audit_log.i
 
 
 --
--- TOC entry 291 (class 1259 OID 17577)
+-- TOC entry 279 (class 1259 OID 17577)
 -- Name: dashboard_status; Type: TABLE; Schema: wecoza_events; Owner: John
 --
 
@@ -5254,8 +4495,8 @@ CREATE TABLE wecoza_events.dashboard_status (
 ALTER TABLE wecoza_events.dashboard_status OWNER TO "John";
 
 --
--- TOC entry 4511 (class 0 OID 0)
--- Dependencies: 291
+-- TOC entry 4375 (class 0 OID 0)
+-- Dependencies: 279
 -- Name: TABLE dashboard_status; Type: COMMENT; Schema: wecoza_events; Owner: John
 --
 
@@ -5263,7 +4504,7 @@ COMMENT ON TABLE wecoza_events.dashboard_status IS 'Status tracking for class-re
 
 
 --
--- TOC entry 292 (class 1259 OID 17587)
+-- TOC entry 280 (class 1259 OID 17587)
 -- Name: dashboard_status_id_seq; Type: SEQUENCE; Schema: wecoza_events; Owner: John
 --
 
@@ -5279,8 +4520,8 @@ CREATE SEQUENCE wecoza_events.dashboard_status_id_seq
 ALTER SEQUENCE wecoza_events.dashboard_status_id_seq OWNER TO "John";
 
 --
--- TOC entry 4512 (class 0 OID 0)
--- Dependencies: 292
+-- TOC entry 4376 (class 0 OID 0)
+-- Dependencies: 280
 -- Name: dashboard_status_id_seq; Type: SEQUENCE OWNED BY; Schema: wecoza_events; Owner: John
 --
 
@@ -5288,7 +4529,7 @@ ALTER SEQUENCE wecoza_events.dashboard_status_id_seq OWNED BY wecoza_events.dash
 
 
 --
--- TOC entry 293 (class 1259 OID 17588)
+-- TOC entry 281 (class 1259 OID 17588)
 -- Name: events_log; Type: TABLE; Schema: wecoza_events; Owner: John
 --
 
@@ -5309,8 +4550,8 @@ CREATE TABLE wecoza_events.events_log (
 ALTER TABLE wecoza_events.events_log OWNER TO "John";
 
 --
--- TOC entry 4513 (class 0 OID 0)
--- Dependencies: 293
+-- TOC entry 4377 (class 0 OID 0)
+-- Dependencies: 281
 -- Name: TABLE events_log; Type: COMMENT; Schema: wecoza_events; Owner: John
 --
 
@@ -5318,7 +4559,7 @@ COMMENT ON TABLE wecoza_events.events_log IS 'Log of all events processed by the
 
 
 --
--- TOC entry 294 (class 1259 OID 17597)
+-- TOC entry 282 (class 1259 OID 17597)
 -- Name: events_log_id_seq; Type: SEQUENCE; Schema: wecoza_events; Owner: John
 --
 
@@ -5334,8 +4575,8 @@ CREATE SEQUENCE wecoza_events.events_log_id_seq
 ALTER SEQUENCE wecoza_events.events_log_id_seq OWNER TO "John";
 
 --
--- TOC entry 4514 (class 0 OID 0)
--- Dependencies: 294
+-- TOC entry 4378 (class 0 OID 0)
+-- Dependencies: 282
 -- Name: events_log_id_seq; Type: SEQUENCE OWNED BY; Schema: wecoza_events; Owner: John
 --
 
@@ -5343,7 +4584,7 @@ ALTER SEQUENCE wecoza_events.events_log_id_seq OWNED BY wecoza_events.events_log
 
 
 --
--- TOC entry 295 (class 1259 OID 17598)
+-- TOC entry 283 (class 1259 OID 17598)
 -- Name: notification_queue; Type: TABLE; Schema: wecoza_events; Owner: John
 --
 
@@ -5370,8 +4611,8 @@ CREATE TABLE wecoza_events.notification_queue (
 ALTER TABLE wecoza_events.notification_queue OWNER TO "John";
 
 --
--- TOC entry 4515 (class 0 OID 0)
--- Dependencies: 295
+-- TOC entry 4379 (class 0 OID 0)
+-- Dependencies: 283
 -- Name: TABLE notification_queue; Type: COMMENT; Schema: wecoza_events; Owner: John
 --
 
@@ -5379,7 +4620,7 @@ COMMENT ON TABLE wecoza_events.notification_queue IS 'Queue for outgoing notific
 
 
 --
--- TOC entry 296 (class 1259 OID 17611)
+-- TOC entry 284 (class 1259 OID 17611)
 -- Name: notification_queue_id_seq; Type: SEQUENCE; Schema: wecoza_events; Owner: John
 --
 
@@ -5395,8 +4636,8 @@ CREATE SEQUENCE wecoza_events.notification_queue_id_seq
 ALTER SEQUENCE wecoza_events.notification_queue_id_seq OWNER TO "John";
 
 --
--- TOC entry 4516 (class 0 OID 0)
--- Dependencies: 296
+-- TOC entry 4380 (class 0 OID 0)
+-- Dependencies: 284
 -- Name: notification_queue_id_seq; Type: SEQUENCE OWNED BY; Schema: wecoza_events; Owner: John
 --
 
@@ -5404,7 +4645,7 @@ ALTER SEQUENCE wecoza_events.notification_queue_id_seq OWNED BY wecoza_events.no
 
 
 --
--- TOC entry 297 (class 1259 OID 17612)
+-- TOC entry 285 (class 1259 OID 17612)
 -- Name: supervisors; Type: TABLE; Schema: wecoza_events; Owner: John
 --
 
@@ -5426,8 +4667,8 @@ CREATE TABLE wecoza_events.supervisors (
 ALTER TABLE wecoza_events.supervisors OWNER TO "John";
 
 --
--- TOC entry 4517 (class 0 OID 0)
--- Dependencies: 297
+-- TOC entry 4381 (class 0 OID 0)
+-- Dependencies: 285
 -- Name: TABLE supervisors; Type: COMMENT; Schema: wecoza_events; Owner: John
 --
 
@@ -5435,7 +4676,7 @@ COMMENT ON TABLE wecoza_events.supervisors IS 'Supervisors assigned to manage cl
 
 
 --
--- TOC entry 298 (class 1259 OID 17624)
+-- TOC entry 286 (class 1259 OID 17624)
 -- Name: supervisors_id_seq; Type: SEQUENCE; Schema: wecoza_events; Owner: John
 --
 
@@ -5451,8 +4692,8 @@ CREATE SEQUENCE wecoza_events.supervisors_id_seq
 ALTER SEQUENCE wecoza_events.supervisors_id_seq OWNER TO "John";
 
 --
--- TOC entry 4518 (class 0 OID 0)
--- Dependencies: 298
+-- TOC entry 4382 (class 0 OID 0)
+-- Dependencies: 286
 -- Name: supervisors_id_seq; Type: SEQUENCE OWNED BY; Schema: wecoza_events; Owner: John
 --
 
@@ -5460,7 +4701,7 @@ ALTER SEQUENCE wecoza_events.supervisors_id_seq OWNED BY wecoza_events.superviso
 
 
 --
--- TOC entry 3509 (class 2604 OID 17625)
+-- TOC entry 3477 (class 2604 OID 17625)
 -- Name: agent_absences absence_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5468,7 +4709,7 @@ ALTER TABLE ONLY public.agent_absences ALTER COLUMN absence_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3658 (class 2604 OID 24747)
+-- TOC entry 3614 (class 2604 OID 24747)
 -- Name: agent_meta meta_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5476,7 +4717,7 @@ ALTER TABLE ONLY public.agent_meta ALTER COLUMN meta_id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3511 (class 2604 OID 17626)
+-- TOC entry 3479 (class 2604 OID 17626)
 -- Name: agent_notes note_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5484,7 +4725,7 @@ ALTER TABLE ONLY public.agent_notes ALTER COLUMN note_id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3513 (class 2604 OID 17627)
+-- TOC entry 3481 (class 2604 OID 17627)
 -- Name: agent_orders order_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5492,7 +4733,7 @@ ALTER TABLE ONLY public.agent_orders ALTER COLUMN order_id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3516 (class 2604 OID 17628)
+-- TOC entry 3484 (class 2604 OID 17628)
 -- Name: agent_replacements replacement_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5500,7 +4741,7 @@ ALTER TABLE ONLY public.agent_replacements ALTER COLUMN replacement_id SET DEFAU
 
 
 --
--- TOC entry 3517 (class 2604 OID 17629)
+-- TOC entry 3485 (class 2604 OID 17629)
 -- Name: agents agent_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5508,7 +4749,7 @@ ALTER TABLE ONLY public.agents ALTER COLUMN agent_id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 3524 (class 2604 OID 17630)
+-- TOC entry 3492 (class 2604 OID 17630)
 -- Name: attendance_registers register_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5516,7 +4757,7 @@ ALTER TABLE ONLY public.attendance_registers ALTER COLUMN register_id SET DEFAUL
 
 
 --
--- TOC entry 3654 (class 2604 OID 24720)
+-- TOC entry 3610 (class 2604 OID 24720)
 -- Name: class_events event_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5524,7 +4765,7 @@ ALTER TABLE ONLY public.class_events ALTER COLUMN event_id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3527 (class 2604 OID 17632)
+-- TOC entry 3495 (class 2604 OID 17632)
 -- Name: class_material_tracking id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5532,7 +4773,7 @@ ALTER TABLE ONLY public.class_material_tracking ALTER COLUMN id SET DEFAULT next
 
 
 --
--- TOC entry 3531 (class 2604 OID 17633)
+-- TOC entry 3499 (class 2604 OID 17633)
 -- Name: class_notes note_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5540,7 +4781,7 @@ ALTER TABLE ONLY public.class_notes ALTER COLUMN note_id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3533 (class 2604 OID 17634)
+-- TOC entry 3501 (class 2604 OID 17634)
 -- Name: class_schedules schedule_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5548,7 +4789,7 @@ ALTER TABLE ONLY public.class_schedules ALTER COLUMN schedule_id SET DEFAULT nex
 
 
 --
--- TOC entry 3635 (class 2604 OID 24604)
+-- TOC entry 3591 (class 2604 OID 24604)
 -- Name: class_type_subjects class_type_subject_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5556,7 +4797,7 @@ ALTER TABLE ONLY public.class_type_subjects ALTER COLUMN class_type_subject_id S
 
 
 --
--- TOC entry 3630 (class 2604 OID 24587)
+-- TOC entry 3586 (class 2604 OID 24587)
 -- Name: class_types class_type_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5564,7 +4805,7 @@ ALTER TABLE ONLY public.class_types ALTER COLUMN class_type_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3534 (class 2604 OID 17635)
+-- TOC entry 3502 (class 2604 OID 17635)
 -- Name: classes class_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5572,7 +4813,7 @@ ALTER TABLE ONLY public.classes ALTER COLUMN class_id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 3544 (class 2604 OID 17636)
+-- TOC entry 3512 (class 2604 OID 17636)
 -- Name: client_communications communication_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5580,7 +4821,7 @@ ALTER TABLE ONLY public.client_communications ALTER COLUMN communication_id SET 
 
 
 --
--- TOC entry 3546 (class 2604 OID 17637)
+-- TOC entry 3514 (class 2604 OID 17637)
 -- Name: clients client_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5588,7 +4829,7 @@ ALTER TABLE ONLY public.clients ALTER COLUMN client_id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3549 (class 2604 OID 17638)
+-- TOC entry 3517 (class 2604 OID 17638)
 -- Name: collections collection_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5596,7 +4837,7 @@ ALTER TABLE ONLY public.collections ALTER COLUMN collection_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3552 (class 2604 OID 17639)
+-- TOC entry 3520 (class 2604 OID 17639)
 -- Name: deliveries delivery_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5604,7 +4845,7 @@ ALTER TABLE ONLY public.deliveries ALTER COLUMN delivery_id SET DEFAULT nextval(
 
 
 --
--- TOC entry 3555 (class 2604 OID 17640)
+-- TOC entry 3523 (class 2604 OID 17640)
 -- Name: employers employer_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5612,23 +4853,7 @@ ALTER TABLE ONLY public.employers ALTER COLUMN employer_id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3558 (class 2604 OID 17641)
--- Name: exam_results result_id; Type: DEFAULT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exam_results ALTER COLUMN result_id SET DEFAULT nextval('public.exam_results_result_id_seq'::regclass);
-
-
---
--- TOC entry 3561 (class 2604 OID 17642)
--- Name: exams exam_id; Type: DEFAULT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exams ALTER COLUMN exam_id SET DEFAULT nextval('public.exams_exam_id_seq'::regclass);
-
-
---
--- TOC entry 3564 (class 2604 OID 17643)
+-- TOC entry 3526 (class 2604 OID 17643)
 -- Name: files file_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5636,7 +4861,7 @@ ALTER TABLE ONLY public.files ALTER COLUMN file_id SET DEFAULT nextval('public.f
 
 
 --
--- TOC entry 3566 (class 2604 OID 17644)
+-- TOC entry 3528 (class 2604 OID 17644)
 -- Name: history history_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5644,7 +4869,7 @@ ALTER TABLE ONLY public.history ALTER COLUMN history_id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3568 (class 2604 OID 17645)
+-- TOC entry 3530 (class 2604 OID 17645)
 -- Name: latest_document id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5652,7 +4877,7 @@ ALTER TABLE ONLY public.latest_document ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3648 (class 2604 OID 24659)
+-- TOC entry 3604 (class 2604 OID 24659)
 -- Name: learner_hours_log log_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5660,7 +4885,7 @@ ALTER TABLE ONLY public.learner_hours_log ALTER COLUMN log_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3640 (class 2604 OID 24626)
+-- TOC entry 3596 (class 2604 OID 24626)
 -- Name: learner_lp_tracking tracking_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5668,7 +4893,15 @@ ALTER TABLE ONLY public.learner_lp_tracking ALTER COLUMN tracking_id SET DEFAULT
 
 
 --
--- TOC entry 3571 (class 2604 OID 17646)
+-- TOC entry 3533 (class 2604 OID 26957)
+-- Name: learner_placement_level placement_level_id; Type: DEFAULT; Schema: public; Owner: John
+--
+
+ALTER TABLE ONLY public.learner_placement_level ALTER COLUMN placement_level_id SET DEFAULT nextval('public.learner_placement_level_placement_level_id_seq'::regclass);
+
+
+--
+-- TOC entry 3534 (class 2604 OID 17646)
 -- Name: learner_portfolios portfolio_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5676,7 +4909,7 @@ ALTER TABLE ONLY public.learner_portfolios ALTER COLUMN portfolio_id SET DEFAULT
 
 
 --
--- TOC entry 3652 (class 2604 OID 24692)
+-- TOC entry 3608 (class 2604 OID 24692)
 -- Name: learner_progression_portfolios file_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5684,15 +4917,7 @@ ALTER TABLE ONLY public.learner_progression_portfolios ALTER COLUMN file_id SET 
 
 
 --
--- TOC entry 3573 (class 2604 OID 17647)
--- Name: learner_progressions progression_id; Type: DEFAULT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_progressions ALTER COLUMN progression_id SET DEFAULT nextval('public.learner_progressions_progression_id_seq'::regclass);
-
-
---
--- TOC entry 3574 (class 2604 OID 17648)
+-- TOC entry 3536 (class 2604 OID 17648)
 -- Name: learner_qualifications id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5700,7 +4925,7 @@ ALTER TABLE ONLY public.learner_qualifications ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 3660 (class 2604 OID 24765)
+-- TOC entry 3616 (class 2604 OID 24765)
 -- Name: learner_sponsors id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5708,7 +4933,7 @@ ALTER TABLE ONLY public.learner_sponsors ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3575 (class 2604 OID 17649)
+-- TOC entry 3537 (class 2604 OID 17649)
 -- Name: learners id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5716,7 +4941,7 @@ ALTER TABLE ONLY public.learners ALTER COLUMN id SET DEFAULT nextval('public.lea
 
 
 --
--- TOC entry 3578 (class 2604 OID 17650)
+-- TOC entry 3540 (class 2604 OID 17650)
 -- Name: locations location_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5724,23 +4949,7 @@ ALTER TABLE ONLY public.locations ALTER COLUMN location_id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3581 (class 2604 OID 17651)
--- Name: products product_id; Type: DEFAULT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.products ALTER COLUMN product_id SET DEFAULT nextval('public.products_product_id_seq'::regclass);
-
-
---
--- TOC entry 3584 (class 2604 OID 17652)
--- Name: progress_reports report_id; Type: DEFAULT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.progress_reports ALTER COLUMN report_id SET DEFAULT nextval('public.progress_reports_report_id_seq'::regclass);
-
-
---
--- TOC entry 3587 (class 2604 OID 17653)
+-- TOC entry 3543 (class 2604 OID 17653)
 -- Name: qa_visits id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5748,7 +4957,7 @@ ALTER TABLE ONLY public.qa_visits ALTER COLUMN id SET DEFAULT nextval('public.qa
 
 
 --
--- TOC entry 3590 (class 2604 OID 17654)
+-- TOC entry 3546 (class 2604 OID 17654)
 -- Name: sites site_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5756,7 +4965,7 @@ ALTER TABLE ONLY public.sites ALTER COLUMN site_id SET DEFAULT nextval('public.s
 
 
 --
--- TOC entry 3593 (class 2604 OID 17655)
+-- TOC entry 3549 (class 2604 OID 17655)
 -- Name: user_permissions permission_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5764,7 +4973,7 @@ ALTER TABLE ONLY public.user_permissions ALTER COLUMN permission_id SET DEFAULT 
 
 
 --
--- TOC entry 3594 (class 2604 OID 17656)
+-- TOC entry 3550 (class 2604 OID 17656)
 -- Name: user_roles role_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5772,7 +4981,7 @@ ALTER TABLE ONLY public.user_roles ALTER COLUMN role_id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3595 (class 2604 OID 17657)
+-- TOC entry 3551 (class 2604 OID 17657)
 -- Name: users user_id; Type: DEFAULT; Schema: public; Owner: John
 --
 
@@ -5780,7 +4989,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 
 
 --
--- TOC entry 3598 (class 2604 OID 17658)
+-- TOC entry 3554 (class 2604 OID 17658)
 -- Name: audit_log id; Type: DEFAULT; Schema: wecoza_events; Owner: John
 --
 
@@ -5788,7 +4997,7 @@ ALTER TABLE ONLY wecoza_events.audit_log ALTER COLUMN id SET DEFAULT nextval('we
 
 
 --
--- TOC entry 3602 (class 2604 OID 17659)
+-- TOC entry 3558 (class 2604 OID 17659)
 -- Name: dashboard_status id; Type: DEFAULT; Schema: wecoza_events; Owner: John
 --
 
@@ -5796,7 +5005,7 @@ ALTER TABLE ONLY wecoza_events.dashboard_status ALTER COLUMN id SET DEFAULT next
 
 
 --
--- TOC entry 3608 (class 2604 OID 17660)
+-- TOC entry 3564 (class 2604 OID 17660)
 -- Name: events_log id; Type: DEFAULT; Schema: wecoza_events; Owner: John
 --
 
@@ -5804,7 +5013,7 @@ ALTER TABLE ONLY wecoza_events.events_log ALTER COLUMN id SET DEFAULT nextval('w
 
 
 --
--- TOC entry 3613 (class 2604 OID 17661)
+-- TOC entry 3569 (class 2604 OID 17661)
 -- Name: notification_queue id; Type: DEFAULT; Schema: wecoza_events; Owner: John
 --
 
@@ -5812,7 +5021,7 @@ ALTER TABLE ONLY wecoza_events.notification_queue ALTER COLUMN id SET DEFAULT ne
 
 
 --
--- TOC entry 3622 (class 2604 OID 17662)
+-- TOC entry 3578 (class 2604 OID 17662)
 -- Name: supervisors id; Type: DEFAULT; Schema: wecoza_events; Owner: John
 --
 
@@ -5820,7 +5029,7 @@ ALTER TABLE ONLY wecoza_events.supervisors ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3681 (class 2606 OID 17688)
+-- TOC entry 3637 (class 2606 OID 17688)
 -- Name: agent_absences agent_absences_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5829,7 +5038,7 @@ ALTER TABLE ONLY public.agent_absences
 
 
 --
--- TOC entry 3902 (class 2606 OID 24752)
+-- TOC entry 3844 (class 2606 OID 24752)
 -- Name: agent_meta agent_meta_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5838,7 +5047,7 @@ ALTER TABLE ONLY public.agent_meta
 
 
 --
--- TOC entry 3904 (class 2606 OID 24754)
+-- TOC entry 3846 (class 2606 OID 24754)
 -- Name: agent_meta agent_meta_unique; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5847,7 +5056,7 @@ ALTER TABLE ONLY public.agent_meta
 
 
 --
--- TOC entry 3685 (class 2606 OID 17690)
+-- TOC entry 3641 (class 2606 OID 17690)
 -- Name: agent_notes agent_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5856,7 +5065,7 @@ ALTER TABLE ONLY public.agent_notes
 
 
 --
--- TOC entry 3688 (class 2606 OID 17692)
+-- TOC entry 3644 (class 2606 OID 17692)
 -- Name: agent_orders agent_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5865,7 +5074,7 @@ ALTER TABLE ONLY public.agent_orders
 
 
 --
--- TOC entry 3690 (class 2606 OID 17694)
+-- TOC entry 3646 (class 2606 OID 17694)
 -- Name: agent_replacements agent_replacements_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5874,7 +5083,7 @@ ALTER TABLE ONLY public.agent_replacements
 
 
 --
--- TOC entry 3692 (class 2606 OID 17696)
+-- TOC entry 3648 (class 2606 OID 17696)
 -- Name: agents agents_email_unique; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5883,7 +5092,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3694 (class 2606 OID 17698)
+-- TOC entry 3650 (class 2606 OID 17698)
 -- Name: agents agents_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5892,7 +5101,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3696 (class 2606 OID 17700)
+-- TOC entry 3652 (class 2606 OID 17700)
 -- Name: agents agents_sa_id_unique; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5901,7 +5110,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3718 (class 2606 OID 17702)
+-- TOC entry 3674 (class 2606 OID 17702)
 -- Name: attendance_registers attendance_registers_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5910,7 +5119,7 @@ ALTER TABLE ONLY public.attendance_registers
 
 
 --
--- TOC entry 3720 (class 2606 OID 17704)
+-- TOC entry 3676 (class 2606 OID 17704)
 -- Name: class_agents class_agents_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5919,7 +5128,7 @@ ALTER TABLE ONLY public.class_agents
 
 
 --
--- TOC entry 3895 (class 2606 OID 24730)
+-- TOC entry 3837 (class 2606 OID 24730)
 -- Name: class_events class_events_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5928,7 +5137,7 @@ ALTER TABLE ONLY public.class_events
 
 
 --
--- TOC entry 3722 (class 2606 OID 17708)
+-- TOC entry 3678 (class 2606 OID 17708)
 -- Name: class_material_tracking class_material_tracking_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5937,7 +5146,7 @@ ALTER TABLE ONLY public.class_material_tracking
 
 
 --
--- TOC entry 3731 (class 2606 OID 17710)
+-- TOC entry 3687 (class 2606 OID 17710)
 -- Name: class_notes class_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5946,7 +5155,7 @@ ALTER TABLE ONLY public.class_notes
 
 
 --
--- TOC entry 3733 (class 2606 OID 17712)
+-- TOC entry 3689 (class 2606 OID 17712)
 -- Name: class_schedules class_schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5955,16 +5164,7 @@ ALTER TABLE ONLY public.class_schedules
 
 
 --
--- TOC entry 3735 (class 2606 OID 17714)
--- Name: class_subjects class_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.class_subjects
-    ADD CONSTRAINT class_subjects_pkey PRIMARY KEY (class_id, product_id);
-
-
---
--- TOC entry 3871 (class 2606 OID 24612)
+-- TOC entry 3813 (class 2606 OID 24612)
 -- Name: class_type_subjects class_type_subjects_class_type_id_subject_code_key; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5973,7 +5173,7 @@ ALTER TABLE ONLY public.class_type_subjects
 
 
 --
--- TOC entry 3873 (class 2606 OID 24610)
+-- TOC entry 3815 (class 2606 OID 24610)
 -- Name: class_type_subjects class_type_subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5982,7 +5182,7 @@ ALTER TABLE ONLY public.class_type_subjects
 
 
 --
--- TOC entry 3864 (class 2606 OID 24596)
+-- TOC entry 3806 (class 2606 OID 24596)
 -- Name: class_types class_types_class_type_code_key; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -5991,7 +5191,7 @@ ALTER TABLE ONLY public.class_types
 
 
 --
--- TOC entry 3866 (class 2606 OID 24594)
+-- TOC entry 3808 (class 2606 OID 24594)
 -- Name: class_types class_types_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6000,7 +5200,7 @@ ALTER TABLE ONLY public.class_types
 
 
 --
--- TOC entry 3737 (class 2606 OID 17716)
+-- TOC entry 3691 (class 2606 OID 17716)
 -- Name: classes classes_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6009,7 +5209,7 @@ ALTER TABLE ONLY public.classes
 
 
 --
--- TOC entry 3747 (class 2606 OID 17718)
+-- TOC entry 3701 (class 2606 OID 17718)
 -- Name: client_communications client_communications_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6018,7 +5218,7 @@ ALTER TABLE ONLY public.client_communications
 
 
 --
--- TOC entry 3750 (class 2606 OID 17720)
+-- TOC entry 3704 (class 2606 OID 17720)
 -- Name: clients clients_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6027,7 +5227,7 @@ ALTER TABLE ONLY public.clients
 
 
 --
--- TOC entry 3757 (class 2606 OID 17722)
+-- TOC entry 3711 (class 2606 OID 17722)
 -- Name: collections collections_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6036,7 +5236,7 @@ ALTER TABLE ONLY public.collections
 
 
 --
--- TOC entry 3759 (class 2606 OID 17724)
+-- TOC entry 3713 (class 2606 OID 17724)
 -- Name: deliveries deliveries_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6045,7 +5245,7 @@ ALTER TABLE ONLY public.deliveries
 
 
 --
--- TOC entry 3761 (class 2606 OID 17726)
+-- TOC entry 3715 (class 2606 OID 17726)
 -- Name: employers employers_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6054,25 +5254,7 @@ ALTER TABLE ONLY public.employers
 
 
 --
--- TOC entry 3763 (class 2606 OID 17728)
--- Name: exam_results exam_results_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exam_results
-    ADD CONSTRAINT exam_results_pkey PRIMARY KEY (result_id);
-
-
---
--- TOC entry 3765 (class 2606 OID 17730)
--- Name: exams exams_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exams
-    ADD CONSTRAINT exams_pkey PRIMARY KEY (exam_id);
-
-
---
--- TOC entry 3767 (class 2606 OID 17732)
+-- TOC entry 3717 (class 2606 OID 17732)
 -- Name: files files_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6081,7 +5263,7 @@ ALTER TABLE ONLY public.files
 
 
 --
--- TOC entry 3769 (class 2606 OID 17734)
+-- TOC entry 3719 (class 2606 OID 17734)
 -- Name: history history_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6090,7 +5272,7 @@ ALTER TABLE ONLY public.history
 
 
 --
--- TOC entry 3890 (class 2606 OID 24667)
+-- TOC entry 3832 (class 2606 OID 24667)
 -- Name: learner_hours_log learner_hours_log_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6099,7 +5281,7 @@ ALTER TABLE ONLY public.learner_hours_log
 
 
 --
--- TOC entry 3885 (class 2606 OID 24638)
+-- TOC entry 3827 (class 2606 OID 24638)
 -- Name: learner_lp_tracking learner_lp_tracking_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6108,7 +5290,7 @@ ALTER TABLE ONLY public.learner_lp_tracking
 
 
 --
--- TOC entry 3777 (class 2606 OID 17736)
+-- TOC entry 3727 (class 2606 OID 17736)
 -- Name: learner_placement_level learner_placement_level_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6117,7 +5299,7 @@ ALTER TABLE ONLY public.learner_placement_level
 
 
 --
--- TOC entry 3779 (class 2606 OID 17738)
+-- TOC entry 3729 (class 2606 OID 17738)
 -- Name: learner_portfolios learner_portfolios_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6126,16 +5308,7 @@ ALTER TABLE ONLY public.learner_portfolios
 
 
 --
--- TOC entry 3781 (class 2606 OID 17740)
--- Name: learner_products learner_products_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_products
-    ADD CONSTRAINT learner_products_pkey PRIMARY KEY (learner_id, product_id);
-
-
---
--- TOC entry 3893 (class 2606 OID 24697)
+-- TOC entry 3835 (class 2606 OID 24697)
 -- Name: learner_progression_portfolios learner_progression_portfolios_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6144,16 +5317,7 @@ ALTER TABLE ONLY public.learner_progression_portfolios
 
 
 --
--- TOC entry 3783 (class 2606 OID 17742)
--- Name: learner_progressions learner_progressions_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_progressions
-    ADD CONSTRAINT learner_progressions_pkey PRIMARY KEY (progression_id);
-
-
---
--- TOC entry 3785 (class 2606 OID 17744)
+-- TOC entry 3731 (class 2606 OID 17744)
 -- Name: learner_qualifications learner_qualifications_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6162,7 +5326,7 @@ ALTER TABLE ONLY public.learner_qualifications
 
 
 --
--- TOC entry 3909 (class 2606 OID 24770)
+-- TOC entry 3851 (class 2606 OID 24770)
 -- Name: learner_sponsors learner_sponsors_learner_id_employer_id_key; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6171,7 +5335,7 @@ ALTER TABLE ONLY public.learner_sponsors
 
 
 --
--- TOC entry 3911 (class 2606 OID 24768)
+-- TOC entry 3853 (class 2606 OID 24768)
 -- Name: learner_sponsors learner_sponsors_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6180,7 +5344,7 @@ ALTER TABLE ONLY public.learner_sponsors
 
 
 --
--- TOC entry 3787 (class 2606 OID 17746)
+-- TOC entry 3733 (class 2606 OID 17746)
 -- Name: learners learners_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6189,7 +5353,7 @@ ALTER TABLE ONLY public.learners
 
 
 --
--- TOC entry 3789 (class 2606 OID 17748)
+-- TOC entry 3735 (class 2606 OID 17748)
 -- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6198,25 +5362,7 @@ ALTER TABLE ONLY public.locations
 
 
 --
--- TOC entry 3791 (class 2606 OID 17750)
--- Name: products products_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.products
-    ADD CONSTRAINT products_pkey PRIMARY KEY (product_id);
-
-
---
--- TOC entry 3793 (class 2606 OID 17752)
--- Name: progress_reports progress_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.progress_reports
-    ADD CONSTRAINT progress_reports_pkey PRIMARY KEY (report_id);
-
-
---
--- TOC entry 3775 (class 2606 OID 17754)
+-- TOC entry 3725 (class 2606 OID 17754)
 -- Name: latest_document qa_visits_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6225,7 +5371,7 @@ ALTER TABLE ONLY public.latest_document
 
 
 --
--- TOC entry 3795 (class 2606 OID 17756)
+-- TOC entry 3737 (class 2606 OID 17756)
 -- Name: qa_visits qa_visits_pkey1; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6234,7 +5380,7 @@ ALTER TABLE ONLY public.qa_visits
 
 
 --
--- TOC entry 3808 (class 2606 OID 17758)
+-- TOC entry 3750 (class 2606 OID 17758)
 -- Name: sites sites_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6243,7 +5389,7 @@ ALTER TABLE ONLY public.sites
 
 
 --
--- TOC entry 3729 (class 2606 OID 17760)
+-- TOC entry 3685 (class 2606 OID 17760)
 -- Name: class_material_tracking unique_class_notification_type; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6252,7 +5398,7 @@ ALTER TABLE ONLY public.class_material_tracking
 
 
 --
--- TOC entry 3811 (class 2606 OID 17762)
+-- TOC entry 3753 (class 2606 OID 17762)
 -- Name: user_permissions user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6261,7 +5407,7 @@ ALTER TABLE ONLY public.user_permissions
 
 
 --
--- TOC entry 3813 (class 2606 OID 17764)
+-- TOC entry 3755 (class 2606 OID 17764)
 -- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6270,7 +5416,7 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
--- TOC entry 3815 (class 2606 OID 17766)
+-- TOC entry 3757 (class 2606 OID 17766)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6279,7 +5425,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3817 (class 2606 OID 17768)
+-- TOC entry 3759 (class 2606 OID 17768)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -6288,7 +5434,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3819 (class 2606 OID 17770)
+-- TOC entry 3761 (class 2606 OID 17770)
 -- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6297,7 +5443,7 @@ ALTER TABLE ONLY wecoza_events.audit_log
 
 
 --
--- TOC entry 3826 (class 2606 OID 17772)
+-- TOC entry 3768 (class 2606 OID 17772)
 -- Name: dashboard_status dashboard_status_class_id_task_type_key; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6306,7 +5452,7 @@ ALTER TABLE ONLY wecoza_events.dashboard_status
 
 
 --
--- TOC entry 3828 (class 2606 OID 17774)
+-- TOC entry 3770 (class 2606 OID 17774)
 -- Name: dashboard_status dashboard_status_pkey; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6315,7 +5461,7 @@ ALTER TABLE ONLY wecoza_events.dashboard_status
 
 
 --
--- TOC entry 3835 (class 2606 OID 17776)
+-- TOC entry 3777 (class 2606 OID 17776)
 -- Name: events_log events_log_idempotency_key_key; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6324,7 +5470,7 @@ ALTER TABLE ONLY wecoza_events.events_log
 
 
 --
--- TOC entry 3837 (class 2606 OID 17778)
+-- TOC entry 3779 (class 2606 OID 17778)
 -- Name: events_log events_log_pkey; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6333,7 +5479,7 @@ ALTER TABLE ONLY wecoza_events.events_log
 
 
 --
--- TOC entry 3851 (class 2606 OID 17780)
+-- TOC entry 3793 (class 2606 OID 17780)
 -- Name: notification_queue notification_queue_idempotency_key_key; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6342,7 +5488,7 @@ ALTER TABLE ONLY wecoza_events.notification_queue
 
 
 --
--- TOC entry 3853 (class 2606 OID 17782)
+-- TOC entry 3795 (class 2606 OID 17782)
 -- Name: notification_queue notification_queue_pkey; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6351,7 +5497,7 @@ ALTER TABLE ONLY wecoza_events.notification_queue
 
 
 --
--- TOC entry 3860 (class 2606 OID 17784)
+-- TOC entry 3802 (class 2606 OID 17784)
 -- Name: supervisors supervisors_email_key; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6360,7 +5506,7 @@ ALTER TABLE ONLY wecoza_events.supervisors
 
 
 --
--- TOC entry 3862 (class 2606 OID 17786)
+-- TOC entry 3804 (class 2606 OID 17786)
 -- Name: supervisors supervisors_pkey; Type: CONSTRAINT; Schema: wecoza_events; Owner: John
 --
 
@@ -6369,7 +5515,7 @@ ALTER TABLE ONLY wecoza_events.supervisors
 
 
 --
--- TOC entry 3682 (class 1259 OID 17787)
+-- TOC entry 3638 (class 1259 OID 17787)
 -- Name: idx_agent_absences_agent_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6377,7 +5523,7 @@ CREATE INDEX idx_agent_absences_agent_id ON public.agent_absences USING btree (a
 
 
 --
--- TOC entry 3683 (class 1259 OID 17788)
+-- TOC entry 3639 (class 1259 OID 17788)
 -- Name: idx_agent_absences_date; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6385,7 +5531,7 @@ CREATE INDEX idx_agent_absences_date ON public.agent_absences USING btree (absen
 
 
 --
--- TOC entry 3905 (class 1259 OID 24760)
+-- TOC entry 3847 (class 1259 OID 24760)
 -- Name: idx_agent_meta_agent_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6393,7 +5539,7 @@ CREATE INDEX idx_agent_meta_agent_id ON public.agent_meta USING btree (agent_id)
 
 
 --
--- TOC entry 3686 (class 1259 OID 17789)
+-- TOC entry 3642 (class 1259 OID 17789)
 -- Name: idx_agent_notes_agent_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6401,7 +5547,7 @@ CREATE INDEX idx_agent_notes_agent_id ON public.agent_notes USING btree (agent_i
 
 
 --
--- TOC entry 3697 (class 1259 OID 17790)
+-- TOC entry 3653 (class 1259 OID 17790)
 -- Name: idx_agents_city; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6409,7 +5555,7 @@ CREATE INDEX idx_agents_city ON public.agents USING btree (city);
 
 
 --
--- TOC entry 3698 (class 1259 OID 17791)
+-- TOC entry 3654 (class 1259 OID 17791)
 -- Name: idx_agents_city_province; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6417,7 +5563,7 @@ CREATE INDEX idx_agents_city_province ON public.agents USING btree (city, provin
 
 
 --
--- TOC entry 3699 (class 1259 OID 17792)
+-- TOC entry 3655 (class 1259 OID 17792)
 -- Name: idx_agents_created_at; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6425,7 +5571,7 @@ CREATE INDEX idx_agents_created_at ON public.agents USING btree (created_at);
 
 
 --
--- TOC entry 3700 (class 1259 OID 17793)
+-- TOC entry 3656 (class 1259 OID 17793)
 -- Name: idx_agents_email; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6433,7 +5579,7 @@ CREATE INDEX idx_agents_email ON public.agents USING btree (email_address);
 
 
 --
--- TOC entry 3701 (class 1259 OID 17794)
+-- TOC entry 3657 (class 1259 OID 17794)
 -- Name: idx_agents_email_address; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6441,7 +5587,7 @@ CREATE INDEX idx_agents_email_address ON public.agents USING btree (email_addres
 
 
 --
--- TOC entry 3702 (class 1259 OID 17795)
+-- TOC entry 3658 (class 1259 OID 17795)
 -- Name: idx_agents_email_unique; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6449,7 +5595,7 @@ CREATE UNIQUE INDEX idx_agents_email_unique ON public.agents USING btree (email_
 
 
 --
--- TOC entry 3703 (class 1259 OID 17796)
+-- TOC entry 3659 (class 1259 OID 17796)
 -- Name: idx_agents_first_name; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6457,7 +5603,7 @@ CREATE INDEX idx_agents_first_name ON public.agents USING btree (first_name);
 
 
 --
--- TOC entry 3704 (class 1259 OID 24789)
+-- TOC entry 3660 (class 1259 OID 24789)
 -- Name: idx_agents_location_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6465,7 +5611,7 @@ CREATE INDEX idx_agents_location_id ON public.agents USING btree (location_id);
 
 
 --
--- TOC entry 3705 (class 1259 OID 17797)
+-- TOC entry 3661 (class 1259 OID 17797)
 -- Name: idx_agents_phone; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6473,7 +5619,7 @@ CREATE INDEX idx_agents_phone ON public.agents USING btree (tel_number);
 
 
 --
--- TOC entry 3706 (class 1259 OID 17798)
+-- TOC entry 3662 (class 1259 OID 17798)
 -- Name: idx_agents_province; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6481,7 +5627,7 @@ CREATE INDEX idx_agents_province ON public.agents USING btree (province);
 
 
 --
--- TOC entry 3707 (class 1259 OID 17799)
+-- TOC entry 3663 (class 1259 OID 17799)
 -- Name: idx_agents_sa_id_no; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6489,7 +5635,7 @@ CREATE INDEX idx_agents_sa_id_no ON public.agents USING btree (sa_id_no);
 
 
 --
--- TOC entry 3708 (class 1259 OID 17800)
+-- TOC entry 3664 (class 1259 OID 17800)
 -- Name: idx_agents_sa_id_unique; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6497,7 +5643,7 @@ CREATE UNIQUE INDEX idx_agents_sa_id_unique ON public.agents USING btree (sa_id_
 
 
 --
--- TOC entry 3709 (class 1259 OID 17801)
+-- TOC entry 3665 (class 1259 OID 17801)
 -- Name: idx_agents_sace; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6505,7 +5651,7 @@ CREATE INDEX idx_agents_sace ON public.agents USING btree (sace_number) WHERE ((
 
 
 --
--- TOC entry 3710 (class 1259 OID 17802)
+-- TOC entry 3666 (class 1259 OID 17802)
 -- Name: idx_agents_search; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6513,7 +5659,7 @@ CREATE INDEX idx_agents_search ON public.agents USING btree (surname, first_name
 
 
 --
--- TOC entry 3711 (class 1259 OID 17803)
+-- TOC entry 3667 (class 1259 OID 17803)
 -- Name: idx_agents_status; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6521,7 +5667,7 @@ CREATE INDEX idx_agents_status ON public.agents USING btree (status);
 
 
 --
--- TOC entry 3712 (class 1259 OID 17804)
+-- TOC entry 3668 (class 1259 OID 17804)
 -- Name: idx_agents_status_created; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6529,7 +5675,7 @@ CREATE INDEX idx_agents_status_created ON public.agents USING btree (status, cre
 
 
 --
--- TOC entry 3713 (class 1259 OID 17805)
+-- TOC entry 3669 (class 1259 OID 17805)
 -- Name: idx_agents_surname; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6537,7 +5683,7 @@ CREATE INDEX idx_agents_surname ON public.agents USING btree (surname);
 
 
 --
--- TOC entry 3714 (class 1259 OID 17806)
+-- TOC entry 3670 (class 1259 OID 17806)
 -- Name: idx_agents_tel_number; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6545,7 +5691,7 @@ CREATE INDEX idx_agents_tel_number ON public.agents USING btree (tel_number);
 
 
 --
--- TOC entry 3715 (class 1259 OID 17807)
+-- TOC entry 3671 (class 1259 OID 17807)
 -- Name: idx_agents_updated_at; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6553,7 +5699,7 @@ CREATE INDEX idx_agents_updated_at ON public.agents USING btree (updated_at);
 
 
 --
--- TOC entry 3716 (class 1259 OID 17808)
+-- TOC entry 3672 (class 1259 OID 17808)
 -- Name: idx_agents_working_areas; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6561,7 +5707,7 @@ CREATE INDEX idx_agents_working_areas ON public.agents USING btree (preferred_wo
 
 
 --
--- TOC entry 3896 (class 1259 OID 24733)
+-- TOC entry 3838 (class 1259 OID 24733)
 -- Name: idx_class_events_created_at; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6569,7 +5715,7 @@ CREATE INDEX idx_class_events_created_at ON public.class_events USING btree (cre
 
 
 --
--- TOC entry 3897 (class 1259 OID 24731)
+-- TOC entry 3839 (class 1259 OID 24731)
 -- Name: idx_class_events_entity; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6577,7 +5723,7 @@ CREATE INDEX idx_class_events_entity ON public.class_events USING btree (entity_
 
 
 --
--- TOC entry 3898 (class 1259 OID 24732)
+-- TOC entry 3840 (class 1259 OID 24732)
 -- Name: idx_class_events_status; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6585,7 +5731,7 @@ CREATE INDEX idx_class_events_status ON public.class_events USING btree (notific
 
 
 --
--- TOC entry 3899 (class 1259 OID 24735)
+-- TOC entry 3841 (class 1259 OID 24735)
 -- Name: idx_class_events_unread; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6593,7 +5739,7 @@ CREATE INDEX idx_class_events_unread ON public.class_events USING btree (created
 
 
 --
--- TOC entry 3900 (class 1259 OID 24734)
+-- TOC entry 3842 (class 1259 OID 24734)
 -- Name: idx_class_events_user_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6601,7 +5747,7 @@ CREATE INDEX idx_class_events_user_id ON public.class_events USING btree (user_i
 
 
 --
--- TOC entry 3867 (class 1259 OID 24598)
+-- TOC entry 3809 (class 1259 OID 24598)
 -- Name: idx_class_types_active; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6609,7 +5755,7 @@ CREATE INDEX idx_class_types_active ON public.class_types USING btree (is_active
 
 
 --
--- TOC entry 3868 (class 1259 OID 24597)
+-- TOC entry 3810 (class 1259 OID 24597)
 -- Name: idx_class_types_code; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6617,7 +5763,7 @@ CREATE INDEX idx_class_types_code ON public.class_types USING btree (class_type_
 
 
 --
--- TOC entry 3869 (class 1259 OID 24599)
+-- TOC entry 3811 (class 1259 OID 24599)
 -- Name: idx_class_types_display_order; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6625,7 +5771,7 @@ CREATE INDEX idx_class_types_display_order ON public.class_types USING btree (di
 
 
 --
--- TOC entry 3738 (class 1259 OID 17812)
+-- TOC entry 3692 (class 1259 OID 17812)
 -- Name: idx_classes_backup_agent_ids; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6633,7 +5779,7 @@ CREATE INDEX idx_classes_backup_agent_ids ON public.classes USING gin (backup_ag
 
 
 --
--- TOC entry 3739 (class 1259 OID 17813)
+-- TOC entry 3693 (class 1259 OID 17813)
 -- Name: idx_classes_class_agent; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6641,7 +5787,7 @@ CREATE INDEX idx_classes_class_agent ON public.classes USING btree (class_agent)
 
 
 --
--- TOC entry 3740 (class 1259 OID 17814)
+-- TOC entry 3694 (class 1259 OID 17814)
 -- Name: idx_classes_class_code; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6649,7 +5795,7 @@ CREATE INDEX idx_classes_class_code ON public.classes USING btree (class_code);
 
 
 --
--- TOC entry 3741 (class 1259 OID 17815)
+-- TOC entry 3695 (class 1259 OID 17815)
 -- Name: idx_classes_class_subject; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6657,7 +5803,7 @@ CREATE INDEX idx_classes_class_subject ON public.classes USING btree (class_subj
 
 
 --
--- TOC entry 3742 (class 1259 OID 17816)
+-- TOC entry 3696 (class 1259 OID 17816)
 -- Name: idx_classes_exam_learners; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6665,7 +5811,7 @@ CREATE INDEX idx_classes_exam_learners ON public.classes USING gin (exam_learner
 
 
 --
--- TOC entry 3743 (class 1259 OID 17817)
+-- TOC entry 3697 (class 1259 OID 17817)
 -- Name: idx_classes_learner_ids; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6673,7 +5819,7 @@ CREATE INDEX idx_classes_learner_ids ON public.classes USING gin (learner_ids);
 
 
 --
--- TOC entry 3744 (class 1259 OID 17818)
+-- TOC entry 3698 (class 1259 OID 17818)
 -- Name: idx_classes_schedule_data; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6681,7 +5827,7 @@ CREATE INDEX idx_classes_schedule_data ON public.classes USING gin (schedule_dat
 
 
 --
--- TOC entry 3745 (class 1259 OID 17819)
+-- TOC entry 3699 (class 1259 OID 17819)
 -- Name: idx_classes_site_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6689,7 +5835,7 @@ CREATE INDEX idx_classes_site_id ON public.classes USING btree (site_id);
 
 
 --
--- TOC entry 3751 (class 1259 OID 17820)
+-- TOC entry 3705 (class 1259 OID 17820)
 -- Name: idx_clients_client_name; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6697,7 +5843,7 @@ CREATE INDEX idx_clients_client_name ON public.clients USING btree (client_name)
 
 
 --
--- TOC entry 3752 (class 1259 OID 17821)
+-- TOC entry 3706 (class 1259 OID 17821)
 -- Name: idx_clients_contact_email; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6705,7 +5851,7 @@ CREATE INDEX idx_clients_contact_email ON public.clients USING btree (contact_pe
 
 
 --
--- TOC entry 3753 (class 1259 OID 17822)
+-- TOC entry 3707 (class 1259 OID 17822)
 -- Name: idx_clients_contact_email_lower; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6713,7 +5859,7 @@ CREATE INDEX idx_clients_contact_email_lower ON public.clients USING btree (lowe
 
 
 --
--- TOC entry 3754 (class 1259 OID 24742)
+-- TOC entry 3708 (class 1259 OID 24742)
 -- Name: idx_clients_deleted_at; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6721,7 +5867,7 @@ CREATE INDEX idx_clients_deleted_at ON public.clients USING btree (deleted_at) W
 
 
 --
--- TOC entry 3874 (class 1259 OID 24620)
+-- TOC entry 3816 (class 1259 OID 24620)
 -- Name: idx_cts_active; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6729,7 +5875,7 @@ CREATE INDEX idx_cts_active ON public.class_type_subjects USING btree (is_active
 
 
 --
--- TOC entry 3875 (class 1259 OID 24619)
+-- TOC entry 3817 (class 1259 OID 24619)
 -- Name: idx_cts_code; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6737,7 +5883,7 @@ CREATE INDEX idx_cts_code ON public.class_type_subjects USING btree (subject_cod
 
 
 --
--- TOC entry 3876 (class 1259 OID 24621)
+-- TOC entry 3818 (class 1259 OID 24621)
 -- Name: idx_cts_display; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6745,7 +5891,7 @@ CREATE INDEX idx_cts_display ON public.class_type_subjects USING btree (class_ty
 
 
 --
--- TOC entry 3877 (class 1259 OID 24618)
+-- TOC entry 3819 (class 1259 OID 24618)
 -- Name: idx_cts_type_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6753,7 +5899,7 @@ CREATE INDEX idx_cts_type_id ON public.class_type_subjects USING btree (class_ty
 
 
 --
--- TOC entry 3886 (class 1259 OID 24709)
+-- TOC entry 3828 (class 1259 OID 24709)
 -- Name: idx_hours_log_date; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6761,7 +5907,7 @@ CREATE INDEX idx_hours_log_date ON public.learner_hours_log USING btree (log_dat
 
 
 --
--- TOC entry 3887 (class 1259 OID 24708)
+-- TOC entry 3829 (class 1259 OID 24708)
 -- Name: idx_hours_log_learner; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6769,7 +5915,7 @@ CREATE INDEX idx_hours_log_learner ON public.learner_hours_log USING btree (lear
 
 
 --
--- TOC entry 3888 (class 1259 OID 24710)
+-- TOC entry 3830 (class 1259 OID 24710)
 -- Name: idx_hours_log_tracking; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6777,7 +5923,7 @@ CREATE INDEX idx_hours_log_tracking ON public.learner_hours_log USING btree (tra
 
 
 --
--- TOC entry 3906 (class 1259 OID 24782)
+-- TOC entry 3848 (class 1259 OID 24782)
 -- Name: idx_learner_sponsors_employer_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6785,7 +5931,7 @@ CREATE INDEX idx_learner_sponsors_employer_id ON public.learner_sponsors USING b
 
 
 --
--- TOC entry 3907 (class 1259 OID 24781)
+-- TOC entry 3849 (class 1259 OID 24781)
 -- Name: idx_learner_sponsors_learner_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6793,7 +5939,7 @@ CREATE INDEX idx_learner_sponsors_learner_id ON public.learner_sponsors USING bt
 
 
 --
--- TOC entry 3878 (class 1259 OID 24705)
+-- TOC entry 3820 (class 1259 OID 24705)
 -- Name: idx_lp_tracking_class; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6801,7 +5947,7 @@ CREATE INDEX idx_lp_tracking_class ON public.learner_lp_tracking USING btree (cl
 
 
 --
--- TOC entry 3879 (class 1259 OID 24707)
+-- TOC entry 3821 (class 1259 OID 24707)
 -- Name: idx_lp_tracking_completion; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6809,7 +5955,7 @@ CREATE INDEX idx_lp_tracking_completion ON public.learner_lp_tracking USING btre
 
 
 --
--- TOC entry 3880 (class 1259 OID 24703)
+-- TOC entry 3822 (class 1259 OID 24703)
 -- Name: idx_lp_tracking_learner; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6817,15 +5963,15 @@ CREATE INDEX idx_lp_tracking_learner ON public.learner_lp_tracking USING btree (
 
 
 --
--- TOC entry 3881 (class 1259 OID 24704)
+-- TOC entry 3823 (class 1259 OID 24704)
 -- Name: idx_lp_tracking_product; Type: INDEX; Schema: public; Owner: John
 --
 
-CREATE INDEX idx_lp_tracking_product ON public.learner_lp_tracking USING btree (product_id);
+CREATE INDEX idx_lp_tracking_product ON public.learner_lp_tracking USING btree (class_type_subject_id);
 
 
 --
--- TOC entry 3882 (class 1259 OID 24706)
+-- TOC entry 3824 (class 1259 OID 24706)
 -- Name: idx_lp_tracking_status; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6833,7 +5979,7 @@ CREATE INDEX idx_lp_tracking_status ON public.learner_lp_tracking USING btree (s
 
 
 --
--- TOC entry 3723 (class 1259 OID 17823)
+-- TOC entry 3679 (class 1259 OID 17823)
 -- Name: idx_material_tracking_class_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6841,7 +5987,7 @@ CREATE INDEX idx_material_tracking_class_id ON public.class_material_tracking US
 
 
 --
--- TOC entry 3724 (class 1259 OID 17824)
+-- TOC entry 3680 (class 1259 OID 17824)
 -- Name: idx_material_tracking_class_type_status; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6849,7 +5995,7 @@ CREATE INDEX idx_material_tracking_class_type_status ON public.class_material_tr
 
 
 --
--- TOC entry 3725 (class 1259 OID 17825)
+-- TOC entry 3681 (class 1259 OID 17825)
 -- Name: idx_material_tracking_sent_at; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6857,7 +6003,7 @@ CREATE INDEX idx_material_tracking_sent_at ON public.class_material_tracking USI
 
 
 --
--- TOC entry 3726 (class 1259 OID 17826)
+-- TOC entry 3682 (class 1259 OID 17826)
 -- Name: idx_material_tracking_status; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6865,7 +6011,7 @@ CREATE INDEX idx_material_tracking_status ON public.class_material_tracking USIN
 
 
 --
--- TOC entry 3727 (class 1259 OID 17827)
+-- TOC entry 3683 (class 1259 OID 17827)
 -- Name: idx_material_tracking_type; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6873,7 +6019,7 @@ CREATE INDEX idx_material_tracking_type ON public.class_material_tracking USING 
 
 
 --
--- TOC entry 3883 (class 1259 OID 24654)
+-- TOC entry 3825 (class 1259 OID 24654)
 -- Name: idx_one_active_lp_per_learner; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6881,7 +6027,7 @@ CREATE UNIQUE INDEX idx_one_active_lp_per_learner ON public.learner_lp_tracking 
 
 
 --
--- TOC entry 3891 (class 1259 OID 24711)
+-- TOC entry 3833 (class 1259 OID 24711)
 -- Name: idx_progression_portfolios_tracking; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6889,7 +6035,7 @@ CREATE INDEX idx_progression_portfolios_tracking ON public.learner_progression_p
 
 
 --
--- TOC entry 3770 (class 1259 OID 17828)
+-- TOC entry 3720 (class 1259 OID 17828)
 -- Name: idx_qa_visits_class_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6897,7 +6043,7 @@ CREATE INDEX idx_qa_visits_class_id ON public.latest_document USING btree (class
 
 
 --
--- TOC entry 3771 (class 1259 OID 17829)
+-- TOC entry 3721 (class 1259 OID 17829)
 -- Name: idx_qa_visits_officer_name; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6905,7 +6051,7 @@ CREATE INDEX idx_qa_visits_officer_name ON public.latest_document USING btree (o
 
 
 --
--- TOC entry 3772 (class 1259 OID 17830)
+-- TOC entry 3722 (class 1259 OID 17830)
 -- Name: idx_qa_visits_visit_date; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6913,7 +6059,7 @@ CREATE INDEX idx_qa_visits_visit_date ON public.latest_document USING btree (vis
 
 
 --
--- TOC entry 3773 (class 1259 OID 17831)
+-- TOC entry 3723 (class 1259 OID 17831)
 -- Name: idx_qa_visits_visit_type; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6921,7 +6067,7 @@ CREATE INDEX idx_qa_visits_visit_type ON public.latest_document USING btree (vis
 
 
 --
--- TOC entry 3796 (class 1259 OID 17832)
+-- TOC entry 3738 (class 1259 OID 17832)
 -- Name: idx_sites_client_hierarchy; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6929,7 +6075,7 @@ CREATE INDEX idx_sites_client_hierarchy ON public.sites USING btree (client_id, 
 
 
 --
--- TOC entry 3797 (class 1259 OID 17833)
+-- TOC entry 3739 (class 1259 OID 17833)
 -- Name: idx_sites_client_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6937,7 +6083,7 @@ CREATE INDEX idx_sites_client_id ON public.sites USING btree (client_id);
 
 
 --
--- TOC entry 3798 (class 1259 OID 17834)
+-- TOC entry 3740 (class 1259 OID 17834)
 -- Name: idx_sites_client_place; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6945,7 +6091,7 @@ CREATE INDEX idx_sites_client_place ON public.sites USING btree (client_id, plac
 
 
 --
--- TOC entry 3799 (class 1259 OID 17835)
+-- TOC entry 3741 (class 1259 OID 17835)
 -- Name: idx_sites_created_at; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6953,7 +6099,7 @@ CREATE INDEX idx_sites_created_at ON public.sites USING btree (created_at);
 
 
 --
--- TOC entry 3800 (class 1259 OID 17836)
+-- TOC entry 3742 (class 1259 OID 17836)
 -- Name: idx_sites_place_lookup; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6961,7 +6107,7 @@ CREATE INDEX idx_sites_place_lookup ON public.sites USING btree (place_id);
 
 
 --
--- TOC entry 3801 (class 1259 OID 17837)
+-- TOC entry 3743 (class 1259 OID 17837)
 -- Name: idx_sites_site_name; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6969,7 +6115,7 @@ CREATE INDEX idx_sites_site_name ON public.sites USING btree (site_name);
 
 
 --
--- TOC entry 3802 (class 1259 OID 17838)
+-- TOC entry 3744 (class 1259 OID 17838)
 -- Name: idx_sites_site_name_lower; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6977,7 +6123,7 @@ CREATE INDEX idx_sites_site_name_lower ON public.sites USING btree (lower((site_
 
 
 --
--- TOC entry 3803 (class 1259 OID 17839)
+-- TOC entry 3745 (class 1259 OID 17839)
 -- Name: idxu_sites_client_head_site_name_ci; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -6985,8 +6131,8 @@ CREATE UNIQUE INDEX idxu_sites_client_head_site_name_ci ON public.sites USING bt
 
 
 --
--- TOC entry 4519 (class 0 OID 0)
--- Dependencies: 3803
+-- TOC entry 4383 (class 0 OID 0)
+-- Dependencies: 3745
 -- Name: INDEX idxu_sites_client_head_site_name_ci; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -6994,7 +6140,7 @@ COMMENT ON INDEX public.idxu_sites_client_head_site_name_ci IS 'Ensures unique (
 
 
 --
--- TOC entry 3804 (class 1259 OID 17840)
+-- TOC entry 3746 (class 1259 OID 17840)
 -- Name: idxu_sites_parent_site_name_ci; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -7002,8 +6148,8 @@ CREATE UNIQUE INDEX idxu_sites_parent_site_name_ci ON public.sites USING btree (
 
 
 --
--- TOC entry 4520 (class 0 OID 0)
--- Dependencies: 3804
+-- TOC entry 4384 (class 0 OID 0)
+-- Dependencies: 3746
 -- Name: INDEX idxu_sites_parent_site_name_ci; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -7011,7 +6157,7 @@ COMMENT ON INDEX public.idxu_sites_parent_site_name_ci IS 'Ensures unique (case-
 
 
 --
--- TOC entry 3755 (class 1259 OID 17841)
+-- TOC entry 3709 (class 1259 OID 17841)
 -- Name: ix_clients_main_client_id; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -7019,7 +6165,7 @@ CREATE INDEX ix_clients_main_client_id ON public.clients USING btree (main_clien
 
 
 --
--- TOC entry 3748 (class 1259 OID 17842)
+-- TOC entry 3702 (class 1259 OID 17842)
 -- Name: ix_comm_site; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -7027,7 +6173,7 @@ CREATE INDEX ix_comm_site ON public.client_communications USING btree (site_id);
 
 
 --
--- TOC entry 3805 (class 1259 OID 17843)
+-- TOC entry 3747 (class 1259 OID 17843)
 -- Name: ix_sites_parent; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -7035,7 +6181,7 @@ CREATE INDEX ix_sites_parent ON public.sites USING btree (parent_site_id);
 
 
 --
--- TOC entry 3806 (class 1259 OID 17844)
+-- TOC entry 3748 (class 1259 OID 17844)
 -- Name: ix_sites_place; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -7043,7 +6189,7 @@ CREATE INDEX ix_sites_place ON public.sites USING btree (place_id);
 
 
 --
--- TOC entry 3809 (class 1259 OID 17845)
+-- TOC entry 3751 (class 1259 OID 17845)
 -- Name: uq_sites_client_lowername; Type: INDEX; Schema: public; Owner: John
 --
 
@@ -7051,7 +6197,7 @@ CREATE UNIQUE INDEX uq_sites_client_lowername ON public.sites USING btree (clien
 
 
 --
--- TOC entry 3820 (class 1259 OID 17846)
+-- TOC entry 3762 (class 1259 OID 17846)
 -- Name: idx_audit_log_action; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7059,7 +6205,7 @@ CREATE INDEX idx_audit_log_action ON wecoza_events.audit_log USING btree (action
 
 
 --
--- TOC entry 3821 (class 1259 OID 17847)
+-- TOC entry 3763 (class 1259 OID 17847)
 -- Name: idx_audit_log_context; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7067,7 +6213,7 @@ CREATE INDEX idx_audit_log_context ON wecoza_events.audit_log USING gin (context
 
 
 --
--- TOC entry 3822 (class 1259 OID 17848)
+-- TOC entry 3764 (class 1259 OID 17848)
 -- Name: idx_audit_log_created_at; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7075,7 +6221,7 @@ CREATE INDEX idx_audit_log_created_at ON wecoza_events.audit_log USING btree (cr
 
 
 --
--- TOC entry 3823 (class 1259 OID 17849)
+-- TOC entry 3765 (class 1259 OID 17849)
 -- Name: idx_audit_log_level; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7083,7 +6229,7 @@ CREATE INDEX idx_audit_log_level ON wecoza_events.audit_log USING btree (level);
 
 
 --
--- TOC entry 3824 (class 1259 OID 17850)
+-- TOC entry 3766 (class 1259 OID 17850)
 -- Name: idx_audit_log_user_id; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7091,7 +6237,7 @@ CREATE INDEX idx_audit_log_user_id ON wecoza_events.audit_log USING btree (user_
 
 
 --
--- TOC entry 3829 (class 1259 OID 17851)
+-- TOC entry 3771 (class 1259 OID 17851)
 -- Name: idx_dashboard_status_class_id; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7099,7 +6245,7 @@ CREATE INDEX idx_dashboard_status_class_id ON wecoza_events.dashboard_status USI
 
 
 --
--- TOC entry 3830 (class 1259 OID 17852)
+-- TOC entry 3772 (class 1259 OID 17852)
 -- Name: idx_dashboard_status_due_date; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7107,7 +6253,7 @@ CREATE INDEX idx_dashboard_status_due_date ON wecoza_events.dashboard_status USI
 
 
 --
--- TOC entry 3831 (class 1259 OID 17853)
+-- TOC entry 3773 (class 1259 OID 17853)
 -- Name: idx_dashboard_status_responsible_user_id; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7115,7 +6261,7 @@ CREATE INDEX idx_dashboard_status_responsible_user_id ON wecoza_events.dashboard
 
 
 --
--- TOC entry 3832 (class 1259 OID 17854)
+-- TOC entry 3774 (class 1259 OID 17854)
 -- Name: idx_dashboard_status_task_status; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7123,7 +6269,7 @@ CREATE INDEX idx_dashboard_status_task_status ON wecoza_events.dashboard_status 
 
 
 --
--- TOC entry 3833 (class 1259 OID 17855)
+-- TOC entry 3775 (class 1259 OID 17855)
 -- Name: idx_dashboard_status_task_type; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7131,7 +6277,7 @@ CREATE INDEX idx_dashboard_status_task_type ON wecoza_events.dashboard_status US
 
 
 --
--- TOC entry 3838 (class 1259 OID 17856)
+-- TOC entry 3780 (class 1259 OID 17856)
 -- Name: idx_events_log_actor_id; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7139,7 +6285,7 @@ CREATE INDEX idx_events_log_actor_id ON wecoza_events.events_log USING btree (ac
 
 
 --
--- TOC entry 3839 (class 1259 OID 17857)
+-- TOC entry 3781 (class 1259 OID 17857)
 -- Name: idx_events_log_class_id; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7147,7 +6293,7 @@ CREATE INDEX idx_events_log_class_id ON wecoza_events.events_log USING btree (cl
 
 
 --
--- TOC entry 3840 (class 1259 OID 17858)
+-- TOC entry 3782 (class 1259 OID 17858)
 -- Name: idx_events_log_event_name; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7155,7 +6301,7 @@ CREATE INDEX idx_events_log_event_name ON wecoza_events.events_log USING btree (
 
 
 --
--- TOC entry 3841 (class 1259 OID 17859)
+-- TOC entry 3783 (class 1259 OID 17859)
 -- Name: idx_events_log_occurred_at; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7163,7 +6309,7 @@ CREATE INDEX idx_events_log_occurred_at ON wecoza_events.events_log USING btree 
 
 
 --
--- TOC entry 3842 (class 1259 OID 17860)
+-- TOC entry 3784 (class 1259 OID 17860)
 -- Name: idx_events_log_payload; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7171,7 +6317,7 @@ CREATE INDEX idx_events_log_payload ON wecoza_events.events_log USING gin (event
 
 
 --
--- TOC entry 3843 (class 1259 OID 17861)
+-- TOC entry 3785 (class 1259 OID 17861)
 -- Name: idx_events_log_processed; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7179,7 +6325,7 @@ CREATE INDEX idx_events_log_processed ON wecoza_events.events_log USING btree (p
 
 
 --
--- TOC entry 3844 (class 1259 OID 17862)
+-- TOC entry 3786 (class 1259 OID 17862)
 -- Name: idx_notification_queue_channel; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7187,7 +6333,7 @@ CREATE INDEX idx_notification_queue_channel ON wecoza_events.notification_queue 
 
 
 --
--- TOC entry 3845 (class 1259 OID 17863)
+-- TOC entry 3787 (class 1259 OID 17863)
 -- Name: idx_notification_queue_event_name; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7195,7 +6341,7 @@ CREATE INDEX idx_notification_queue_event_name ON wecoza_events.notification_que
 
 
 --
--- TOC entry 3846 (class 1259 OID 17864)
+-- TOC entry 3788 (class 1259 OID 17864)
 -- Name: idx_notification_queue_recipient_email; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7203,7 +6349,7 @@ CREATE INDEX idx_notification_queue_recipient_email ON wecoza_events.notificatio
 
 
 --
--- TOC entry 3847 (class 1259 OID 17865)
+-- TOC entry 3789 (class 1259 OID 17865)
 -- Name: idx_notification_queue_scheduled_at; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7211,7 +6357,7 @@ CREATE INDEX idx_notification_queue_scheduled_at ON wecoza_events.notification_q
 
 
 --
--- TOC entry 3848 (class 1259 OID 17866)
+-- TOC entry 3790 (class 1259 OID 17866)
 -- Name: idx_notification_queue_status; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7219,7 +6365,7 @@ CREATE INDEX idx_notification_queue_status ON wecoza_events.notification_queue U
 
 
 --
--- TOC entry 3849 (class 1259 OID 17867)
+-- TOC entry 3791 (class 1259 OID 17867)
 -- Name: idx_notification_queue_template_name; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7227,7 +6373,7 @@ CREATE INDEX idx_notification_queue_template_name ON wecoza_events.notification_
 
 
 --
--- TOC entry 3854 (class 1259 OID 17868)
+-- TOC entry 3796 (class 1259 OID 17868)
 -- Name: idx_supervisors_client_assignments; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7235,7 +6381,7 @@ CREATE INDEX idx_supervisors_client_assignments ON wecoza_events.supervisors USI
 
 
 --
--- TOC entry 3855 (class 1259 OID 17869)
+-- TOC entry 3797 (class 1259 OID 17869)
 -- Name: idx_supervisors_email; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7243,7 +6389,7 @@ CREATE INDEX idx_supervisors_email ON wecoza_events.supervisors USING btree (ema
 
 
 --
--- TOC entry 3856 (class 1259 OID 17870)
+-- TOC entry 3798 (class 1259 OID 17870)
 -- Name: idx_supervisors_is_active; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7251,7 +6397,7 @@ CREATE INDEX idx_supervisors_is_active ON wecoza_events.supervisors USING btree 
 
 
 --
--- TOC entry 3857 (class 1259 OID 17871)
+-- TOC entry 3799 (class 1259 OID 17871)
 -- Name: idx_supervisors_is_default; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7259,7 +6405,7 @@ CREATE INDEX idx_supervisors_is_default ON wecoza_events.supervisors USING btree
 
 
 --
--- TOC entry 3858 (class 1259 OID 17872)
+-- TOC entry 3800 (class 1259 OID 17872)
 -- Name: idx_supervisors_site_assignments; Type: INDEX; Schema: wecoza_events; Owner: John
 --
 
@@ -7267,7 +6413,7 @@ CREATE INDEX idx_supervisors_site_assignments ON wecoza_events.supervisors USING
 
 
 --
--- TOC entry 3983 (class 2620 OID 17874)
+-- TOC entry 3910 (class 2620 OID 17874)
 -- Name: sites trg_sites_same_client; Type: TRIGGER; Schema: public; Owner: John
 --
 
@@ -7275,7 +6421,7 @@ CREATE TRIGGER trg_sites_same_client BEFORE INSERT OR UPDATE OF client_id, paren
 
 
 --
--- TOC entry 3981 (class 2620 OID 17875)
+-- TOC entry 3908 (class 2620 OID 17875)
 -- Name: agents update_agents_updated_at; Type: TRIGGER; Schema: public; Owner: John
 --
 
@@ -7283,7 +6429,7 @@ CREATE TRIGGER update_agents_updated_at BEFORE UPDATE ON public.agents FOR EACH 
 
 
 --
--- TOC entry 3982 (class 2620 OID 17876)
+-- TOC entry 3909 (class 2620 OID 17876)
 -- Name: class_material_tracking update_material_tracking_updated_at; Type: TRIGGER; Schema: public; Owner: John
 --
 
@@ -7291,7 +6437,7 @@ CREATE TRIGGER update_material_tracking_updated_at BEFORE UPDATE ON public.class
 
 
 --
--- TOC entry 3984 (class 2620 OID 17877)
+-- TOC entry 3911 (class 2620 OID 17877)
 -- Name: dashboard_status update_dashboard_status_updated_at; Type: TRIGGER; Schema: wecoza_events; Owner: John
 --
 
@@ -7299,7 +6445,7 @@ CREATE TRIGGER update_dashboard_status_updated_at BEFORE UPDATE ON wecoza_events
 
 
 --
--- TOC entry 3985 (class 2620 OID 17878)
+-- TOC entry 3912 (class 2620 OID 17878)
 -- Name: notification_queue update_notification_queue_updated_at; Type: TRIGGER; Schema: wecoza_events; Owner: John
 --
 
@@ -7307,7 +6453,7 @@ CREATE TRIGGER update_notification_queue_updated_at BEFORE UPDATE ON wecoza_even
 
 
 --
--- TOC entry 3986 (class 2620 OID 17879)
+-- TOC entry 3913 (class 2620 OID 17879)
 -- Name: supervisors update_supervisors_updated_at; Type: TRIGGER; Schema: wecoza_events; Owner: John
 --
 
@@ -7315,7 +6461,7 @@ CREATE TRIGGER update_supervisors_updated_at BEFORE UPDATE ON wecoza_events.supe
 
 
 --
--- TOC entry 3912 (class 2606 OID 17880)
+-- TOC entry 3854 (class 2606 OID 17880)
 -- Name: agent_absences agent_absences_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7324,7 +6470,7 @@ ALTER TABLE ONLY public.agent_absences
 
 
 --
--- TOC entry 3913 (class 2606 OID 17885)
+-- TOC entry 3855 (class 2606 OID 17885)
 -- Name: agent_absences agent_absences_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7333,7 +6479,7 @@ ALTER TABLE ONLY public.agent_absences
 
 
 --
--- TOC entry 3978 (class 2606 OID 24755)
+-- TOC entry 3905 (class 2606 OID 24755)
 -- Name: agent_meta agent_meta_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7342,7 +6488,7 @@ ALTER TABLE ONLY public.agent_meta
 
 
 --
--- TOC entry 3914 (class 2606 OID 17890)
+-- TOC entry 3856 (class 2606 OID 17890)
 -- Name: agent_notes agent_notes_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7351,7 +6497,7 @@ ALTER TABLE ONLY public.agent_notes
 
 
 --
--- TOC entry 3915 (class 2606 OID 17895)
+-- TOC entry 3857 (class 2606 OID 17895)
 -- Name: agent_orders agent_orders_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7360,7 +6506,7 @@ ALTER TABLE ONLY public.agent_orders
 
 
 --
--- TOC entry 3916 (class 2606 OID 17900)
+-- TOC entry 3858 (class 2606 OID 17900)
 -- Name: agent_orders agent_orders_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7369,7 +6515,7 @@ ALTER TABLE ONLY public.agent_orders
 
 
 --
--- TOC entry 3917 (class 2606 OID 17905)
+-- TOC entry 3859 (class 2606 OID 17905)
 -- Name: agent_replacements agent_replacements_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7378,7 +6524,7 @@ ALTER TABLE ONLY public.agent_replacements
 
 
 --
--- TOC entry 3918 (class 2606 OID 17910)
+-- TOC entry 3860 (class 2606 OID 17910)
 -- Name: agent_replacements agent_replacements_original_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7387,7 +6533,7 @@ ALTER TABLE ONLY public.agent_replacements
 
 
 --
--- TOC entry 3919 (class 2606 OID 17915)
+-- TOC entry 3861 (class 2606 OID 17915)
 -- Name: agent_replacements agent_replacements_replacement_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7396,7 +6542,7 @@ ALTER TABLE ONLY public.agent_replacements
 
 
 --
--- TOC entry 3920 (class 2606 OID 17920)
+-- TOC entry 3862 (class 2606 OID 17920)
 -- Name: agents agents_preferred_working_area_1_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7405,7 +6551,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3921 (class 2606 OID 17925)
+-- TOC entry 3863 (class 2606 OID 17925)
 -- Name: agents agents_preferred_working_area_2_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7414,7 +6560,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3922 (class 2606 OID 17930)
+-- TOC entry 3864 (class 2606 OID 17930)
 -- Name: agents agents_preferred_working_area_3_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7423,7 +6569,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3924 (class 2606 OID 17935)
+-- TOC entry 3866 (class 2606 OID 17935)
 -- Name: attendance_registers attendance_registers_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7432,7 +6578,7 @@ ALTER TABLE ONLY public.attendance_registers
 
 
 --
--- TOC entry 3925 (class 2606 OID 17940)
+-- TOC entry 3867 (class 2606 OID 17940)
 -- Name: attendance_registers attendance_registers_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7441,7 +6587,7 @@ ALTER TABLE ONLY public.attendance_registers
 
 
 --
--- TOC entry 3926 (class 2606 OID 17945)
+-- TOC entry 3868 (class 2606 OID 17945)
 -- Name: class_agents class_agents_agent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7450,7 +6596,7 @@ ALTER TABLE ONLY public.class_agents
 
 
 --
--- TOC entry 3927 (class 2606 OID 17950)
+-- TOC entry 3869 (class 2606 OID 17950)
 -- Name: class_agents class_agents_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7459,7 +6605,7 @@ ALTER TABLE ONLY public.class_agents
 
 
 --
--- TOC entry 3929 (class 2606 OID 17960)
+-- TOC entry 3871 (class 2606 OID 17960)
 -- Name: class_notes class_notes_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7468,7 +6614,7 @@ ALTER TABLE ONLY public.class_notes
 
 
 --
--- TOC entry 3930 (class 2606 OID 17965)
+-- TOC entry 3872 (class 2606 OID 17965)
 -- Name: class_schedules class_schedules_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7477,25 +6623,7 @@ ALTER TABLE ONLY public.class_schedules
 
 
 --
--- TOC entry 3931 (class 2606 OID 17970)
--- Name: class_subjects class_subjects_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.class_subjects
-    ADD CONSTRAINT class_subjects_class_id_fkey FOREIGN KEY (class_id) REFERENCES public.classes(class_id);
-
-
---
--- TOC entry 3932 (class 2606 OID 17975)
--- Name: class_subjects class_subjects_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.class_subjects
-    ADD CONSTRAINT class_subjects_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3969 (class 2606 OID 24613)
+-- TOC entry 3896 (class 2606 OID 24613)
 -- Name: class_type_subjects class_type_subjects_class_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7504,7 +6632,7 @@ ALTER TABLE ONLY public.class_type_subjects
 
 
 --
--- TOC entry 3933 (class 2606 OID 17980)
+-- TOC entry 3873 (class 2606 OID 17980)
 -- Name: classes classes_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7513,7 +6641,7 @@ ALTER TABLE ONLY public.classes
 
 
 --
--- TOC entry 3934 (class 2606 OID 17985)
+-- TOC entry 3874 (class 2606 OID 17985)
 -- Name: classes classes_project_supervisor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7522,7 +6650,7 @@ ALTER TABLE ONLY public.classes
 
 
 --
--- TOC entry 3937 (class 2606 OID 17990)
+-- TOC entry 3877 (class 2606 OID 17990)
 -- Name: client_communications client_communications_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7531,7 +6659,7 @@ ALTER TABLE ONLY public.client_communications
 
 
 --
--- TOC entry 3938 (class 2606 OID 17995)
+-- TOC entry 3878 (class 2606 OID 17995)
 -- Name: client_communications client_communications_site_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7540,7 +6668,7 @@ ALTER TABLE ONLY public.client_communications
 
 
 --
--- TOC entry 3939 (class 2606 OID 18000)
+-- TOC entry 3879 (class 2606 OID 18000)
 -- Name: client_communications client_communications_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7549,7 +6677,7 @@ ALTER TABLE ONLY public.client_communications
 
 
 --
--- TOC entry 3940 (class 2606 OID 18005)
+-- TOC entry 3880 (class 2606 OID 18005)
 -- Name: clients clients_main_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7558,7 +6686,7 @@ ALTER TABLE ONLY public.clients
 
 
 --
--- TOC entry 3941 (class 2606 OID 18010)
+-- TOC entry 3881 (class 2606 OID 18010)
 -- Name: collections collections_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7567,7 +6695,7 @@ ALTER TABLE ONLY public.collections
 
 
 --
--- TOC entry 3942 (class 2606 OID 18015)
+-- TOC entry 3882 (class 2606 OID 18015)
 -- Name: deliveries deliveries_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7576,43 +6704,7 @@ ALTER TABLE ONLY public.deliveries
 
 
 --
--- TOC entry 3943 (class 2606 OID 18020)
--- Name: exam_results exam_results_exam_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exam_results
-    ADD CONSTRAINT exam_results_exam_id_fkey FOREIGN KEY (exam_id) REFERENCES public.exams(exam_id);
-
-
---
--- TOC entry 3944 (class 2606 OID 18025)
--- Name: exam_results exam_results_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exam_results
-    ADD CONSTRAINT exam_results_learner_id_fkey FOREIGN KEY (learner_id) REFERENCES public.learners(id);
-
-
---
--- TOC entry 3945 (class 2606 OID 18030)
--- Name: exams exams_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exams
-    ADD CONSTRAINT exams_learner_id_fkey FOREIGN KEY (learner_id) REFERENCES public.learners(id);
-
-
---
--- TOC entry 3946 (class 2606 OID 18035)
--- Name: exams exams_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.exams
-    ADD CONSTRAINT exams_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3923 (class 2606 OID 24784)
+-- TOC entry 3865 (class 2606 OID 24784)
 -- Name: agents fk_agents_location; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7621,7 +6713,7 @@ ALTER TABLE ONLY public.agents
 
 
 --
--- TOC entry 3928 (class 2606 OID 18040)
+-- TOC entry 3870 (class 2606 OID 18040)
 -- Name: class_material_tracking fk_class_material_tracking_class; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7630,7 +6722,7 @@ ALTER TABLE ONLY public.class_material_tracking
 
 
 --
--- TOC entry 3935 (class 2606 OID 18045)
+-- TOC entry 3875 (class 2606 OID 18045)
 -- Name: classes fk_classes_agent; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7639,7 +6731,7 @@ ALTER TABLE ONLY public.classes
 
 
 --
--- TOC entry 3936 (class 2606 OID 18050)
+-- TOC entry 3876 (class 2606 OID 18050)
 -- Name: classes fk_classes_site; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7648,7 +6740,7 @@ ALTER TABLE ONLY public.classes
 
 
 --
--- TOC entry 3955 (class 2606 OID 18055)
+-- TOC entry 3886 (class 2606 OID 18055)
 -- Name: learners fk_highest_qualification; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7657,8 +6749,8 @@ ALTER TABLE ONLY public.learners
 
 
 --
--- TOC entry 4521 (class 0 OID 0)
--- Dependencies: 3955
+-- TOC entry 4385 (class 0 OID 0)
+-- Dependencies: 3886
 -- Name: CONSTRAINT fk_highest_qualification ON learners; Type: COMMENT; Schema: public; Owner: John
 --
 
@@ -7666,7 +6758,7 @@ COMMENT ON CONSTRAINT fk_highest_qualification ON public.learners IS 'Ensures th
 
 
 --
--- TOC entry 3973 (class 2606 OID 24678)
+-- TOC entry 3900 (class 2606 OID 24678)
 -- Name: learner_hours_log fk_hours_log_class; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7675,7 +6767,7 @@ ALTER TABLE ONLY public.learner_hours_log
 
 
 --
--- TOC entry 3974 (class 2606 OID 24668)
+-- TOC entry 3901 (class 2606 OID 24668)
 -- Name: learner_hours_log fk_hours_log_learner; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7684,16 +6776,16 @@ ALTER TABLE ONLY public.learner_hours_log
 
 
 --
--- TOC entry 3975 (class 2606 OID 24673)
--- Name: learner_hours_log fk_hours_log_product; Type: FK CONSTRAINT; Schema: public; Owner: John
+-- TOC entry 3902 (class 2606 OID 26972)
+-- Name: learner_hours_log fk_hours_log_subject; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
 ALTER TABLE ONLY public.learner_hours_log
-    ADD CONSTRAINT fk_hours_log_product FOREIGN KEY (product_id) REFERENCES public.products(product_id);
+    ADD CONSTRAINT fk_hours_log_subject FOREIGN KEY (class_type_subject_id) REFERENCES public.class_type_subjects(class_type_subject_id);
 
 
 --
--- TOC entry 3976 (class 2606 OID 24683)
+-- TOC entry 3903 (class 2606 OID 24683)
 -- Name: learner_hours_log fk_hours_log_tracking; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7702,7 +6794,7 @@ ALTER TABLE ONLY public.learner_hours_log
 
 
 --
--- TOC entry 3970 (class 2606 OID 24649)
+-- TOC entry 3897 (class 2606 OID 24649)
 -- Name: learner_lp_tracking fk_lp_tracking_class; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7711,7 +6803,7 @@ ALTER TABLE ONLY public.learner_lp_tracking
 
 
 --
--- TOC entry 3971 (class 2606 OID 24639)
+-- TOC entry 3898 (class 2606 OID 24639)
 -- Name: learner_lp_tracking fk_lp_tracking_learner; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7720,16 +6812,16 @@ ALTER TABLE ONLY public.learner_lp_tracking
 
 
 --
--- TOC entry 3972 (class 2606 OID 24644)
--- Name: learner_lp_tracking fk_lp_tracking_product; Type: FK CONSTRAINT; Schema: public; Owner: John
+-- TOC entry 3899 (class 2606 OID 26967)
+-- Name: learner_lp_tracking fk_lp_tracking_subject; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
 ALTER TABLE ONLY public.learner_lp_tracking
-    ADD CONSTRAINT fk_lp_tracking_product FOREIGN KEY (product_id) REFERENCES public.products(product_id);
+    ADD CONSTRAINT fk_lp_tracking_subject FOREIGN KEY (class_type_subject_id) REFERENCES public.class_type_subjects(class_type_subject_id);
 
 
 --
--- TOC entry 3956 (class 2606 OID 18060)
+-- TOC entry 3887 (class 2606 OID 18060)
 -- Name: learners fk_placement_level; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7738,7 +6830,7 @@ ALTER TABLE ONLY public.learners
 
 
 --
--- TOC entry 3977 (class 2606 OID 24698)
+-- TOC entry 3904 (class 2606 OID 24698)
 -- Name: learner_progression_portfolios fk_portfolio_tracking; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7747,7 +6839,7 @@ ALTER TABLE ONLY public.learner_progression_portfolios
 
 
 --
--- TOC entry 3948 (class 2606 OID 18065)
+-- TOC entry 3884 (class 2606 OID 18065)
 -- Name: latest_document fk_qa_visits_class; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7756,7 +6848,7 @@ ALTER TABLE ONLY public.latest_document
 
 
 --
--- TOC entry 3964 (class 2606 OID 18070)
+-- TOC entry 3891 (class 2606 OID 18070)
 -- Name: qa_visits fk_qa_visits_class; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7765,7 +6857,7 @@ ALTER TABLE ONLY public.qa_visits
 
 
 --
--- TOC entry 3965 (class 2606 OID 18075)
+-- TOC entry 3892 (class 2606 OID 18075)
 -- Name: sites fk_sites_client; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7774,7 +6866,7 @@ ALTER TABLE ONLY public.sites
 
 
 --
--- TOC entry 3947 (class 2606 OID 18080)
+-- TOC entry 3883 (class 2606 OID 18080)
 -- Name: history history_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7783,7 +6875,7 @@ ALTER TABLE ONLY public.history
 
 
 --
--- TOC entry 3949 (class 2606 OID 18085)
+-- TOC entry 3885 (class 2606 OID 18085)
 -- Name: learner_portfolios learner_portfolios_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7792,52 +6884,7 @@ ALTER TABLE ONLY public.learner_portfolios
 
 
 --
--- TOC entry 3950 (class 2606 OID 18090)
--- Name: learner_products learner_products_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_products
-    ADD CONSTRAINT learner_products_learner_id_fkey FOREIGN KEY (learner_id) REFERENCES public.learners(id);
-
-
---
--- TOC entry 3951 (class 2606 OID 18095)
--- Name: learner_products learner_products_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_products
-    ADD CONSTRAINT learner_products_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3952 (class 2606 OID 18100)
--- Name: learner_progressions learner_progressions_from_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_progressions
-    ADD CONSTRAINT learner_progressions_from_product_id_fkey FOREIGN KEY (from_product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3953 (class 2606 OID 18105)
--- Name: learner_progressions learner_progressions_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_progressions
-    ADD CONSTRAINT learner_progressions_learner_id_fkey FOREIGN KEY (learner_id) REFERENCES public.learners(id);
-
-
---
--- TOC entry 3954 (class 2606 OID 18110)
--- Name: learner_progressions learner_progressions_to_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.learner_progressions
-    ADD CONSTRAINT learner_progressions_to_product_id_fkey FOREIGN KEY (to_product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3979 (class 2606 OID 24776)
+-- TOC entry 3906 (class 2606 OID 24776)
 -- Name: learner_sponsors learner_sponsors_employer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7846,7 +6893,7 @@ ALTER TABLE ONLY public.learner_sponsors
 
 
 --
--- TOC entry 3980 (class 2606 OID 24771)
+-- TOC entry 3907 (class 2606 OID 24771)
 -- Name: learner_sponsors learner_sponsors_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7855,7 +6902,7 @@ ALTER TABLE ONLY public.learner_sponsors
 
 
 --
--- TOC entry 3957 (class 2606 OID 18115)
+-- TOC entry 3888 (class 2606 OID 18115)
 -- Name: learners learners_city_town_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7864,7 +6911,7 @@ ALTER TABLE ONLY public.learners
 
 
 --
--- TOC entry 3958 (class 2606 OID 18120)
+-- TOC entry 3889 (class 2606 OID 18120)
 -- Name: learners learners_employer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7873,7 +6920,7 @@ ALTER TABLE ONLY public.learners
 
 
 --
--- TOC entry 3959 (class 2606 OID 18125)
+-- TOC entry 3890 (class 2606 OID 18125)
 -- Name: learners learners_province_region_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7882,43 +6929,7 @@ ALTER TABLE ONLY public.learners
 
 
 --
--- TOC entry 3960 (class 2606 OID 18130)
--- Name: products products_parent_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.products
-    ADD CONSTRAINT products_parent_product_id_fkey FOREIGN KEY (parent_product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3961 (class 2606 OID 18135)
--- Name: progress_reports progress_reports_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.progress_reports
-    ADD CONSTRAINT progress_reports_class_id_fkey FOREIGN KEY (class_id) REFERENCES public.classes(class_id);
-
-
---
--- TOC entry 3962 (class 2606 OID 18140)
--- Name: progress_reports progress_reports_learner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.progress_reports
-    ADD CONSTRAINT progress_reports_learner_id_fkey FOREIGN KEY (learner_id) REFERENCES public.learners(id);
-
-
---
--- TOC entry 3963 (class 2606 OID 18145)
--- Name: progress_reports progress_reports_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
---
-
-ALTER TABLE ONLY public.progress_reports
-    ADD CONSTRAINT progress_reports_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id);
-
-
---
--- TOC entry 3966 (class 2606 OID 18150)
+-- TOC entry 3893 (class 2606 OID 18150)
 -- Name: sites sites_parent_site_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7927,7 +6938,7 @@ ALTER TABLE ONLY public.sites
 
 
 --
--- TOC entry 3967 (class 2606 OID 18155)
+-- TOC entry 3894 (class 2606 OID 18155)
 -- Name: sites sites_place_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7936,7 +6947,7 @@ ALTER TABLE ONLY public.sites
 
 
 --
--- TOC entry 3968 (class 2606 OID 18160)
+-- TOC entry 3895 (class 2606 OID 18160)
 -- Name: user_permissions user_permissions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: John
 --
 
@@ -7945,7 +6956,7 @@ ALTER TABLE ONLY public.user_permissions
 
 
 --
--- TOC entry 4138 (class 0 OID 0)
+-- TOC entry 4065 (class 0 OID 0)
 -- Dependencies: 7
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
 --
@@ -7953,11 +6964,11 @@ ALTER TABLE ONLY public.user_permissions
 REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 
 
--- Completed on 2026-02-17 15:38:10 SAST
+-- Completed on 2026-02-19 13:38:27 SAST
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict OTVgfNd2iZ8rniKSNjR7AkO5Aecwr4Xps07dhRlp0OcF8t9tei237slqMTrWODb
+\unrestrict Vgt0T9Nrz8F9L5XGAgmBebMJghbHuvaLTGbfwjzWDINqDDben1SOEoo3AIABpDh
 

@@ -38,7 +38,7 @@
  *   - supervisors: Array of supervisor data with 'id' and 'name' keys
  *   - learners: Array of learner data with 'id' and 'name' keys
  *   - setas: Array of SETA data with 'id' and 'name' keys
- *   - products: Array of product/course data with 'id', 'name', and 'learning_area' keys
+ *   - subjects: Array of subject data from class_type_subjects (populated dynamically by class type selection)
  *   - class_types: Array of class type data with 'id' and 'name' keys
  *   - yes_no_options: Array of Yes/No options with 'id' and 'name' keys
  *   - redirect_url: URL to redirect to after successful form submission

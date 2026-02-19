@@ -14,7 +14,7 @@ class WipeDataHandler
 {
     /**
      * Transactional tables that will be truncated.
-     * Reference tables (locations, class_types, products, etc.) are intentionally excluded.
+     * Reference tables (locations, class_types, class_type_subjects, etc.) are intentionally excluded.
      */
     private const TRANSACTIONAL_TABLES = [
         'locations',
@@ -22,51 +22,28 @@ class WipeDataHandler
         'agent_meta',
         'agent_notes',
         'agent_absences',
-        'agent_orders',
-        'agent_replacements',
         'clients',
         'client_communications',
         'learners',
         'learner_hours_log',
         'learner_lp_tracking',
         'learner_portfolios',
-        'learner_products',
         'learner_progression_portfolios',
-        'learner_progressions',
         'learner_sponsors',
         'classes',
-        'class_agents',
         'class_events',
         'class_material_tracking',
-        'class_notes',
-        'class_schedules',
-        'class_subjects',
         'sites',
-        'attendance_registers',
-        'collections',
-        'deliveries',
-        'exams',
-        'exam_results',
-        'files',
-        'history',
-        'latest_document',
-        'progress_reports',
         'qa_visits',
     ];
 
     /**
      * Tables preserved (not truncated):
      * - class_types: Class type definitions
-     * - class_type_subjects: Subject mappings per class type
-     * - products: Learning programmes/qualifications
+     * - class_type_subjects: Subject definitions per class type (LP source of truth)
      * - learner_qualifications: Qualification lookup values
      * - learner_placement_level: Numeracy/communication level lookup values
      * - employers: Employer/sponsor lookup values
-     * - user_roles: Role definitions
-     * - user_permissions: Permission mappings
-     * - users: User accounts
-     * - sites_migration_backup: Historical backup
-     * - sites_address_audit: Audit trail
      *
      * Note: locations IS truncated — rebuild by seeding location form first.
      */
