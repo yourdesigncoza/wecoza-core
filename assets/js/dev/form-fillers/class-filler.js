@@ -345,11 +345,21 @@
                 clickButton('#add-selected-learners-btn');
                 await Gen.delay(800);
 
-                // Handle LP collision modal if it pops up
+                // Wait for user to handle LP collision modal if it appeared
                 var collisionModal = document.querySelector('#lpCollisionWarningModal');
-                if (collisionModal && collisionModal.classList.contains('show')) {
-                    var confirmBtn = document.querySelector('#confirmAddWithCollision');
-                    if (confirmBtn) confirmBtn.click();
+                if (collisionModal) {
+                    console.log('[DevToolbar] LP collision modal detected — waiting for user...');
+                    await new Promise(function (resolve) {
+                        var timeout = 300000; // 5 min
+                        var elapsed = 0;
+                        var interval = setInterval(function () {
+                            elapsed += 500;
+                            if (!document.getElementById('lpCollisionWarningModal') || elapsed >= timeout) {
+                                clearInterval(interval);
+                                resolve();
+                            }
+                        }, 500);
+                    });
                     await Gen.delay(500);
                 }
 

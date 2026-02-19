@@ -167,9 +167,9 @@
                 return;
             }
             if (isRequired) {
-                element.attr('required', 'required');
+                element.prop('required', true);
             } else {
-                element.removeAttr('required');
+                element.prop('required', false);
             }
         };
 

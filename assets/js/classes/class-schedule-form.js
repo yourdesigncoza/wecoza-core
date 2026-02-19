@@ -144,13 +144,13 @@
             // Show appropriate fields based on pattern
             if (pattern === 'weekly' || pattern === 'biweekly') {
                 $daySelection.removeClass('d-none');
-                $('#schedule_day_of_month').removeAttr('required');
+                $('#schedule_day_of_month').prop('required', false);
 
                 // Update per-day time controls based on current day selection
                 updatePerDayTimeControls();
             } else if (pattern === 'monthly') {
                 $dayOfMonth.removeClass('d-none');
-                $('#schedule_day_of_month').attr('required', 'required');
+                $('#schedule_day_of_month').prop('required', true);
 
                 // For monthly pattern, always show single time controls
                 // since monthly scheduling doesn't use multiple days
@@ -232,11 +232,11 @@
             if ($firstCheckbox.length > 0) {
                 if (anyDaySelected) {
                     // Remove required attribute when any day is selected
-                    $firstCheckbox.removeAttr('required');
+                    $firstCheckbox.prop('required', false);
                     $firstCheckbox[0].setCustomValidity('');
                 } else {
                     // Add required attribute when no days are selected
-                    $firstCheckbox.attr('required', 'required');
+                    $firstCheckbox.prop('required', true);
                     $firstCheckbox[0].setCustomValidity('Please select at least one day.');
                 }
             }
@@ -1310,7 +1310,7 @@
                 // Show exam type field and make it required
                 $examTypeContainer.show();
                 if ($examType.length) {
-                    $examType.attr('required', 'required');
+                    $examType.prop('required', true);
                 }
 
                 // Show exam learners container if it exists
@@ -1321,7 +1321,7 @@
                 // Hide exam type field and remove required attribute YDCOZA
                 $examTypeContainer.hide();
                 if ($examType.length) {
-                    $examType.removeAttr('required');
+                    $examType.prop('required', false);
                     $examType.val(''); // Clear the value
                 }
 
@@ -1632,7 +1632,7 @@
             });
 
             // Focus on the first input in the new row
-            $newRow.find('select').first().focus();
+            $newRow.find('select').first().trigger('focus');
         });
 
         // Handle remove buttons for any existing rows (in case of editing)

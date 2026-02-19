@@ -227,10 +227,10 @@ class LearnerSelectionTable {
 
                 // Mark already assigned learners
                 if (this.assignedLearners.has(learner.id)) {
-                    learner.element.classList.add('table-secondary');
+                    learner.element.classList.add('table-primary');
                     if (learner.checkbox) learner.checkbox.disabled = true;
                 } else {
-                    learner.element.classList.remove('table-secondary');
+                    learner.element.classList.remove('table-primary');
                     if (learner.checkbox) learner.checkbox.disabled = false;
                 }
             }
@@ -451,6 +451,8 @@ class LearnerSelectionTable {
             nonce: document.querySelector('#nonce')?.value || '',
             learner_ids: learnersWithActiveLPs.map(l => l.id),
             class_id: document.querySelector('#class_id')?.value || '',
+            class_code: document.querySelector('#class_code')?.value || '',
+            class_type: document.querySelector('#class_type_id option:checked')?.textContent?.trim() || '',
             acknowledged_by: 'admin',
             timestamp: new Date().toISOString()
         };
@@ -464,10 +466,13 @@ class LearnerSelectionTable {
             }
         });
 
-        navigator.sendBeacon(
-            (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'),
-            formData
-        );
+        const beaconUrl = (typeof wecozaClass !== 'undefined' && wecozaClass.ajaxUrl)
+            ? wecozaClass.ajaxUrl
+            : (typeof ajaxurl !== 'undefined' ? ajaxurl : null);
+
+        if (beaconUrl) {
+            navigator.sendBeacon(beaconUrl, formData);
+        }
     }
 
     /**
@@ -489,26 +494,26 @@ class LearnerSelectionTable {
                     <strong>${esc(name)}</strong>
                     <div class="mt-2">
                         <div class="d-flex justify-content-between mb-1">
-                            <small>Active LP:</small>
+                            <span>Active LP:</span>
                             <span class="badge badge-phoenix badge-phoenix-warning">${esc(courseName)}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-1">
-                            <small>Progress:</small>
+                            <span>Progress:</span>
                             <span>${progress}%</span>
                         </div>
                         <div class="progress mb-2" style="height: 6px;">
                             <div class="progress-bar bg-warning" role="progressbar" style="width: ${progress}%"></div>
                         </div>
                         <div class="d-flex justify-content-between mb-1">
-                            <small>Hours Present:</small>
+                            <span>Hours Present:</span>
                             <span>${esc(String(learner.active_hours_present || 0))} / ${esc(String(learner.active_product_duration || 0))} hrs</span>
                         </div>
                         <div class="d-flex justify-content-between mb-1">
-                            <small>Start Date:</small>
+                            <span>Start Date:</span>
                             <span>${esc(learner.active_start_date || 'N/A')}</span>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <small>Current Class:</small>
+                            <span>Current Class:</span>
                             <span>${esc(classCode)}</span>
                         </div>
                     </div>
@@ -534,12 +539,12 @@ class LearnerSelectionTable {
                             ${learnerListHtml}
                             <div class="alert alert-info mt-3 mb-0">
                                 <i class="bi bi-info-circle me-2"></i>
-                                <small>Adding ${learnersWithActiveLPs.length === 1 ? 'this learner' : 'these learners'} to this class will put their current LP on hold and start a new progression.</small>
+                                Adding ${learnersWithActiveLPs.length === 1 ? 'this learner' : 'these learners'} to this class will put their current LP on hold and start a new progression.
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-warning" id="confirmAddWithCollision">
+                            <button type="button" class="btn btn-subtle-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-subtle-warning" id="confirmAddWithCollision">
                                 <i class="bi bi-check-circle me-1"></i> Add Anyway
                             </button>
                         </div>
@@ -547,6 +552,7 @@ class LearnerSelectionTable {
                 </div>
             </div>
         `;
+                            
 
         // Remove existing modal if any
         const existingModal = document.getElementById('lpCollisionWarningModal');

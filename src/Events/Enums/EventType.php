@@ -24,6 +24,7 @@ enum EventType: string
     case LEARNER_REMOVE = 'LEARNER_REMOVE';
     case LEARNER_UPDATE = 'LEARNER_UPDATE';
     case STATUS_CHANGE = 'STATUS_CHANGE';
+    case LP_COLLISION = 'LP_COLLISION';
 
     /**
      * Human-readable label for display
@@ -38,6 +39,7 @@ enum EventType: string
             self::LEARNER_REMOVE => 'Learner Removed',
             self::LEARNER_UPDATE => 'Learner Updated',
             self::STATUS_CHANGE => 'Status Changed',
+            self::LP_COLLISION => 'LP Collision Acknowledged',
         };
     }
 
@@ -54,6 +56,7 @@ enum EventType: string
             self::LEARNER_ADD => 3,
             self::CLASS_UPDATE => 2,
             self::LEARNER_UPDATE => 2,
+            self::LP_COLLISION => 2,
         };
     }
 
@@ -96,7 +99,7 @@ enum EventType: string
      */
     public function isClassEvent(): bool
     {
-        return in_array($this, [self::CLASS_INSERT, self::CLASS_UPDATE, self::CLASS_DELETE], true);
+        return in_array($this, [self::CLASS_INSERT, self::CLASS_UPDATE, self::CLASS_DELETE, self::LP_COLLISION], true);
     }
 
     /**

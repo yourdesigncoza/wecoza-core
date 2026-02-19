@@ -362,19 +362,20 @@ final class AISummaryShortcode
                 }
 
                 function getAjaxUrl(container) {
-                    return container.getAttribute('data-ajax-url') || window.ajaxurl || '/wp-admin/admin-ajax.php';
+                    return container.getAttribute('data-ajax-url') || window.ajaxurl || null;
                 }
 
                 function markAsViewed(container, eventId) {
                     var nonce = container.getAttribute('data-nonce');
-                    if (!nonce || !eventId) return;
+                    var ajaxUrl = getAjaxUrl(container);
+                    if (!nonce || !eventId || !ajaxUrl) return;
 
                     var formData = new FormData();
                     formData.append('action', 'wecoza_mark_notification_viewed');
                     formData.append('nonce', nonce);
                     formData.append('event_id', eventId);
 
-                    fetch(getAjaxUrl(container), {
+                    fetch(ajaxUrl, {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin'
@@ -398,14 +399,15 @@ final class AISummaryShortcode
 
                 function markAsAcknowledged(container, eventId) {
                     var nonce = container.getAttribute('data-nonce');
-                    if (!nonce || !eventId) return;
+                    var ajaxUrl = getAjaxUrl(container);
+                    if (!nonce || !eventId || !ajaxUrl) return;
 
                     var formData = new FormData();
                     formData.append('action', 'wecoza_mark_notification_acknowledged');
                     formData.append('nonce', nonce);
                     formData.append('event_id', eventId);
 
-                    fetch(getAjaxUrl(container), {
+                    fetch(ajaxUrl, {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin'
@@ -443,14 +445,15 @@ final class AISummaryShortcode
                 function deleteNotification(container, eventId) {
                     if (!confirm('Delete this notification?')) return;
                     var nonce = container.getAttribute('data-nonce');
-                    if (!nonce || !eventId) return;
+                    var ajaxUrl = getAjaxUrl(container);
+                    if (!nonce || !eventId || !ajaxUrl) return;
 
                     var formData = new FormData();
                     formData.append('action', 'wecoza_delete_notification');
                     formData.append('nonce', nonce);
                     formData.append('event_id', eventId);
 
-                    fetch(getAjaxUrl(container), {
+                    fetch(ajaxUrl, {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin'

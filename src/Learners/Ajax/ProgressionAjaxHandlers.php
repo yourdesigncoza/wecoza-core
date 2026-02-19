@@ -17,6 +17,9 @@ use WeCoza\Learners\Services\ProgressionService;
 use WeCoza\Learners\Services\PortfolioUploadService;
 use WeCoza\Learners\Models\LearnerProgressionModel;
 use WeCoza\Learners\Repositories\LearnerProgressionRepository;
+use WeCoza\Events\DTOs\ClassEventDTO;
+use WeCoza\Events\Enums\EventType;
+use WeCoza\Events\Repositories\ClassEventRepository;
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -207,21 +210,143 @@ function handle_log_collision_acknowledgement(): void
         $classId = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
         $userId  = get_current_user_id();
 
-        wecoza_log(
-            sprintf(
-                'LP Collision Acknowledged: Admin user %d added learners [%s] to class %d despite active LPs',
-                $userId,
-                implode(', ', $learnerIds),
-                $classId
-            ),
-            'info'
+        // Enrich with context from DB so the audit record is self-contained
+        $enrichedLearners = build_collision_learner_context($learnerIds);
+        $classContext      = build_collision_class_context($classId);
+
+        // For new classes (class_id=0), fall back to form-supplied values
+        $classCode = $classContext['class_code']
+            ?? (isset($_POST['class_code']) ? sanitize_text_field($_POST['class_code']) : null)
+            ?: null;
+        $classType = $classContext['class_type']
+            ?? (isset($_POST['class_type']) ? sanitize_text_field($_POST['class_type']) : null)
+            ?: null;
+
+        $dto = ClassEventDTO::create(
+            eventType: EventType::LP_COLLISION,
+            entityType: 'class',
+            entityId: $classId,
+            eventData: [
+                'action'               => 'lp_collision_acknowledged',
+                'affected_learners'    => $enrichedLearners,
+                'class_id'             => $classId,
+                'class_code'           => $classCode,
+                'class_type'           => $classType,
+                'acknowledged_by'      => $userId,
+                'acknowledged_at'      => wp_date('c'),
+            ],
+            userId: $userId,
         );
 
-        wp_send_json_success(['logged' => true]);
+        // Set notification_status to 'sent' so this audit event skips the enrichment/email pipeline
+        $dto = $dto->withStatus('sent');
+
+        $repo    = new ClassEventRepository();
+        $eventId = $repo->insertEvent($dto);
+
+        wp_send_json_success(['logged' => true, 'event_id' => $eventId]);
 
     } catch (Exception $e) {
         wp_send_json_error(['message' => $e->getMessage()]);
     }
+}
+
+/**
+ * Build enriched learner context for LP collision events
+ *
+ * Fetches learner names and their active LP details so the audit
+ * record is self-contained and readable without joins.
+ *
+ * @param int[] $learnerIds
+ * @return array<int, array{learner_id: int, name: string, active_lp: array|null}>
+ */
+function build_collision_learner_context(array $learnerIds): array
+{
+    if (empty($learnerIds)) {
+        return [];
+    }
+
+    $db  = wecoza_db();
+    $pdo = $db->getPdo();
+
+    // Fetch learner names
+    $placeholders = implode(',', array_fill(0, count($learnerIds), '?'));
+    $sql = "SELECT id, first_name, surname FROM learners WHERE id IN ({$placeholders})";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(array_values($learnerIds));
+    $learnerRows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    $nameMap = [];
+    foreach ($learnerRows as $row) {
+        $nameMap[(int) $row['id']] = trim($row['first_name'] . ' ' . $row['surname']);
+    }
+
+    // Fetch active LP info per learner
+    $sql = <<<SQL
+SELECT t.learner_id, t.tracking_id, t.status, t.class_id,
+       cts.subject_name, cts.subject_code
+FROM learner_lp_tracking t
+JOIN class_type_subjects cts ON cts.class_type_subject_id = t.class_type_subject_id
+WHERE t.learner_id IN ({$placeholders})
+  AND t.status = 'in_progress'
+SQL;
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(array_values($learnerIds));
+    $lpRows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    $lpMap = [];
+    foreach ($lpRows as $row) {
+        $lpMap[(int) $row['learner_id']] = [
+            'tracking_id'  => (int) $row['tracking_id'],
+            'status'       => $row['status'],
+            'class_id'     => $row['class_id'] ? (int) $row['class_id'] : null,
+            'subject_name' => $row['subject_name'],
+            'subject_code' => $row['subject_code'],
+        ];
+    }
+
+    // Merge into enriched array
+    $result = [];
+    foreach ($learnerIds as $id) {
+        $result[] = [
+            'learner_id' => $id,
+            'name'       => $nameMap[$id] ?? 'Unknown',
+            'active_lp'  => $lpMap[$id] ?? null,
+        ];
+    }
+
+    return $result;
+}
+
+/**
+ * Build class context for LP collision events
+ *
+ * @param int $classId
+ * @return array{class_code: string|null, class_type: string|null}
+ */
+function build_collision_class_context(int $classId): array
+{
+    if ($classId <= 0) {
+        return ['class_code' => null, 'class_type' => null];
+    }
+
+    $db  = wecoza_db();
+    $pdo = $db->getPdo();
+
+    $sql = <<<SQL
+SELECT c.class_code, ct.class_type_name
+FROM classes c
+LEFT JOIN class_types ct ON ct.class_type_id = c.class_type
+WHERE c.class_id = ?
+SQL;
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$classId]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    return [
+        'class_code' => $row['class_code'] ?? null,
+        'class_type' => $row['class_type_name'] ?? null,
+    ];
 }
 
 /**

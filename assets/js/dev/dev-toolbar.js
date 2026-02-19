@@ -219,7 +219,12 @@
         formData.append('action', 'wecoza_dev_wipe_data');
         formData.append('nonce', config.nonce || '');
 
-        fetch(config.ajaxUrl || '/wp-admin/admin-ajax.php', {
+        if (!config.ajaxUrl) {
+            setStatus(toolbar, 'Wipe failed: AJAX URL not configured', 'error');
+            return;
+        }
+
+        fetch(config.ajaxUrl, {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'

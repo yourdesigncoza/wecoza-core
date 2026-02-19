@@ -10,10 +10,7 @@
  * Global variable to store the AJAX URL
  * This will be set by WordPress via wp_localize_script
  */
-var wecozaClass = wecozaClass || {
-    ajaxUrl: '/wp-admin/admin-ajax.php',
-    debug: true
-};
+var wecozaClass = wecozaClass || {};
 
 /**
  * Auto-populate learner level selects based on selected class subject
@@ -160,10 +157,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading indicator
         classSubjectSelect.innerHTML = '<option value="">Loading...</option>';
 
-        // Get the AJAX URL from WordPress
+        // Get the AJAX URL from WordPress (set via wp_localize_script)
         const ajaxUrl = (typeof wecozaClass !== 'undefined' && wecozaClass.ajaxUrl)
             ? wecozaClass.ajaxUrl
-            : '/wp-admin/admin-ajax.php';
+            : null;
+
+        if (!ajaxUrl) {
+            console.error('WeCoza: AJAX URL not configured. Ensure wp_localize_script provides wecozaClass.ajaxUrl');
+            classSubjectSelect.innerHTML = '<option value="">Error: AJAX not configured</option>';
+            return;
+        }
 
         // Make AJAX request to get subjects
         const requestUrl = `${ajaxUrl}?action=get_class_subjects&class_type=${classType}`;
@@ -247,7 +250,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function fetchProgressionDuration(classType) {
         const ajaxUrl = (typeof wecozaClass !== 'undefined' && wecozaClass.ajaxUrl)
             ? wecozaClass.ajaxUrl
-            : '/wp-admin/admin-ajax.php';
+            : null;
+
+        if (!ajaxUrl) return;
 
         fetch(`${ajaxUrl}?action=get_class_subjects&class_type=${classType}`)
             .then(response => response.json())

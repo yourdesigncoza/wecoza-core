@@ -242,6 +242,9 @@ add_action(
         if (class_exists(\WeCoza\Events\Shortcodes\AISummaryShortcode::class)) {
             \WeCoza\Events\Shortcodes\AISummaryShortcode::register();
         }
+        if (class_exists(\WeCoza\Events\Shortcodes\LPCollisionAuditShortcode::class)) {
+            \WeCoza\Events\Shortcodes\LPCollisionAuditShortcode::register();
+        }
         if (class_exists(\WeCoza\Events\Controllers\TaskController::class)) {
             \WeCoza\Events\Controllers\TaskController::register();
         }

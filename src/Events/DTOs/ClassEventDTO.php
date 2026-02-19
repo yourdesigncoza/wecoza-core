@@ -150,13 +150,20 @@ final class ClassEventDTO
      */
     public function toInsertArray(): array
     {
-        return [
+        $data = [
             'event_type' => $this->eventType->value,
             'entity_type' => $this->entityType,
             'entity_id' => $this->entityId,
             'user_id' => $this->userId,
             'event_data' => json_encode($this->eventData, JSON_THROW_ON_ERROR),
         ];
+
+        // Include notification_status when overriding the DB default ('pending')
+        if ($this->notificationStatus !== 'pending') {
+            $data['notification_status'] = $this->notificationStatus;
+        }
+
+        return $data;
     }
 
     /**

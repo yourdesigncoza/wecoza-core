@@ -50,6 +50,7 @@ final class ClassEventRepository extends BaseRepository
             'entity_id',
             'user_id',
             'notification_status',
+            'deleted_at',
         ];
     }
 

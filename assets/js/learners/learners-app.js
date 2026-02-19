@@ -97,11 +97,11 @@
         if (triggerElement.val() === triggerValue) {
             targetElement.removeClass('d-none'); // Show the field
             if (isRequired) {
-                targetElement.find('input, select').attr('required', 'required'); // Add required attribute
+                targetElement.find('input, select').prop('required', true); // Add required attribute
             }
         } else {
             targetElement.addClass('d-none'); // Hide the field
-            targetElement.find('input, select').removeAttr('required'); // Remove required attribute
+            targetElement.find('input, select').prop('required', false); // Remove required attribute
             targetElement.find('input, select').val(''); // Clear the field value
         }
     }
@@ -139,10 +139,10 @@
         });
 
         // Event handler for assessment status change
-        assessmentStatus.change(togglePlacementFields);
+        assessmentStatus.on('change', togglePlacementFields);
 
         // Clear values on form submit if status is "Not Assessed"
-        form_update.submit(function(e) {
+        form_update.on('submit', function(e) {
             if (assessmentStatus.val() === 'Not Assessed') {
                 placementDateInput.val('');
                 placementLevelSelect.val('');
