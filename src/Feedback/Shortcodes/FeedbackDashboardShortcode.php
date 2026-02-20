@@ -5,6 +5,7 @@ namespace WeCoza\Feedback\Shortcodes;
 
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\Feedback\Repositories\FeedbackRepository;
+use WeCoza\Feedback\Repositories\FeedbackCommentRepository;
 
 final class FeedbackDashboardShortcode
 {
@@ -15,6 +16,7 @@ final class FeedbackDashboardShortcode
     {
         add_shortcode('wecoza_feedback_dashboard', [new self(), 'render']);
         add_action('wp_ajax_wecoza_feedback_resolve', [new self(), 'handleResolve']);
+        add_action('wp_ajax_wecoza_feedback_comment', [new self(), 'handleComment']);
     }
 
     public function render(array $atts = []): string
@@ -29,6 +31,14 @@ final class FeedbackDashboardShortcode
 
         $user = wp_get_current_user();
         $isAdmin = ($user->user_email === self::ADMIN_EMAIL);
+
+        // Batch-load comments for all feedback items (avoids N+1)
+        $commentsByFeedback = [];
+        if (!empty($items)) {
+            $feedbackIds = array_column($items, 'id');
+            $commentRepo = new FeedbackCommentRepository();
+            $commentsByFeedback = $commentRepo->findByFeedbackIds(array_map('intval', $feedbackIds));
+        }
 
         wp_enqueue_script(
             'wecoza-feedback-dashboard',
@@ -45,10 +55,48 @@ final class FeedbackDashboardShortcode
         ]);
 
         return wecoza_view('feedback/dashboard', [
-            'items'   => $items,
-            'filter'  => $filter,
-            'isAdmin' => $isAdmin,
+            'items'              => $items,
+            'filter'             => $filter,
+            'isAdmin'            => $isAdmin,
+            'commentsByFeedback' => $commentsByFeedback,
         ], true);
+    }
+
+    public function handleComment(): void
+    {
+        AjaxSecurity::requireNonce(self::NONCE_ACTION);
+
+        $user = wp_get_current_user();
+        if ($user->user_email !== self::ADMIN_EMAIL) {
+            wp_send_json_error(['message' => 'Only the project admin can add comments'], 403);
+            return;
+        }
+
+        $feedbackId = (int) ($_POST['feedback_id'] ?? 0);
+        $commentText = sanitize_textarea_field($_POST['comment_text'] ?? '');
+
+        if ($feedbackId <= 0 || $commentText === '') {
+            wp_send_json_error(['message' => 'Feedback ID and comment text are required'], 400);
+            return;
+        }
+
+        $repo = new FeedbackCommentRepository();
+        $commentId = $repo->insert([
+            'feedback_id'  => $feedbackId,
+            'author_email' => $user->user_email,
+            'comment_text' => $commentText,
+        ]);
+
+        if ($commentId) {
+            wp_send_json_success([
+                'id'           => $commentId,
+                'author_email' => $user->user_email,
+                'comment_text' => $commentText,
+                'created_at'   => date('Y-m-d H:i:s'),
+            ]);
+        } else {
+            wp_send_json_error(['message' => 'Failed to save comment'], 500);
+        }
     }
 
     public function handleResolve(): void

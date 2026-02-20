@@ -246,6 +246,9 @@ add_action(
         if (class_exists(\WeCoza\Events\Shortcodes\LPCollisionAuditShortcode::class)) {
             \WeCoza\Events\Shortcodes\LPCollisionAuditShortcode::register();
         }
+        if (class_exists(\WeCoza\Events\Shortcodes\SystemPulseShortcode::class)) {
+            \WeCoza\Events\Shortcodes\SystemPulseShortcode::register();
+        }
         if (class_exists(\WeCoza\Events\Controllers\TaskController::class)) {
             \WeCoza\Events\Controllers\TaskController::register();
         }
@@ -650,6 +653,14 @@ add_action(
 
         require_once WECOZA_CORE_PATH .
             "src/Learners/Ajax/ProgressionAjaxHandlers.php";
+
+        // Auto-detect shortcode context for the feedback widget
+        add_filter('do_shortcode_tag', function (string $output, string $tag): string {
+            if (str_starts_with($tag, 'wecoza_') && !str_contains($output, 'data-wecoza-shortcode')) {
+                return '<div data-wecoza-shortcode="' . esc_attr($tag) . '" style="display:contents">' . $output . '</div>';
+            }
+            return $output;
+        }, 10, 2);
 
         // Debug logging
         if (defined("WP_DEBUG") && WP_DEBUG) {

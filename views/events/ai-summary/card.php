@@ -65,32 +65,21 @@ if (!defined("ABSPATH")) {
                                         "wecoza-events",
                                     ); ?>
                             </p>
-                            <?php if (!empty($summary["client_name"])): ?>
                             <p class="mb-0 fs-10 text-body-tertiary">
-                                <i class="bi bi-building me-1"></i><?php echo esc_html(
-                                    $summary["client_name"],
-                                ); ?>
+                                <?php if (!empty($summary["client_name"])): ?>
+                                <i class="bi bi-building me-1"></i><?php echo esc_html($summary["client_name"]); ?>
+                                <?php else: ?>&nbsp;<?php endif; ?>
                             </p>
-                            <?php endif; ?>
-                            <?php if (!empty($summary["site_name"])): ?>
                             <p class="mb-0 fs-10 text-body-tertiary">
-                                <i class="bi bi-geo-alt me-1"></i><?php
-                                echo esc_html($summary["site_name"]);
-                                if (
-                                    !empty($summary["site_address"])
-                                ): ?> &mdash; <?php echo esc_html(
-     $summary["site_address"],
- );endif;
-                                ?>
+                                <?php if (!empty($summary["site_name"])): ?>
+                                <i class="bi bi-geo-alt me-1"></i><?php echo esc_html($summary["site_name"]); if (!empty($summary["site_address"])): ?> &mdash; <?php echo esc_html($summary["site_address"]); endif; ?>
+                                <?php else: ?>&nbsp;<?php endif; ?>
                             </p>
-                            <?php endif; ?>
-                            <?php if (!empty($summary["agent_name"])): ?>
                             <p class="mb-0 fs-10 text-body-tertiary">
-                                <i class="bi bi-person me-1"></i><?php echo esc_html(
-                                    $summary["agent_name"],
-                                ); ?>
+                                <?php if (!empty($summary["agent_name"])): ?>
+                                <i class="bi bi-person me-1"></i><?php echo esc_html($summary["agent_name"]); ?>
+                                <?php else: ?>&nbsp;<?php endif; ?>
                             </p>
-                            <?php endif; ?>
                         </div>
                         <span class="badge <?php echo esc_attr(
                             $summary["operation_badge_class"] ??

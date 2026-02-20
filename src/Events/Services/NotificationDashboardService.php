@@ -5,8 +5,10 @@ namespace WeCoza\Events\Services;
 
 use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Events\DTOs\ClassEventDTO;
+use WeCoza\Events\Enums\EventType;
 use WeCoza\Events\Repositories\ClassEventRepository;
 
+use function get_userdata;
 use function wp_date;
 
 if (!defined('ABSPATH')) {
@@ -196,6 +198,12 @@ final class NotificationDashboardService
     public function transformForDisplay(ClassEventDTO $event): array
     {
         $eventData = $event->eventData;
+
+        // LP_COLLISION events store data directly in eventData (no new_row)
+        if ($event->eventType === EventType::LP_COLLISION) {
+            return $this->transformLpCollisionForDisplay($event);
+        }
+
         $newRow = $eventData['new_row'] ?? [];
         $aiSummary = $event->aiSummary;
 
@@ -270,6 +278,169 @@ final class NotificationDashboardService
     public function transformManyForDisplay(array $events): array
     {
         return array_map([$this, 'transformForDisplay'], $events);
+    }
+
+    /**
+     * Transform an LP_COLLISION event for display
+     *
+     * LP collision events store class_code, class_type, affected_learners,
+     * and acknowledged_by directly in eventData rather than in new_row.
+     *
+     * @param ClassEventDTO $event
+     * @return array<string, mixed>
+     */
+    private function transformLpCollisionForDisplay(ClassEventDTO $event): array
+    {
+        $eventData = $event->eventData;
+        $classCode = $eventData['class_code'] ?? '';
+        $classType = $eventData['class_type'] ?? '';
+
+        // Hydrate header from the class row (try class_id first, then class_code)
+        $classRow = $this->fetchClassRow((int) ($eventData['class_id'] ?? 0), $classCode);
+
+        $classSubject = $classRow['class_subject'] ?? '';
+        if ($classSubject === '') {
+            $classSubject = $classType !== '' ? "LP Collision — {$classType}" : 'Class no longer exists';
+        }
+
+        $agentId = (int) ($classRow['class_agent'] ?? 0);
+        $agentName = $agentId > 0 ? $this->resolveAgentName($agentId) : '';
+
+        $clientId = (int) ($classRow['client_id'] ?? 0);
+        $clientName = $clientId > 0 ? $this->resolveClientName($clientId) : '';
+
+        $siteId = (int) ($classRow['site_id'] ?? 0);
+        $siteInfo = $siteId > 0 ? $this->resolveSiteInfo($siteId) : ['name' => '', 'address' => ''];
+
+        // Resolve acknowledged_by WP user ID to display name
+        $acknowledgedBy = $eventData['acknowledged_by'] ?? $event->userId;
+        $userName = 'Unknown';
+        if ($acknowledgedBy) {
+            $user = get_userdata((int) $acknowledgedBy);
+            if ($user) {
+                $userName = $user->display_name;
+            }
+        }
+
+        // Build summary from affected learners
+        $lines = ["**Acknowledged by:** {$userName}"];
+        foreach ($eventData['affected_learners'] ?? [] as $learner) {
+            $name = $learner['name'] ?? 'Unknown';
+            $lp = $learner['active_lp'] ?? null;
+            $subjectName = $lp['subject_name'] ?? '';
+            $lines[] = "- {$name}" . ($subjectName !== '' ? " ({$subjectName})" : '');
+        }
+        $summaryText = implode("\n", $lines);
+
+        $learnerCount = count($eventData['affected_learners'] ?? []);
+
+        return [
+            'event_id' => $event->eventId,
+            'event_type' => $event->eventType->value,
+            'event_type_label' => $event->getLabel(),
+            'entity_type' => $event->entityType,
+            'entity_id' => $event->entityId,
+            'user_id' => $event->userId,
+            'notification_status' => $event->notificationStatus,
+            'priority' => $event->getPriority(),
+
+            'class_code' => $classCode,
+            'class_subject' => $classSubject,
+            'class_name' => $classCode !== '' ? $classCode : 'Unknown Class',
+            'agent_id' => $agentId,
+            'agent_name' => $agentName,
+            'client_id' => $clientId,
+            'client_name' => $clientName,
+            'site_id' => $siteId,
+            'site_name' => $siteInfo['name'],
+            'site_address' => $siteInfo['address'],
+
+            'start_date' => $classRow['_start_date'] ?? '',
+            'end_date' => $classRow['_end_date'] ?? '',
+            'class_type' => $classType,
+            'schedule_pattern' => $classRow['_schedule_pattern'] ?? '',
+            'learner_count' => $learnerCount,
+
+            'has_ai_summary' => true,
+            'ai_summary_text' => $summaryText,
+            'ai_summary_status' => 'success',
+            'ai_summary_model' => null,
+            'ai_tokens_used' => null,
+
+            'created_at' => $event->createdAt,
+            'created_at_formatted' => $this->formatTimestamp($event->createdAt),
+            'enriched_at' => $event->enrichedAt,
+            'enriched_at_formatted' => $this->formatTimestamp($event->enrichedAt),
+            'sent_at' => $event->sentAt,
+            'sent_at_formatted' => $this->formatTimestamp($event->sentAt),
+            'viewed_at' => $event->viewedAt,
+            'viewed_at_formatted' => $this->formatTimestamp($event->viewedAt),
+            'acknowledged_at' => $event->acknowledgedAt,
+            'acknowledged_at_formatted' => $this->formatTimestamp($event->acknowledgedAt),
+
+            'is_read' => $event->isViewed(),
+            'is_acknowledged' => $event->isAcknowledged(),
+            'is_sent' => $event->isSent(),
+            'is_enriched' => $event->isEnriched(),
+
+            'event_data' => $eventData,
+        ];
+    }
+
+    /**
+     * Fetch a class row for hydrating LP collision card headers
+     *
+     * Tries class_id first, then falls back to class_code lookup.
+     * Extracts start/end dates and pattern from the schedule_data JSON
+     * into virtual keys _start_date, _end_date, _schedule_pattern.
+     *
+     * @param int $classId Class ID from eventData (may be 0 for unsaved classes)
+     * @param string $classCode Class code fallback
+     * @return array<string, mixed> Class row (with virtual keys) or empty array
+     */
+    private function fetchClassRow(int $classId, string $classCode = ''): array
+    {
+        if ($classId <= 0 && $classCode === '') {
+            return [];
+        }
+
+        try {
+            $pdo = wecoza_db()->getPdo();
+
+            if ($classId > 0) {
+                $stmt = $pdo->prepare(
+                    'SELECT class_subject, class_agent, client_id, site_id, schedule_data, learner_ids
+                     FROM public.classes WHERE class_id = :id LIMIT 1'
+                );
+                $stmt->execute([':id' => $classId]);
+            } else {
+                $stmt = $pdo->prepare(
+                    'SELECT class_subject, class_agent, client_id, site_id, schedule_data, learner_ids
+                     FROM public.classes WHERE class_code = :code LIMIT 1'
+                );
+                $stmt->execute([':code' => $classCode]);
+            }
+
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($row === false || $row === null) {
+                return [];
+            }
+
+            // Extract schedule dates from JSON schedule_data
+            $schedule = $row['schedule_data'] ?? null;
+            if (is_string($schedule)) {
+                $schedule = json_decode($schedule, true);
+            }
+            $row['_start_date'] = $schedule['startDate'] ?? '';
+            $row['_end_date'] = $schedule['endDate'] ?? '';
+            $row['_schedule_pattern'] = $schedule['pattern'] ?? '';
+
+            return $row;
+        } catch (\Throwable $e) {
+            // Graceful fallback — class may have been deleted
+        }
+
+        return [];
     }
 
     /**

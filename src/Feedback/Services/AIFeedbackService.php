@@ -7,8 +7,8 @@ use WeCoza\Feedback\Support\SchemaContext;
 
 final class AIFeedbackService
 {
-    private const MODEL = 'gpt-4o-mini';
-    private const TIMEOUT = 15;
+    private const MODEL = 'gpt-5-mini';
+    private const TIMEOUT = 30;
     private const API_URL = 'https://api.openai.com/v1/chat/completions';
 
     private string $apiKey;
@@ -59,6 +59,9 @@ Rules:
 - {$categoryRules}
 - Under 10 characters or generic phrases like "fix this", "broken", "doesn't work" without context = vague
 - Be concise in follow-up questions - one specific question only
+- NEVER repeat or rephrase a question already asked in this conversation. Ask about something NEW.
+- If the user has answered your previous questions, evaluate the COMBINED context to decide if feedback is now clear.
+- When a shortcode or page URL is provided, you already know the page/screen context — do NOT ask which page or section the issue is on.
 PROMPT;
 
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
@@ -74,7 +77,15 @@ PROMPT;
             }
         }
 
-        $messages[] = ['role' => 'user', 'content' => "Category: {$category}\nFeedback: {$feedbackText}"];
+        $contextParts = ["Category: {$category}"];
+        if ($shortcode) {
+            $contextParts[] = "Shortcode: {$shortcode}";
+        }
+        if ($pageUrl) {
+            $contextParts[] = "Page URL: {$pageUrl}";
+        }
+        $contextParts[] = "Feedback: {$feedbackText}";
+        $messages[] = ['role' => 'user', 'content' => implode("\n", $contextParts)];
 
         $response = $this->callOpenAI($messages);
         if ($response === null) {
@@ -102,6 +113,7 @@ PROMPT;
 
         $module = SchemaContext::detectModule($shortcode, $pageUrl);
         $moduleName = $module ? ucfirst($module) : 'General';
+        $schemaContext = SchemaContext::getSchemaForModule($module);
 
         $fullFeedback = $feedbackText;
         foreach ($conversationHistory as $entry) {
@@ -128,6 +140,9 @@ Priority guidelines:
 
 Module: {$moduleName}
 Category: {$category}
+
+Schema context:
+{$schemaContext}
 PROMPT;
 
         $messages = [
@@ -148,8 +163,7 @@ PROMPT;
         $body = wp_json_encode([
             'model'       => self::MODEL,
             'messages'    => $messages,
-            'temperature' => 0.3,
-            'max_tokens'  => 500,
+            'max_completion_tokens' => 2048,
         ]);
 
         $response = wp_remote_post(self::API_URL, [
@@ -168,7 +182,8 @@ PROMPT;
 
         $statusCode = wp_remote_retrieve_response_code($response);
         if ($statusCode !== 200) {
-            wecoza_log("AIFeedbackService: API returned HTTP {$statusCode}", 'error');
+            $errBody = wp_remote_retrieve_body($response);
+            wecoza_log("AIFeedbackService: API returned HTTP {$statusCode}: {$errBody}", 'error');
             return null;
         }
 

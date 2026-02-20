@@ -152,29 +152,20 @@ final class FeedbackController
             $conversation[$lastIdx]['answer'] = $answer;
         }
 
-        // Build full text with follow-up answers
-        $fullText = $record['feedback_text'];
-        foreach ($conversation as $entry) {
-            if (isset($entry['answer'])) {
-                $fullText .= "\n\n" . $entry['answer'];
-            }
-        }
-
         // If max rounds reached, go straight to enrichment
         if ($round >= self::MAX_FOLLOWUP_ROUNDS) {
             $this->repository->update($feedbackId, [
                 'ai_conversation' => wp_json_encode($conversation),
-                'feedback_text'   => $fullText,
                 'updated_at'      => date('Y-m-d H:i:s'),
             ]);
 
-            $this->enrichAndSave($feedbackId, $fullText, $record['category'], $record['shortcode'], $record['page_url']);
+            $this->enrichAndSave($feedbackId, $record['feedback_text'], $record['category'], $record['shortcode'], $record['page_url']);
             return;
         }
 
-        // Re-check vagueness with conversation history
+        // Re-check vagueness with conversation history (original text, not concatenated)
         $vaguenessResult = $this->aiService->checkVagueness(
-            $fullText,
+            $record['feedback_text'],
             $record['category'],
             $record['shortcode'] ?: null,
             $record['page_url'] ?: null,
@@ -185,7 +176,6 @@ final class FeedbackController
             $conversation[] = ['question' => $vaguenessResult['follow_up']];
             $this->repository->update($feedbackId, [
                 'ai_conversation' => wp_json_encode($conversation),
-                'feedback_text'   => $fullText,
                 'updated_at'      => date('Y-m-d H:i:s'),
             ]);
 
@@ -201,11 +191,10 @@ final class FeedbackController
         // Clear - enrich and save
         $this->repository->update($feedbackId, [
             'ai_conversation' => wp_json_encode($conversation),
-            'feedback_text'   => $fullText,
             'updated_at'      => date('Y-m-d H:i:s'),
         ]);
 
-        $this->enrichAndSave($feedbackId, $fullText, $record['category'], $record['shortcode'], $record['page_url']);
+        $this->enrichAndSave($feedbackId, $record['feedback_text'], $record['category'], $record['shortcode'], $record['page_url']);
     }
 
     /**

@@ -56,6 +56,10 @@ final class AISummaryPresenter
             'label' => 'Status Changed',
             'badge_class' => 'badge-phoenix badge-phoenix-primary',
         ],
+        'LP_COLLISION' => [
+            'label' => 'LP Collision',
+            'badge_class' => 'badge-phoenix badge-phoenix-danger',
+        ],
     ];
 
     /**
@@ -197,7 +201,7 @@ final class AISummaryPresenter
     {
         return match (strtoupper($eventType)) {
             'CLASS_INSERT', 'LEARNER_ADD' => 'INSERT',
-            'CLASS_UPDATE', 'LEARNER_UPDATE', 'STATUS_CHANGE' => 'UPDATE',
+            'CLASS_UPDATE', 'LEARNER_UPDATE', 'STATUS_CHANGE', 'LP_COLLISION' => 'UPDATE',
             'CLASS_DELETE', 'LEARNER_REMOVE' => 'DELETE',
             default => 'UNKNOWN',
         };

@@ -1,5 +1,5 @@
 /**
- * Feedback Dashboard - Resolve toggle + Copy report
+ * Feedback Dashboard - Resolve toggle + Copy report + Dev comments
  */
 (function ($) {
     'use strict';
@@ -11,7 +11,7 @@
         if (!data) return;
 
         var lines = [];
-        lines.push('## ' + data.category + ' Report: ' + data.title);
+        lines.push('## ' + data.ref + ' — ' + data.title);
         lines.push('**Priority:** ' + data.priority + ' | **Category:** ' + data.category + ' | **Date:** ' + data.date);
         lines.push('');
         lines.push('**Reporter:** ' + data.reporter);
@@ -37,6 +37,16 @@
             lines.push(data.screenshot);
         }
 
+        if (data.comments && data.comments.length) {
+            lines.push('');
+            lines.push('### Developer Comments');
+            data.comments.forEach(function (c) {
+                var author = c.author_email.split('@')[0];
+                var date = c.created_at ? c.created_at.substring(0, 16).replace('T', ' ') : '';
+                lines.push('- **' + author + '** (' + date + '): ' + c.comment_text);
+            });
+        }
+
         var text = lines.join('\n');
 
         navigator.clipboard.writeText(text).then(function () {
@@ -44,6 +54,79 @@
             $btn.html('<span class="fas fa-check me-1"></span>Copied!');
             setTimeout(function () { $btn.html(origHtml); }, 2000);
         });
+    });
+
+    // ── Comment Submit ──────────────────────────────────────────────────
+    $(document).on('click', '.wecoza-comment-submit', function () {
+        var $btn = $(this);
+        var feedbackId = $btn.data('feedback-id');
+        var $textarea = $('.wecoza-comment-input[data-feedback-id="' + feedbackId + '"]');
+        var text = $.trim($textarea.val());
+
+        if (!text) return;
+
+        $btn.prop('disabled', true);
+
+        $.post(wecozaFeedbackDashboard.ajaxUrl, {
+            action: 'wecoza_feedback_comment',
+            nonce: wecozaFeedbackDashboard.nonce,
+            feedback_id: feedbackId,
+            comment_text: text
+        })
+            .done(function (response) {
+                if (!response.success) {
+                    alert(response.data?.message || 'Failed to save comment');
+                    return;
+                }
+
+                var c = response.data;
+                var author = c.author_email.split('@')[0];
+                var dateStr = c.created_at.substring(0, 16).replace('T', ' ');
+                // Format nicely if possible
+                try {
+                    var d = new Date(c.created_at);
+                    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    dateStr = months[d.getMonth()] + ' ' + d.getDate() + ', ' +
+                              String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+                } catch (e) {}
+
+                var html = '<div class="bg-body-highlight rounded-2 p-2 mb-2">' +
+                    '<p class="mb-1 fs-9">' + $('<span>').text(c.comment_text).html().replace(/\n/g, '<br>') + '</p>' +
+                    '<small class="text-body-tertiary fs-10">' + $('<span>').text(author).html() +
+                    ' &middot; ' + dateStr + '</small></div>';
+
+                var $list = $('.wecoza-feedback-comment-list[data-feedback-id="' + feedbackId + '"]');
+                $list.append(html);
+                $textarea.val('');
+
+                // Update badge count
+                var $badge = $('.wecoza-comment-count-' + feedbackId);
+                var count = $list.children('.bg-body-highlight').length;
+                $badge.text(count);
+
+                // Update report data on copy button to include new comment
+                var $copyBtn = $list.closest('.accordion-body').find('.wecoza-feedback-copy-btn');
+                var reportData = $copyBtn.data('report');
+                if (reportData) {
+                    if (!reportData.comments) reportData.comments = [];
+                    reportData.comments.push(c);
+                    $copyBtn.data('report', reportData);
+                }
+            })
+            .fail(function () {
+                alert('Network error. Please try again.');
+            })
+            .always(function () {
+                $btn.prop('disabled', false);
+            });
+    });
+
+    // Ctrl+Enter shortcut on comment textarea
+    $(document).on('keydown', '.wecoza-comment-input', function (e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            $(this).closest('.mt-2').find('.wecoza-comment-submit').trigger('click');
+        }
     });
 
     // ── Resolve Toggle ─────────────────────────────────────────────────

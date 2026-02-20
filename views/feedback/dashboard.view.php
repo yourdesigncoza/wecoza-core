@@ -4,9 +4,10 @@
  *
  * Uses Phoenix accordion pattern for expandable rows.
  *
- * @var array $items     Feedback records
- * @var string $filter   Current filter (all|open|resolved)
- * @var bool $isAdmin    Whether current user can resolve items
+ * @var array  $items              Feedback records
+ * @var string $filter             Current filter (all|open|resolved)
+ * @var bool   $isAdmin            Whether current user can resolve items
+ * @var array  $commentsByFeedback Comments keyed by feedback_id
  */
 if (!defined('ABSPATH')) {
     exit;
@@ -53,6 +54,7 @@ $totalLabel = match ($filter) {
                 <?php if ($isAdmin): ?>
                     <div style="width: 35px;" class="text-center flex-shrink-0">Done</div>
                 <?php endif; ?>
+                <div style="width: 70px;" class="flex-shrink-0">ID</div>
                 <div class="flex-grow-1">Title</div>
                 <div style="width: 90px;" class="text-center">Category</div>
                 <div style="width: 70px;" class="text-center">Priority</div>
@@ -106,6 +108,11 @@ $totalLabel = match ($filter) {
                         }
                     }
                     $rowId = (int) $item['id'];
+                    $feedbackRef = match ($item['category']) {
+                        'bug_report'      => 'BUG',
+                        'feature_request' => 'FEAT',
+                        default           => 'FB',
+                    } . '-' . $rowId;
                     $collapseId = 'feedbackCollapse' . $rowId;
                     $headerId = 'feedbackHeader' . $rowId;
                 ?>
@@ -129,6 +136,9 @@ $totalLabel = match ($filter) {
                                     aria-expanded="false"
                                     aria-controls="<?= $collapseId ?>">
                                 <div class="d-flex align-items-center w-100">
+                                    <div style="width: 70px;" class="flex-shrink-0">
+                                        <code class="fs-10 text-body-tertiary"><?= esc_html($feedbackRef) ?></code>
+                                    </div>
                                     <div class="flex-grow-1 me-2">
                                         <strong class="fs-9 <?= $isResolved ? 'text-decoration-line-through' : '' ?>">
                                             <?= esc_html($item['ai_generated_title'] ?: substr($item['feedback_text'], 0, 60)) ?>
@@ -165,6 +175,7 @@ $totalLabel = match ($filter) {
                                     // Build lean report data for clipboard
                                     $firstLine = strtok($item['feedback_text'], "\n");
                                     $reportData = [
+                                        'ref'         => $feedbackRef,
                                         'title'       => $item['ai_generated_title'] ?: substr($item['feedback_text'], 0, 60),
                                         'priority'    => $item['ai_suggested_priority'] ?? 'Medium',
                                         'category'    => $categoryLabel,
@@ -176,6 +187,7 @@ $totalLabel = match ($filter) {
                                         'description' => trim($firstLine),
                                         'conversation' => $conversation,
                                         'screenshot'  => $screenshotUrl,
+                                        'comments'    => $commentsByFeedback[$rowId] ?? [],
                                     ];
                                 ?>
                                 <div class="d-flex justify-content-end mb-2">
@@ -268,6 +280,39 @@ $totalLabel = match ($filter) {
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
+                                        </div>
+
+                                        <!-- Dev Comments -->
+                                        <?php $feedbackComments = $commentsByFeedback[$rowId] ?? []; ?>
+                                        <div class="border rounded-3 p-3 mt-3">
+                                            <h6 class="fs-9 fw-bold text-body-secondary mb-2">
+                                                <span class="fas fa-comments fa-xs me-1"></span>Dev Comments
+                                                <span class="badge badge-phoenix badge-phoenix-secondary ms-1 wecoza-comment-count-<?= $rowId ?>"><?= count($feedbackComments) ?></span>
+                                            </h6>
+                                            <div class="wecoza-feedback-comment-list" data-feedback-id="<?= $rowId ?>">
+                                                <?php foreach ($feedbackComments as $comment): ?>
+                                                    <div class="bg-body-highlight rounded-2 p-2 mb-2">
+                                                        <p class="mb-1 fs-9"><?= nl2br(esc_html($comment['comment_text'])) ?></p>
+                                                        <small class="text-body-tertiary fs-10">
+                                                            <?= esc_html(explode('@', $comment['author_email'])[0]) ?>
+                                                            &middot; <?= esc_html(date('M j, H:i', strtotime($comment['created_at']))) ?>
+                                                        </small>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <?php if ($isAdmin): ?>
+                                                <div class="mt-2">
+                                                    <textarea class="form-control form-control-sm wecoza-comment-input mb-2"
+                                                              data-feedback-id="<?= $rowId ?>"
+                                                              rows="2"
+                                                              placeholder="Add a comment..."></textarea>
+                                                    <button type="button"
+                                                            class="btn btn-phoenix-primary btn-sm wecoza-comment-submit"
+                                                            data-feedback-id="<?= $rowId ?>">
+                                                        <span class="fas fa-paper-plane me-1"></span>Send
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <!-- Right: Screenshot -->
