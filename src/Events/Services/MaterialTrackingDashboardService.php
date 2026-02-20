@@ -91,7 +91,7 @@ final class MaterialTrackingDashboardService
      */
     public function canViewDashboard(): bool
     {
-        return current_user_can('view_material_tracking') || current_user_can('manage_options');
+        return is_user_logged_in();
     }
 
     /**

@@ -240,8 +240,8 @@ class LookupTableController extends BaseController
         }
 
         // Capability check
-        if (!current_user_can($config['capability'])) {
-            return '<div class="alert alert-warning">You do not have permission to manage this table.</div>';
+        if (!is_user_logged_in()) {
+            return '<div class="alert alert-warning">You must be logged in to manage this table.</div>';
         }
 
         // Resolve column_options into actual select option lists

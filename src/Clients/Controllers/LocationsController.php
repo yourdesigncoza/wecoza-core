@@ -105,8 +105,8 @@ class LocationsController extends BaseController {
     }
 
     public function captureLocationShortcode($atts): string {
-        if (!current_user_can('manage_wecoza_clients')) {
-            return '<p>' . esc_html__('You do not have permission to capture locations.', 'wecoza-core') . '</p>';
+        if (!is_user_logged_in()) {
+            return '<p>' . esc_html__('You must be logged in to capture locations.', 'wecoza-core') . '</p>';
         }
 
         $config = wecoza_config('clients');
@@ -202,8 +202,8 @@ class LocationsController extends BaseController {
     }
 
     public function editLocationShortcode($atts): string {
-        if (!current_user_can('edit_wecoza_clients')) {
-            return '<p>' . esc_html__('You do not have permission to edit locations.', 'wecoza-core') . '</p>';
+        if (!is_user_logged_in()) {
+            return '<p>' . esc_html__('You must be logged in to edit locations.', 'wecoza-core') . '</p>';
         }
 
         $atts = shortcode_atts(array(
@@ -313,8 +313,8 @@ class LocationsController extends BaseController {
     }
 
     public function listLocationsShortcode($atts): string {
-        if (!current_user_can('view_wecoza_clients')) {
-            return '<p>' . esc_html__('You do not have permission to view locations.', 'wecoza-core') . '</p>';
+        if (!is_user_logged_in()) {
+            return '<p>' . esc_html__('You must be logged in to view locations.', 'wecoza-core') . '</p>';
         }
 
         $atts = shortcode_atts(array(

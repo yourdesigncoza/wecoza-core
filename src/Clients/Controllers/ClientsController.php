@@ -180,8 +180,8 @@ class ClientsController extends BaseController {
      */
     public function captureClientShortcode($atts): string {
         // Check permissions
-        if (!current_user_can('manage_wecoza_clients')) {
-            return '<p>' . __('You do not have permission to create clients.', 'wecoza-core') . '</p>';
+        if (!is_user_logged_in()) {
+            return '<p>' . __('You must be logged in to create clients.', 'wecoza-core') . '</p>';
         }
 
         $atts = shortcode_atts(['id' => 0], $atts);
@@ -245,8 +245,8 @@ class ClientsController extends BaseController {
      */
     public function displayClientsShortcode($atts): string {
         // Check permissions
-        if (!current_user_can('view_wecoza_clients')) {
-            return '<p>' . __('You do not have permission to view clients.', 'wecoza-core') . '</p>';
+        if (!is_user_logged_in()) {
+            return '<p>' . __('You must be logged in to view clients.', 'wecoza-core') . '</p>';
         }
 
         $atts = shortcode_atts([
@@ -308,8 +308,8 @@ class ClientsController extends BaseController {
      */
     public function updateClientShortcode($atts): string {
         // Check permissions
-        if (!current_user_can('edit_wecoza_clients')) {
-            return '<p>' . __('You do not have permission to update clients.', 'wecoza-core') . '</p>';
+        if (!is_user_logged_in()) {
+            return '<p>' . __('You must be logged in to update clients.', 'wecoza-core') . '</p>';
         }
 
         // Get client ID from URL parameters
