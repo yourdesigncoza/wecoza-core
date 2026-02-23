@@ -480,11 +480,11 @@ class LearnerRepository extends BaseRepository
                     cts.subject_duration AS active_subject_duration,
                     lpt.class_id AS active_class_id,
                     c.class_code AS active_class_code,
-                    lpt.hours_present AS active_hours_present,
+                    lpt.hours_trained AS active_hours_trained,
                     lpt.start_date AS active_start_date,
                     CASE
                         WHEN cts.subject_duration > 0 THEN
-                            LEAST(100, ROUND((lpt.hours_present / cts.subject_duration) * 100, 1))
+                            LEAST(100, ROUND((lpt.hours_trained / cts.subject_duration) * 100, 1))
                         ELSE 0
                     END AS active_progress_pct
                 FROM learner_lp_tracking lpt
@@ -507,7 +507,7 @@ class LearnerRepository extends BaseRepository
                 alp.active_course_name,
                 alp.active_class_id,
                 alp.active_class_code,
-                alp.active_hours_present,
+                alp.active_hours_trained,
                 alp.active_subject_duration,
                 alp.active_progress_pct,
                 alp.active_start_date,
@@ -576,7 +576,7 @@ class LearnerRepository extends BaseRepository
                 lpt.start_date,
                 CASE
                     WHEN cts.subject_duration > 0 THEN
-                        LEAST(100, ROUND((lpt.hours_present / cts.subject_duration) * 100, 1))
+                        LEAST(100, ROUND((lpt.hours_trained / cts.subject_duration) * 100, 1))
                     ELSE 0
                 END AS progress_pct
             FROM learner_lp_tracking lpt

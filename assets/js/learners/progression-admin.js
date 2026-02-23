@@ -150,8 +150,8 @@
 
             // Col 6: Progress bar
             const duration   = parseFloat(row.subject_duration) || 0;
-            const present    = parseFloat(row.hours_present) || 0;
-            const pct        = duration > 0 ? Math.min(100, Math.round((present / duration) * 100)) : 0;
+            const trained    = parseFloat(row.hours_trained) || 0;
+            const pct        = duration > 0 ? Math.min(100, Math.round((trained / duration) * 100)) : 0;
             const $progressTd = $('<td>').css('min-width', '120px');
             const $outer = $('<div>').addClass('progress progress-sm').css({ height: '8px', width: '80px', display: 'inline-block' });
             const $bar   = $('<div>').addClass('progress-bar bg-primary').css('width', pct + '%')
@@ -627,7 +627,7 @@
             .text(statusLabel(data.status)).appendTo($row);
 
         $('<span>').addClass('text-muted ms-2 fs-9')
-            .text('Hours: ' + (data.hours_present || 0) + ' / ' + (data.subject_duration || 0) + ' present')
+            .text('Hours: ' + (data.hours_trained || 0) + ' / ' + (data.subject_duration || 0) + ' trained')
             .appendTo($row);
 
         $summary.append($row);

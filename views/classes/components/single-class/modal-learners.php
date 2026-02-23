@@ -161,7 +161,7 @@ try {
                               </span>
                               <br>
                               <small class="text-muted">
-                                 <?php echo esc_html(number_format($lpDetails['hours_present'] ?? 0, 1)); ?> / <?php echo esc_html(number_format($lpDetails['subject_duration'] ?? 0, 1)); ?> hrs
+                                 <?php echo esc_html(number_format($lpDetails['hours_trained'] ?? 0, 1)); ?> / <?php echo esc_html(number_format($lpDetails['subject_duration'] ?? 0, 1)); ?> hrs
                               </small>
                            </div>
                            <?php else: ?>
@@ -190,7 +190,7 @@ try {
                                       aria-valuenow="<?php echo $progressPct; ?>"
                                       aria-valuemin="0"
                                       aria-valuemax="100"
-                                      title="<?php echo esc_attr($hoursPresent); ?> / <?php echo esc_attr($productDuration); ?> hrs">
+                                      title="<?php echo esc_attr($hoursTrained); ?> / <?php echo esc_attr($productDuration); ?> hrs">
                                  </div>
                               </div>
                               <small class="text-muted"><?php echo number_format($progressPct, 0); ?>%</small>

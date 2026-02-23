@@ -49,35 +49,25 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="placeholder-glow mb-3">
-                            <span class="placeholder col-6"></span>
-                            <div class="progress mt-2" style="height: 24px;">
+                        <div class="d-flex align-items-center gap-2 mb-3 placeholder-glow">
+                            <span class="placeholder" style="width: 60px;"></span>
+                            <div class="progress flex-grow-1" style="height: 10px;">
                                 <div class="progress-bar placeholder col-12"></div>
                             </div>
+                            <span class="placeholder" style="width: 40px;"></span>
                         </div>
-                        <div class="row g-3">
-                            <div class="col-4">
-                                <div class="card bg-body-subtle text-center p-3">
-                                    <span class="placeholder col-8"></span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card bg-body-subtle text-center p-3">
-                                    <span class="placeholder col-8"></span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card bg-body-subtle text-center p-3">
-                                    <span class="placeholder col-8"></span>
-                                </div>
-                            </div>
+                        <div class="d-flex gap-4 placeholder-glow">
+                            <span class="placeholder" style="width: 100px;"></span>
+                            <span class="placeholder" style="width: 100px;"></span>
+                            <span class="placeholder" style="width: 100px;"></span>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div class="row g-3">
             <!-- Current LP Card (JS targets #progression-current-lp for in-place updates) -->
-            <div id="progression-current-lp">
+            <div class="col-xl-7" id="progression-current-lp">
                 <?php if ($currentLP): ?>
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -97,50 +87,41 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                         </div>
                         <div class="card-body">
                             <!-- Progress Bar -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span class="fw-semibold">Progress</span>
-                                    <span class="fw-bold"><?php echo round($progressPercentage, 1); ?>%</span>
-                                </div>
-                                <div class="progress" style="height: 24px;">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="fw-semibold small text-nowrap">Progress</span>
+                                <div class="progress flex-grow-1" style="height: 10px;">
                                     <div class="progress-bar <?php echo $progressBarClass; ?>"
                                          role="progressbar"
                                          style="width: <?php echo $progressPercentage; ?>%"
                                          aria-valuenow="<?php echo $progressPercentage; ?>"
                                          aria-valuemin="0"
-                                         aria-valuemax="100">
-                                        <?php echo esc_html($currentLP['hours_present']); ?> / <?php echo esc_html($currentLP['subject_duration']); ?> hrs
-                                    </div>
+                                         aria-valuemax="100"></div>
                                 </div>
-                                <?php if ($currentLP['is_hours_complete']): ?>
-                                    <small class="text-success">
-                                        <i class="bi bi-check-circle me-1"></i>Required hours completed
-                                    </small>
-                                <?php endif; ?>
+                                <span class="fw-bold small text-nowrap"><?php echo round($progressPercentage, 1); ?>%</span>
+                                <small class="text-muted text-nowrap"><?php echo esc_html($currentLP['hours_trained']); ?> / <?php echo esc_html($currentLP['subject_duration']); ?> hrs</small>
                             </div>
+                            <?php if ($currentLP['is_hours_complete']): ?>
+                                <small class="text-success d-block mb-3">
+                                    <i class="bi bi-check-circle me-1"></i>Required hours completed
+                                </small>
+                            <?php endif; ?>
 
                             <!-- Hours Breakdown -->
-                            <div class="row g-3 mb-4">
-                                <div class="col-4">
-                                    <div class="card bg-body-subtle text-center p-3">
-                                        <i class="bi bi-calendar-check text-info fs-4"></i>
-                                        <div class="fs-4 fw-bold mt-2"><?php echo number_format($currentLP['hours_trained'], 1); ?></div>
-                                        <small class="text-muted">Trained Hours</small>
-                                    </div>
+                            <div class="d-flex gap-4 mb-3">
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-calendar-check text-info"></i>
+                                    <span class="fw-semibold"><?php echo number_format($currentLP['hours_trained'], 1); ?></span>
+                                    <small class="text-muted">Trained</small>
                                 </div>
-                                <div class="col-4">
-                                    <div class="card bg-body-subtle text-center p-3">
-                                        <i class="bi bi-check2-circle text-success fs-4"></i>
-                                        <div class="fs-4 fw-bold mt-2"><?php echo number_format($currentLP['hours_present'], 1); ?></div>
-                                        <small class="text-muted">Present Hours</small>
-                                    </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-check2-circle text-success"></i>
+                                    <span class="fw-semibold"><?php echo number_format($currentLP['hours_present'], 1); ?></span>
+                                    <small class="text-muted">Present</small>
                                 </div>
-                                <div class="col-4">
-                                    <div class="card bg-body-subtle text-center p-3">
-                                        <i class="bi bi-x-circle text-danger fs-4"></i>
-                                        <div class="fs-4 fw-bold mt-2"><?php echo number_format($currentLP['hours_absent'], 1); ?></div>
-                                        <small class="text-muted">Absent Hours</small>
-                                    </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-x-circle text-danger"></i>
+                                    <span class="fw-semibold"><?php echo number_format($currentLP['hours_absent'], 1); ?></span>
+                                    <small class="text-muted">Absent</small>
                                 </div>
                             </div>
 
@@ -251,7 +232,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
             </div><!-- #progression-current-lp -->
 
             <!-- Progression History (JS targets #progression-history for auto-refresh) -->
-            <div id="progression-history">
+            <div class="col-xl-5" id="progression-history">
                 <?php if (!empty($history)): ?>
                     <div class="card">
                         <div class="card-header">
@@ -278,7 +259,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                                 </span>
                                                 <span class="ms-3">
                                                     <i class="bi bi-clock me-1"></i>
-                                                    <?php echo number_format($lp['hours_present'], 1); ?> / <?php echo number_format($lp['subject_duration'], 1); ?> hrs
+                                                    <?php echo number_format($lp['hours_trained'], 1); ?> / <?php echo number_format($lp['subject_duration'], 1); ?> hrs
                                                 </span>
                                             </div>
                                         </div>
@@ -297,6 +278,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                     </div>
                 <?php endif; ?>
             </div><!-- #progression-history -->
+            </div><!-- .row -->
 
         </div>
     </div>

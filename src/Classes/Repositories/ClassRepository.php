@@ -236,11 +236,11 @@ class ClassRepository extends BaseRepository
                         cts.subject_duration AS active_subject_duration,
                         lpt.class_id AS active_class_id,
                         c.class_code AS active_class_code,
-                        lpt.hours_present AS active_hours_present,
+                        lpt.hours_trained AS active_hours_trained,
                         lpt.start_date AS active_start_date,
                         CASE
                             WHEN cts.subject_duration > 0 THEN
-                                LEAST(100, ROUND((lpt.hours_present / cts.subject_duration) * 100, 1))
+                                LEAST(100, ROUND((lpt.hours_trained / cts.subject_duration) * 100, 1))
                             ELSE 0
                         END AS active_progress_pct
                     FROM learner_lp_tracking lpt
@@ -268,7 +268,7 @@ class ClassRepository extends BaseRepository
                     alp.active_course_name,
                     alp.active_class_id,
                     alp.active_class_code,
-                    alp.active_hours_present,
+                    alp.active_hours_trained,
                     alp.active_subject_duration,
                     alp.active_progress_pct,
                     alp.active_start_date,
@@ -325,7 +325,7 @@ class ClassRepository extends BaseRepository
                     'active_course_name' => sanitize_text_field($row['active_course_name'] ?? ''),
                     'active_class_id' => $row['active_class_id'] ? (int)$row['active_class_id'] : null,
                     'active_class_code' => sanitize_text_field($row['active_class_code'] ?? ''),
-                    'active_hours_present' => $row['active_hours_present'] ? (float)$row['active_hours_present'] : 0,
+                    'active_hours_trained' => $row['active_hours_trained'] ? (float)$row['active_hours_trained'] : 0,
                     'active_subject_duration' => $row['active_subject_duration'] ? (float)$row['active_subject_duration'] : 0,
                     'active_progress_pct' => $row['active_progress_pct'] ? (float)$row['active_progress_pct'] : 0,
                     'active_start_date' => sanitize_text_field($row['active_start_date'] ?? '')

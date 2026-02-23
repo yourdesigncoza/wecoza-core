@@ -604,7 +604,7 @@ class LearnerProgressionRepository extends BaseRepository
      *
      * Applies the same filter logic as findForReport but returns a single stats row:
      *   - total_learners, total_progressions, completed_count, in_progress_count, on_hold_count
-     *   - avg_progress (avg hours_present/subject_duration*100, capped at 100, non-completed only)
+     *   - avg_progress (avg hours_trained/subject_duration*100, capped at 100, non-completed only)
      *   - completion_rate (completed_count / total_progressions * 100)
      */
     public function getReportSummaryStats(array $filters = []): array
@@ -622,7 +622,7 @@ class LearnerProgressionRepository extends BaseRepository
                         LEAST(
                             CASE
                                 WHEN lpt.status != 'completed' AND NULLIF(cts.subject_duration, 0) IS NOT NULL
-                                    THEN (lpt.hours_present / cts.subject_duration::float) * 100
+                                    THEN (lpt.hours_trained / cts.subject_duration::float) * 100
                                 ELSE NULL
                             END,
                             100
