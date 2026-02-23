@@ -715,6 +715,171 @@ class LearnerProgressionRepository extends BaseRepository
     }
 
     /**
+     * Fetch all progression rows for the regulatory export (Umalusi / DHET compliance).
+     *
+     * 6-table JOIN: lpt + class_type_subjects + learners + classes + clients + employers.
+     * Returns one flat row per progression containing every compliance-required column.
+     *
+     * Supported filters:
+     *   - date_from  (string YYYY-MM-DD): lpt.start_date >= :date_from
+     *   - date_to    (string YYYY-MM-DD): lpt.start_date <= :date_to
+     *   - status     (string): lpt.status = :status
+     *   - client_id  (int): cl.client_id = :client_id
+     *
+     * Results ordered by: client_name, employer_name, surname, first_name, start_date.
+     */
+    public function findForRegulatoryExport(array $filters = []): array
+    {
+        // Complex query: 6-table JOIN for full regulatory compliance columns with date-range filter
+        $sql = "
+            SELECT
+                l.first_name,
+                l.surname,
+                l.sa_id_no,
+                l.passport_number,
+                cts.subject_code   AS lp_code,
+                cts.subject_name   AS lp_name,
+                cts.subject_duration AS lp_duration_hours,
+                c.class_code,
+                cl.client_name,
+                emp.employer_name,
+                lpt.start_date,
+                lpt.completion_date,
+                lpt.hours_trained,
+                lpt.hours_present,
+                lpt.hours_absent,
+                lpt.status,
+                CASE WHEN lpt.portfolio_file_path IS NOT NULL THEN 'Yes' ELSE 'No' END AS portfolio_submitted,
+                lpt.created_at,
+                lpt.updated_at
+            FROM learner_lp_tracking lpt
+            LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
+            LEFT JOIN learners l               ON lpt.learner_id = l.id
+            LEFT JOIN classes c                ON lpt.class_id = c.class_id
+            LEFT JOIN clients cl               ON c.client_id = cl.client_id
+            LEFT JOIN employers emp            ON l.employer_id = emp.employer_id
+        ";
+
+        $conditions = [];
+        $params     = [];
+        $paramTypes = [];
+
+        if (!empty($filters['date_from'])) {
+            $conditions[]              = "lpt.start_date >= :date_from";
+            $params['date_from']       = $filters['date_from'];
+            $paramTypes['date_from']   = PDO::PARAM_STR;
+        }
+
+        if (!empty($filters['date_to'])) {
+            $conditions[]            = "lpt.start_date <= :date_to";
+            $params['date_to']       = $filters['date_to'];
+            $paramTypes['date_to']   = PDO::PARAM_STR;
+        }
+
+        if (!empty($filters['status'])) {
+            $conditions[]          = "lpt.status = :status";
+            $params['status']      = $filters['status'];
+            $paramTypes['status']  = PDO::PARAM_STR;
+        }
+
+        if (!empty($filters['client_id'])) {
+            $conditions[]              = "cl.client_id = :client_id";
+            $params['client_id']       = (int) $filters['client_id'];
+            $paramTypes['client_id']   = PDO::PARAM_INT;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $sql .= " ORDER BY cl.client_name, emp.employer_name, l.surname, l.first_name, lpt.start_date";
+
+        try {
+            $pdo  = $this->db->getPdo();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $key => $value) {
+                $stmt->bindValue(":$key", $value, $paramTypes[$key]);
+            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository findForRegulatoryExport error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Return COUNT(*) for the regulatory export query using the same filter logic.
+     *
+     * Used by the frontend to display total matching records before triggering
+     * the CSV download.
+     *
+     * Supported filters: same as findForRegulatoryExport().
+     */
+    public function getRegulatoryExportCount(array $filters = []): int
+    {
+        // Complex query: same 6-table JOIN as findForRegulatoryExport, COUNT(*) only
+        $sql = "
+            SELECT COUNT(*)
+            FROM learner_lp_tracking lpt
+            LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
+            LEFT JOIN learners l               ON lpt.learner_id = l.id
+            LEFT JOIN classes c                ON lpt.class_id = c.class_id
+            LEFT JOIN clients cl               ON c.client_id = cl.client_id
+            LEFT JOIN employers emp            ON l.employer_id = emp.employer_id
+        ";
+
+        $conditions = [];
+        $params     = [];
+        $paramTypes = [];
+
+        if (!empty($filters['date_from'])) {
+            $conditions[]              = "lpt.start_date >= :date_from";
+            $params['date_from']       = $filters['date_from'];
+            $paramTypes['date_from']   = PDO::PARAM_STR;
+        }
+
+        if (!empty($filters['date_to'])) {
+            $conditions[]            = "lpt.start_date <= :date_to";
+            $params['date_to']       = $filters['date_to'];
+            $paramTypes['date_to']   = PDO::PARAM_STR;
+        }
+
+        if (!empty($filters['status'])) {
+            $conditions[]          = "lpt.status = :status";
+            $params['status']      = $filters['status'];
+            $paramTypes['status']  = PDO::PARAM_STR;
+        }
+
+        if (!empty($filters['client_id'])) {
+            $conditions[]              = "cl.client_id = :client_id";
+            $params['client_id']       = (int) $filters['client_id'];
+            $paramTypes['client_id']   = PDO::PARAM_INT;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        try {
+            $pdo  = $this->db->getPdo();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $key => $value) {
+                $stmt->bindValue(":$key", $value, $paramTypes[$key]);
+            }
+
+            $stmt->execute();
+            return (int) $stmt->fetchColumn();
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository getRegulatoryExportCount error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
      * Save portfolio file record
      */
     public function savePortfolioFile(int $trackingId, array $fileData): ?int
