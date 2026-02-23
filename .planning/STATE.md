@@ -38,7 +38,7 @@ See: .planning/ROADMAP.md for current milestone detail
 ### Decisions
 
 - WEC-178: Mario confirmed agents capture per-learner hours per class session; schedule defines max hours; Client Cancelled / Agent Absent don't count toward hours_trained
-- v6.0: Progress calculation uses hours_trained (not hours_present) per Mario's clarification — PROG-01/02/03 fix is Phase 48
+- [Phase 48-01]: Progress calculation uses hours_trained (not hours_present) per Mario's clarification — fixed in PHP model (getProgressPercentage/isHoursComplete), service (getLearnerOverallProgress), SQL CTEs (ClassRepository/LearnerRepository/LearnerProgressionRepository), views, and JS
 - v6.0: Any logged-in user can capture attendance (no agent-only restriction)
 - v6.0: Captured sessions are locked (view-only); admin can delete + re-capture for audit integrity
 - v6.0: Backdating allowed for any past scheduled date up to today

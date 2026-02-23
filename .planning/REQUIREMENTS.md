@@ -7,9 +7,9 @@
 
 ### Progress Fix
 
-- [ ] **PROG-01**: Progress percentage uses hours_trained (not hours_present) per Mario's clarification
-- [ ] **PROG-02**: Hours completion check uses hours_trained against subject_duration
-- [ ] **PROG-03**: Overall learner progress aggregation uses hours_trained for in-progress LPs
+- [x] **PROG-01**: Progress percentage uses hours_trained (not hours_present) per Mario's clarification
+- [x] **PROG-02**: Hours completion check uses hours_trained against subject_duration
+- [x] **PROG-03**: Overall learner progress aggregation uses hours_trained for in-progress LPs
 
 ### Backend Integration
 
@@ -85,9 +85,9 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROG-01 | Phase 48 | Pending |
-| PROG-02 | Phase 48 | Pending |
-| PROG-03 | Phase 48 | Pending |
+| PROG-01 | Phase 48 | Complete |
+| PROG-02 | Phase 48 | Complete |
+| PROG-03 | Phase 48 | Complete |
 | BACK-01 | Phase 48 | Complete |
 | BACK-02 | Phase 48 | Complete |
 | BACK-03 | Phase 48 | Complete |

@@ -126,7 +126,7 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
 
 **Milestone Goal:** Build an attendance capture UI where agents record per-learner hours for each class session, feeding the existing (but unused) `logHours()` infrastructure to make progression tracking actually work.
 
-- [ ] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension
+- [x] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension (completed 2026-02-23)
 - [ ] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules
 - [ ] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend
 - [ ] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter
@@ -142,7 +142,7 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
   2. Overall learner progress aggregation (getLearnerOverallProgress()) uses hours_trained for in-progress LPs
   3. The class_attendance_sessions table exists in PostgreSQL with a unique constraint on (class_id, session_date)
   4. ProgressionService::logHours() and LearnerProgressionModel::addHours() accept session_id and created_by without breaking existing callers
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 48-01-PLAN.md — Progress fix: change hours_present to hours_trained in model, service, SQL queries, view templates, and JS
@@ -211,7 +211,7 @@ Plans:
 | 36-41 | v4.0 | 14/14 | Complete | 2026-02-16 |
 | 42-43 | v4.1 | 3/3 | Complete | 2026-02-17 |
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
-| 48. Foundation | 1/2 | In Progress|  | - |
+| 48. Foundation | 2/2 | Complete   | 2026-02-23 | - |
 | 49. Backend Logic | v6.0 | 0/2 | Not started | - |
 | 50. AJAX Endpoints | v6.0 | 0/1 | Not started | - |
 | 51. Frontend | v6.0 | 0/2 | Not started | - |
