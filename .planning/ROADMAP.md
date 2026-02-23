@@ -212,7 +212,7 @@ Plans:
 | 42-43 | v4.1 | 3/3 | Complete | 2026-02-17 |
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
-| 49. Backend Logic | 2/2 | Complete   | 2026-02-23 | - |
+| 49. Backend Logic | 2/2 | Complete    | 2026-02-23 | - |
 | 50. AJAX Endpoints | v6.0 | 0/1 | Not started | - |
 | 51. Frontend | v6.0 | 0/2 | Not started | - |
 
