@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 49 of 51 (Backend Logic)
-Plan: 1 of 3 in current phase — Plan 01 complete
+Plan: 2 of 3 in current phase — Plan 02 complete
 Status: In progress
-Last activity: 2026-02-23 — Phase 49 Plan 01 complete: AttendanceRepository with CRUD and column whitelisting
+Last activity: 2026-02-23 — Phase 49 Plan 02 complete: AttendanceService with five public methods and LearnerProgressionRepository::deleteHoursLogBySessionId
 
 Progress: [██████████████████░░] 48/51 phases in progress
 
@@ -51,6 +51,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 48-02]: captured_by uses WP user ID (not agent record ID) for consistency with learner_hours_log.created_by
 - [Phase 48-02]: session_id/created_by added as ?int = null to logHours/addHours — null values filtered by repository array_intersect_key, fully backward-compatible
 - [Phase 49-01]: UNIQUE constraint on (class_id, session_date) enforced at DB level — AttendanceRepository trusts constraint and lets DB throw on duplicates, no application-level check needed
+- [Phase 49-02]: perDayTimes->perDay format mapping + mode='per-day' in generateSessionList before calling ScheduleService — handles both old start_time and new startTime DB key formats
+- [Phase 49-02]: captureAttendance uses error-tolerant foreach loop — per-learner logHours failures don't abort the whole capture
+- [Phase 49-02]: deleteHoursLogBySessionId lives in LearnerProgressionRepository (not raw SQL in service) — all hours-log DB access stays in repository layer
 
 ### Pending Todos
 
@@ -65,7 +68,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 49-backend-logic-01-PLAN.md (all tasks)
+Stopped at: Completed 49-backend-logic-02-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 49 Plan 01 complete. Proceed to Phase 49 Plan 02.
+**Next action:** Phase 49 Plan 02 complete. Proceed to Phase 49 Plan 03.

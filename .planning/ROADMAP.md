@@ -127,7 +127,7 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
 **Milestone Goal:** Build an attendance capture UI where agents record per-learner hours for each class session, feeding the existing (but unused) `logHours()` infrastructure to make progression tracking actually work.
 
 - [x] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension (completed 2026-02-23)
-- [ ] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules
+- [x] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules (completed 2026-02-23)
 - [ ] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend
 - [ ] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter
 
@@ -158,7 +158,7 @@ Plans:
   3. AttendanceService rejects capture if the submitted date is not a legitimate scheduled date for that class
   4. Sessions marked "Client Cancelled" or "Agent Absent" create a session record with zero hours — no hours logged to learner_lp_tracking accumulators
   5. Admin delete of a captured session reverses the accumulated hours from learner_lp_tracking and removes the session record
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 49-01-PLAN.md — AttendanceRepository CRUD with column whitelisting (findByClass, findByClassAndDate, createSession, updateSession, deleteSession, getSessionsWithLearnerHours)
@@ -212,7 +212,7 @@ Plans:
 | 42-43 | v4.1 | 3/3 | Complete | 2026-02-17 |
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
-| 49. Backend Logic | 1/2 | In Progress|  | - |
+| 49. Backend Logic | 2/2 | Complete   | 2026-02-23 | - |
 | 50. AJAX Endpoints | v6.0 | 0/1 | Not started | - |
 | 51. Frontend | v6.0 | 0/2 | Not started | - |
 

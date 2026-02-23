@@ -17,8 +17,8 @@
 - [x] **BACK-02**: `LearnerProgressionModel::addHours()` passes session_id and created_by to the hours log insert
 - [x] **BACK-03**: New `class_attendance_sessions` table tracks sessions with status, scheduled hours, and captured_by
 - [x] **BACK-04**: `AttendanceRepository` provides CRUD for attendance sessions with column whitelisting
-- [ ] **BACK-05**: `AttendanceService` generates scheduled session dates from class `schedule_data` JSONB via `ScheduleService`
-- [ ] **BACK-06**: `AttendanceService` validates session date is a legitimate scheduled date before accepting capture
+- [x] **BACK-05**: `AttendanceService` generates scheduled session dates from class `schedule_data` JSONB via `ScheduleService`
+- [x] **BACK-06**: `AttendanceService` validates session date is a legitimate scheduled date before accepting capture
 
 ### Attendance Capture
 
@@ -30,11 +30,11 @@
 
 ### Session Management
 
-- [ ] **SESS-01**: Agent can mark a session as "Client Cancelled" (no hours logged for any learner)
-- [ ] **SESS-02**: Agent can mark a session as "Agent Absent" (no hours logged for any learner)
+- [x] **SESS-01**: Agent can mark a session as "Client Cancelled" (no hours logged for any learner)
+- [x] **SESS-02**: Agent can mark a session as "Agent Absent" (no hours logged for any learner)
 - [x] **SESS-03**: Duplicate capture prevented — one session record per class per date (DB constraint)
-- [ ] **SESS-04**: Captured sessions are locked (view-only); cannot be edited after submission
-- [ ] **SESS-05**: Admin can delete a captured session (reverses hours from tracking accumulators)
+- [x] **SESS-04**: Captured sessions are locked (view-only); cannot be edited after submission
+- [x] **SESS-05**: Admin can delete a captured session (reverses hours from tracking accumulators)
 
 ### UI / Frontend
 
@@ -92,18 +92,18 @@ Which phases cover which requirements.
 | BACK-02 | Phase 48 | Complete |
 | BACK-03 | Phase 48 | Complete |
 | BACK-04 | Phase 49 | Complete |
-| BACK-05 | Phase 49 | Pending |
-| BACK-06 | Phase 49 | Pending |
+| BACK-05 | Phase 49 | Complete |
+| BACK-06 | Phase 49 | Complete |
 | ATT-01 | Phase 51 | Pending |
 | ATT-02 | Phase 51 | Pending |
 | ATT-03 | Phase 51 | Pending |
 | ATT-04 | Phase 51 | Pending |
 | ATT-05 | Phase 50 | Pending |
-| SESS-01 | Phase 49 | Pending |
-| SESS-02 | Phase 49 | Pending |
+| SESS-01 | Phase 49 | Complete |
+| SESS-02 | Phase 49 | Complete |
 | SESS-03 | Phase 49 | Complete |
-| SESS-04 | Phase 49 | Pending |
-| SESS-05 | Phase 49 | Pending |
+| SESS-04 | Phase 49 | Complete |
+| SESS-05 | Phase 49 | Complete |
 | UI-01 | Phase 51 | Pending |
 | UI-02 | Phase 51 | Pending |
 | UI-03 | Phase 51 | Pending |
