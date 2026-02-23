@@ -15,6 +15,7 @@
     const config = window.progressionAdminAjax || {};
     let currentPage    = 1;
     let currentFilters = {};
+    const selectedIds  = new Set();
 
     // Cache of full dataset from first load used to populate filter dropdowns
     let filterOptionsCache = {
@@ -127,6 +128,9 @@
                     .attr('type', 'checkbox')
                     .addClass('form-check-input row-checkbox')
                     .val(row.tracking_id);
+                if (selectedIds.has(String(row.tracking_id))) {
+                    $cb.prop('checked', true);
+                }
                 $checkCell.append($cb);
             }
             $tr.append($checkCell);
@@ -237,10 +241,10 @@
      * @param {Object} meta  Response object with total, page, page_size, pages fields
      */
     function renderPagination(meta) {
-        const total     = parseInt(meta.total)     || 0;
-        const page      = parseInt(meta.page)      || 1;
-        const pageSize  = parseInt(meta.page_size) || 25;
-        const pages     = parseInt(meta.pages)     || 1;
+        const total     = parseInt(meta.total)        || 0;
+        const page      = parseInt(meta.current_page) || currentPage;
+        const pageSize  = parseInt(meta.page_size)    || 25;
+        const pages     = parseInt(meta.pages)        || 1;
         const from      = total === 0 ? 0 : (page - 1) * pageSize + 1;
         const to        = Math.min(page * pageSize, total);
 
@@ -430,6 +434,7 @@
             }
         });
         currentPage = 1;
+        selectedIds.clear();
         loadProgressions();
     }
 
@@ -442,7 +447,15 @@
      */
     function handleSelectAll() {
         const checked = $(this).is(':checked');
-        $('#progression-admin-tbody .row-checkbox').prop('checked', checked);
+        $('#progression-admin-tbody .row-checkbox').each(function() {
+            $(this).prop('checked', checked);
+            const id = String($(this).val());
+            if (checked) {
+                selectedIds.add(id);
+            } else {
+                selectedIds.delete(id);
+            }
+        });
         updateBulkBar();
     }
 
@@ -450,18 +463,23 @@
      * Update bulk action bar visibility and selected count.
      */
     function updateBulkBar() {
-        const count = $('#progression-admin-tbody .row-checkbox:checked').length;
-        const total = $('#progression-admin-tbody .row-checkbox').length;
+        const pageChecked = $('#progression-admin-tbody .row-checkbox:checked').length;
+        const pageTotal   = $('#progression-admin-tbody .row-checkbox').length;
 
-        // Sync select-all state
-        if (total > 0) {
-            $('#select-all-progressions').prop('indeterminate', count > 0 && count < total);
-            $('#select-all-progressions').prop('checked', count === total);
+        // Sync select-all checkbox with current page state
+        if (pageTotal > 0) {
+            $('#select-all-progressions').prop('indeterminate', pageChecked > 0 && pageChecked < pageTotal);
+            $('#select-all-progressions').prop('checked', pageChecked === pageTotal && pageTotal > 0);
+        } else {
+            $('#select-all-progressions').prop('checked', false);
+            $('#select-all-progressions').prop('indeterminate', false);
         }
 
-        if (count > 0) {
+        // Bar visibility based on total cross-page selection
+        const totalSelected = selectedIds.size;
+        if (totalSelected > 0) {
             $('#bulk-action-bar').removeClass('d-none');
-            $('#selected-count').text(count);
+            $('#selected-count').text(totalSelected);
         } else {
             $('#bulk-action-bar').addClass('d-none');
         }
@@ -473,11 +491,7 @@
      * @returns {Array<string>}
      */
     function getCheckedIds() {
-        const ids = [];
-        $('#progression-admin-tbody .row-checkbox:checked').each(function() {
-            ids.push($(this).val());
-        });
-        return ids;
+        return Array.from(selectedIds);
     }
 
     // =========================================================
@@ -540,6 +554,7 @@
                 $btn.prop('disabled', false).html(
                     '<i class="bi bi-check2-all me-1"></i> Confirm Complete'
                 );
+                selectedIds.clear();
                 loadProgressions();
             },
             error: function() {
@@ -879,7 +894,15 @@
     function bindEvents() {
         $('#progression-filter-form').on('submit', handleFilterSubmit);
         $('#select-all-progressions').on('change', handleSelectAll);
-        $('#progression-admin-tbody').on('change', '.row-checkbox', updateBulkBar);
+        $('#progression-admin-tbody').on('change', '.row-checkbox', function() {
+            const id = String($(this).val());
+            if ($(this).is(':checked')) {
+                selectedIds.add(id);
+            } else {
+                selectedIds.delete(id);
+            }
+            updateBulkBar();
+        });
         $('#btn-bulk-complete').on('click', handleBulkCompleteClick);
         $('#btn-confirm-bulk-complete').on('click', handleBulkCompleteConfirm);
         $('#progression-admin-tbody').on('click', '.btn-hours-log', handleHoursLogClick);

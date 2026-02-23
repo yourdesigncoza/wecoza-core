@@ -5,132 +5,101 @@
  * @var array<int, array<string, mixed>> $records Presented collision events
  */
 
-if (!defined("ABSPATH")) {
-    exit();
-} ?>
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+$totalCount = count($records);
+?>
 <div class="wecoza-lp-collision-audit" id="lp-collision-audit">
-    <div class="card h-100">
-        <!-- Header -->
+
+    <div class="card shadow-none border" data-component-card="data-component-card">
+        <!-- Card Header -->
         <div class="card-header p-3 border-bottom">
-            <div class="row g-3 justify-content-between align-items-center">
-                <div class="col-12 col-md">
-                    <h4 class="text-body-emphasis mb-0">
-                        LP Collision Audit Trail
-                        <i class="bi bi-shield-exclamation ms-2"></i>
-                    </h4>
+            <div class="row align-items-center">
+                <div class="col">
+                    <h4 class="mb-0">LP Collision Audit Trail <i class="bi bi-shield-exclamation ms-1"></i></h4>
                     <p class="text-body-tertiary fs-9 mb-0 mt-1">
-                        Record of Learner Program collisions acknowledged during learner assignment
+                        Record of LP collisions acknowledged during learner assignment
                     </p>
                 </div>
-                <div class="search-box col-auto">
-                    <form class="position-relative" onsubmit="return false;">
-                        <input
-                            type="search"
-                            class="form-control search-input search form-control-sm"
-                            id="lp-collision-search"
-                            placeholder="Search by name, class code, subject..."
-                            aria-label="Search">
-                        <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                            <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
-                        </svg>
-                    </form>
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <span class="text-muted fs-9">
+                        <span id="lp-collision-visible"><?php echo $totalCount; ?></span>
+                        of <?php echo $totalCount; ?> records
+                    </span>
+                    <?php if (!empty($records)): ?>
+                        <div class="search-box">
+                            <form class="position-relative" onsubmit="return false;">
+                                <input
+                                    type="search"
+                                    class="form-control search-input search form-control-sm"
+                                    id="lp-collision-search"
+                                    placeholder="Search..."
+                                    aria-label="Search">
+                                <i class="bi bi-search position-absolute top-50 translate-middle-y" style="left: 10px; font-size: 0.75rem; color: var(--phoenix-quaternary-color);"></i>
+                            </form>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        <!-- Table -->
-        <div class="card-body p-0">
+        <!-- Card Body -->
+        <div class="card-body p-4 py-2">
             <?php if (empty($records)): ?>
                 <div class="text-center py-5">
-                    <i class="bi bi-check-circle fs-3 text-success"></i>
-                    <p class="text-body-tertiary mt-2 mb-0">No LP collision acknowledgements recorded yet.</p>
+                    <i class="bi bi-check-circle fs-1 text-success d-block mb-2"></i>
+                    <span class="text-body-tertiary">No LP collision acknowledgements recorded yet.</span>
                 </div>
             <?php else: ?>
                 <div class="table-responsive scrollbar" style="max-height: 600px; overflow-y: auto;">
                     <table class="table table-hover table-sm fs-9 mb-0 overflow-hidden" id="lp-collision-table">
-                        <thead class="border-bottom bg-body">
+                        <thead class="text-body">
                             <tr>
-                                <th scope="col" class="border-0 ps-3" style="min-width: 140px;">Date</th>
-                                <th scope="col" class="border-0">Acknowledged By</th>
-                                <th scope="col" class="border-0">Class</th>
-                                <th scope="col" class="border-0">Affected Learners</th>
+                                <th class="sort pe-1 align-middle white-space-nowrap ps-1" style="min-width: 140px;">Date</th>
+                                <th class="sort pe-1 align-middle white-space-nowrap">Acknowledged By</th>
+                                <th class="sort pe-1 align-middle white-space-nowrap">Class</th>
+                                <th class="sort pe-1 align-middle white-space-nowrap">Affected Learners</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($records as $record): ?>
-                                <tr data-search-index="<?php echo $record[
-                                    "search_index"
-                                ]; ?>">
-                                    <td class="ps-3 align-middle">
-                                        <span class="fw-semibold"><?php echo $record[
-                                            "date"
-                                        ]; ?></span>
+                                <tr data-search-index="<?php echo $record['search_index']; ?>">
+                                    <td class="py-2 align-middle white-space-nowrap ps-1">
+                                        <span class="fw-semibold"><?php echo $record['date']; ?></span>
                                     </td>
-                                    <td class="align-middle">
-                                        <?php echo $record[
-                                            "acknowledged_by"
-                                        ]; ?>
+                                    <td class="py-2 align-middle white-space-nowrap">
+                                        <?php echo $record['acknowledged_by']; ?>
                                     </td>
-                                    <td class="align-middle">
-                                        <span class="fw-semibold"><?php echo $record[
-                                            "class_code"
-                                        ]; ?></span>
-                                        <?php if ($record["class_type"]): ?>
-                                            <br><span class="text-body-tertiary fs-10"><?php echo $record[
-                                                "class_type"
-                                            ]; ?></span>
+                                    <td class="py-2 align-middle white-space-nowrap">
+                                        <span class="fw-semibold"><?php echo $record['class_code']; ?></span>
+                                        <?php if ($record['class_type']): ?>
+                                            <br><span class="text-body-tertiary fs-10"><?php echo $record['class_type']; ?></span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="align-middle">
-                                        <?php if (
-                                            $record["learner_count"] <= 3
-                                        ): ?>
-                                            <?php foreach (
-                                                $record["learners"]
-                                                as $learner
-                                            ): ?>
+                                    <td class="py-2 align-middle">
+                                        <?php if ($record['learner_count'] <= 3): ?>
+                                            <?php foreach ($record['learners'] as $learner): ?>
                                                 <div class="mb-1">
-                                                    <?php echo $learner[
-                                                        "name"
-                                                    ]; ?>
-                                                    <?php if (
-                                                        $learner["subject_name"]
-                                                    ): ?>
-                                                        <span class="badge badge-phoenix badge-phoenix-warning fs-10 ms-1"><?php echo $learner[
-                                                            "subject_name"
-                                                        ]; ?></span>
+                                                    <?php echo $learner['name']; ?>
+                                                    <?php if ($learner['subject_name']): ?>
+                                                        <span class="badge badge-phoenix badge-phoenix-warning fs-10 ms-1"><?php echo $learner['subject_name']; ?></span>
                                                     <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <div class="lp-collision-learners-summary">
-                                                <a href="#" class="text-primary fs-9 lp-collision-toggle" data-event-id="<?php echo (int) $record[
-                                                    "event_id"
-                                                ]; ?>">
-                                                    <?php echo $record[
-                                                        "learner_count"
-                                                    ]; ?> learners
+                                                <a href="#" class="text-primary fs-9 lp-collision-toggle" data-event-id="<?php echo (int) $record['event_id']; ?>">
+                                                    <?php echo $record['learner_count']; ?> learners
                                                     <i class="bi bi-chevron-down ms-1 fs-10"></i>
                                                 </a>
-                                                <div class="lp-collision-learners-detail mt-1" id="collision-detail-<?php echo (int) $record[
-                                                    "event_id"
-                                                ]; ?>" hidden>
-                                                    <?php foreach (
-                                                        $record["learners"]
-                                                        as $learner
-                                                    ): ?>
+                                                <div class="lp-collision-learners-detail mt-1" id="collision-detail-<?php echo (int) $record['event_id']; ?>" hidden>
+                                                    <?php foreach ($record['learners'] as $learner): ?>
                                                         <div class="mb-1">
-                                                            <?php echo $learner[
-                                                                "name"
-                                                            ]; ?>
-                                                            <?php if (
-                                                                $learner[
-                                                                    "subject_name"
-                                                                ]
-                                                            ): ?>
-                                                                <span class="badge badge-phoenix badge-phoenix-warning fs-10 ms-1"><?php echo $learner[
-                                                                    "subject_name"
-                                                                ]; ?></span>
+                                                            <?php echo $learner['name']; ?>
+                                                            <?php if ($learner['subject_name']): ?>
+                                                                <span class="badge badge-phoenix badge-phoenix-warning fs-10 ms-1"><?php echo $learner['subject_name']; ?></span>
                                                             <?php endif; ?>
                                                         </div>
                                                     <?php endforeach; ?>
@@ -151,18 +120,8 @@ if (!defined("ABSPATH")) {
             <?php endif; ?>
         </div>
 
-        <!-- Footer -->
-        <?php if (!empty($records)): ?>
-            <div class="card-footer border-top text-center py-2">
-                <p class="mb-0 text-body-tertiary fs-10">
-                    Showing <span id="lp-collision-visible"><?php echo count(
-                        $records,
-                    ); ?></span>
-                    of <?php echo count($records); ?> records
-                </p>
-            </div>
-        <?php endif; ?>
-    </div>
+    </div><!-- /card -->
+
 </div>
 
 <script>
