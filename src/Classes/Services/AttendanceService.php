@@ -104,6 +104,87 @@ class AttendanceService
         return ($end - $start) / 3600;
     }
 
+    /**
+     * Get the current timestamp using the WordPress timezone.
+     * Consistent with the DateTime objects in generateSessionList().
+     */
+    private function now(): string
+    {
+        $tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC');
+        return (new DateTime('now', $tz))->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Validate a session date and return its scheduled hours in a single pass.
+     * Replaces separate validateSessionDate + hours-lookup calls to avoid
+     * calling generateSessionList() multiple times per request.
+     *
+     * @throws Exception if the date is not a scheduled date for this class
+     */
+    private function getValidatedScheduledHours(int $classId, string $sessionDate): float
+    {
+        $sessions = $this->generateSessionList($classId);
+
+        foreach ($sessions as $session) {
+            if ($session['date'] === $sessionDate) {
+                return (float) $session['scheduled_hours'];
+            }
+        }
+
+        throw new Exception("Invalid session date: not a scheduled date for this class");
+    }
+
+    /**
+     * Find or create a session record, enforcing the "pending-only" lock rule.
+     * Shared by captureAttendance and markException to eliminate duplication.
+     *
+     * @throws Exception if session already captured/marked, or creation fails
+     */
+    private function createOrUpdateSession(
+        int $classId,
+        string $sessionDate,
+        string $status,
+        int $userId,
+        float $scheduledHours,
+        ?string $notes = null
+    ): int {
+        $existingSession = $this->repository->findByClassAndDate($classId, $sessionDate);
+        $sessionId       = null;
+
+        if ($existingSession) {
+            if ($existingSession['status'] !== 'pending') {
+                throw new Exception("Session already captured or marked — cannot re-capture");
+            }
+            $sessionId = (int) $existingSession['session_id'];
+        }
+
+        $sessionData = [
+            'class_id'        => $classId,
+            'session_date'    => $sessionDate,
+            'status'          => $status,
+            'scheduled_hours' => $scheduledHours,
+            'notes'           => $notes,
+            'captured_by'     => $userId,
+            'captured_at'     => $this->now(),
+            'updated_at'      => $this->now(),
+        ];
+
+        if ($sessionId !== null) {
+            $this->repository->updateSession($sessionId, $sessionData);
+        } else {
+            $sessionData['created_at'] = $this->now();
+            $newSessionId = $this->repository->createSession($sessionData);
+
+            if (!$newSessionId) {
+                throw new Exception("Failed to create session record");
+            }
+
+            $sessionId = $newSessionId;
+        }
+
+        return $sessionId;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Public Methods
@@ -213,15 +294,12 @@ class AttendanceService
      */
     public function validateSessionDate(int $classId, string $sessionDate): bool
     {
-        $sessions = $this->generateSessionList($classId);
-
-        foreach ($sessions as $session) {
-            if ($session['date'] === $sessionDate) {
-                return true;
-            }
+        try {
+            $this->getValidatedScheduledHours($classId, $sessionDate);
+            return true;
+        } catch (Exception) {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -239,58 +317,11 @@ class AttendanceService
      */
     public function captureAttendance(int $classId, string $sessionDate, array $learnerHours, int $capturedBy): array
     {
-        // Validate the date is a scheduled session date
-        if (!$this->validateSessionDate($classId, $sessionDate)) {
-            throw new Exception("Invalid session date: not a scheduled date for this class");
-        }
+        // Validate date + get hours in one generateSessionList() call (not two)
+        $scheduledHours = $this->getValidatedScheduledHours($classId, $sessionDate);
 
-        // Check for existing session
-        $existingSession = $this->repository->findByClassAndDate($classId, $sessionDate);
-        $sessionId       = null;
-
-        if ($existingSession) {
-            if ($existingSession['status'] !== 'pending') {
-                throw new Exception("Session already captured or marked — cannot re-capture");
-            }
-            // Found a pending session — use it for update
-            $sessionId = (int) $existingSession['session_id'];
-        }
-
-        // Get scheduled hours for this date from the generated session list
-        $scheduledHours  = 0.0;
-        $sessions        = $this->generateSessionList($classId);
-        foreach ($sessions as $session) {
-            if ($session['date'] === $sessionDate) {
-                $scheduledHours = (float) $session['scheduled_hours'];
-                break;
-            }
-        }
-
-        // Build session data
-        $sessionData = [
-            'class_id'        => $classId,
-            'session_date'    => $sessionDate,
-            'status'          => 'captured',
-            'scheduled_hours' => $scheduledHours,
-            'captured_by'     => $capturedBy,
-            'captured_at'     => current_time('mysql'),
-            'updated_at'      => current_time('mysql'),
-        ];
-
-        if ($sessionId !== null) {
-            // Update existing pending session
-            $this->repository->updateSession($sessionId, $sessionData);
-        } else {
-            // Create new session
-            $sessionData['created_at'] = current_time('mysql');
-            $newSessionId = $this->repository->createSession($sessionData);
-
-            if (!$newSessionId) {
-                throw new Exception("Failed to create attendance session record");
-            }
-
-            $sessionId = $newSessionId;
-        }
+        // Create or update session using shared helper
+        $sessionId = $this->createOrUpdateSession($classId, $sessionDate, 'captured', $capturedBy, $scheduledHours);
 
         // Log hours for each learner — continue even if individual learners fail
         $successCount = 0;
@@ -348,58 +379,11 @@ class AttendanceService
             throw new Exception("Invalid exception type: '{$exceptionType}'. Must be one of: " . implode(', ', $allowedTypes));
         }
 
-        // Validate the date is scheduled
-        if (!$this->validateSessionDate($classId, $sessionDate)) {
-            throw new Exception("Invalid session date: not a scheduled date for this class");
-        }
+        // Validate date + get hours in one generateSessionList() call
+        $scheduledHours = $this->getValidatedScheduledHours($classId, $sessionDate);
 
-        // Check for existing session
-        $existingSession = $this->repository->findByClassAndDate($classId, $sessionDate);
-        $sessionId       = null;
-
-        if ($existingSession) {
-            if ($existingSession['status'] !== 'pending') {
-                throw new Exception("Session already captured or marked — cannot re-capture");
-            }
-            $sessionId = (int) $existingSession['session_id'];
-        }
-
-        // Get scheduled hours for this date
-        $scheduledHours = 0.0;
-        $sessions       = $this->generateSessionList($classId);
-        foreach ($sessions as $session) {
-            if ($session['date'] === $sessionDate) {
-                $scheduledHours = (float) $session['scheduled_hours'];
-                break;
-            }
-        }
-
-        // Build session data — NO learner hours logged (zero hours, key business rule)
-        $sessionData = [
-            'class_id'        => $classId,
-            'session_date'    => $sessionDate,
-            'status'          => $exceptionType,
-            'scheduled_hours' => $scheduledHours,
-            'notes'           => $notes,
-            'captured_by'     => $markedBy,
-            'captured_at'     => current_time('mysql'),
-            'updated_at'      => current_time('mysql'),
-        ];
-
-        if ($sessionId !== null) {
-            // Update existing pending session
-            $this->repository->updateSession($sessionId, $sessionData);
-        } else {
-            // Create new session
-            $sessionData['created_at'] = current_time('mysql');
-            $newSessionId = $this->repository->createSession($sessionData);
-
-            if (!$newSessionId) {
-                throw new Exception("Failed to create exception session record");
-            }
-
-            $sessionId = $newSessionId;
-        }
+        // Create or update session — NO learner hours logged (zero hours, key business rule)
+        $sessionId = $this->createOrUpdateSession($classId, $sessionDate, $exceptionType, $markedBy, $scheduledHours, $notes);
 
         return [
             'session_id' => $sessionId,

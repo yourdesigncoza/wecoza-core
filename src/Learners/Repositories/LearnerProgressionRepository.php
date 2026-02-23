@@ -918,28 +918,17 @@ class LearnerProgressionRepository extends BaseRepository
      */
     public function deleteHoursLogBySessionId(int $sessionId): array
     {
-        // Step 1: Get affected tracking_ids before deletion
-        $selectSql = "SELECT DISTINCT tracking_id FROM learner_hours_log WHERE session_id = :session_id";
+        // Atomic delete + return affected tracking IDs via PostgreSQL RETURNING clause
+        $sql = "DELETE FROM learner_hours_log WHERE session_id = :session_id RETURNING tracking_id";
 
         try {
-            $stmt        = $this->db->query($selectSql, ['session_id' => $sessionId]);
+            $stmt        = $this->db->query($sql, ['session_id' => $sessionId]);
             $trackingIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            return array_values(array_unique($trackingIds ?: []));
         } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerProgressionRepository deleteHoursLogBySessionId select error: " . $e->getMessage());
+            error_log("WeCoza Core: LearnerProgressionRepository deleteHoursLogBySessionId error: " . $e->getMessage());
             return [];
         }
-
-        // Step 2: Delete the rows
-        $deleteSql = "DELETE FROM learner_hours_log WHERE session_id = :session_id";
-
-        try {
-            $this->db->query($deleteSql, ['session_id' => $sessionId]);
-        } catch (Exception $e) {
-            error_log("WeCoza Core: LearnerProgressionRepository deleteHoursLogBySessionId delete error: " . $e->getMessage());
-            return [];
-        }
-
-        return $trackingIds ?: [];
     }
 
     /**
