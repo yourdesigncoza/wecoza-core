@@ -1,114 +1,121 @@
-# Requirements: WeCoza Core v5.0 — Learner Progression
+# Requirements: WeCoza Core v6.0 — Agent Attendance Capture
 
-**Defined:** 2026-02-18
-**Core Value:** Complete learner LP progression tracking — from class assignment through completion, with management, reporting, and regulatory compliance.
+**Defined:** 2026-02-23
+**Core Value:** Agents record per-learner training hours per class session, feeding the existing progression system so progress bars and reports reflect real data.
 
-## v5.0 Requirements
+## v6.0 Requirements
 
-### AJAX Wiring
+### Progress Fix
 
-- [x] **AJAX-01**: Admin can mark LP as complete via "Mark Complete" button with portfolio upload
-- [x] **AJAX-02**: Admin can upload additional portfolio files to an existing progression
-- [x] **AJAX-03**: Frontend can fetch learner progression data without page reload (current LP, history, overall progress)
-- [x] **AJAX-04**: All three AJAX handlers registered in wecoza-core.php with proper namespace references
+- [ ] **PROG-01**: Progress percentage uses hours_trained (not hours_present) per Mario's clarification
+- [ ] **PROG-02**: Hours completion check uses hours_trained against subject_duration
+- [ ] **PROG-03**: Overall learner progress aggregation uses hours_trained for in-progress LPs
 
-### Admin Management
+### Backend Integration
 
-- [x] **ADMIN-01**: Admin can view all progressions in a filterable table (filter by client, class, LP/product, status)
-- [x] **ADMIN-02**: Admin can bulk-mark multiple progressions as complete
-- [x] **ADMIN-03**: Admin can view audit trail (hours log history) for any progression
-- [x] **ADMIN-04**: Admin management page accessible via shortcode `[wecoza_progression_admin]`
-- [x] **ADMIN-05**: Admin can start a new LP for a learner (manual assignment)
-- [x] **ADMIN-06**: Admin can put an LP on hold or resume it
+- [ ] **BACK-01**: `ProgressionService::logHours()` accepts optional session_id and created_by parameters (backward-compatible)
+- [ ] **BACK-02**: `LearnerProgressionModel::addHours()` passes session_id and created_by to the hours log insert
+- [ ] **BACK-03**: New `class_attendance_sessions` table tracks sessions with status, scheduled hours, and captured_by
+- [ ] **BACK-04**: `AttendanceRepository` provides CRUD for attendance sessions with column whitelisting
+- [ ] **BACK-05**: `AttendanceService` generates scheduled session dates from class `schedule_data` JSONB via `ScheduleService`
+- [ ] **BACK-06**: `AttendanceService` validates session date is a legitimate scheduled date before accepting capture
 
-### Learner Report (WEC-165)
+### Attendance Capture
 
-- [x] **RPT-01**: User can search for a learner by name or ID on the progression report page
-- [x] **RPT-02**: User can view individual learner timeline showing LP progression (level, class, date)
-- [x] **RPT-03**: User can filter learners by employer/client company
-- [x] **RPT-04**: User can view multiple learners grouped by company with individual timelines
-- [x] **RPT-05**: User can see Phoenix-styled summary cards (total learners, completion rate, avg progress, active LPs)
-- [x] **RPT-06**: Report page accessible via shortcode `[wecoza_learner_progression_report]`
+- [ ] **ATT-01**: Agent can capture per-learner hours present for a scheduled class session
+- [ ] **ATT-02**: Hours_trained auto-populated from class schedule (same for all learners in a session)
+- [ ] **ATT-03**: Hours present defaults to full scheduled hours; agent adjusts down for late/absent learners
+- [ ] **ATT-04**: Hours absent auto-calculated as hours_trained minus hours_present
+- [ ] **ATT-05**: Captured attendance feeds into existing `logHours()` pipeline, updating learner_lp_tracking accumulators
 
-### Regulatory Reporting
+### Session Management
 
-- [ ] **REG-01**: Admin can generate monthly progressions report (date range filter)
-- [ ] **REG-02**: Monthly report shows learner name, LP, class, client, start/completion dates, hours
-- [ ] **REG-03**: Admin can export any report/table to CSV
-- [ ] **REG-04**: Report data suitable for Umalusi/DHET compliance submissions
+- [ ] **SESS-01**: Agent can mark a session as "Client Cancelled" (no hours logged for any learner)
+- [ ] **SESS-02**: Agent can mark a session as "Agent Absent" (no hours logged for any learner)
+- [ ] **SESS-03**: Duplicate capture prevented — one session record per class per date (DB constraint)
+- [ ] **SESS-04**: Captured sessions are locked (view-only); cannot be edited after submission
+- [ ] **SESS-05**: Admin can delete a captured session (reverses hours from tracking accumulators)
 
-### Class Integration
+### UI / Frontend
 
-- [x] **CLASS-01**: Available Learners table in class form shows "Last Completed Course" column
-- [x] **CLASS-02**: Collision detection warns when adding learner with active LP to class
-- [x] **CLASS-03**: Class learner modal shows read-only progression info (current LP, progress bar, status badge)
+- [ ] **UI-01**: Attendance section visible on single class display page with summary cards
+- [ ] **UI-02**: Session list table shows scheduled sessions with date, day, time, hours, status badge, and action button
+- [ ] **UI-03**: Capture modal shows enrolled learners with hours-present number input (min=0, max=scheduled, step=0.5)
+- [ ] **UI-04**: Month filter tabs for navigating schedules with many sessions
+- [ ] **UI-05**: View detail shows per-learner hours for previously captured sessions (read-only)
+- [ ] **UI-06**: AJAX endpoints for session list, capture, mark exception, session detail, and admin delete
 
-## v6+ Requirements
+## v7+ Requirements
 
 Deferred to future milestones.
 
+### Regulatory Export (from v5.0 Phase 47)
+
+- **REG-01**: Admin can generate monthly progressions report with date-range filter
+- **REG-02**: Admin can export report as CSV for Umalusi/DHET submission
+- **REG-03**: Export includes all required compliance fields
+
+### Advanced Attendance
+
+- **ADV-01**: Attendance capture restricted to assigned class agent only
+- **ADV-02**: Backdating time window limit (e.g., 7 days)
+- **ADV-03**: Attendance editing within grace period before lock
+
 ### Advanced Export
+
 - **EXP-01**: PDF export with formatted layout (requires TCPDF/DOMPDF)
 - **EXP-02**: Excel export with formatting (requires PhpSpreadsheet)
-
-### Statistics Dashboard
-- **STAT-01**: Chart.js progression rate gauge
-- **STAT-02**: Level distribution bar chart
-- **STAT-03**: Company comparison interactive table
-
-### Attendance Integration
-- **ATT-01**: Auto-sync hours from class schedule data
-- **ATT-02**: Auto-sync hours from attendance records
-- **ATT-03**: Scheduled recalculation of hours from multiple sources
-
-### Packages
-- **PKG-01**: Package support where learners work on different subjects simultaneously
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Packages (different subjects per learner) | Deferred per WEC-168 discussion with Mario |
-| Chart.js / interactive charts | User chose Phoenix summary cards over charting library |
-| PDF/Excel export | User chose CSV only for this milestone |
-| Mobile app | Not planned |
-| Facilitator portal | Facilitators are read-only per Mario — Wecoza provides LP info |
+| QA visit integration | QA tracks venue compliance, not per-learner hours |
+| Automatic hours from schedule | Mario: agents manually capture, schedule defines max only |
+| Real-time attendance tracking | Overkill; agents record after the fact |
+| Mobile attendance app | Web-first, WP admin works on mobile browsers |
+| Biometric/GPS attendance | Not part of current workflow |
+| Agent-only restriction | Decided: any logged-in user can capture (simpler) |
+| Session editing after capture | Decided: locked for audit integrity |
 | Assessment tracking | Mario confirmed NO assessments — hours + portfolio only |
-| Auto attendance-to-hours sync | Requires attendance module integration — separate milestone |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AJAX-01 | Phase 44 | Complete |
-| AJAX-02 | Phase 44 | Complete |
-| AJAX-03 | Phase 44 | Complete |
-| AJAX-04 | Phase 44 | Complete |
-| CLASS-01 | Phase 44 | Complete |
-| CLASS-02 | Phase 44 | Complete |
-| CLASS-03 | Phase 44 | Complete |
-| ADMIN-01 | Phase 45 | Complete |
-| ADMIN-02 | Phase 45 | Complete |
-| ADMIN-03 | Phase 45 | Complete |
-| ADMIN-04 | Phase 45 | Complete |
-| ADMIN-05 | Phase 45 | Complete |
-| ADMIN-06 | Phase 45 | Complete |
-| RPT-01 | Phase 46 | Complete |
-| RPT-02 | Phase 46 | Complete |
-| RPT-03 | Phase 46 | Complete |
-| RPT-04 | Phase 46 | Complete |
-| RPT-05 | Phase 46 | Complete |
-| RPT-06 | Phase 46 | Complete |
-| REG-01 | Phase 47 | Pending |
-| REG-02 | Phase 47 | Pending |
-| REG-03 | Phase 47 | Pending |
-| REG-04 | Phase 47 | Pending |
+| PROG-01 | TBD | Pending |
+| PROG-02 | TBD | Pending |
+| PROG-03 | TBD | Pending |
+| BACK-01 | TBD | Pending |
+| BACK-02 | TBD | Pending |
+| BACK-03 | TBD | Pending |
+| BACK-04 | TBD | Pending |
+| BACK-05 | TBD | Pending |
+| BACK-06 | TBD | Pending |
+| ATT-01 | TBD | Pending |
+| ATT-02 | TBD | Pending |
+| ATT-03 | TBD | Pending |
+| ATT-04 | TBD | Pending |
+| ATT-05 | TBD | Pending |
+| SESS-01 | TBD | Pending |
+| SESS-02 | TBD | Pending |
+| SESS-03 | TBD | Pending |
+| SESS-04 | TBD | Pending |
+| SESS-05 | TBD | Pending |
+| UI-01 | TBD | Pending |
+| UI-02 | TBD | Pending |
+| UI-03 | TBD | Pending |
+| UI-04 | TBD | Pending |
+| UI-05 | TBD | Pending |
+| UI-06 | TBD | Pending |
 
 **Coverage:**
-- v5.0 requirements: 23 total
-- Mapped to phases: 23
-- Unmapped: 0
+- v6.0 requirements: 25 total
+- Mapped to phases: 0
+- Unmapped: 25
 
 ---
-*Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after initial definition*
+*Requirements defined: 2026-02-23*
+*Last updated: 2026-02-23 after initial definition*
