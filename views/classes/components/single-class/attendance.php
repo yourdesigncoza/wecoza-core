@@ -211,6 +211,7 @@ if (empty($class)) {
             </div>
             <div class="modal-body pt-2">
                 <p id="exception-session-info" class="text-muted mb-3"></p>
+                <div id="exception-alert"></div>
                 <div class="mb-3">
                     <label class="form-label">Exception Type</label>
                     <select class="form-select" id="exception-type-select">
