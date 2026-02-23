@@ -158,11 +158,11 @@ Plans:
   3. AttendanceService rejects capture if the submitted date is not a legitimate scheduled date for that class
   4. Sessions marked "Client Cancelled" or "Agent Absent" create a session record with zero hours — no hours logged to learner_lp_tracking accumulators
   5. Admin delete of a captured session reverses the accumulated hours from learner_lp_tracking and removes the session record
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 49-01: AttendanceRepository — findByClass(), findByClassAndDate(), createSession(), updateSession(), deleteSession() with column whitelisting
-- [ ] 49-02: AttendanceService — generateSessionList(), validateSessionDate(), captureAttendance(), markException(), deleteAndReverseHours()
+- [ ] 49-01-PLAN.md — AttendanceRepository CRUD with column whitelisting (findByClass, findByClassAndDate, createSession, updateSession, deleteSession, getSessionsWithLearnerHours)
+- [ ] 49-02-PLAN.md — AttendanceService business logic (generateSessionList, validateSessionDate, captureAttendance, markException, deleteAndReverseHours)
 
 ### Phase 50: AJAX Endpoints
 **Goal**: All six frontend operations have working, secured AJAX endpoints that return structured JSON and delegate all logic to AttendanceService
