@@ -11,7 +11,8 @@
 - ✅ **v3.1 Form Field Wiring Fixes** — Phases 31-35 (shipped 2026-02-13)
 - ✅ **v4.0 Technical Debt** — Phases 36-41 (shipped 2026-02-16)
 - ✅ **v4.1 Lookup Table Admin** — Phases 42-43 (shipped 2026-02-17)
-- 🚧 **v5.0 Learner Progression** — Phases 44-47 (in progress)
+- ✅ **v5.0 Learner Progression** — Phases 44-46 (shipped 2026-02-23)
+- 🚧 **v6.0 Agent Attendance Capture** — Phases 48-51 (in progress)
 
 ## Phases
 
@@ -109,94 +110,113 @@ See: `.planning/milestones/v4.1-ROADMAP.md`
 
 </details>
 
-### 🚧 v5.0 Learner Progression (In Progress)
+<details>
+<summary>✅ v5.0 Learner Progression (Phases 44-46) — SHIPPED 2026-02-23</summary>
 
-**Milestone Goal:** Complete learner LP progression tracking — AJAX wiring, admin management, WEC-165 reporting dashboard, and regulatory CSV export.
+- [x] Phase 44: AJAX Wiring + Class Integration (3/3 plans) — completed 2026-02-18
+- [x] Phase 45: Admin Management (3/3 plans) — completed 2026-02-18
+- [x] Phase 46: Learner Progression Report (3/3 plans) — completed 2026-02-19
+- Phase 47: Regulatory Export — deferred to v7+
 
-#### Phase 44: AJAX Wiring + Class Integration
-**Goal**: The existing progression UI works end-to-end — mark-complete, portfolio upload, and data fetch all fire correctly, and class forms show progression context
-**Depends on**: Phase 43
-**Requirements**: AJAX-01, AJAX-02, AJAX-03, AJAX-04, CLASS-01, CLASS-02, CLASS-03
+See: `.planning/milestones/v5.0-ROADMAP.md`
+
+</details>
+
+### 🚧 v6.0 Agent Attendance Capture (In Progress)
+
+**Milestone Goal:** Build an attendance capture UI where agents record per-learner hours for each class session, feeding the existing (but unused) `logHours()` infrastructure to make progression tracking actually work.
+
+- [ ] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension
+- [ ] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules
+- [ ] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend
+- [ ] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter
+
+## Phase Details
+
+### Phase 48: Foundation
+**Goal**: The data layer exists and progress calculation uses the correct field — all downstream attendance work builds on accurate infrastructure
+**Depends on**: Phase 46 (v5.0 complete)
+**Requirements**: PROG-01, PROG-02, PROG-03, BACK-01, BACK-02, BACK-03
 **Success Criteria** (what must be TRUE):
-  1. Admin clicks "Mark Complete" on a learner progression and the status changes to completed with optional portfolio file accepted
-  2. Admin uploads an additional portfolio file to an existing in-progress LP and receives a success response
-  3. Progression data loads on the learner view without a page reload via the fetch handler
-  4. Available Learners table in class capture shows a "Last Completed Course" column populated from progression history
-  5. Adding a learner to a class who already has an active LP surfaces a visible collision warning before confirmation
-**Plans:** 3/3 plans complete
+  1. Learner progression bars read from hours_trained (not hours_present) in getProgressPercentage() and isHoursComplete()
+  2. Overall learner progress aggregation (getLearnerOverallProgress()) uses hours_trained for in-progress LPs
+  3. The class_attendance_sessions table exists in PostgreSQL with a unique constraint on (class_id, session_date)
+  4. ProgressionService::logHours() and LearnerProgressionModel::addHours() accept session_id and created_by without breaking existing callers
+**Plans**: TBD
 
 Plans:
-- [ ] 44-01-PLAN.md — Register progression AJAX handlers (mark-complete, portfolio-upload, fetch-data, collision-log)
-- [ ] 44-02-PLAN.md — Enhance learner progressions frontend (confirmation modal, in-place updates, skeleton loading, upload progress)
-- [ ] 44-03-PLAN.md — Class integration UI (Last Completed Course column, collision modal enhancement, learner modal progression display)
+- [ ] 48-01: Progress fix — change hours_present to hours_trained in getProgressPercentage(), isHoursComplete(), getLearnerOverallProgress()
+- [ ] 48-02: Schema + signature extension — write class_attendance_sessions schema SQL, extend logHours() and addHours() signatures (backward-compatible)
 
-#### Phase 45: Admin Management
-**Goal**: Admin can manage all progressions from a single shortcode — filter, bulk-complete, inspect audit trail, start new LPs, and put LPs on hold
-**Depends on**: Phase 44
-**Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05, ADMIN-06
+### Phase 49: Backend Logic
+**Goal**: Attendance business logic is fully encapsulated — sessions are created, queried, validated, and exception-marked server-side with correct hours propagation
+**Depends on**: Phase 48
+**Requirements**: BACK-04, BACK-05, BACK-06, SESS-01, SESS-02, SESS-03, SESS-04, SESS-05
 **Success Criteria** (what must be TRUE):
-  1. Admin opens `[wecoza_progression_admin]` and sees a filterable table of all progressions (client, class, LP, status)
-  2. Admin selects multiple in-progress progressions, clicks "Bulk Complete", and all selected rows change status
-  3. Admin clicks the audit icon on any row and sees the full hours log for that progression
-  4. Admin can manually start a new LP for a learner by selecting learner + LP from a form within the page
-  5. Admin can toggle a progression to On Hold or resume it, and the status badge reflects the change immediately
-**Plans:** 3/3 plans complete
+  1. AttendanceRepository enforces column whitelisting and the unique (class_id, session_date) constraint prevents duplicate session records
+  2. AttendanceService generates the correct scheduled session dates for a class by delegating to ScheduleService::generateScheduleEntries()
+  3. AttendanceService rejects capture if the submitted date is not a legitimate scheduled date for that class
+  4. Sessions marked "Client Cancelled" or "Agent Absent" create a session record with zero hours — no hours logged to learner_lp_tracking accumulators
+  5. Admin delete of a captured session reverses the accumulated hours from learner_lp_tracking and removes the session record
+**Plans**: TBD
 
 Plans:
-- [ ] 45-01-PLAN.md — AJAX handlers for admin operations (bulk-complete, hours-log, start-LP, hold/resume, admin-fetch)
-- [ ] 45-02-PLAN.md — Shortcode [wecoza_progression_admin] + view template with filters, table, modals
-- [ ] 45-03-PLAN.md — JS wiring for all admin management actions (filters, bulk, audit, start, hold/resume)
+- [ ] 49-01: AttendanceRepository — findByClass(), findByClassAndDate(), createSession(), updateSession(), deleteSession() with column whitelisting
+- [ ] 49-02: AttendanceService — generateSessionList(), validateSessionDate(), captureAttendance(), markException(), deleteAndReverseHours()
 
-#### Phase 46: Learner Progression Report
-**Goal**: Admin can search learners, view their LP timeline, filter by employer, and see Phoenix summary cards — satisfying WEC-165
-**Depends on**: Phase 44
-**Requirements**: RPT-01, RPT-02, RPT-03, RPT-04, RPT-05, RPT-06
+### Phase 50: AJAX Endpoints
+**Goal**: All six frontend operations have working, secured AJAX endpoints that return structured JSON and delegate all logic to AttendanceService
+**Depends on**: Phase 49
+**Requirements**: UI-06, ATT-05
 **Success Criteria** (what must be TRUE):
-  1. Admin searches by learner name or ID and the report filters to matching learners instantly
-  2. Admin selects a single learner and sees a chronological timeline of LP, class, and date entries
-  3. Admin filters by employer/client company and the report collapses to learners from that company only
-  4. Multi-learner view groups learners by company with expandable rows showing individual timelines
-  5. Phoenix-styled summary cards above the report show totals, completion rates, and average hours at a glance
-**Plans:** 3/3 plans complete
+  1. wecoza_attendance_get_sessions returns session list with correct status and action state for each session
+  2. wecoza_attendance_capture creates a session record, calls logHours() for each learner, and returns success
+  3. wecoza_attendance_mark_exception creates a zero-hours session with the correct exception status
+  4. wecoza_attendance_get_detail returns per-learner hours breakdown for a captured session
+  5. wecoza_attendance_admin_delete reverses hours from tracking accumulators and removes the session record
+  6. All five endpoints validate nonce and return structured JSON error responses on failure
+**Plans**: TBD
 
 Plans:
-- [ ] 46-01-PLAN.md -- Backend AJAX handler + repository methods for report queries (search, employer filter, summary stats)
-- [ ] 46-02-PLAN.md -- Shortcode [wecoza_learner_progression_report] + view template with summary cards, filters, results container
-- [ ] 46-03-PLAN.md -- JS wiring for search, filter, summary card population, company-grouped accordion, learner timeline rendering
+- [ ] 50-01: AttendanceAjaxHandlers — all six handlers with nonce validation and service delegation; wire registration into wecoza-core.php and enqueue JS config via ClassController
 
-#### Phase 47: Regulatory Export
-**Goal**: Admin can generate a compliance-ready monthly progressions report with date-range filter and download it as CSV
-**Depends on**: Phase 45
-**Requirements**: REG-01, REG-02, REG-03, REG-04
+### Phase 51: Frontend
+**Goal**: Agent opens a class page, navigates sessions by month, captures attendance via modal, and views prior sessions read-only — progression data updates without any separate action
+**Depends on**: Phase 50
+**Requirements**: ATT-01, ATT-02, ATT-03, ATT-04, UI-01, UI-02, UI-03, UI-04, UI-05
 **Success Criteria** (what must be TRUE):
-  1. Admin selects a date range and generates a monthly progressions report showing learner, LP, class, client, dates, and hours
-  2. Admin clicks "Export CSV" and a correctly structured CSV file downloads with all report columns
-  3. The exported data includes all fields required for Umalusi/DHET submission without manual post-processing
-**Plans:** 2 plans
+  1. The single class display page shows an Attendance section with summary cards (total sessions, captured, pending)
+  2. The session table shows each scheduled session with date, day, time range, hours, status badge, and action button
+  3. Month filter tabs appear above the session table and clicking a tab narrows the list to sessions in that month only
+  4. Clicking "Capture" opens a modal with enrolled learners, hours_trained pre-filled, and hours_present defaulting to the same value (adjustable down in 0.5-step increments, min 0)
+  5. Hours absent auto-calculates as hours_trained minus hours_present in real time without manual input
+  6. Clicking "View" on a captured session shows a read-only per-learner hours breakdown
+**Plans**: TBD
 
 Plans:
-- [ ] 47-01-PLAN.md -- Backend repository method (findForRegulatoryExport) + AJAX handlers (get_regulatory_report, export_regulatory_csv)
-- [ ] 47-02-PLAN.md -- Shortcode [wecoza_regulatory_export] + view template + JS module (date-range filter, compliance table, CSV download)
+- [ ] 51-01: Attendance view template — attendance.php component with summary cards, month tabs, session table; insert into single-class-display.view.php; enqueue JS in ClassController
+- [ ] 51-02: attendance-capture.js — session list rendering, month filter logic, capture modal, view-detail modal, all AJAX calls wired to backend
 
 ## Progress
 
-| Phase | Milestone | Plans | Status | Completed |
-|-------|-----------|-------|--------|-----------|
-| 1-7 | v1 | 13 | Complete | 2026-02-02 |
-| 8-12 | v1.1 | 13 | Complete | 2026-02-02 |
-| 13-18 | v1.2 | 16 | Complete | 2026-02-05 |
-| 19 | v1.3 | 2 | Complete | 2026-02-06 |
-| 21-25 | v2.0 | 10 | Complete | 2026-02-12 |
-| 26-30 | v3.0 | 11 | Complete | 2026-02-12 |
-| 31-35 | v3.1 | 8 | Complete | 2026-02-13 |
-| 36-41 | v4.0 | 14 | Complete | 2026-02-16 |
-| 42-43 | v4.1 | 3 | Complete | 2026-02-17 |
-| 44 | 3/3 | Complete    | 2026-02-18 | - |
-| 45 | 3/3 | Complete    | 2026-02-18 | - |
-| 46 | 3/3 | Complete   | 2026-02-19 | - |
-| 47 | v5.0 | 2 | Not started | - |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1-7 | v1 | 13/13 | Complete | 2026-02-02 |
+| 8-12 | v1.1 | 13/13 | Complete | 2026-02-02 |
+| 13-18 | v1.2 | 16/16 | Complete | 2026-02-05 |
+| 19 | v1.3 | 2/2 | Complete | 2026-02-06 |
+| 21-25 | v2.0 | 10/10 | Complete | 2026-02-12 |
+| 26-30 | v3.0 | 11/11 | Complete | 2026-02-12 |
+| 31-35 | v3.1 | 8/8 | Complete | 2026-02-13 |
+| 36-41 | v4.0 | 14/14 | Complete | 2026-02-16 |
+| 42-43 | v4.1 | 3/3 | Complete | 2026-02-17 |
+| 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
+| 48. Foundation | v6.0 | 0/2 | Not started | - |
+| 49. Backend Logic | v6.0 | 0/2 | Not started | - |
+| 50. AJAX Endpoints | v6.0 | 0/1 | Not started | - |
+| 51. Frontend | v6.0 | 0/2 | Not started | - |
 
-**Total: 43 phases complete, 90 plans, 9 milestones shipped — v5.0 in progress (phases 44-47)**
+**Total: 46 phases complete, 103 plans executed — v6.0 in progress (phases 48-51)**
 
 ---
-*Last updated: 2026-02-18 after Phase 44 planning*
+*Last updated: 2026-02-23 after v6.0 roadmap created*
