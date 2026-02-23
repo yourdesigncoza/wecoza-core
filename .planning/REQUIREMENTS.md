@@ -16,7 +16,7 @@
 - [x] **BACK-01**: `ProgressionService::logHours()` accepts optional session_id and created_by parameters (backward-compatible)
 - [x] **BACK-02**: `LearnerProgressionModel::addHours()` passes session_id and created_by to the hours log insert
 - [x] **BACK-03**: New `class_attendance_sessions` table tracks sessions with status, scheduled hours, and captured_by
-- [ ] **BACK-04**: `AttendanceRepository` provides CRUD for attendance sessions with column whitelisting
+- [x] **BACK-04**: `AttendanceRepository` provides CRUD for attendance sessions with column whitelisting
 - [ ] **BACK-05**: `AttendanceService` generates scheduled session dates from class `schedule_data` JSONB via `ScheduleService`
 - [ ] **BACK-06**: `AttendanceService` validates session date is a legitimate scheduled date before accepting capture
 
@@ -32,7 +32,7 @@
 
 - [ ] **SESS-01**: Agent can mark a session as "Client Cancelled" (no hours logged for any learner)
 - [ ] **SESS-02**: Agent can mark a session as "Agent Absent" (no hours logged for any learner)
-- [ ] **SESS-03**: Duplicate capture prevented — one session record per class per date (DB constraint)
+- [x] **SESS-03**: Duplicate capture prevented — one session record per class per date (DB constraint)
 - [ ] **SESS-04**: Captured sessions are locked (view-only); cannot be edited after submission
 - [ ] **SESS-05**: Admin can delete a captured session (reverses hours from tracking accumulators)
 
@@ -91,7 +91,7 @@ Which phases cover which requirements.
 | BACK-01 | Phase 48 | Complete |
 | BACK-02 | Phase 48 | Complete |
 | BACK-03 | Phase 48 | Complete |
-| BACK-04 | Phase 49 | Pending |
+| BACK-04 | Phase 49 | Complete |
 | BACK-05 | Phase 49 | Pending |
 | BACK-06 | Phase 49 | Pending |
 | ATT-01 | Phase 51 | Pending |
@@ -101,7 +101,7 @@ Which phases cover which requirements.
 | ATT-05 | Phase 50 | Pending |
 | SESS-01 | Phase 49 | Pending |
 | SESS-02 | Phase 49 | Pending |
-| SESS-03 | Phase 49 | Pending |
+| SESS-03 | Phase 49 | Complete |
 | SESS-04 | Phase 49 | Pending |
 | SESS-05 | Phase 49 | Pending |
 | UI-01 | Phase 51 | Pending |

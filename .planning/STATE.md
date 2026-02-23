@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v6.0 Agent Attendance Capture — Phase 48: Foundation
+**Current focus:** v6.0 Agent Attendance Capture — Phase 49: Backend Logic
 
 ## Current Position
 
-Phase: 48 of 51 (Foundation)
-Plan: 2 of 2 in current phase — Plan 02 complete
+Phase: 49 of 51 (Backend Logic)
+Plan: 1 of 3 in current phase — Plan 01 complete
 Status: In progress
-Last activity: 2026-02-23 — Phase 48 Plan 02 complete: sessions schema SQL + logHours/addHours signature extension
+Last activity: 2026-02-23 — Phase 49 Plan 01 complete: AttendanceRepository with CRUD and column whitelisting
 
 Progress: [██████████████████░░] 48/51 phases in progress
 
@@ -50,6 +50,7 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 48-02]: class_attendance_sessions status column uses VARCHAR(30) CHECK constraint on 4 values: pending, captured, client_cancelled, agent_absent
 - [Phase 48-02]: captured_by uses WP user ID (not agent record ID) for consistency with learner_hours_log.created_by
 - [Phase 48-02]: session_id/created_by added as ?int = null to logHours/addHours — null values filtered by repository array_intersect_key, fully backward-compatible
+- [Phase 49-01]: UNIQUE constraint on (class_id, session_date) enforced at DB level — AttendanceRepository trusts constraint and lets DB throw on duplicates, no application-level check needed
 
 ### Pending Todos
 
@@ -64,7 +65,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 48-foundation-02-PLAN.md (all tasks)
+Stopped at: Completed 49-backend-logic-01-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 48 Plan 02 complete. Phase 48 foundation done. Proceed to Phase 49 attendance capture.
+**Next action:** Phase 49 Plan 01 complete. Proceed to Phase 49 Plan 02.
