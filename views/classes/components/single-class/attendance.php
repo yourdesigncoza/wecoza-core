@@ -41,56 +41,28 @@ if (empty($class)) {
     </div>
     <div class="card-body">
 
-        <!-- Summary Cards Row -->
-        <div class="row g-3 mb-4" id="attendance-summary-cards">
-
-            <!-- Total Sessions Card -->
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body d-flex align-items-center gap-3 py-3">
-                        <i class="bi bi-calendar-range fs-3 text-primary"></i>
-                        <div>
-                            <h4 class="mb-0" id="att-total-sessions">...</h4>
-                            <span class="fs-9 text-body-tertiary">Scheduled</span>
-                        </div>
-                    </div>
+        <!-- Summary Stats Bar -->
+        <div class="scrollbar mb-4" id="attendance-summary-cards">
+            <div class="row g-0 flex-nowrap">
+                <div class="col-auto border-end pe-4">
+                    <h6 class="text-body-tertiary">Scheduled : <span id="att-total-sessions">...</span></h6>
+                </div>
+                <div class="col-auto px-4 border-end">
+                    <h6 class="text-body-tertiary">Completed : <span id="att-captured-count">...</span></h6>
+                </div>
+                <div class="col-auto px-4">
+                    <h6 class="text-body-tertiary">Remaining : <span id="att-pending-count">...</span></h6>
                 </div>
             </div>
+        </div>
 
-            <!-- Captured Sessions Card -->
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body d-flex align-items-center gap-3 py-3">
-                        <i class="bi bi-check-circle fs-3 text-success"></i>
-                        <div>
-                            <h4 class="mb-0" id="att-captured-count">...</h4>
-                            <span class="fs-9 text-body-tertiary">Completed</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pending Sessions Card -->
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body d-flex align-items-center gap-3 py-3">
-                        <i class="bi bi-clock fs-3 text-warning"></i>
-                        <div>
-                            <h4 class="mb-0" id="att-pending-count">...</h4>
-                            <span class="fs-9 text-body-tertiary">Remaining</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /#attendance-summary-cards -->
-
-        <!-- Month Filter Tabs -->
-        <ul class="nav nav-underline mb-3" id="attendance-month-tabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" data-month="all">All</button>
-            </li>
-        </ul>
+        <!-- Month Filter -->
+        <div class="mb-3 d-flex align-items-center gap-2">
+            <label for="attendance-month-select" class="text-body-tertiary text-nowrap mb-0">Month :</label>
+            <select class="form-select form-select-sm" id="attendance-month-select" style="max-width: 200px;">
+                <option value="all">All months</option>
+            </select>
+        </div>
 
         <!-- Alert Container -->
         <div id="attendance-alert"></div>

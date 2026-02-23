@@ -18,7 +18,7 @@
     if (!config.classId) return; // Not on single class page
 
     let allSessions  = [];     // Full session list from server
-    let currentMonth = 'all'; // Active month filter
+    let currentMonth = new Date().toISOString().substring(0, 7); // Default to current month
 
     // Module-level state for open modals
     let captureDate      = '';
@@ -111,10 +111,8 @@
      * Inserts tab buttons after the static "All" tab.
      */
     function buildMonthTabs() {
-        const $tabs = $('#attendance-month-tabs');
-
-        // Remove all tabs except the "All" tab (first)
-        $tabs.find('li:not(:first)').remove();
+        const $select = $('#attendance-month-select');
+        $select.find('option:not(:first)').remove(); // keep "All months"
 
         const months = new Map();
         allSessions.forEach(function(s) {
@@ -128,18 +126,10 @@
         });
 
         months.forEach(function(label, ym) {
-            var activeClass = (ym === currentMonth) ? ' active' : '';
-            $tabs.append(
-                '<li class="nav-item">'
-                + '<button class="nav-link' + activeClass + '" data-month="' + ym + '">' + label + '</button>'
-                + '</li>'
-            );
+            $select.append('<option value="' + ym + '">' + label + '</option>');
         });
 
-        // Keep "All" tab active state in sync
-        if (currentMonth !== 'all') {
-            $tabs.find('[data-month="all"]').removeClass('active');
-        }
+        $select.val(currentMonth);
     }
 
     // =========================================================
@@ -221,6 +211,12 @@
      * @returns {string} HTML string
      */
     function getActionButton(s) {
+        // Future dates: no actions allowed
+        const today = new Date().toISOString().slice(0, 10);
+        if (s.date > today) {
+            return '<span class="text-muted">—</span>';
+        }
+
         if (s.status === 'pending') {
             return '<div class="btn-group btn-group-sm">'
                 + '<button class="btn btn-sm btn-phoenix-primary btn-capture" data-date="' + escAttr(s.date) + '">Capture</button>'
@@ -250,11 +246,9 @@
      * Bind all event listeners for the attendance section.
      */
     function bindEvents() {
-        // Month tab click
-        $('#attendance-month-tabs').on('click', '.nav-link', function() {
-            $('#attendance-month-tabs .nav-link').removeClass('active');
-            $(this).addClass('active');
-            currentMonth = $(this).data('month') || 'all';
+        // Month filter change
+        $('#attendance-month-select').on('change', function() {
+            currentMonth = $(this).val();
             renderSessionTable();
         });
 

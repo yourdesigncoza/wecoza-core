@@ -92,6 +92,10 @@ function handle_attendance_capture(): void
             throw new Exception('session_date must be a valid YYYY-MM-DD date.');
         }
 
+        if ($sessionDate > date('Y-m-d')) {
+            throw new Exception('Cannot capture attendance for a future date.');
+        }
+
         $rawLearnerHours = isset($_POST['learner_hours']) && is_array($_POST['learner_hours'])
             ? $_POST['learner_hours']
             : [];
@@ -167,6 +171,10 @@ function handle_attendance_mark_exception(): void
 
         if (empty($sessionDate) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $sessionDate)) {
             throw new Exception('session_date must be a valid YYYY-MM-DD date.');
+        }
+
+        if ($sessionDate > date('Y-m-d')) {
+            throw new Exception('Cannot mark exception for a future date.');
         }
 
         // Normalize: accept both camelCase (exceptionType) and snake_case (exception_type)

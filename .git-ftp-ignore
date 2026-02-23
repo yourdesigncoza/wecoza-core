@@ -1,0 +1,10 @@
+.git-ftp-ignore
+.gitignore
+.claude/
+CLAUDE.md
+tests/
+schema/
+docs/
+*.md
+.env
+.integrate/
