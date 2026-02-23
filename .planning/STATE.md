@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 47 of 51 (Regulatory Export)
-Plan: 1 of 2 in current phase — Plan 01 complete
+Plan: 2 of 2 in current phase — Plan 02 tasks complete, awaiting human verify checkpoint
 Status: In progress
-Last activity: 2026-02-23 — Phase 47 Plan 01 complete: regulatory export backend (repository methods + AJAX handlers)
+Last activity: 2026-02-23 — Phase 47 Plan 02 complete: regulatory export frontend (shortcode + view + JS module)
 
 Progress: [██████████████████░░] 46/50 phases complete
 
@@ -45,6 +45,8 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 47-01]: Admin-only access (manage_options) enforced on both regulatory endpoints — PII data requires highest privilege
 - [Phase 47-01]: Separate first_name/surname columns returned (not CONCAT) to support regulatory form field mapping
 - [Phase 47-01]: UTF-8 BOM prepended to CSV output for Excel UTF-8 compatibility
+- [Phase 47-02]: Client dropdown populated from first fetch response (guard flag) — no separate AJAX call needed
+- [Phase 47-02]: CSV export uses window.location.href redirect — browser handles file download from Content-Disposition header
 
 ### Pending Todos
 
@@ -59,7 +61,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 47-regulatory-export-01-PLAN.md
+Stopped at: Checkpoint — 47-regulatory-export-02-PLAN.md Task 3 (human-verify)
 Resume file: —
 
-**Next action:** Execute Phase 47 Plan 02 (frontend regulatory export UI)
+**Next action:** Human verifies [wecoza_regulatory_export] page end-to-end, then continue Phase 47 Plan 02 Task 3
