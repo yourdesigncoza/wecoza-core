@@ -128,12 +128,18 @@
         });
 
         months.forEach(function(label, ym) {
+            var activeClass = (ym === currentMonth) ? ' active' : '';
             $tabs.append(
                 '<li class="nav-item">'
-                + '<button class="nav-link" data-month="' + ym + '">' + label + '</button>'
+                + '<button class="nav-link' + activeClass + '" data-month="' + ym + '">' + label + '</button>'
                 + '</li>'
             );
         });
+
+        // Keep "All" tab active state in sync
+        if (currentMonth !== 'all') {
+            $tabs.find('[data-month="all"]').removeClass('active');
+        }
     }
 
     // =========================================================
@@ -218,7 +224,7 @@
         if (s.status === 'pending') {
             return '<div class="btn-group btn-group-sm">'
                 + '<button class="btn btn-sm btn-phoenix-primary btn-capture" data-date="' + escAttr(s.date) + '">Capture</button>'
-                + '<button class="btn btn-sm btn-subtle-warning btn-exception" data-date="' + escAttr(s.date) + '" title="Mark Exception">'
+                + '<button class="btn btn-sm btn-subtle-warning btn-exception" data-date="' + escAttr(s.date) + '" title="Mark Exception" aria-label="Mark Exception">'
                 + '<i class="bi bi-exclamation-triangle"></i>'
                 + '</button>'
                 + '</div>';
@@ -318,6 +324,7 @@
 
         if (learnerIds.length === 0) {
             html = '<tr><td colspan="4" class="text-center text-muted py-2">No enrolled learners found.</td></tr>';
+            $('#btn-submit-capture').prop('disabled', true);
         } else {
             learnerIds.forEach(function(learner) {
                 const id   = learner.id || learner.learner_id || 0;
@@ -361,18 +368,36 @@
         );
         clearAlert('#capture-alert');
 
-        // Collect per-learner hours
+        // Collect and validate per-learner hours
         const learnerHours = [];
+        let isValid = true;
         $('#capture-learners-tbody tr').each(function() {
-            const learnerId    = parseInt($(this).data('learner-id')) || 0;
-            const hoursPresent = parseFloat($(this).find('.hours-present-input').val()) || 0;
-            if (learnerId > 0) {
+            const learnerId = parseInt($(this).data('learner-id')) || 0;
+            if (learnerId <= 0) return;
+
+            const $input = $(this).find('.hours-present-input');
+            const hoursPresent = parseFloat($input.val());
+            const maxHours = parseFloat($input.attr('max'));
+
+            if (isNaN(hoursPresent) || hoursPresent < 0 || hoursPresent > maxHours) {
+                isValid = false;
+                $input.addClass('is-invalid');
+            } else {
+                $input.removeClass('is-invalid');
                 learnerHours.push({
                     learner_id:    learnerId,
                     hours_present: hoursPresent,
                 });
             }
         });
+
+        if (!isValid) {
+            showAlert('#capture-alert', 'Please ensure all hours are between 0 and the scheduled maximum.', 'danger');
+            $btn.prop('disabled', false).html(
+                '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
+            );
+            return;
+        }
 
         $.ajax({
             url:  config.ajaxUrl,
@@ -421,6 +446,12 @@
         $('#exception-type-select').val('');
         $('#exception-notes').val('');
         clearAlert('#exception-alert');
+
+        // Reset submit button state (prevents stuck "Submitting..." after prior success)
+        $('#btn-submit-exception').prop('disabled', false).html(
+            '<i class="bi bi-check-lg me-1"></i>Mark Exception'
+        );
+
         showModal('attendanceExceptionModal');
     }
 

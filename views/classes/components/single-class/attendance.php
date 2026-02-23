@@ -109,11 +109,6 @@ if (empty($class)) {
                     </tr>
                 </thead>
                 <tbody id="attendance-sessions-tbody"></tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">Loading sessions...</td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
 
@@ -202,11 +197,11 @@ if (empty($class)) {
 </div><!-- /#attendanceDetailModal -->
 
 <!-- Mark Exception Modal -->
-<div class="modal fade" id="attendanceExceptionModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="attendanceExceptionModal" tabindex="-1" aria-labelledby="attendanceExceptionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Mark Exception</h5>
+                <h5 class="modal-title" id="attendanceExceptionModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>Mark Exception</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2">
