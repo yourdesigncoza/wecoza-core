@@ -128,7 +128,7 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
 
 - [x] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension (completed 2026-02-23)
 - [x] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules (completed 2026-02-23)
-- [ ] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend
+- [x] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend (completed 2026-02-23)
 - [ ] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter
 
 ## Phase Details
@@ -175,7 +175,7 @@ Plans:
   4. wecoza_attendance_get_detail returns per-learner hours breakdown for a captured session
   5. wecoza_attendance_admin_delete reverses hours from tracking accumulators and removes the session record
   6. All five endpoints validate nonce and return structured JSON error responses on failure
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 50-01-PLAN.md — AttendanceAjaxHandlers with five AJAX endpoints, service wrapper, nonce validation, input normalization, range validation; wire into wecoza-core.php and ClassController
@@ -213,7 +213,7 @@ Plans:
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
 | 49. Backend Logic | 2/2 | Complete    | 2026-02-23 | - |
-| 50. AJAX Endpoints | v6.0 | 0/1 | Not started | - |
+| 50. AJAX Endpoints | 1/1 | Complete   | 2026-02-23 | - |
 | 51. Frontend | v6.0 | 0/2 | Not started | - |
 
 **Total: 46 phases complete, 103 plans executed — v6.0 in progress (phases 48-51)**

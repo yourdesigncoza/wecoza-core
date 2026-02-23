@@ -26,7 +26,7 @@
 - [ ] **ATT-02**: Hours_trained auto-populated from class schedule (same for all learners in a session)
 - [ ] **ATT-03**: Hours present defaults to full scheduled hours; agent adjusts down for late/absent learners
 - [ ] **ATT-04**: Hours absent auto-calculated as hours_trained minus hours_present
-- [ ] **ATT-05**: Captured attendance feeds into existing `logHours()` pipeline, updating learner_lp_tracking accumulators
+- [x] **ATT-05**: Captured attendance feeds into existing `logHours()` pipeline, updating learner_lp_tracking accumulators
 
 ### Session Management
 
@@ -43,7 +43,7 @@
 - [ ] **UI-03**: Capture modal shows enrolled learners with hours-present number input (min=0, max=scheduled, step=0.5)
 - [ ] **UI-04**: Month filter tabs for navigating schedules with many sessions
 - [ ] **UI-05**: View detail shows per-learner hours for previously captured sessions (read-only)
-- [ ] **UI-06**: AJAX endpoints for session list, capture, mark exception, session detail, and admin delete
+- [x] **UI-06**: AJAX endpoints for session list, capture, mark exception, session detail, and admin delete
 
 ## v7+ Requirements
 
@@ -98,7 +98,7 @@ Which phases cover which requirements.
 | ATT-02 | Phase 51 | Pending |
 | ATT-03 | Phase 51 | Pending |
 | ATT-04 | Phase 51 | Pending |
-| ATT-05 | Phase 50 | Pending |
+| ATT-05 | Phase 50 | Complete |
 | SESS-01 | Phase 49 | Complete |
 | SESS-02 | Phase 49 | Complete |
 | SESS-03 | Phase 49 | Complete |
@@ -109,7 +109,7 @@ Which phases cover which requirements.
 | UI-03 | Phase 51 | Pending |
 | UI-04 | Phase 51 | Pending |
 | UI-05 | Phase 51 | Pending |
-| UI-06 | Phase 50 | Pending |
+| UI-06 | Phase 50 | Complete |
 
 **Coverage:**
 - v6.0 requirements: 25 total

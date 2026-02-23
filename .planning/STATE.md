@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v6.0 Agent Attendance Capture — Phase 49: Backend Logic
+**Current focus:** v6.0 Agent Attendance Capture — Phase 50: AJAX Endpoints
 
 ## Current Position
 
-Phase: 49 of 51 (Backend Logic)
-Plan: 2 of 3 in current phase — Plan 02 complete
+Phase: 50 of 51 (AJAX Endpoints)
+Plan: 1 of 1 in current phase — Plan 01 complete
 Status: In progress
-Last activity: 2026-02-23 — Phase 49 Plan 02 complete: AttendanceService with five public methods and LearnerProgressionRepository::deleteHoursLogBySessionId
+Last activity: 2026-02-23 — Phase 50 Plan 01 complete: Five AJAX attendance endpoints wired to AttendanceService with nonce validation, camelCase normalization, and hours range validation
 
-Progress: [██████████████████░░] 48/51 phases in progress
+Progress: [████████████████████] 49/51 phases in progress
 
 ## Milestone History
 
@@ -54,6 +54,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 49-02]: perDayTimes->perDay format mapping + mode='per-day' in generateSessionList before calling ScheduleService — handles both old start_time and new startTime DB key formats
 - [Phase 49-02]: captureAttendance uses error-tolerant foreach loop — per-learner logHours failures don't abort the whole capture
 - [Phase 49-02]: deleteHoursLogBySessionId lives in LearnerProgressionRepository (not raw SQL in service) — all hours-log DB access stays in repository layer
+- [Phase 50-01]: Shared verify_attendance_nonce() helper instead of inline check_ajax_referer in each handler — DRY pattern matching ProgressionAjaxHandlers approach
+- [Phase 50-01]: Range validation in AJAX handler layer (not service) — handler owns HTTP input normalization; service owns business rules
+- [Phase 50-01]: No wp_ajax_nopriv_ registrations — site requires login per project policy
 
 ### Pending Todos
 
@@ -68,7 +71,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 49-backend-logic-02-PLAN.md (all tasks)
+Stopped at: Completed 50-ajax-endpoints-01-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 49 Plan 02 complete. Proceed to Phase 49 Plan 03.
+**Next action:** Phase 50 Plan 01 complete. Proceed to Phase 51 (JS Frontend).
