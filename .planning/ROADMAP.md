@@ -142,11 +142,11 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
   2. Overall learner progress aggregation (getLearnerOverallProgress()) uses hours_trained for in-progress LPs
   3. The class_attendance_sessions table exists in PostgreSQL with a unique constraint on (class_id, session_date)
   4. ProgressionService::logHours() and LearnerProgressionModel::addHours() accept session_id and created_by without breaking existing callers
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 48-01: Progress fix — change hours_present to hours_trained in getProgressPercentage(), isHoursComplete(), getLearnerOverallProgress()
-- [ ] 48-02: Schema + signature extension — write class_attendance_sessions schema SQL, extend logHours() and addHours() signatures (backward-compatible)
+- [ ] 48-01-PLAN.md — Progress fix: change hours_present to hours_trained in model, service, SQL queries, view templates, and JS
+- [ ] 48-02-PLAN.md — Schema + signature extension: class_attendance_sessions CREATE TABLE SQL, extend logHours() and addHours() with session_id and created_by
 
 ### Phase 49: Backend Logic
 **Goal**: Attendance business logic is fully encapsulated — sessions are created, queried, validated, and exception-marked server-side with correct hours propagation
