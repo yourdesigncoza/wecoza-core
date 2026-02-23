@@ -6,6 +6,7 @@ namespace WeCoza\Feedback\Controllers;
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\Feedback\Repositories\FeedbackRepository;
 use WeCoza\Feedback\Services\AIFeedbackService;
+use WeCoza\Feedback\Services\TrelloService;
 
 final class FeedbackController
 {
@@ -218,11 +219,29 @@ final class FeedbackController
             is_array($conversation) ? $conversation : []
         );
 
-        $this->repository->update($feedbackId, [
+        $updateData = [
             'ai_generated_title'    => $enrichment['title'],
             'ai_suggested_priority' => $enrichment['priority'],
             'updated_at'            => date('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        $this->repository->update($feedbackId, $updateData);
+
+        // Push to Trello (fire-and-forget: failure doesn't block user)
+        $trello = new TrelloService();
+        if ($trello->isConfigured()) {
+            $record = $this->repository->findById($feedbackId);
+            if ($record) {
+                $trelloResult = $trello->createCard($record);
+                if ($trelloResult !== null) {
+                    $this->repository->update($feedbackId, [
+                        'trello_card_id'  => $trelloResult['id'],
+                        'trello_card_url' => $trelloResult['url'],
+                        'updated_at'      => date('Y-m-d H:i:s'),
+                    ]);
+                }
+            }
+        }
 
         wp_send_json_success([
             'status'  => 'submitted',

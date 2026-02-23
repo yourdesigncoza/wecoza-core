@@ -6,6 +6,7 @@ namespace WeCoza\Feedback\Shortcodes;
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\Feedback\Repositories\FeedbackRepository;
 use WeCoza\Feedback\Repositories\FeedbackCommentRepository;
+use WeCoza\Feedback\Services\TrelloService;
 
 final class FeedbackDashboardShortcode
 {
@@ -88,6 +89,19 @@ final class FeedbackDashboardShortcode
         ]);
 
         if ($commentId) {
+            // Sync comment to Trello card (best-effort)
+            $feedbackRepo = new FeedbackRepository();
+            $feedback = $feedbackRepo->findById($feedbackId);
+            if (!empty($feedback['trello_card_id'])) {
+                $trello = new TrelloService();
+                if ($trello->isConfigured()) {
+                    $trello->addComment(
+                        $feedback['trello_card_id'],
+                        "**Dev comment by {$user->user_email}:**\n\n{$commentText}"
+                    );
+                }
+            }
+
             wp_send_json_success([
                 'id'           => $commentId,
                 'author_email' => $user->user_email,
@@ -120,8 +134,21 @@ final class FeedbackDashboardShortcode
 
         if ($success) {
             $record = $repository->findById($feedbackId);
+            $isResolved = (bool) ($record['is_resolved'] ?? false);
+
+            // Sync status to Trello card (best-effort)
+            if (!empty($record['trello_card_id'])) {
+                $trello = new TrelloService();
+                if ($trello->isConfigured()) {
+                    $trello->moveCardToList(
+                        $record['trello_card_id'],
+                        $isResolved ? 'Resolved' : 'Open'
+                    );
+                }
+            }
+
             wp_send_json_success([
-                'is_resolved' => (bool) ($record['is_resolved'] ?? false),
+                'is_resolved' => $isResolved,
                 'resolved_at' => $record['resolved_at'] ?? null,
             ]);
         } else {

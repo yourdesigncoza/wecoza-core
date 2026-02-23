@@ -190,7 +190,15 @@ $totalLabel = match ($filter) {
                                         'comments'    => $commentsByFeedback[$rowId] ?? [],
                                     ];
                                 ?>
-                                <div class="d-flex justify-content-end mb-2">
+                                <div class="d-flex justify-content-end mb-2 gap-2">
+                                    <?php if (!empty($item['trello_card_url'])): ?>
+                                        <a href="<?= esc_url($item['trello_card_url']) ?>"
+                                           target="_blank"
+                                           class="btn btn-phoenix-info btn-sm"
+                                           title="View on Trello">
+                                            <span class="fab fa-trello me-1"></span>Trello
+                                        </a>
+                                    <?php endif; ?>
                                     <button type="button"
                                             class="btn btn-phoenix-secondary btn-sm wecoza-feedback-copy-btn"
                                             data-report="<?= esc_attr(json_encode($reportData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) ?>"

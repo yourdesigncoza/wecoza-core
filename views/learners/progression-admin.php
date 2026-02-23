@@ -29,21 +29,19 @@ if (!defined('ABSPATH')) {
     <!-- Main Content (hidden until JS loads data) -->
     <div id="progression-admin-content" class="d-none">
 
-        <!-- Header Row: Title + Start New LP button -->
-        <div class="row mb-3 align-items-center">
-            <div class="col">
-                <h4 class="mb-0">Progression Management <i class="bi bi-mortarboard ms-1"></i></h4>
-            </div>
-            <div class="col-auto">
-                <button id="btn-start-new-lp" class="btn btn-phoenix-primary btn-sm">
-                    <i class="bi bi-plus-circle me-1"></i> Start New LP
-                </button>
-            </div>
-        </div>
-
-        <!-- Filter Card -->
-        <div class="card shadow-none border mb-3">
-            <div class="card-body p-3">
+        <!-- Progression Management Card -->
+        <div class="card shadow-none border" data-component-card="data-component-card">
+            <div class="card-header p-3 border-bottom">
+                <div class="row align-items-center mb-2">
+                    <div class="col">
+                        <h4 class="mb-0">Progression Management <i class="bi bi-mortarboard ms-1"></i></h4>
+                    </div>
+                    <div class="col-auto">
+                        <button id="btn-start-new-lp" class="btn btn-phoenix-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i> Start New LP
+                        </button>
+                    </div>
+                </div>
                 <form id="progression-filter-form" class="row g-2 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label fs-9 mb-1">Client</label>
@@ -79,18 +77,15 @@ if (!defined('ABSPATH')) {
                     </div>
                 </form>
             </div>
-        </div>
 
-        <!-- Bulk Action Bar (hidden until checkboxes selected) -->
-        <div id="bulk-action-bar" class="alert alert-phoenix-info d-none mb-3 d-flex align-items-center justify-content-between">
-            <span><strong id="selected-count">0</strong> progression(s) selected</span>
-            <button id="btn-bulk-complete" class="btn btn-phoenix-success btn-sm">
-                <i class="bi bi-check2-all me-1"></i> Bulk Complete
-            </button>
-        </div>
+            <!-- Bulk Action Bar (hidden until checkboxes selected) -->
+            <div id="bulk-action-bar" class="d-none d-flex align-items-center justify-content-between px-4 py-2 bg-info-subtle border-bottom">
+                <span><strong id="selected-count">0</strong> progression(s) selected</span>
+                <button id="btn-bulk-complete" class="btn btn-phoenix-success btn-sm">
+                    <i class="bi bi-check2-all me-1"></i> Bulk Complete
+                </button>
+            </div>
 
-        <!-- Data Table Card -->
-        <div class="card shadow-none border" data-component-card="data-component-card">
             <div class="card-body p-4 py-2">
                 <div class="table-responsive">
                     <table id="progression-admin-table" class="table table-hover table-sm fs-9 mb-0">

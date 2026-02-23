@@ -104,31 +104,28 @@ if (!defined('ABSPATH')) {
         </div>
 
         <!-- Results Table Card -->
-        <div id="reg-table-card" class="card shadow-none border">
-            <div class="table-responsive">
-                <table class="table table-sm table-hover mb-0" id="reg-table">
-                    <thead class="table-light">
+        <div id="reg-table-card" class="card shadow-none border" data-component-card="data-component-card">
+            <div class="card-body p-4 py-2">
+                <div class="table-responsive scrollbar">
+                <table class="table table-sm fs-9 mb-0 overflow-hidden" id="reg-table">
+                    <thead class="text-body">
                         <tr>
-                            <th>First Name</th>
-                            <th>Surname</th>
-                            <th>SA ID</th>
-                            <th>Programme</th>
-                            <th>Class Code</th>
-                            <th>Client</th>
-                            <th>Employer</th>
-                            <th>Start Date</th>
-                            <th>Completion Date</th>
-                            <th>Hours Trained</th>
-                            <th>Hours Present</th>
-                            <th>Hours Absent</th>
-                            <th>Status</th>
-                            <th>Portfolio</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap">First Name</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap">Surname</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap" style="min-width:8rem">SA ID</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap" style="min-width:10rem">Programme</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap">Status</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap">Class Code</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap">Client</th>
+                            <th class="sort pe-1 align-middle white-space-nowrap">Employer</th>
+                            <th class="no-sort pe-1 align-middle" style="width:2rem"></th>
                         </tr>
                     </thead>
                     <tbody id="reg-table-body">
-                        <!-- JS populates -->
+                        <!-- JS populates main + detail rows -->
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 

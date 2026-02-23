@@ -24,8 +24,10 @@ final class SettingsPage
     private const API_OPTIONS = [
         'wecoza_google_maps_api_key',
         'wecoza_openai_api_key',
-        'wecoza_linear_api_key',
-        'wecoza_linear_team_id',
+        'wecoza_trello_api_key',
+        'wecoza_trello_api_token',
+        'wecoza_trello_board_id',
+        'wecoza_trello_assign_member',
     ];
 
     // Notifications section
@@ -99,13 +101,17 @@ final class SettingsPage
 
         self::registerPasswordPreserve($group, 'wecoza_google_maps_api_key');
         self::registerPasswordPreserve($group, 'wecoza_openai_api_key');
-        self::registerPasswordPreserve($group, 'wecoza_linear_api_key');
-        self::registerText($group, 'wecoza_linear_team_id');
+        self::registerPasswordPreserve($group, 'wecoza_trello_api_key');
+        self::registerPasswordPreserve($group, 'wecoza_trello_api_token');
+        self::registerText($group, 'wecoza_trello_board_id');
+        self::registerText($group, 'wecoza_trello_assign_member');
 
-        add_settings_field('wecoza_google_maps_api_key', __('Google Maps API Key', 'wecoza'), [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_google_maps_api_key']);
-        add_settings_field('wecoza_openai_api_key',      __('OpenAI API Key', 'wecoza'),      [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_openai_api_key']);
-        add_settings_field('wecoza_linear_api_key',      __('Linear API Key', 'wecoza'),      [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_linear_api_key']);
-        add_settings_field('wecoza_linear_team_id',      __('Linear Team ID', 'wecoza'),      [self::class, 'renderTextField'],     $page, self::API_SECTION, ['name' => 'wecoza_linear_team_id', 'placeholder' => 'UUID from Linear Settings > Teams']);
+        add_settings_field('wecoza_google_maps_api_key',   __('Google Maps API Key', 'wecoza'),   [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_google_maps_api_key']);
+        add_settings_field('wecoza_openai_api_key',        __('OpenAI API Key', 'wecoza'),        [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_openai_api_key']);
+        add_settings_field('wecoza_trello_api_key',        __('Trello API Key', 'wecoza'),        [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_trello_api_key']);
+        add_settings_field('wecoza_trello_api_token',      __('Trello API Token', 'wecoza'),      [self::class, 'renderPasswordField'], $page, self::API_SECTION, ['name' => 'wecoza_trello_api_token']);
+        add_settings_field('wecoza_trello_board_id',       __('Trello Board ID', 'wecoza'),       [self::class, 'renderTextField'],     $page, self::API_SECTION, ['name' => 'wecoza_trello_board_id', 'placeholder' => 'Board ID from Trello URL']);
+        add_settings_field('wecoza_trello_assign_member',  __('Trello Assign Member', 'wecoza'),  [self::class, 'renderTextField'],     $page, self::API_SECTION, ['name' => 'wecoza_trello_assign_member', 'placeholder' => '@username from Trello']);
 
         // ── Notifications ───────────────────────────────────────────────
         add_settings_section(

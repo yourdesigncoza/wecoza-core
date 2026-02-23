@@ -164,6 +164,7 @@
 
     /**
      * Render the compliance table from a rows array.
+     * Each data row renders as a main row + a collapsible detail row.
      * Shows empty state when there are no rows.
      *
      * @param {Array} rows
@@ -180,7 +181,11 @@
         $('#reg-empty').addClass('d-none');
         $('#reg-table-card').removeClass('d-none');
 
-        rows.forEach(function(row) {
+        const cellClass = 'py-2 align-middle white-space-nowrap';
+
+        rows.forEach(function(row, index) {
+            const detailId = 'reg-detail-' + index;
+
             const saId = row.sa_id_no
                 ? row.sa_id_no
                 : (row.passport_number || '—');
@@ -189,24 +194,73 @@
                 ? (row.lp_code ? row.lp_name + ' (' + row.lp_code + ')' : row.lp_name)
                 : '—';
 
-            const $tr = $('<tr>');
-            $tr.append($('<td>').text(row.first_name || ''));
-            $tr.append($('<td>').text(row.surname || ''));
-            $tr.append($('<td>').text(saId));
-            $tr.append($('<td>').text(programme));
-            $tr.append($('<td>').text(row.class_code || '—'));
-            $tr.append($('<td>').text(row.client_name || '—'));
-            $tr.append($('<td>').text(row.employer_name || '—'));
-            $tr.append($('<td>').text(row.start_date || '—'));
-            $tr.append($('<td>').text(row.completion_date || '—'));
-            $tr.append($('<td>').text(row.hours_trained || '0'));
-            $tr.append($('<td>').text(row.hours_present || '0'));
-            $tr.append($('<td>').text(row.hours_absent || '0'));
-            $tr.append($('<td>').html(statusBadge(row.status)));
-            $tr.append($('<td>').text(row.portfolio_submitted ? 'Yes' : 'No'));
+            // Main row
+            const $mainRow = $('<tr class="btn-reveal-trigger">');
+            $mainRow.append($('<td>').addClass(cellClass).text(row.first_name || ''));
+            $mainRow.append($('<td>').addClass(cellClass).text(row.surname || ''));
+            $mainRow.append($('<td>').addClass(cellClass).text(saId));
+            $mainRow.append($('<td>').addClass(cellClass).text(programme));
+            $mainRow.append($('<td>').addClass('py-2 align-middle text-center fs-8 white-space-nowrap').html(statusBadge(row.status)));
+            $mainRow.append($('<td>').addClass(cellClass).text(row.class_code || '—'));
+            $mainRow.append($('<td>').addClass(cellClass).text(row.client_name || '—'));
+            $mainRow.append($('<td>').addClass(cellClass).text(row.employer_name || '—'));
+            $mainRow.append(
+                $('<td>').addClass('py-2 align-middle text-end').html(
+                    '<button class="reg-toggle-btn" data-bs-toggle="collapse" data-bs-target="#' + detailId + '" aria-expanded="false" aria-controls="' + detailId + '">' +
+                    '<i class="bi bi-plus-lg reg-icon-expand"></i>' +
+                    '<i class="bi bi-dash-lg reg-icon-collapse d-none"></i>' +
+                    '</button>'
+                )
+            );
+            $tbody.append($mainRow);
 
-            $tbody.append($tr);
+            // Detail row (collapsible)
+            const $detailRow = $('<tr class="reg-detail-row">');
+            const $detailTd  = $('<td colspan="9" class="p-0">');
+            const $collapse  = $('<div class="collapse" id="' + detailId + '">');
+            const $content   = $('<div class="reg-detail-content border-top p-3">');
+
+            $content.html(
+                '<div class="row g-2">' +
+                    '<div class="col-md-4"><span class="text-body-tertiary">Start Date:</span> ' + escHtml(row.start_date || '—') + '</div>' +
+                    '<div class="col-md-4"><span class="text-body-tertiary">Completion Date:</span> ' + escHtml(row.completion_date || '—') + '</div>' +
+                    '<div class="col-md-4"><span class="text-body-tertiary">Hours Trained:</span> ' + escHtml(row.hours_trained || '0') + '</div>' +
+                    '<div class="col-md-4"><span class="text-body-tertiary">Hours Present:</span> ' + escHtml(row.hours_present || '0') + '</div>' +
+                    '<div class="col-md-4"><span class="text-body-tertiary">Hours Absent:</span> ' + escHtml(row.hours_absent || '0') + '</div>' +
+                    '<div class="col-md-4"><span class="text-body-tertiary">Portfolio Submitted:</span> ' + (row.portfolio_submitted ? 'Yes' : 'No') + '</div>' +
+                '</div>'
+            );
+
+            $collapse.append($content);
+            $detailTd.append($collapse);
+            $detailRow.append($detailTd);
+            $tbody.append($detailRow);
         });
+
+        // Toggle +/- icon with collapse state
+        $('#reg-table-body').off('show.bs.collapse hide.bs.collapse')
+            .on('show.bs.collapse', '.collapse', function() {
+                var btn = $('[data-bs-target="#' + this.id + '"]');
+                btn.find('.reg-icon-expand').addClass('d-none');
+                btn.find('.reg-icon-collapse').removeClass('d-none');
+            })
+            .on('hide.bs.collapse', '.collapse', function() {
+                var btn = $('[data-bs-target="#' + this.id + '"]');
+                btn.find('.reg-icon-expand').removeClass('d-none');
+                btn.find('.reg-icon-collapse').addClass('d-none');
+            });
+    }
+
+    /**
+     * Escape HTML entities in a string for safe insertion.
+     *
+     * @param {string} str
+     * @returns {string}
+     */
+    function escHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(String(str)));
+        return div.innerHTML;
     }
 
     // =========================================================
@@ -300,9 +354,9 @@
 
         const entry = map[status];
         if (entry) {
-            return '<span class="badge badge-phoenix ' + entry[0] + '">' + entry[1] + '</span>';
+            return '<span class="badge fs-10 badge-phoenix ' + entry[0] + '">' + entry[1] + '</span>';
         }
-        return '<span class="badge badge-phoenix badge-phoenix-secondary">' + (status || 'Unknown') + '</span>';
+        return '<span class="badge fs-10 badge-phoenix badge-phoenix-secondary">' + (status || 'Unknown') + '</span>';
     }
 
     /**

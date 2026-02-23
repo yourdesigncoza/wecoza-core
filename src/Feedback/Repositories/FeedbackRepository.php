@@ -27,6 +27,7 @@ final class FeedbackRepository extends BaseRepository
             'ai_conversation', 'ai_generated_title', 'ai_suggested_priority',
             'page_url', 'page_title', 'shortcode', 'url_params',
             'browser_info', 'viewport', 'screenshot_path',
+            'trello_card_id', 'trello_card_url',
         ];
     }
 
@@ -36,6 +37,7 @@ final class FeedbackRepository extends BaseRepository
             'feedback_text', 'ai_conversation', 'ai_generated_title',
             'ai_suggested_priority',
             'is_resolved', 'resolved_by', 'resolved_at', 'updated_at',
+            'trello_card_id', 'trello_card_url',
         ];
     }
 

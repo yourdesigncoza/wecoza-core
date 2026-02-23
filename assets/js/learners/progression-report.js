@@ -121,6 +121,9 @@
         $('#stat-completion-rate').text(Math.round(summary.completion_rate || 0));
         $('#stat-avg-progress').text(Math.round(summary.avg_progress    || 0));
         $('#stat-active-lps').text(summary.in_progress_count || 0);
+
+        $('#stat-completion-badge').text('of all progressions');
+        $('#stat-progress-badge').text('hours completed');
     }
 
     // =========================================================
@@ -218,37 +221,33 @@
             const learnerCount = (group.learners || []).length;
             const groupId      = 'employer-' + (group.employer_id || 'unknown');
 
-            const $card = $('<div>').addClass('card shadow-none border mb-2');
-
-            // Card header - clickable accordion toggle
-            const $header = $('<div>')
-                .addClass('card-header p-2 cursor-pointer')
+            // Group header row (flat section, not a card)
+            const $groupHeader = $('<div>')
+                .addClass('d-flex justify-content-between align-items-center p-2 px-3 bg-body-tertiary border-bottom cursor-pointer')
                 .attr('data-bs-toggle', 'collapse')
                 .attr('data-bs-target', '#' + groupId);
 
-            const $headerRow = $('<div>').addClass('d-flex justify-content-between align-items-center');
-            $('<h6>').addClass('mb-0')
+            $('<h6>').addClass('mb-0 fs-9')
                 .append($('<i>').addClass('bi bi-building me-2'))
                 .append(document.createTextNode(group.employer_name || 'Unknown Employer'))
-                .appendTo($headerRow);
+                .appendTo($groupHeader);
 
-            $('<span>').addClass('badge badge-phoenix badge-phoenix-secondary')
+            const $right = $('<span>').addClass('d-flex align-items-center gap-2');
+            $('<span>').addClass('badge badge-phoenix badge-phoenix-secondary fs-10')
                 .text(learnerCount + ' learner(s)')
-                .appendTo($headerRow);
+                .appendTo($right);
+            $('<i>').addClass('bi bi-chevron-down fs-9 transition-transform')
+                .appendTo($right);
+            $right.appendTo($groupHeader);
 
-            $header.append($headerRow);
-
-            // Collapsible body
-            const $collapseDiv = $('<div>').attr('id', groupId).addClass('collapse show');
-            const $cardBody    = $('<div>').addClass('card-body p-0');
+            // Collapsible learner rows — collapsed by default
+            const $collapseDiv = $('<div>').attr('id', groupId).addClass('collapse');
 
             (group.learners || []).forEach(function(learner) {
-                $cardBody.append(renderLearnerRow(learner));
+                $collapseDiv.append(renderLearnerRow(learner));
             });
 
-            $collapseDiv.append($cardBody);
-            $card.append($header).append($collapseDiv);
-            $results.append($card);
+            $results.append($groupHeader).append($collapseDiv);
         });
     }
 
@@ -272,7 +271,11 @@
             .attr('data-bs-toggle', 'collapse')
             .attr('data-bs-target', '#' + timelineId);
 
-        $('<span>').addClass('fw-semibold').text(learnerName).appendTo($toggleRow);
+        const $left = $('<span>').addClass('d-flex align-items-center gap-2');
+        $('<i>').addClass('bi bi-chevron-right fs-10 text-muted transition-transform').appendTo($left);
+        $('<span>').addClass('fw-semibold').text(learnerName).appendTo($left);
+        $left.appendTo($toggleRow);
+
         $('<span>').addClass('text-muted fs-9')
             .html('ID: ' + learnerId + ' &middot; ' + progressionCount + ' LP(s)')
             .appendTo($toggleRow);
@@ -383,16 +386,16 @@
      * Bind all event listeners.
      */
     function bindEvents() {
-        // Search button click
-        $('#btn-report-search').on('click', function() {
-            fetchReport();
-        });
-
         // Enter key in search field
         $('#report-search').on('keypress', function(e) {
             if (e.which === 13) {
                 fetchReport();
             }
+        });
+
+        // Employer dropdown change triggers fetch
+        $('#report-employer-filter').on('change', function() {
+            fetchReport();
         });
 
         // Status pill click — client-side filter from cache, no server round-trip

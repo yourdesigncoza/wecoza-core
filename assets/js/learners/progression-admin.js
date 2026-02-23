@@ -143,7 +143,7 @@
             // Col 5: Status badge
             const $statusTd = $('<td>');
             const $badge = $('<span>')
-                .addClass('badge badge-phoenix ' + statusBadgeClass(row.status))
+                .addClass('badge fs-10 badge-phoenix ' + statusBadgeClass(row.status))
                 .text(statusLabel(row.status));
             $statusTd.append($badge);
             $tr.append($statusTd);
@@ -620,10 +620,10 @@
 
         $('<strong>').text(data.learner_name || '').appendTo($row);
 
-        $('<span>').addClass('badge badge-phoenix badge-phoenix-info ms-2')
+        $('<span>').addClass('badge fs-10 badge-phoenix badge-phoenix-info ms-2')
             .text(data.subject_name || '').appendTo($row);
 
-        $('<span>').addClass('badge badge-phoenix ' + statusBadgeClass(data.status))
+        $('<span>').addClass('badge fs-10 badge-phoenix ' + statusBadgeClass(data.status))
             .text(statusLabel(data.status)).appendTo($row);
 
         $('<span>').addClass('text-muted ms-2 fs-9')
@@ -662,7 +662,7 @@
             $tr.append($('<td>').text(entry.hours_present || 0));
 
             const $sourceTd = $('<td>');
-            $('<span>').addClass('badge badge-phoenix badge-phoenix-secondary')
+            $('<span>').addClass('badge fs-10 badge-phoenix badge-phoenix-secondary')
                 .text(source).appendTo($sourceTd);
             $tr.append($sourceTd);
 
