@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v6.0 Agent Attendance Capture — Phase 50: AJAX Endpoints
+**Current focus:** v6.0 Agent Attendance Capture — Phase 51: Frontend
 
 ## Current Position
 
-Phase: 50 of 51 (AJAX Endpoints)
-Plan: 1 of 1 in current phase — Plan 01 complete
+Phase: 51 of 51 (Frontend)
+Plan: 1 of 2 in current phase — Plan 01 complete
 Status: In progress
-Last activity: 2026-02-23 — Phase 50 Plan 01 complete: Five AJAX attendance endpoints wired to AttendanceService with nonce validation, camelCase normalization, and hours range validation
+Last activity: 2026-02-23 — Phase 51 Plan 01 complete: Attendance PHP view component with 3 summary cards, month tabs, session table, capture/detail/exception modals; wired into single-class-display with attendance-capture.js enqueue and learnerIds localization
 
 Progress: [████████████████████] 49/51 phases in progress
 
@@ -57,6 +57,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 50-01]: Shared verify_attendance_nonce() helper instead of inline check_ajax_referer in each handler — DRY pattern matching ProgressionAjaxHandlers approach
 - [Phase 50-01]: Range validation in AJAX handler layer (not service) — handler owns HTTP input normalization; service owns business rules
 - [Phase 50-01]: No wp_ajax_nopriv_ registrations — site requires login per project policy
+- [Phase 51-01]: attendance-capture.js depends on wecoza-single-class-display-js so WeCozaSingleClass config is available before attendance JS runs
+- [Phase 51-01]: learnerIds decoded from JSON string to PHP array before wp_localize_script — JS receives plain array
+- [Phase 51-01]: Admin delete button rendered conditionally via current_user_can('manage_options') in PHP template
 
 ### Pending Todos
 
@@ -71,7 +74,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 50-ajax-endpoints-01-PLAN.md (all tasks)
+Stopped at: Completed 51-frontend-01-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 50 Plan 01 complete. Proceed to Phase 51 (JS Frontend).
+**Next action:** Phase 51 Plan 01 complete. Proceed to Phase 51 Plan 02 (attendance-capture.js implementation).

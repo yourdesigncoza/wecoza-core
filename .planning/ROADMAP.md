@@ -191,7 +191,7 @@ Plans:
   4. Clicking "Capture" opens a modal with enrolled learners, hours_trained pre-filled, and hours_present defaulting to the same value (adjustable down in 0.5-step increments, min 0)
   5. Hours absent auto-calculates as hours_trained minus hours_present in real time without manual input
   6. Clicking "View" on a captured session shows a read-only per-learner hours breakdown
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 51-01-PLAN.md — PHP view template: attendance.php component with summary cards, month tabs, session table, capture/view/exception modals; insert into single-class-display.view.php; enqueue and localize JS in ClassController
@@ -214,7 +214,7 @@ Plans:
 | 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
 | 49. Backend Logic | 2/2 | Complete    | 2026-02-23 | - |
 | 50. AJAX Endpoints | 1/1 | Complete    | 2026-02-23 | - |
-| 51. Frontend | v6.0 | 0/2 | Not started | - |
+| 51. Frontend | 1/2 | In Progress|  | - |
 
 **Total: 46 phases complete, 103 plans executed — v6.0 in progress (phases 48-51)**
 

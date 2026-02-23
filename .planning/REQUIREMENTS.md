@@ -38,11 +38,11 @@
 
 ### UI / Frontend
 
-- [ ] **UI-01**: Attendance section visible on single class display page with summary cards
-- [ ] **UI-02**: Session list table shows scheduled sessions with date, day, time, hours, status badge, and action button
-- [ ] **UI-03**: Capture modal shows enrolled learners with hours-present number input (min=0, max=scheduled, step=0.5)
-- [ ] **UI-04**: Month filter tabs for navigating schedules with many sessions
-- [ ] **UI-05**: View detail shows per-learner hours for previously captured sessions (read-only)
+- [x] **UI-01**: Attendance section visible on single class display page with summary cards
+- [x] **UI-02**: Session list table shows scheduled sessions with date, day, time, hours, status badge, and action button
+- [x] **UI-03**: Capture modal shows enrolled learners with hours-present number input (min=0, max=scheduled, step=0.5)
+- [x] **UI-04**: Month filter tabs for navigating schedules with many sessions
+- [x] **UI-05**: View detail shows per-learner hours for previously captured sessions (read-only)
 - [x] **UI-06**: AJAX endpoints for session list, capture, mark exception, session detail, and admin delete
 
 ## v7+ Requirements
@@ -104,11 +104,11 @@ Which phases cover which requirements.
 | SESS-03 | Phase 49 | Complete |
 | SESS-04 | Phase 49 | Complete |
 | SESS-05 | Phase 49 | Complete |
-| UI-01 | Phase 51 | Pending |
-| UI-02 | Phase 51 | Pending |
-| UI-03 | Phase 51 | Pending |
-| UI-04 | Phase 51 | Pending |
-| UI-05 | Phase 51 | Pending |
+| UI-01 | Phase 51 | Complete |
+| UI-02 | Phase 51 | Complete |
+| UI-03 | Phase 51 | Complete |
+| UI-04 | Phase 51 | Complete |
+| UI-05 | Phase 51 | Complete |
 | UI-06 | Phase 50 | Complete |
 
 **Coverage:**
