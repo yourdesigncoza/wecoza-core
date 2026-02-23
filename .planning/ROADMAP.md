@@ -172,7 +172,11 @@ Plans:
   1. Admin selects a date range and generates a monthly progressions report showing learner, LP, class, client, dates, and hours
   2. Admin clicks "Export CSV" and a correctly structured CSV file downloads with all report columns
   3. The exported data includes all fields required for Umalusi/DHET submission without manual post-processing
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 47-01-PLAN.md -- Backend repository method (findForRegulatoryExport) + AJAX handlers (get_regulatory_report, export_regulatory_csv)
+- [ ] 47-02-PLAN.md -- Shortcode [wecoza_regulatory_export] + view template + JS module (date-range filter, compliance table, CSV download)
 
 ## Progress
 
@@ -190,7 +194,7 @@ Plans:
 | 44 | 3/3 | Complete    | 2026-02-18 | - |
 | 45 | 3/3 | Complete    | 2026-02-18 | - |
 | 46 | 3/3 | Complete   | 2026-02-19 | - |
-| 47 | v5.0 | TBD | Not started | - |
+| 47 | v5.0 | 2 | Not started | - |
 
 **Total: 43 phases complete, 90 plans, 9 milestones shipped — v5.0 in progress (phases 44-47)**
 
