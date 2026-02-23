@@ -175,10 +175,10 @@ Plans:
   4. wecoza_attendance_get_detail returns per-learner hours breakdown for a captured session
   5. wecoza_attendance_admin_delete reverses hours from tracking accumulators and removes the session record
   6. All five endpoints validate nonce and return structured JSON error responses on failure
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 50-01: AttendanceAjaxHandlers — all six handlers with nonce validation and service delegation; wire registration into wecoza-core.php and enqueue JS config via ClassController
+- [ ] 50-01-PLAN.md — AttendanceAjaxHandlers with five AJAX endpoints, service wrapper, nonce validation, input normalization, range validation; wire into wecoza-core.php and ClassController
 
 ### Phase 51: Frontend
 **Goal**: Agent opens a class page, navigates sessions by month, captures attendance via modal, and views prior sessions read-only — progression data updates without any separate action
