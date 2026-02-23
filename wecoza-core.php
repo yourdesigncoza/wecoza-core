@@ -628,6 +628,10 @@ add_action(
         require_once WECOZA_CORE_PATH .
             "src/Learners/Shortcodes/progression-report-shortcode.php";
 
+        // Regulatory export shortcode [wecoza_regulatory_export]
+        require_once WECOZA_CORE_PATH .
+            "src/Learners/Shortcodes/regulatory-export-shortcode.php";
+
         /*
     |--------------------------------------------------------------------------
     | Load Learners AJAX Handlers
