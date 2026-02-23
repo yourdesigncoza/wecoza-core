@@ -13,9 +13,9 @@
 
 ### Backend Integration
 
-- [ ] **BACK-01**: `ProgressionService::logHours()` accepts optional session_id and created_by parameters (backward-compatible)
-- [ ] **BACK-02**: `LearnerProgressionModel::addHours()` passes session_id and created_by to the hours log insert
-- [ ] **BACK-03**: New `class_attendance_sessions` table tracks sessions with status, scheduled hours, and captured_by
+- [x] **BACK-01**: `ProgressionService::logHours()` accepts optional session_id and created_by parameters (backward-compatible)
+- [x] **BACK-02**: `LearnerProgressionModel::addHours()` passes session_id and created_by to the hours log insert
+- [x] **BACK-03**: New `class_attendance_sessions` table tracks sessions with status, scheduled hours, and captured_by
 - [ ] **BACK-04**: `AttendanceRepository` provides CRUD for attendance sessions with column whitelisting
 - [ ] **BACK-05**: `AttendanceService` generates scheduled session dates from class `schedule_data` JSONB via `ScheduleService`
 - [ ] **BACK-06**: `AttendanceService` validates session date is a legitimate scheduled date before accepting capture
@@ -88,9 +88,9 @@ Which phases cover which requirements.
 | PROG-01 | Phase 48 | Pending |
 | PROG-02 | Phase 48 | Pending |
 | PROG-03 | Phase 48 | Pending |
-| BACK-01 | Phase 48 | Pending |
-| BACK-02 | Phase 48 | Pending |
-| BACK-03 | Phase 48 | Pending |
+| BACK-01 | Phase 48 | Complete |
+| BACK-02 | Phase 48 | Complete |
+| BACK-03 | Phase 48 | Complete |
 | BACK-04 | Phase 49 | Pending |
 | BACK-05 | Phase 49 | Pending |
 | BACK-06 | Phase 49 | Pending |

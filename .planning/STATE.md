@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 ## Current Position
 
-Phase: 47 of 51 (Regulatory Export)
-Plan: 2 of 2 in current phase — Plan 02 tasks complete, awaiting human verify checkpoint
+Phase: 48 of 51 (Foundation)
+Plan: 2 of 2 in current phase — Plan 02 complete
 Status: In progress
-Last activity: 2026-02-23 — Phase 47 Plan 02 complete: regulatory export frontend (shortcode + view + JS module)
+Last activity: 2026-02-23 — Phase 48 Plan 02 complete: sessions schema SQL + logHours/addHours signature extension
 
-Progress: [██████████████████░░] 46/50 phases complete
+Progress: [██████████████████░░] 48/51 phases in progress
 
 ## Milestone History
 
@@ -47,6 +47,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 47-01]: UTF-8 BOM prepended to CSV output for Excel UTF-8 compatibility
 - [Phase 47-02]: Client dropdown populated from first fetch response (guard flag) — no separate AJAX call needed
 - [Phase 47-02]: CSV export uses window.location.href redirect — browser handles file download from Content-Disposition header
+- [Phase 48-02]: class_attendance_sessions status column uses VARCHAR(30) CHECK constraint on 4 values: pending, captured, client_cancelled, agent_absent
+- [Phase 48-02]: captured_by uses WP user ID (not agent record ID) for consistency with learner_hours_log.created_by
+- [Phase 48-02]: session_id/created_by added as ?int = null to logHours/addHours — null values filtered by repository array_intersect_key, fully backward-compatible
 
 ### Pending Todos
 
@@ -61,7 +64,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Checkpoint — 47-regulatory-export-02-PLAN.md Task 3 (human-verify)
+Stopped at: Completed 48-foundation-02-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Human verifies [wecoza_regulatory_export] page end-to-end, then continue Phase 47 Plan 02 Task 3
+**Next action:** Phase 48 Plan 02 complete. Phase 48 foundation done. Proceed to Phase 49 attendance capture.
