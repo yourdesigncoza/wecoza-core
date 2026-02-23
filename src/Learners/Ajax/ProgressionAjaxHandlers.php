@@ -695,6 +695,159 @@ function handle_get_progression_report(): void
 }
 
 /**
+ * Return flat progression rows for the regulatory report page (Umalusi / DHET).
+ *
+ * Accepts GET params: date_from, date_to, status, client_id.
+ * Returns { rows: [...], total: N }.
+ *
+ * AJAX action: get_regulatory_report
+ */
+function handle_get_regulatory_report(): void
+{
+    try {
+        verify_learner_access('learners_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized access']);
+            return;
+        }
+
+        $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
+        $filters         = [];
+
+        // Validate date_from: must match YYYY-MM-DD
+        if (!empty($_GET['date_from']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date_from'])) {
+            $filters['date_from'] = sanitize_text_field($_GET['date_from']);
+        }
+
+        // Validate date_to: must match YYYY-MM-DD
+        if (!empty($_GET['date_to']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date_to'])) {
+            $filters['date_to'] = sanitize_text_field($_GET['date_to']);
+        }
+
+        if (!empty($_GET['status']) && in_array($_GET['status'], $allowedStatuses, true)) {
+            $filters['status'] = sanitize_key($_GET['status']);
+        }
+
+        if (!empty($_GET['client_id'])) {
+            $filters['client_id'] = intval($_GET['client_id']);
+        }
+
+        $repository = new LearnerProgressionRepository();
+        $data       = $repository->findForRegulatoryExport($filters);
+        $count      = $repository->getRegulatoryExportCount($filters);
+
+        wp_send_json_success([
+            'rows'  => $data,
+            'total' => $count,
+        ]);
+
+    } catch (Exception $e) {
+        wp_send_json_error(['message' => $e->getMessage()]);
+    }
+}
+
+/**
+ * Stream a CSV file containing all regulatory export rows (Umalusi / DHET compliance).
+ *
+ * Accepts GET params: date_from, date_to, status, client_id (same as handle_get_regulatory_report).
+ * Outputs a UTF-8 BOM CSV with a header row and all compliance columns.
+ * Calls exit after the stream — no wp_send_json response.
+ *
+ * AJAX action: export_regulatory_csv
+ */
+function handle_export_regulatory_csv(): void
+{
+    verify_learner_access('learners_nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_die('Unauthorized access', 403);
+    }
+
+    $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
+    $filters         = [];
+
+    if (!empty($_GET['date_from']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date_from'])) {
+        $filters['date_from'] = sanitize_text_field($_GET['date_from']);
+    }
+
+    if (!empty($_GET['date_to']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date_to'])) {
+        $filters['date_to'] = sanitize_text_field($_GET['date_to']);
+    }
+
+    if (!empty($_GET['status']) && in_array($_GET['status'], $allowedStatuses, true)) {
+        $filters['status'] = sanitize_key($_GET['status']);
+    }
+
+    if (!empty($_GET['client_id'])) {
+        $filters['client_id'] = intval($_GET['client_id']);
+    }
+
+    $repository = new LearnerProgressionRepository();
+    $data       = $repository->findForRegulatoryExport($filters);
+
+    $filename = 'progression-export-' . date('Y-m-d') . '.csv';
+
+    // Stream CSV headers
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+
+    $output = fopen('php://output', 'w');
+
+    // UTF-8 BOM for Excel compatibility
+    fwrite($output, "\xEF\xBB\xBF");
+
+    // CSV header row
+    fputcsv($output, [
+        'First Name',
+        'Surname',
+        'SA ID Number',
+        'Passport Number',
+        'Programme Code',
+        'Programme Name',
+        'Programme Duration (Hours)',
+        'Class Code',
+        'Client',
+        'Employer',
+        'Start Date',
+        'Completion Date',
+        'Hours Trained',
+        'Hours Present',
+        'Hours Absent',
+        'Status',
+        'Portfolio Submitted',
+    ]);
+
+    // Data rows mapped from query result keys
+    foreach ($data as $row) {
+        fputcsv($output, [
+            $row['first_name']         ?? '',
+            $row['surname']            ?? '',
+            $row['sa_id_no']           ?? '',
+            $row['passport_number']    ?? '',
+            $row['lp_code']            ?? '',
+            $row['lp_name']            ?? '',
+            $row['lp_duration_hours']  ?? '',
+            $row['class_code']         ?? '',
+            $row['client_name']        ?? '',
+            $row['employer_name']      ?? '',
+            $row['start_date']         ?? '',
+            $row['completion_date']    ?? '',
+            $row['hours_trained']      ?? '',
+            $row['hours_present']      ?? '',
+            $row['hours_absent']       ?? '',
+            $row['status']             ?? '',
+            $row['portfolio_submitted'] ?? 'No',
+        ]);
+    }
+
+    fclose($output);
+    exit;
+}
+
+/**
  * Register all progression AJAX handlers
  */
 function register_progression_ajax_handlers(): void
@@ -709,6 +862,8 @@ function register_progression_ajax_handlers(): void
     add_action('wp_ajax_start_learner_progression',        __NAMESPACE__ . '\handle_start_learner_progression');
     add_action('wp_ajax_toggle_progression_hold',          __NAMESPACE__ . '\handle_toggle_progression_hold');
     add_action('wp_ajax_get_progression_report',           __NAMESPACE__ . '\handle_get_progression_report');
+    add_action('wp_ajax_get_regulatory_report',            __NAMESPACE__ . '\handle_get_regulatory_report');
+    add_action('wp_ajax_export_regulatory_csv',            __NAMESPACE__ . '\handle_export_regulatory_csv');
 }
 
 // Register handlers on init
