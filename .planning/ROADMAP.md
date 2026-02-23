@@ -213,7 +213,7 @@ Plans:
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
 | 49. Backend Logic | 2/2 | Complete    | 2026-02-23 | - |
-| 50. AJAX Endpoints | 1/1 | Complete   | 2026-02-23 | - |
+| 50. AJAX Endpoints | 1/1 | Complete    | 2026-02-23 | - |
 | 51. Frontend | v6.0 | 0/2 | Not started | - |
 
 **Total: 46 phases complete, 103 plans executed — v6.0 in progress (phases 48-51)**
