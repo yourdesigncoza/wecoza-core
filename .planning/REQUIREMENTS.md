@@ -81,41 +81,41 @@ Deferred to future milestones.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROG-01 | TBD | Pending |
-| PROG-02 | TBD | Pending |
-| PROG-03 | TBD | Pending |
-| BACK-01 | TBD | Pending |
-| BACK-02 | TBD | Pending |
-| BACK-03 | TBD | Pending |
-| BACK-04 | TBD | Pending |
-| BACK-05 | TBD | Pending |
-| BACK-06 | TBD | Pending |
-| ATT-01 | TBD | Pending |
-| ATT-02 | TBD | Pending |
-| ATT-03 | TBD | Pending |
-| ATT-04 | TBD | Pending |
-| ATT-05 | TBD | Pending |
-| SESS-01 | TBD | Pending |
-| SESS-02 | TBD | Pending |
-| SESS-03 | TBD | Pending |
-| SESS-04 | TBD | Pending |
-| SESS-05 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| UI-06 | TBD | Pending |
+| PROG-01 | Phase 48 | Pending |
+| PROG-02 | Phase 48 | Pending |
+| PROG-03 | Phase 48 | Pending |
+| BACK-01 | Phase 48 | Pending |
+| BACK-02 | Phase 48 | Pending |
+| BACK-03 | Phase 48 | Pending |
+| BACK-04 | Phase 49 | Pending |
+| BACK-05 | Phase 49 | Pending |
+| BACK-06 | Phase 49 | Pending |
+| ATT-01 | Phase 51 | Pending |
+| ATT-02 | Phase 51 | Pending |
+| ATT-03 | Phase 51 | Pending |
+| ATT-04 | Phase 51 | Pending |
+| ATT-05 | Phase 50 | Pending |
+| SESS-01 | Phase 49 | Pending |
+| SESS-02 | Phase 49 | Pending |
+| SESS-03 | Phase 49 | Pending |
+| SESS-04 | Phase 49 | Pending |
+| SESS-05 | Phase 49 | Pending |
+| UI-01 | Phase 51 | Pending |
+| UI-02 | Phase 51 | Pending |
+| UI-03 | Phase 51 | Pending |
+| UI-04 | Phase 51 | Pending |
+| UI-05 | Phase 51 | Pending |
+| UI-06 | Phase 50 | Pending |
 
 **Coverage:**
 - v6.0 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after initial definition*
+*Last updated: 2026-02-23 after roadmap creation — all 25 requirements mapped*
