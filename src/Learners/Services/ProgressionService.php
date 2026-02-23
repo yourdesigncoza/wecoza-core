@@ -283,7 +283,7 @@ class ProgressionService
                 $totalCompletedHours += $duration;
                 $completedLPs++;
             } else {
-                $totalCompletedHours += $progression->getHoursPresent();
+                $totalCompletedHours += $progression->getHoursTrained();
             }
         }
 

@@ -179,7 +179,7 @@ class LearnerProgressionModel extends BaseModel
         if (!$this->subjectDuration || $this->subjectDuration <= 0) {
             return 0;
         }
-        return min(100, round(($this->hoursPresent / $this->subjectDuration) * 100, 1));
+        return min(100, round(($this->hoursTrained / $this->subjectDuration) * 100, 1));
     }
 
     /**
@@ -195,7 +195,7 @@ class LearnerProgressionModel extends BaseModel
      */
     public function isHoursComplete(): bool
     {
-        return $this->subjectDuration && $this->hoursPresent >= $this->subjectDuration;
+        return $this->subjectDuration && $this->hoursTrained >= $this->subjectDuration;
     }
 
     /**
