@@ -658,6 +658,19 @@ add_action(
         require_once WECOZA_CORE_PATH .
             "src/Learners/Ajax/ProgressionAjaxHandlers.php";
 
+        /*
+        |--------------------------------------------------------------------------
+        | Load Attendance AJAX Handlers
+        |--------------------------------------------------------------------------
+        |
+        | AJAX handlers for class attendance operations: session list, capture,
+        | mark exception, session detail, and admin delete.
+        |
+        */
+
+        require_once WECOZA_CORE_PATH .
+            "src/Classes/Ajax/AttendanceAjaxHandlers.php";
+
         // Auto-detect shortcode context for the feedback widget
         add_filter('do_shortcode_tag', function (string $output, string $tag): string {
             if (str_starts_with($tag, 'wecoza_') && !str_contains($output, 'data-wecoza-shortcode')) {

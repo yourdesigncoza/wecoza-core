@@ -392,6 +392,30 @@ class AttendanceService
     }
 
     /**
+     * Get per-learner hours breakdown for a captured session.
+     *
+     * Service wrapper around AttendanceRepository::getSessionsWithLearnerHours().
+     * Phase 50 audit: repository method should be accessed through service, not directly.
+     *
+     * @param int $sessionId Session ID
+     * @return array Per-learner hours rows with session metadata
+     * @throws Exception if session not found
+     */
+    public function getSessionDetail(int $sessionId): array
+    {
+        $session = $this->repository->findById($sessionId);
+
+        if (!$session) {
+            throw new Exception("Session not found: {$sessionId}");
+        }
+
+        return [
+            'session'  => $session,
+            'learners' => $this->repository->getSessionsWithLearnerHours($sessionId),
+        ];
+    }
+
+    /**
      * Admin delete: remove a session and reverse any associated learner hours.
      *
      * For 'captured' sessions: deletes learner_hours_log entries and recalculates

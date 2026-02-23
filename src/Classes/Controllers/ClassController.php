@@ -481,6 +481,7 @@ class ClassController extends BaseController
             'editUrl' => esc_url_raw($editUrl),
             'calendarNonce' => wp_create_nonce('wecoza_calendar_nonce'),
             'classNonce' => wp_create_nonce('wecoza_class_nonce'),
+            'attendanceNonce' => wp_create_nonce('wecoza_attendance_nonce'),
             'canEdit' => current_user_can('edit_posts') || current_user_can('manage_options'),
             'isAdmin' => current_user_can('manage_options'),
             'showLoading' => $showLoading,
