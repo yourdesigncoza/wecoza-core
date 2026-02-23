@@ -221,6 +221,14 @@ class ClassController extends BaseController
             true
         );
 
+        wp_register_script(
+            'wecoza-attendance-capture-js',
+            WECOZA_CORE_URL . 'assets/js/classes/attendance-capture.js',
+            ['jquery', 'wecoza-single-class-display-js'],
+            WECOZA_CORE_VERSION,
+            true
+        );
+
         wp_localize_script('wecoza-class-js', 'wecozaClass', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wecoza_class_nonce'),
@@ -455,6 +463,7 @@ class ClassController extends BaseController
     private function enqueueAndLocalizeSingleClassScript(array $class, bool $showLoading): void
     {
         wp_enqueue_script('wecoza-single-class-display-js');
+        wp_enqueue_script('wecoza-attendance-capture-js');
 
         $newClassPage = get_page_by_path('app/new-class');
         $editUrl = $newClassPage
@@ -466,6 +475,11 @@ class ClassController extends BaseController
         $notesData = $class['class_notes_data'] ?? [];
         if (is_string($notesData)) {
             $notesData = json_decode($notesData, true) ?: [];
+        }
+
+        $learnerIds = $class['learner_ids'] ?? [];
+        if (is_string($learnerIds)) {
+            $learnerIds = json_decode($learnerIds, true) ?: [];
         }
 
         wp_localize_script('wecoza-single-class-display-js', 'WeCozaSingleClass', [
@@ -486,6 +500,7 @@ class ClassController extends BaseController
             'isAdmin' => current_user_can('manage_options'),
             'showLoading' => $showLoading,
             'notesData' => $notesData,
+            'learnerIds' => $learnerIds,
             'debug' => defined('WP_DEBUG') && WP_DEBUG
         ]);
     }

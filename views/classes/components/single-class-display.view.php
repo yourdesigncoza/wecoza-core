@@ -152,6 +152,9 @@ $component_data = [
       <!-- Class Notes Section -->
       <?php echo wecoza_view('classes/components/single-class/notes', $component_data); ?>
 
+      <!-- Attendance Section -->
+      <?php echo wecoza_view('classes/components/single-class/attendance', $component_data); ?>
+
       <!-- Monthly Schedule Summary Section -->
       <?php
       // Process monthly schedule data for single class
