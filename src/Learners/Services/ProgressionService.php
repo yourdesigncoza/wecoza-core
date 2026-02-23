@@ -226,15 +226,23 @@ class ProgressionService
 
     /**
      * Log hours for a learner's current LP
+     *
+     * @param int         $learnerId     The learner whose hours to log
+     * @param float       $hoursTrained  Total hours the session ran (present + absent)
+     * @param float       $hoursPresent  Hours the learner was actually present
+     * @param string      $source        Source of the log entry (default: 'manual')
+     * @param string|null $notes         Optional notes about the log entry
+     * @param int|null    $sessionId     Optional session ID from class_attendance_sessions
+     * @param int|null    $createdBy     Optional WP user ID of the person creating this log
      */
-    public function logHours(int $learnerId, float $hoursTrained, float $hoursPresent, string $source = 'manual', ?string $notes = null): bool
+    public function logHours(int $learnerId, float $hoursTrained, float $hoursPresent, string $source = 'manual', ?string $notes = null, ?int $sessionId = null, ?int $createdBy = null): bool
     {
         $progression = LearnerProgressionModel::getCurrentForLearner($learnerId);
         if (!$progression) {
             throw new Exception("Learner has no in-progress LP");
         }
 
-        return $progression->addHours($hoursTrained, $hoursPresent, $source, $notes);
+        return $progression->addHours($hoursTrained, $hoursPresent, $source, $notes, $sessionId, $createdBy);
     }
 
     /**

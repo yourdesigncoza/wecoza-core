@@ -311,8 +311,15 @@ class LearnerProgressionModel extends BaseModel
 
     /**
      * Add hours to this progression
+     *
+     * @param float       $trained    Total hours the session ran (present + absent)
+     * @param float       $present    Hours the learner was actually present
+     * @param string      $source     Source of the log entry (default: 'manual')
+     * @param string|null $notes      Optional notes about the log entry
+     * @param int|null    $sessionId  Optional session ID from class_attendance_sessions for audit trail
+     * @param int|null    $createdBy  Optional WP user ID of the person creating this log entry
      */
-    public function addHours(float $trained, float $present, string $source = 'manual', ?string $notes = null): bool
+    public function addHours(float $trained, float $present, string $source = 'manual', ?string $notes = null, ?int $sessionId = null, ?int $createdBy = null): bool
     {
         $this->hoursTrained += $trained;
         $this->hoursPresent += $present;
@@ -327,6 +334,8 @@ class LearnerProgressionModel extends BaseModel
             'hours_trained' => $trained,
             'hours_present' => $present,
             'source' => $source,
+            'session_id' => $sessionId,
+            'created_by' => $createdBy,
             'notes' => $notes,
         ]);
 
