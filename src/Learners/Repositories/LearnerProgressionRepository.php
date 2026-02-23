@@ -910,6 +910,39 @@ class LearnerProgressionRepository extends BaseRepository
     }
 
     /**
+     * Delete hours log entries by session_id and return affected tracking IDs.
+     * Used by AttendanceService::deleteAndReverseHours() for hours reversal.
+     *
+     * @param int $sessionId Session ID to delete log entries for
+     * @return array Array of distinct tracking_ids that had rows deleted
+     */
+    public function deleteHoursLogBySessionId(int $sessionId): array
+    {
+        // Step 1: Get affected tracking_ids before deletion
+        $selectSql = "SELECT DISTINCT tracking_id FROM learner_hours_log WHERE session_id = :session_id";
+
+        try {
+            $stmt        = $this->db->query($selectSql, ['session_id' => $sessionId]);
+            $trackingIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository deleteHoursLogBySessionId select error: " . $e->getMessage());
+            return [];
+        }
+
+        // Step 2: Delete the rows
+        $deleteSql = "DELETE FROM learner_hours_log WHERE session_id = :session_id";
+
+        try {
+            $this->db->query($deleteSql, ['session_id' => $sessionId]);
+        } catch (Exception $e) {
+            error_log("WeCoza Core: LearnerProgressionRepository deleteHoursLogBySessionId delete error: " . $e->getMessage());
+            return [];
+        }
+
+        return $trackingIds ?: [];
+    }
+
+    /**
      * Get portfolio files for a tracking ID
      */
     public function getPortfolioFiles(int $trackingId): array
