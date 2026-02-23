@@ -62,25 +62,27 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Generic lookup table CRUD infrastructure (config-driven Repository, AjaxHandler, Controller) — v4.1
 - ✓ Qualifications admin shortcode `[wecoza_manage_qualifications]` with inline-edit Phoenix table — v4.1
 - ✓ Placement levels admin shortcode `[wecoza_manage_placement_levels]` via config reuse — v4.1
+- ✓ AJAX wiring for progression (mark-complete, portfolio upload, data fetch, collision log) — v5.0
+- ✓ Admin progression management panel with filters, bulk ops, hold/resume — v5.0
+- ✓ Learner progression report with timeline, employer filter, summary cards (WEC-165) — v5.0
 
 ### Active
 
-#### Current Milestone: v5.0 Learner Progression
+#### Current Milestone: v6.0 Agent Attendance Capture
 
-**Goal:** Complete learner LP progression tracking integration, admin management, reporting dashboard with timeline/stats, regulatory exports, and portfolio upload wiring.
+**Goal:** Build an attendance capture UI where agents record per-learner hours for each class session, feeding the existing (but unused) `logHours()` infrastructure to make progression tracking actually work.
 
 **Target features:**
-- Wire up existing progression AJAX handlers (mark complete, portfolio upload, data fetch)
-- Admin progression management panel with filters
-- Learner progression report page with timeline visualization (WEC-165)
-- Regulatory reporting for Umalusi/DHET (monthly progressions, compliance export)
-- Phoenix-styled summary cards (no Chart.js)
-- PDF/Excel export for compliance reports
-- LearnerRepository progression context methods (collision detection, last-course)
+- Agent captures per-learner attendance hours on class sessions (WEC-178)
+- Session management with Client Cancelled / Agent Absent exceptions
+- Progress calculation fix (use hours_trained instead of hours_present)
+- Attendance section on single class view with session list, capture modal
+- Duplicate session prevention and locked-after-capture audit trail
 
 ### Out of Scope
 
 - Packages feature (learners on different subjects) — deferred per WEC-168 discussion
+- Regulatory reporting for Umalusi/DHET (monthly progressions, CSV export) — deferred from v5.0 Phase 47
 - New reporting features — separate milestone
 - Mobile app — not planned
 - OAuth/social login — not required
@@ -196,5 +198,11 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | TABLES + SHORTCODE_MAP constants in Controller | Single source of truth; AjaxHandler calls getTableConfig() | ✓ v4.1 |
 | PHP-to-JS config via embedded JSON script tag | Avoids per-shortcode wp_localize_script registration | ✓ v4.1 |
 
+| Agent attendance capture (WEC-178) | Mario: agents capture per-learner hours per session; exceptions don't count | — Pending |
+| Progress calc uses hours_trained | Mario: "total hours trained for tracking, not present hours" | — Pending |
+| Any logged-in user can capture | No agent-only restriction, simpler auth model | — Pending |
+| Captured sessions locked | View-only after submit; admin can delete + re-capture | — Pending |
+| Backdating allowed | Agent can capture for any past scheduled date up to today | — Pending |
+
 ---
-*Last updated: 2026-02-18 after v5.0 milestone started*
+*Last updated: 2026-02-23 after v6.0 milestone started*

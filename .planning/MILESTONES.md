@@ -1,5 +1,30 @@
 # Project Milestones: WeCoza Core
 
+## v5.0 Learner Progression (Shipped: 2026-02-23)
+
+**Delivered:** Wired up LP progression AJAX handlers (mark-complete, portfolio upload, collision log), built admin progression management panel with filters/bulk-complete/hold-resume, and created WEC-165 learner progression report with employer filter, summary cards, and timeline display.
+
+**Phases completed:** 44-46 (9 plans total)
+**Phase 47 (Regulatory Export) deferred** to future milestone.
+
+**Key accomplishments:**
+
+- Registered and wired 10 progression AJAX handlers (mark-complete with portfolio, standalone upload, data fetch, collision acknowledgement, bulk-complete, hours-log, start-LP, hold/resume, admin-fetch, report)
+- Built `[wecoza_progression_admin]` shortcode with filterable table, bulk operations, audit trail modal, start-LP form, hold/resume toggle
+- Built `[wecoza_learner_progression_report]` shortcode with employer-grouped accordion, learner timelines, Phoenix summary cards, status pill filters
+- Class integration UI: Last Completed Course column, collision modal, learner modal progression display
+
+**Stats:**
+
+- 9 plans, 12 phases of tasks
+- Phases 44-46 (3 phases)
+
+**Git range:** v5.0 phases
+
+**What's next:** v6.0 Agent Attendance Capture
+
+---
+
 ## v4.0 Technical Debt (Shipped: 2026-02-16)
 
 **Delivered:** Refactored WeCoza Core architecture with service layer extraction, model unification, address storage normalization, repository pattern enforcement, return type hints, and constants extraction across all 5 modules.
