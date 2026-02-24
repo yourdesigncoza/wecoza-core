@@ -223,7 +223,7 @@ Plans:
 **Goal:** Classes have an explicit three-way status (draft/active/stopped) with manager controls, attendance locking on non-active classes, auto-activation on order_nr entry, and status history audit trail
 **Depends on:** Phase 51
 **Requirements:** WEC-179, WEC-180
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans complete
 
 Plans:
 - [ ] 52-01-PLAN.md — DB migration SQL + wecoza_resolve_class_status() helper + ClassModel/ClassRepository updates

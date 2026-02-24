@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 52 of 52 (Class Activation Logic)
-Plan: 5 of 6 in current phase — Plan 05 complete
-Status: In progress
-Last activity: 2026-02-24 — Phase 52 Plan 05 complete: ClassStatusAjaxHandler (activate/stop/reactivate AJAX with DB transactions, idempotency, CC7 order_nr_metadata), status management UI (status card + activate modal + stop modal + history panel) in single-class-display view
+Plan: 6 of 6 in current phase — Plan 06 Task 1 complete, awaiting human-verify checkpoint
+Status: In progress (checkpoint)
+Last activity: 2026-02-24 — Phase 52 Plan 06: JS status action handlers wired (initializeStatusActions: activate/stop/reactivate/history) in single-class-display.js. Paused at Task 2 human-verify checkpoint.
 
 Progress: [████████████████████] 49/51 phases in progress
 
@@ -71,6 +71,8 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 52-05]: Stop reason whitelist defined as PHP constants (CLASS_STATUS_STOP_REASONS) — DRY single definition
 - [Phase 52-05]: Status history collapsible panel renders placeholder text — JS will load history on first expand
 - [Phase 52-05]: Activate/stop modals include invalid-feedback divs for client-side validation UX
+- [Phase 52]: initializeStatusActions() added as SingleClassApp method — called from init(), consistent with existing method pattern
+- [Phase 52]: showStatusToast() scoped locally inside initializeStatusActions() — separate from attendance-capture.js IIFE scope
 
 ### Roadmap Evolution
 
@@ -89,7 +91,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 52-05-PLAN.md (all tasks)
+Stopped at: 52-06 Task 1 complete (JS handlers committed 12515e9). Paused at Task 2 checkpoint:human-verify.
 Resume file: —
 
-**Next action:** Phase 52 Plan 05 complete. Proceed to Phase 52 Plan 06 (final plan in phase — likely JS wiring for status action handlers + history panel rendering).
+**Next action:** Human verifies complete status management flow (12 steps in 52-06-PLAN.md Task 2). After verification, phase 52 is complete.
