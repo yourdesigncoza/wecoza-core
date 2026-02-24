@@ -481,6 +481,25 @@ if (!function_exists('wecoza_resolve_class_status')) {
     }
 }
 
+if (!function_exists('wecoza_class_status_badge_svg')) {
+    /**
+     * Return a Feather SVG icon for a class status, matching Phoenix badge conventions.
+     *
+     * @param string $status One of 'active', 'stopped', or 'draft' (default).
+     * @return string Inline SVG markup with ms-1 class for badge alignment.
+     */
+    function wecoza_class_status_badge_svg(string $status): string
+    {
+        $svgAttrs = 'xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="height:12.8px;width:12.8px;"';
+
+        return match ($status) {
+            'active'  => '<svg ' . $svgAttrs . ' class="feather feather-check ms-1"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            'stopped' => '<svg ' . $svgAttrs . ' class="feather feather-x ms-1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+            default   => '<svg ' . $svgAttrs . ' class="feather feather-alert-octagon ms-1"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+        };
+    }
+}
+
 if (!function_exists('wecoza_sanitize_value')) {
     /**
      * Sanitize a value based on type

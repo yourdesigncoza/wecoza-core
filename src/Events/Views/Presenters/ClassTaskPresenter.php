@@ -252,9 +252,9 @@ final class ClassTaskPresenter
         $status = wecoza_resolve_class_status($row);
 
         return match ($status) {
-            'active'  => ['class' => 'badge-phoenix-success', 'label' => 'Active',  'icon' => 'bi-check-circle'],
-            'stopped' => ['class' => 'badge-phoenix-danger',  'label' => 'Stopped', 'icon' => 'bi-stop-circle'],
-            default   => ['class' => 'badge-phoenix-warning', 'label' => 'Draft',   'icon' => 'bi-file-earmark-text'],
+            'active'  => ['class' => 'badge-phoenix-success', 'label' => 'Active',  'svg' => wecoza_class_status_badge_svg('active')],
+            'stopped' => ['class' => 'badge-phoenix-danger',  'label' => 'Stopped', 'svg' => wecoza_class_status_badge_svg('stopped')],
+            default   => ['class' => 'badge-phoenix-warning', 'label' => 'Draft',   'svg' => wecoza_class_status_badge_svg('draft')],
         };
     }
 

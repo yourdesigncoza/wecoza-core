@@ -152,7 +152,7 @@ echo $assets;
                                         <?php if (!empty($class['class_status_badge'])): ?>
                                         <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['class_status_badge']['class']); ?>">
                                             <span class="badge-label"><?php echo esc_html($class['class_status_badge']['label']); ?></span>
-                                            <span class="ms-1 <?php echo esc_attr($class['class_status_badge']['icon']); ?>"></span>
+                                            <?php echo $class['class_status_badge']['svg']; ?>
                                         </span>
                                         <?php endif; ?>
                                     </div>

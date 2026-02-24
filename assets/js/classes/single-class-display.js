@@ -852,7 +852,7 @@
                     class_id: config.classId
                 }, function(response) {
                     if (response.success && response.data.history && response.data.history.length > 0) {
-                        var html = '<table class="table table-sm fs-10"><thead><tr>' +
+                        var html = '<table class="table table-sm fs-9"><thead><tr>' +
                             '<th>Date</th><th>From</th><th>To</th><th>Reason</th><th>Changed By</th><th>Notes</th></tr></thead><tbody>';
                         response.data.history.forEach(function(row) {
                             var oldBadge = row.old_status === 'active' ? 'success' : row.old_status === 'stopped' ? 'danger' : 'warning';

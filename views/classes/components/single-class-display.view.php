@@ -140,17 +140,17 @@ $component_data = [
               <h5 class="card-title mb-3"><?= esc_html__('Class Status Management', 'wecoza-core'); ?></h5>
               <div class="d-flex gap-2 align-items-center">
                   <?php if ($classStatus === 'draft'): ?>
-                      <span class="badge badge-phoenix badge-phoenix-warning me-2"><i class="bi bi-file-earmark-text me-1"></i><?= esc_html__('Draft', 'wecoza-core'); ?></span>
+                      <span class="badge badge-phoenix badge-phoenix-warning me-2"><span class="badge-label"><?= esc_html__('Draft', 'wecoza-core'); ?></span><?= wecoza_class_status_badge_svg('draft'); ?></span>
                       <button type="button" class="btn btn-phoenix-success btn-sm" data-bs-toggle="modal" data-bs-target="#activateClassModal">
                           <i class="bi bi-check-circle me-1"></i><?= esc_html__('Activate Class', 'wecoza-core'); ?>
                       </button>
                   <?php elseif ($classStatus === 'active'): ?>
-                      <span class="badge badge-phoenix badge-phoenix-success me-2"><i class="bi bi-check-circle me-1"></i><?= esc_html__('Active', 'wecoza-core'); ?></span>
+                      <span class="badge badge-phoenix badge-phoenix-success me-2"><span class="badge-label"><?= esc_html__('Active', 'wecoza-core'); ?></span><?= wecoza_class_status_badge_svg('active'); ?></span>
                       <button type="button" class="btn btn-phoenix-danger btn-sm" data-bs-toggle="modal" data-bs-target="#stopClassModal">
                           <i class="bi bi-stop-circle me-1"></i><?= esc_html__('Stop Class', 'wecoza-core'); ?>
                       </button>
                   <?php elseif ($classStatus === 'stopped'): ?>
-                      <span class="badge badge-phoenix badge-phoenix-danger me-2"><i class="bi bi-stop-circle me-1"></i><?= esc_html__('Stopped', 'wecoza-core'); ?></span>
+                      <span class="badge badge-phoenix badge-phoenix-danger me-2"><span class="badge-label"><?= esc_html__('Stopped', 'wecoza-core'); ?></span><?= wecoza_class_status_badge_svg('stopped'); ?></span>
                       <button type="button" class="btn btn-phoenix-success btn-sm" id="btn-reactivate-class">
                           <i class="bi bi-arrow-counterclockwise me-1"></i><?= esc_html__('Reactivate Class', 'wecoza-core'); ?>
                       </button>

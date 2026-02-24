@@ -280,15 +280,10 @@ $controller = $controller ?? null;
                                             'stopped' => __('Stopped', 'wecoza-core'),
                                             default   => __('Draft', 'wecoza-core'),
                                         };
-                                        $badgeIcon = match($classStatus) {
-                                            'active'  => 'bi-check-circle',
-                                            'stopped' => 'bi-stop-circle',
-                                            default   => 'bi-file-earmark-text',
-                                        };
                                         ?>
                                         <span class="badge badge-phoenix fs-10 <?= esc_attr($badgeClass); ?>">
                                             <span class="badge-label"><?= esc_html($badgeLabel); ?></span>
-                                            <i class="<?= esc_attr($badgeIcon); ?> ms-1"></i>
+                                            <?= wecoza_class_status_badge_svg($classStatus); ?>
                                         </span>
                                     </td>
                                     <td class="py-2 fs-8 white-space-nowrap">
