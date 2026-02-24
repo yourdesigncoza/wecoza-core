@@ -218,5 +218,20 @@ Plans:
 
 **Total: 46 phases complete, 103 plans executed — v6.0 in progress (phases 48-51)**
 
+### Phase 52: Class Activation Logic
+
+**Goal:** Classes have an explicit three-way status (draft/active/stopped) with manager controls, attendance locking on non-active classes, auto-activation on order_nr entry, and status history audit trail
+**Depends on:** Phase 51
+**Requirements:** WEC-179, WEC-180
+**Plans:** 6 plans
+
+Plans:
+- [ ] 52-01-PLAN.md — DB migration SQL + wecoza_resolve_class_status() helper + ClassModel/ClassRepository updates
+- [ ] 52-02-PLAN.md — TaskManager auto-activate on order_nr + event tasks class status badge
+- [ ] 52-03-PLAN.md — Attendance lock on non-active classes (view + JS + AJAX guard)
+- [ ] 52-04-PLAN.md — Classes listing three-way badge + single class status summary card
+- [ ] 52-05-PLAN.md — ClassStatusAjaxHandler (activate/stop/reactivate) + manager UI (buttons/modals/history)
+- [ ] 52-06-PLAN.md — Status action JS handlers + history loader + end-to-end verification
+
 ---
-*Last updated: 2026-02-23 after v6.0 roadmap created*
+*Last updated: 2026-02-24 after Phase 52 planning*
