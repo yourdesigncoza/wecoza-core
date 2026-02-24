@@ -454,6 +454,33 @@ if (!function_exists('wecoza_transform_dropdown')) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Class Status Functions
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('wecoza_resolve_class_status')) {
+    /**
+     * Resolve the effective class status from a class data array.
+     *
+     * During the migration window, class_status may be NULL for rows that were
+     * inserted before the column was added. This helper provides a safe fallback:
+     * - If class_status is present and non-empty, use it directly.
+     * - Otherwise, derive status from order_nr (non-empty = active, empty = draft).
+     *
+     * This function (CC1) must be used everywhere class status is read to ensure
+     * backward compatibility during the migration period.
+     *
+     * @param array $class Class data row (from DB query or ClassModel::toArray())
+     * @return string One of 'draft', 'active', or 'stopped'
+     */
+    function wecoza_resolve_class_status(array $class): string
+    {
+        return $class['class_status'] ?? (empty($class['order_nr']) ? 'draft' : 'active');
+    }
+}
+
 if (!function_exists('wecoza_sanitize_value')) {
     /**
      * Sanitize a value based on type

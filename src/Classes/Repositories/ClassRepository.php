@@ -57,7 +57,7 @@ class ClassRepository extends BaseRepository
         return [
             'class_id', 'client_id', 'site_id', 'class_type', 'class_subject',
             'class_code', 'seta_funded', 'seta', 'exam_class', 'class_agent',
-            'project_supervisor_id', 'created_at', 'updated_at'
+            'project_supervisor_id', 'class_status', 'created_at', 'updated_at'
         ];
     }
 
@@ -73,7 +73,7 @@ class ClassRepository extends BaseRepository
             'initial_class_agent', 'initial_agent_start_date', 'project_supervisor_id',
             'learner_ids', 'exam_learners', 'backup_agent_ids',
             'schedule_data', 'stop_restart_dates', 'event_dates', 'class_notes_data',
-            'order_nr', 'created_at', 'updated_at'
+            'order_nr', 'class_status', 'created_at', 'updated_at'
         ];
     }
 
@@ -530,6 +530,7 @@ class ClassRepository extends BaseRepository
                 c.project_supervisor_id,
                 c.stop_restart_dates,
                 c.order_nr,
+                c.class_status,
                 c.created_at,
                 c.updated_at
             FROM public.classes c
@@ -589,6 +590,7 @@ class ClassRepository extends BaseRepository
                 'created_at' => $classModel->getCreatedAt(),
                 'updated_at' => $classModel->getUpdatedAt(),
                 'order_nr' => $classModel->getOrderNr(),
+                'class_status' => $classModel->getClassStatus(),
             ];
 
             // Add client name

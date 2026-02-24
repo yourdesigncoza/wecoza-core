@@ -52,6 +52,7 @@ class ClassModel extends BaseModel
     private array $classNotesData = [];
     private array $eventDates = [];
     private ?string $order_nr = null;
+    private string $classStatus = 'draft';
     private ?string $createdAt = null;
     private ?string $updatedAt = null;
 
@@ -99,6 +100,7 @@ class ClassModel extends BaseModel
         $this->setClassNotesData($this->parseJsonField($data['class_notes_data'] ?? $data['classNotes'] ?? $data['class_notes'] ?? []));
         $this->setEventDates($this->parseJsonField($data['event_dates'] ?? $data['eventDates'] ?? []));
         $this->setOrderNr($data['order_nr'] ?? null);
+        $this->classStatus = wecoza_resolve_class_status($data);
 
         return $this;
     }
@@ -164,6 +166,7 @@ class ClassModel extends BaseModel
                 'class_notes_data' => json_encode($this->getClassNotesData()),
                 'event_dates' => json_encode($this->getEventDates()),
                 'order_nr' => $this->getOrderNr(),
+                'class_status' => $this->getClassStatus(),
                 'created_at' => $this->getCreatedAt(),
                 'updated_at' => $this->getUpdatedAt()
             ];
@@ -223,6 +226,7 @@ class ClassModel extends BaseModel
                 'class_notes_data' => json_encode($this->getClassNotesData()),
                 'event_dates' => json_encode($this->getEventDates()),
                 'order_nr' => $this->getOrderNr(),
+                'class_status' => $this->getClassStatus(),
                 'updated_at' => $this->getUpdatedAt()
             ];
 
@@ -413,17 +417,29 @@ class ClassModel extends BaseModel
     public function getUpdatedAt(): ?string { return $this->updatedAt; }
     public function setUpdatedAt(?string $updatedAt): self { $this->updatedAt = $updatedAt; return $this; }
 
-    public function isDraft(): bool {
-        return empty($this->order_nr);
-    }
+    // -------------------------------------------------------------------------
+    // Class Status Methods
+    //
+    // classStatus is the explicit activation state of the class.
+    // Note: ClassController::isClassCurrentlyStopped() checks stop_restart_dates
+    // JSON for schedule pauses — a separate concept from class deactivation.
+    // Do not confuse: stop_restart_dates = schedule gaps; class_status = lifecycle.
+    // -------------------------------------------------------------------------
 
-    public function isActive(): bool {
-        return !empty($this->order_nr);
-    }
+    public function getClassStatus(): string { return $this->classStatus; }
+    public function setClassStatus(string $status): void { $this->classStatus = $status; }
 
-    public function getStatus(): string {
-        return $this->isActive() ? 'Active' : 'Draft';
-    }
+    public function isDraft(): bool { return $this->classStatus === 'draft'; }
+    public function isActive(): bool { return $this->classStatus === 'active'; }
+    public function isStopped(): bool { return $this->classStatus === 'stopped'; }
+
+    public function getStatus(): string { return ucfirst($this->classStatus); }
+
+    /**
+     * Whether attendance capture is allowed for this class.
+     * Only active classes accept new attendance records.
+     */
+    public function isAttendanceAllowed(): bool { return $this->isActive(); }
 
     public function getLearnerData(): array
     {
@@ -568,6 +584,7 @@ class ClassModel extends BaseModel
             'class_notes_data' => $this->getClassNotesData(),
             'event_dates' => $this->getEventDates(),
             'order_nr' => $this->getOrderNr(),
+            'class_status' => $this->getClassStatus(),
             'created_at' => $this->getCreatedAt(),
             'updated_at' => $this->getUpdatedAt(),
             'status' => $this->getStatus(),
