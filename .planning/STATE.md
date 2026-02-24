@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 52 of 52 (Class Activation Logic)
-Plan: 4 of 6 in current phase — Plan 04 complete
+Plan: 5 of 6 in current phase — Plan 05 complete
 Status: In progress
-Last activity: 2026-02-24 — Phase 52 Plan 04 complete: three-way Draft/Active/Stopped Phoenix badge on classes listing (wecoza_resolve_class_status()), 6th status summary card on single-class detail page, ClassController active_count updated to use class_status rather than legacy schedule-pause check
+Last activity: 2026-02-24 — Phase 52 Plan 05 complete: ClassStatusAjaxHandler (activate/stop/reactivate AJAX with DB transactions, idempotency, CC7 order_nr_metadata), status management UI (status card + activate modal + stop modal + history panel) in single-class-display view
 
 Progress: [████████████████████] 49/51 phases in progress
 
@@ -68,6 +68,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 52-03]: require_active_class() calls wp_send_json_error + exit directly — consistent with verify_attendance_nonce() pattern in same file
 - [Phase 52-03]: Attendance view/delete endpoints unguarded — capture/exception only; history remains accessible regardless of class status
 - [Phase 52]: Active count uses wecoza_resolve_class_status() === 'active' not legacy isClassCurrentlyStopped() schedule-pause check
+- [Phase 52-05]: Stop reason whitelist defined as PHP constants (CLASS_STATUS_STOP_REASONS) — DRY single definition
+- [Phase 52-05]: Status history collapsible panel renders placeholder text — JS will load history on first expand
+- [Phase 52-05]: Activate/stop modals include invalid-feedback divs for client-side validation UX
 
 ### Roadmap Evolution
 
@@ -86,7 +89,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 52-04-PLAN.md (all tasks)
+Stopped at: Completed 52-05-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 52 Plan 04 complete. Proceed to Phase 52 Plan 05 (status management UI — activate/stop/reactivate actions, modal + AJAX handler).
+**Next action:** Phase 52 Plan 05 complete. Proceed to Phase 52 Plan 06 (final plan in phase — likely JS wiring for status action handlers + history panel rendering).
