@@ -269,3 +269,31 @@
 
 ---
 
+
+## v6.0 Agent Attendance Capture (Shipped: 2026-02-24)
+
+**Delivered:** Built attendance capture UI where agents record per-learner hours for each class session, feeding the existing `logHours()` infrastructure to make progression tracking actually work. Added three-way class lifecycle (draft/active/stopped) with manager controls and attendance lock gates.
+
+**Phases completed:** 48-52 (13 plans total)
+
+**Key accomplishments:**
+
+- Fixed progress calculation to use hours_trained (not hours_present) across PHP model, SQL CTEs, view templates, and JS
+- Built AttendanceService/Repository with session CRUD, exception marking (Client Cancelled/Agent Absent), and admin delete with hours reversal
+- Wired 5 AJAX endpoints with nonce validation, camelCase normalization, and hours range validation
+- Created attendance capture UI — session list table, month filter, capture/view/exception modals with hours auto-calculation
+- Implemented three-way class status lifecycle (draft/active/stopped) with manager-only transitions, auto-activate on order_nr, and status history audit trail
+- Added attendance lock gate preventing capture on non-active classes (view-side + server-side AJAX guard)
+
+**Stats:**
+
+- 48 files changed, 6,189 insertions, 284 deletions
+- 5 phases, 13 plans, 33 commits
+- 2 days from start to ship (2026-02-23 → 2026-02-24)
+
+**Git range:** `e8d8e31` → `d04e704`
+
+**What's next:** TBD (use `/gsd:new-milestone` to define next milestone)
+
+---
+

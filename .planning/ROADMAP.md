@@ -122,81 +122,19 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
 
 </details>
 
-### ✅ v6.0 Agent Attendance Capture (SHIPPED 2026-02-24)
+<details>
+<summary>✅ v6.0 Agent Attendance Capture (Phases 48-52) — SHIPPED 2026-02-24</summary>
 
-**Milestone Goal:** Build an attendance capture UI where agents record per-learner hours for each class session, feeding the existing (but unused) `logHours()` infrastructure to make progression tracking actually work.
+- [x] Phase 48: Foundation (2/2 plans) — completed 2026-02-23
+- [x] Phase 49: Backend Logic (2/2 plans) — completed 2026-02-23
+- [x] Phase 50: AJAX Endpoints (1/1 plans) — completed 2026-02-23
+- [x] Phase 51: Frontend (2/2 plans) — completed 2026-02-23
+- [x] Phase 52: Class Activation Logic (6/6 plans) — completed 2026-02-24
+- 13 plans total
 
-- [x] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension (completed 2026-02-23)
-- [x] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules (completed 2026-02-23)
-- [x] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend (completed 2026-02-23)
-- [x] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter (completed 2026-02-23)
-- [x] **Phase 52: Class Activation Logic** — Three-way status, manager controls, attendance lock, auto-activate, status history (completed 2026-02-24)
+See: `.planning/milestones/v6.0-ROADMAP.md`
 
-## Phase Details
-
-### Phase 48: Foundation
-**Goal**: The data layer exists and progress calculation uses the correct field — all downstream attendance work builds on accurate infrastructure
-**Depends on**: Phase 46 (v5.0 complete)
-**Requirements**: PROG-01, PROG-02, PROG-03, BACK-01, BACK-02, BACK-03
-**Success Criteria** (what must be TRUE):
-  1. Learner progression bars read from hours_trained (not hours_present) in getProgressPercentage() and isHoursComplete()
-  2. Overall learner progress aggregation (getLearnerOverallProgress()) uses hours_trained for in-progress LPs
-  3. The class_attendance_sessions table exists in PostgreSQL with a unique constraint on (class_id, session_date)
-  4. ProgressionService::logHours() and LearnerProgressionModel::addHours() accept session_id and created_by without breaking existing callers
-**Plans:** 2/2 plans complete
-
-Plans:
-- [ ] 48-01-PLAN.md — Progress fix: change hours_present to hours_trained in model, service, SQL queries, view templates, and JS
-- [ ] 48-02-PLAN.md — Schema + signature extension: class_attendance_sessions CREATE TABLE SQL, extend logHours() and addHours() with session_id and created_by
-
-### Phase 49: Backend Logic
-**Goal**: Attendance business logic is fully encapsulated — sessions are created, queried, validated, and exception-marked server-side with correct hours propagation
-**Depends on**: Phase 48
-**Requirements**: BACK-04, BACK-05, BACK-06, SESS-01, SESS-02, SESS-03, SESS-04, SESS-05
-**Success Criteria** (what must be TRUE):
-  1. AttendanceRepository enforces column whitelisting and the unique (class_id, session_date) constraint prevents duplicate session records
-  2. AttendanceService generates the correct scheduled session dates for a class by delegating to ScheduleService::generateScheduleEntries()
-  3. AttendanceService rejects capture if the submitted date is not a legitimate scheduled date for that class
-  4. Sessions marked "Client Cancelled" or "Agent Absent" create a session record with zero hours — no hours logged to learner_lp_tracking accumulators
-  5. Admin delete of a captured session reverses the accumulated hours from learner_lp_tracking and removes the session record
-**Plans:** 2/2 plans complete
-
-Plans:
-- [ ] 49-01-PLAN.md — AttendanceRepository CRUD with column whitelisting (findByClass, findByClassAndDate, createSession, updateSession, deleteSession, getSessionsWithLearnerHours)
-- [ ] 49-02-PLAN.md — AttendanceService business logic (generateSessionList, validateSessionDate, captureAttendance, markException, deleteAndReverseHours)
-
-### Phase 50: AJAX Endpoints
-**Goal**: All six frontend operations have working, secured AJAX endpoints that return structured JSON and delegate all logic to AttendanceService
-**Depends on**: Phase 49
-**Requirements**: UI-06, ATT-05
-**Success Criteria** (what must be TRUE):
-  1. wecoza_attendance_get_sessions returns session list with correct status and action state for each session
-  2. wecoza_attendance_capture creates a session record, calls logHours() for each learner, and returns success
-  3. wecoza_attendance_mark_exception creates a zero-hours session with the correct exception status
-  4. wecoza_attendance_get_detail returns per-learner hours breakdown for a captured session
-  5. wecoza_attendance_admin_delete reverses hours from tracking accumulators and removes the session record
-  6. All five endpoints validate nonce and return structured JSON error responses on failure
-**Plans:** 1/1 plans complete
-
-Plans:
-- [ ] 50-01-PLAN.md — AttendanceAjaxHandlers with five AJAX endpoints, service wrapper, nonce validation, input normalization, range validation; wire into wecoza-core.php and ClassController
-
-### Phase 51: Frontend
-**Goal**: Agent opens a class page, navigates sessions by month, captures attendance via modal, and views prior sessions read-only — progression data updates without any separate action
-**Depends on**: Phase 50
-**Requirements**: ATT-01, ATT-02, ATT-03, ATT-04, UI-01, UI-02, UI-03, UI-04, UI-05
-**Success Criteria** (what must be TRUE):
-  1. The single class display page shows an Attendance section with summary cards (total sessions, captured, pending)
-  2. The session table shows each scheduled session with date, day, time range, hours, status badge, and action button
-  3. Month filter tabs appear above the session table and clicking a tab narrows the list to sessions in that month only
-  4. Clicking "Capture" opens a modal with enrolled learners, hours_trained pre-filled, and hours_present defaulting to the same value (adjustable down in 0.5-step increments, min 0)
-  5. Hours absent auto-calculates as hours_trained minus hours_present in real time without manual input
-  6. Clicking "View" on a captured session shows a read-only per-learner hours breakdown
-**Plans:** 1/2 plans executed
-
-Plans:
-- [ ] 51-01-PLAN.md — PHP view template: attendance.php component with summary cards, month tabs, session table, capture/view/exception modals; insert into single-class-display.view.php; enqueue and localize JS in ClassController
-- [ ] 51-02-PLAN.md — attendance-capture.js: session list rendering, month filter, capture modal with hours auto-calc, view-detail modal, exception modal, admin delete; all AJAX calls wired to Phase 50 endpoints
+</details>
 
 ## Progress
 
@@ -212,13 +150,9 @@ Plans:
 | 36-41 | v4.0 | 14/14 | Complete | 2026-02-16 |
 | 42-43 | v4.1 | 3/3 | Complete | 2026-02-17 |
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
-| 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
-| 49. Backend Logic | 2/2 | Complete    | 2026-02-23 | - |
-| 50. AJAX Endpoints | 1/1 | Complete    | 2026-02-23 | - |
-| 51. Frontend | 2/2 | Complete | 2026-02-23 | - |
-| 52. Class Activation | 6/6 | Complete | 2026-02-24 | - |
+| 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 
-**Total: 52 phases complete, 111 plans executed — v6.0 shipped 2026-02-24**
+**Total: 52 phases complete, 111 plans executed across 11 milestones**
 
 ---
-*Last updated: 2026-02-24 — Phase 52 complete, v6.0 shipped*
+*Last updated: 2026-02-24 — v6.0 milestone archived*
