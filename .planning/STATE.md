@@ -62,6 +62,9 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 51-01]: Admin delete button rendered conditionally via current_user_can('manage_options') in PHP template
 - [Phase 52]: wecoza_resolve_class_status() uses null-coalescing fallback for migration window compatibility
 - [Phase 52]: ClassModel classStatus defaults to 'draft' matching DB column default
+- [Phase 52-02]: normaliseOrderNumber() changed to public static — DRY reuse by ClassStatusAjaxHandler (Plan 05)
+- [Phase 52-02]: Separate :order_nr_check PDO param for CASE expression — PDO cannot bind same name twice in one statement
+- [Phase 52-02]: wecoza_resolve_class_status() used in ClassTaskPresenter badge formatter for migration-window NULL safety
 - [Phase 52-03]: require_active_class() calls wp_send_json_error + exit directly — consistent with verify_attendance_nonce() pattern in same file
 - [Phase 52-03]: Attendance view/delete endpoints unguarded — capture/exception only; history remains accessible regardless of class status
 
