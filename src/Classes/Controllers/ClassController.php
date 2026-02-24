@@ -482,6 +482,9 @@ class ClassController extends BaseController
             $learnerIds = json_decode($learnerIds, true) ?: [];
         }
 
+        // Compute class status once — used for both classStatus and isAttendanceLocked (avoids double-call).
+        $classStatus = wecoza_resolve_class_status($class);
+
         wp_localize_script('wecoza-single-class-display-js', 'WeCozaSingleClass', [
             'classId' => $class['class_id'] ?? null,
             'classCode' => $class['class_code'] ?? '',
@@ -496,6 +499,9 @@ class ClassController extends BaseController
             'calendarNonce' => wp_create_nonce('wecoza_calendar_nonce'),
             'classNonce' => wp_create_nonce('wecoza_class_nonce'),
             'attendanceNonce' => wp_create_nonce('wecoza_attendance_nonce'),
+            'classStatus' => $classStatus,
+            'isAttendanceLocked' => $classStatus !== 'active',
+            'orderNr' => $class['order_nr'] ?? '',
             'canEdit' => current_user_can('edit_posts') || current_user_can('manage_options'),
             'isAdmin' => current_user_can('manage_options'),
             'showLoading' => $showLoading,

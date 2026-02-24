@@ -30,6 +30,30 @@ $class = $class ?? [];
 if (empty($class)) {
     return;
 }
+
+// Attendance lock gate: only active classes allow attendance capture.
+// Note: class_status = 'stopped' means class deactivation (access control).
+//       stop_restart_dates = schedule pauses (schedule exclusion). These are distinct concepts.
+$classStatus        = wecoza_resolve_class_status($class);
+$isAttendanceLocked = $classStatus !== 'active';
+
+if ($isAttendanceLocked) {
+    $lockMsg = $classStatus === 'stopped'
+        ? __('This class has been stopped. Attendance capture is locked.', 'wecoza-core')
+        : __('This class is in draft status. Attendance capture is not available until the class is activated.', 'wecoza-core');
+    ?>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title mb-3"><?= esc_html__('Attendance', 'wecoza-core'); ?></h5>
+            <div class="alert alert-subtle-warning d-flex align-items-center mb-0">
+                <i class="bi bi-lock-fill me-3 fs-4"></i>
+                <div><?= esc_html($lockMsg); ?></div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return;
+}
 ?>
 
 <!-- Attendance Section -->
