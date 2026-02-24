@@ -5,21 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v6.0 Class Activation Logic — Phase 52
+**Current focus:** v6.0 shipped — all phases complete
 
 ## Current Position
 
 Phase: 52 of 52 (Class Activation Logic)
-Plan: 6 of 6 in current phase — Plan 06 Task 1 complete, awaiting human-verify checkpoint
-Status: In progress (checkpoint)
-Last activity: 2026-02-24 — Phase 52 Plan 06: JS status action handlers wired (initializeStatusActions: activate/stop/reactivate/history) in single-class-display.js. Paused at Task 2 human-verify checkpoint.
+Plan: 6 of 6 — Complete
+Status: Phase 52 complete, v6.0 milestone shipped
+Last activity: 2026-02-24 — Phase 52 approved after UAT (3 rounds of fixes: Gemini code review, badge alignment, attendance month filter)
 
-Progress: [████████████████████] 49/51 phases in progress
+Progress: [████████████████████] 52/52 phases complete
 
 ## Milestone History
 
 | Version | Name | Shipped | Phases | Plans |
 |---------|------|---------|--------|-------|
+| v6.0 | Agent Attendance Capture | 2026-02-24 | 48-52 | 12 |
 | v5.0 | Learner Progression | 2026-02-23 | 44-46 | 9 |
 | v4.1 | Lookup Table Admin | 2026-02-17 | 42-43 | 3 |
 | v4.0 | Technical Debt | 2026-02-16 | 36-41 | 14 |
@@ -38,45 +39,21 @@ See: .planning/ROADMAP.md for current milestone detail
 ### Decisions
 
 - WEC-178: Mario confirmed agents capture per-learner hours per class session; schedule defines max hours; Client Cancelled / Agent Absent don't count toward hours_trained
-- [Phase 48-01]: Progress calculation uses hours_trained (not hours_present) per Mario's clarification — fixed in PHP model (getProgressPercentage/isHoursComplete), service (getLearnerOverallProgress), SQL CTEs (ClassRepository/LearnerRepository/LearnerProgressionRepository), views, and JS
+- [Phase 48-01]: Progress calculation uses hours_trained (not hours_present) per Mario's clarification
 - v6.0: Any logged-in user can capture attendance (no agent-only restriction)
 - v6.0: Captured sessions are locked (view-only); admin can delete + re-capture for audit integrity
 - v6.0: Backdating allowed for any past scheduled date up to today
-- [Phase 47-01]: Admin-only access (manage_options) enforced on both regulatory endpoints — PII data requires highest privilege
-- [Phase 47-01]: Separate first_name/surname columns returned (not CONCAT) to support regulatory form field mapping
-- [Phase 47-01]: UTF-8 BOM prepended to CSV output for Excel UTF-8 compatibility
-- [Phase 47-02]: Client dropdown populated from first fetch response (guard flag) — no separate AJAX call needed
-- [Phase 47-02]: CSV export uses window.location.href redirect — browser handles file download from Content-Disposition header
-- [Phase 48-02]: class_attendance_sessions status column uses VARCHAR(30) CHECK constraint on 4 values: pending, captured, client_cancelled, agent_absent
-- [Phase 48-02]: captured_by uses WP user ID (not agent record ID) for consistency with learner_hours_log.created_by
-- [Phase 48-02]: session_id/created_by added as ?int = null to logHours/addHours — null values filtered by repository array_intersect_key, fully backward-compatible
-- [Phase 49-01]: UNIQUE constraint on (class_id, session_date) enforced at DB level — AttendanceRepository trusts constraint and lets DB throw on duplicates, no application-level check needed
-- [Phase 49-02]: perDayTimes->perDay format mapping + mode='per-day' in generateSessionList before calling ScheduleService — handles both old start_time and new startTime DB key formats
-- [Phase 49-02]: captureAttendance uses error-tolerant foreach loop — per-learner logHours failures don't abort the whole capture
-- [Phase 49-02]: deleteHoursLogBySessionId lives in LearnerProgressionRepository (not raw SQL in service) — all hours-log DB access stays in repository layer
-- [Phase 50-01]: Shared verify_attendance_nonce() helper instead of inline check_ajax_referer in each handler — DRY pattern matching ProgressionAjaxHandlers approach
-- [Phase 50-01]: Range validation in AJAX handler layer (not service) — handler owns HTTP input normalization; service owns business rules
-- [Phase 50-01]: No wp_ajax_nopriv_ registrations — site requires login per project policy
-- [Phase 51-01]: attendance-capture.js depends on wecoza-single-class-display-js so WeCozaSingleClass config is available before attendance JS runs
-- [Phase 51-01]: learnerIds decoded from JSON string to PHP array before wp_localize_script — JS receives plain array
-- [Phase 51-01]: Admin delete button rendered conditionally via current_user_can('manage_options') in PHP template
 - [Phase 52]: wecoza_resolve_class_status() uses null-coalescing fallback for migration window compatibility
-- [Phase 52]: ClassModel classStatus defaults to 'draft' matching DB column default
-- [Phase 52-02]: normaliseOrderNumber() changed to public static — DRY reuse by ClassStatusAjaxHandler (Plan 05)
-- [Phase 52-02]: Separate :order_nr_check PDO param for CASE expression — PDO cannot bind same name twice in one statement
-- [Phase 52-02]: wecoza_resolve_class_status() used in ClassTaskPresenter badge formatter for migration-window NULL safety
-- [Phase 52-03]: require_active_class() calls wp_send_json_error + exit directly — consistent with verify_attendance_nonce() pattern in same file
-- [Phase 52-03]: Attendance view/delete endpoints unguarded — capture/exception only; history remains accessible regardless of class status
-- [Phase 52]: Active count uses wecoza_resolve_class_status() === 'active' not legacy isClassCurrentlyStopped() schedule-pause check
-- [Phase 52-05]: Stop reason whitelist defined as PHP constants (CLASS_STATUS_STOP_REASONS) — DRY single definition
-- [Phase 52-05]: Status history collapsible panel renders placeholder text — JS will load history on first expand
-- [Phase 52-05]: Activate/stop modals include invalid-feedback divs for client-side validation UX
-- [Phase 52]: initializeStatusActions() added as SingleClassApp method — called from init(), consistent with existing method pattern
-- [Phase 52]: showStatusToast() scoped locally inside initializeStatusActions() — separate from attendance-capture.js IIFE scope
+- [Phase 52]: Three-way class status (draft/active/stopped) with manager-only transitions
+- [Phase 52]: Auto-activate on order_nr entry via TaskManager with audit trail to class_status_history
+- [Phase 52]: Attendance lock gate on non-active classes (view + server-side AJAX guard)
+- [Phase 52]: Status transitions use FOR UPDATE row lock inside transaction for concurrency safety
+- [Phase 52]: Phoenix Feather SVG icons for status badges (not Bootstrap Icons)
+- [Phase 52]: wecoza_class_status_badge_svg() DRY helper for badge SVG markup across 5 views
 
 ### Roadmap Evolution
 
-- Phase 52 added: Class Activation Logic (WEC-179/180)
+- Phase 52 added: Class Activation Logic (WEC-179/180) — completed 2026-02-24
 
 ### Pending Todos
 
@@ -87,11 +64,12 @@ None.
 | Source | Issue | Impact |
 |--------|-------|--------|
 | v4.0 tech debt | Address dual-write period active, old agent address columns remain | Must eventually remove old columns |
+| ScheduleService | declare(strict_types=1) from commit 3897e45 broke setDate() for monthly-pattern classes — fixed with (int) casts but production needs deployment | Deploy latest code to production |
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: 52-06 Task 1 complete (JS handlers committed 12515e9). Paused at Task 2 checkpoint:human-verify.
+Stopped at: Phase 52 complete. v6.0 milestone shipped.
 Resume file: —
 
-**Next action:** Human verifies complete status management flow (12 steps in 52-06-PLAN.md Task 2). After verification, phase 52 is complete.
+**Next action:** Deploy latest code to production (includes strict_types int cast fix + attendance month filter fix). Consider starting next milestone (v7.0).

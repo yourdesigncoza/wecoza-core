@@ -12,7 +12,7 @@
 - ✅ **v4.0 Technical Debt** — Phases 36-41 (shipped 2026-02-16)
 - ✅ **v4.1 Lookup Table Admin** — Phases 42-43 (shipped 2026-02-17)
 - ✅ **v5.0 Learner Progression** — Phases 44-46 (shipped 2026-02-23)
-- 🚧 **v6.0 Agent Attendance Capture** — Phases 48-51 (in progress)
+- ✅ **v6.0 Agent Attendance Capture** — Phases 48-52 (shipped 2026-02-24)
 
 ## Phases
 
@@ -122,14 +122,15 @@ See: `.planning/milestones/v5.0-ROADMAP.md`
 
 </details>
 
-### 🚧 v6.0 Agent Attendance Capture (In Progress)
+### ✅ v6.0 Agent Attendance Capture (SHIPPED 2026-02-24)
 
 **Milestone Goal:** Build an attendance capture UI where agents record per-learner hours for each class session, feeding the existing (but unused) `logHours()` infrastructure to make progression tracking actually work.
 
 - [x] **Phase 48: Foundation** — Schema, progress calculation fix, and logHours signature extension (completed 2026-02-23)
 - [x] **Phase 49: Backend Logic** — AttendanceRepository, AttendanceService, session management rules (completed 2026-02-23)
 - [x] **Phase 50: AJAX Endpoints** — Six endpoints connecting service layer to frontend (completed 2026-02-23)
-- [ ] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter
+- [x] **Phase 51: Frontend** — Attendance view, capture modal, JS wiring, month filter (completed 2026-02-23)
+- [x] **Phase 52: Class Activation Logic** — Three-way status, manager controls, attendance lock, auto-activate, status history (completed 2026-02-24)
 
 ## Phase Details
 
@@ -214,24 +215,10 @@ Plans:
 | 48. Foundation | 2/2 | Complete    | 2026-02-23 | - |
 | 49. Backend Logic | 2/2 | Complete    | 2026-02-23 | - |
 | 50. AJAX Endpoints | 1/1 | Complete    | 2026-02-23 | - |
-| 51. Frontend | 1/2 | In Progress|  | - |
+| 51. Frontend | 2/2 | Complete | 2026-02-23 | - |
+| 52. Class Activation | 6/6 | Complete | 2026-02-24 | - |
 
-**Total: 46 phases complete, 103 plans executed — v6.0 in progress (phases 48-51)**
-
-### Phase 52: Class Activation Logic
-
-**Goal:** Classes have an explicit three-way status (draft/active/stopped) with manager controls, attendance locking on non-active classes, auto-activation on order_nr entry, and status history audit trail
-**Depends on:** Phase 51
-**Requirements:** WEC-179, WEC-180
-**Plans:** 6/6 plans complete
-
-Plans:
-- [ ] 52-01-PLAN.md — DB migration SQL + wecoza_resolve_class_status() helper + ClassModel/ClassRepository updates
-- [ ] 52-02-PLAN.md — TaskManager auto-activate on order_nr + event tasks class status badge
-- [ ] 52-03-PLAN.md — Attendance lock on non-active classes (view + JS + AJAX guard)
-- [ ] 52-04-PLAN.md — Classes listing three-way badge + single class status summary card
-- [ ] 52-05-PLAN.md — ClassStatusAjaxHandler (activate/stop/reactivate) + manager UI (buttons/modals/history)
-- [ ] 52-06-PLAN.md — Status action JS handlers + history loader + end-to-end verification
+**Total: 52 phases complete, 111 plans executed — v6.0 shipped 2026-02-24**
 
 ---
-*Last updated: 2026-02-24 after Phase 52 planning*
+*Last updated: 2026-02-24 — Phase 52 complete, v6.0 shipped*
