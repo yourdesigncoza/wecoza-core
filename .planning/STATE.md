@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 52 of 52 (Class Activation Logic)
-Plan: 1 of 6 in current phase — Plan 01 complete
+Plan: 3 of 6 in current phase — Plan 03 complete
 Status: In progress
-Last activity: 2026-02-24 — Phase 52 Plan 01 complete: DB migration SQL (class_status column + class_status_history table), wecoza_resolve_class_status() helper in functions.php, ClassModel classStatus property/getter/setter/status-methods, ClassRepository column whitelists + SELECT updated
+Last activity: 2026-02-24 — Phase 52 Plan 03 complete: attendance view lock gate (alert-subtle-warning for draft/stopped), classStatus/isAttendanceLocked/orderNr in WeCozaSingleClass JS config, require_active_class() AJAX guard on capture and exception handlers
 
 Progress: [████████████████████] 49/51 phases in progress
 
@@ -62,6 +62,8 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 51-01]: Admin delete button rendered conditionally via current_user_can('manage_options') in PHP template
 - [Phase 52]: wecoza_resolve_class_status() uses null-coalescing fallback for migration window compatibility
 - [Phase 52]: ClassModel classStatus defaults to 'draft' matching DB column default
+- [Phase 52-03]: require_active_class() calls wp_send_json_error + exit directly — consistent with verify_attendance_nonce() pattern in same file
+- [Phase 52-03]: Attendance view/delete endpoints unguarded — capture/exception only; history remains accessible regardless of class status
 
 ### Roadmap Evolution
 
@@ -80,7 +82,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 52-01-PLAN.md (all tasks)
+Stopped at: Completed 52-03-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 52 Plan 01 complete. Proceed to Phase 52 Plan 02 (TaskManager auto-activate on order_nr assign).
+**Next action:** Phase 52 Plan 03 complete. Proceed to Phase 52 Plan 04 (event tasks badge — ClassTaskRepository + Presenter + main.php).
