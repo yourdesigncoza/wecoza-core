@@ -114,6 +114,8 @@ final class ClassTaskPresenter
         $openCount = count($tasksPayload['open'] ?? []);
         $status = $this->formatTaskStatusBadge($openCount);
 
+        $classStatusBadge = $this->formatClassStatusBadge($row);
+
         $data = [
             'id' => $classId,
             'code' => $code,
@@ -128,6 +130,7 @@ final class ClassTaskPresenter
             'agent_display' => $agentDisplay,
             'exam' => $exam,
             'status' => $status,
+            'class_status_badge' => $classStatusBadge,
             'seta' => $seta,
             'change' => $change,
             'log_id' => $logId,
@@ -233,6 +236,26 @@ final class ClassTaskPresenter
             'label' => strtoupper(__('Completed', 'wecoza-events')),
             'class' => 'badge-phoenix-secondary',
         ];
+    }
+
+    /**
+     * Format the class status badge based on class_status value.
+     *
+     * Uses wecoza_resolve_class_status() for migration-window compatibility:
+     * when class_status is NULL (pre-backfill), falls back to order_nr presence.
+     *
+     * @param array<string, mixed> $row Raw class row from repository
+     * @return array{class: string, label: string, icon: string}
+     */
+    private function formatClassStatusBadge(array $row): array
+    {
+        $status = wecoza_resolve_class_status($row);
+
+        return match ($status) {
+            'active'  => ['class' => 'badge-phoenix-success', 'label' => 'Active',  'icon' => 'bi-check-circle'],
+            'stopped' => ['class' => 'badge-phoenix-danger',  'label' => 'Stopped', 'icon' => 'bi-stop-circle'],
+            default   => ['class' => 'badge-phoenix-warning', 'label' => 'Draft',   'icon' => 'bi-file-earmark-text'],
+        };
     }
 
     private function formatChangeBadge(string $operation): array

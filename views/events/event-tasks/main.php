@@ -148,6 +148,12 @@ echo $assets;
                                     <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['status']['class']); ?>" data-role="status-badge">
                                         <?php echo esc_html($class['status']['label']); ?>
                                     </span>
+                                    <?php if (!empty($class['class_status_badge'])): ?>
+                                    <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['class_status_badge']['class']); ?>">
+                                        <span class="badge-label"><?php echo esc_html($class['class_status_badge']['label']); ?></span>
+                                        <span class="ms-1 <?php echo esc_attr($class['class_status_badge']['icon']); ?>"></span>
+                                    </span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['change']['class']); ?>">

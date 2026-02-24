@@ -84,6 +84,7 @@ SELECT
     c.stop_restart_dates,
     c.updated_at,
     c.order_nr,
+    c.class_status,
     c.event_dates,
     cl.client_name
 FROM classes c
