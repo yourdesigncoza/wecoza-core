@@ -95,7 +95,7 @@ final class TaskManager
         string $timestamp,
         ?string $note
     ): TaskCollection {
-        $orderNumber = $this->normaliseOrderNumber($note ?? '');
+        $orderNumber = self::normaliseOrderNumber($note ?? '');
         if ($orderNumber === '') {
             throw new RuntimeException(__('An order number is required before completing this task.', 'wecoza-events'));
         }
@@ -191,12 +191,12 @@ final class TaskManager
      * Fetch a class by ID with fields needed for task building.
      *
      * @param int $classId Class ID
-     * @return array<string, mixed> Class data with class_id, order_nr, order_nr_metadata, event_dates
+     * @return array<string, mixed> Class data with class_id, order_nr, order_nr_metadata, event_dates, class_status
      * @throws RuntimeException If class not found
      */
     private function fetchClassById(int $classId): array
     {
-        $sql = "SELECT class_id, order_nr, order_nr_metadata, event_dates FROM classes WHERE class_id = :class_id LIMIT 1";
+        $sql = "SELECT class_id, order_nr, order_nr_metadata, event_dates, class_status FROM classes WHERE class_id = :class_id LIMIT 1";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if ($stmt === false) {
@@ -235,7 +235,9 @@ final class TaskManager
             $metadata = json_encode(['completed_by' => $userId, 'completed_at' => $timestamp], JSON_THROW_ON_ERROR);
         }
 
-        $sql = "UPDATE classes SET order_nr = :order_nr, order_nr_metadata = :metadata, updated_at = now() WHERE class_id = :class_id";
+        $sql = "UPDATE classes SET order_nr = :order_nr, order_nr_metadata = :metadata,
+            class_status = CASE WHEN class_status = 'draft' AND :order_nr_check != '' THEN 'active' ELSE class_status END,
+            updated_at = now() WHERE class_id = :class_id";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if ($stmt === false) {
@@ -244,6 +246,7 @@ final class TaskManager
 
         $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
         $stmt->bindValue(':order_nr', $orderNumber, PDO::PARAM_STR);
+        $stmt->bindValue(':order_nr_check', $orderNumber, PDO::PARAM_STR);
         $stmt->bindValue(':metadata', $metadata, $metadata !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
 
         if (!$stmt->execute()) {
@@ -251,7 +254,7 @@ final class TaskManager
         }
     }
 
-    private function normaliseOrderNumber(string $value): string
+    public static function normaliseOrderNumber(string $value): string
     {
         $value = trim($value);
         $value = preg_replace('/[[:cntrl:]]+/', '', $value) ?? '';
