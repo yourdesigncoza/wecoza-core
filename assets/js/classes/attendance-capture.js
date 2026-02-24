@@ -129,7 +129,14 @@
             $select.append('<option value="' + ym + '">' + label + '</option>');
         });
 
+        // Try selecting the current month; if it has no sessions, fall back
+        // to the first month with data (or 'all' if none).
         $select.val(currentMonth);
+        if ($select.val() !== currentMonth) {
+            var firstAvailable = $select.find('option:nth-child(2)').val();
+            currentMonth = firstAvailable || 'all';
+            $select.val(currentMonth);
+        }
     }
 
     // =========================================================

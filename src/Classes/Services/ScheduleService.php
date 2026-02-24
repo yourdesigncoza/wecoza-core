@@ -348,8 +348,8 @@ class ScheduleService
             // Handle pattern-based generation
             $pattern = $scheduleData['pattern'] ?? 'weekly';
             $tz = wp_timezone();
-            $startDate = isset($scheduleData['startDate']) ? new DateTime($scheduleData['startDate'], $tz) : null;
-            $endDate = isset($scheduleData['endDate']) ? new DateTime($scheduleData['endDate'], $tz) : null;
+            $startDate = !empty($scheduleData['startDate']) ? new DateTime($scheduleData['startDate'], $tz) : null;
+            $endDate = !empty($scheduleData['endDate']) ? new DateTime($scheduleData['endDate'], $tz) : null;
             $timeData = $scheduleData['timeData'] ?? [];
             $selectedDays = $scheduleData['selectedDays'] ?? [];
 
