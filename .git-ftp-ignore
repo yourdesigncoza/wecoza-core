@@ -8,3 +8,23 @@ docs/
 *.md
 .env
 .integrate/
+.git/
+.planning/
+docs/
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+# Build artifacts
+*.map
+# Dependencies
+vendor/
+node_modules/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
