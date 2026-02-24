@@ -235,11 +235,20 @@ final class TaskManager
             $metadata = json_encode(['completed_by' => $userId, 'completed_at' => $timestamp], JSON_THROW_ON_ERROR);
         }
 
+        $pdo = $this->db->getPdo();
+
+        // Check current status before update — needed for audit trail
+        $checkStmt = $pdo->prepare('SELECT class_status, order_nr FROM classes WHERE class_id = :class_id');
+        $checkStmt->execute([':class_id' => $classId]);
+        $currentRow = $checkStmt->fetch(PDO::FETCH_ASSOC);
+        $currentStatus = $currentRow ? wecoza_resolve_class_status($currentRow) : 'draft';
+        $willAutoActivate = $currentStatus === 'draft' && $orderNumber !== '';
+
         $sql = "UPDATE classes SET order_nr = :order_nr, order_nr_metadata = :metadata,
             class_status = CASE WHEN class_status = 'draft' AND :order_nr_check != '' THEN 'active' ELSE class_status END,
             updated_at = now() WHERE class_id = :class_id";
 
-        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt = $pdo->prepare($sql);
         if ($stmt === false) {
             throw new RuntimeException('Failed to prepare order number update.');
         }
@@ -251,6 +260,22 @@ final class TaskManager
 
         if (!$stmt->execute()) {
             throw new RuntimeException('Failed to update class order number.');
+        }
+
+        // Record auto-activation in class_status_history for audit trail
+        if ($willAutoActivate) {
+            $histStmt = $pdo->prepare(
+                "INSERT INTO class_status_history (class_id, old_status, new_status, reason, notes, changed_by)
+                 VALUES (:class_id, :old_status, :new_status, :reason, :notes, :changed_by)"
+            );
+            $histStmt->execute([
+                ':class_id'   => $classId,
+                ':old_status' => 'draft',
+                ':new_status' => 'active',
+                ':reason'     => 'auto_activate_order_nr',
+                ':notes'      => null,
+                ':changed_by' => $userId ?? get_current_user_id(),
+            ]);
         }
     }
 

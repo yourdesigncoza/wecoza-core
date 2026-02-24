@@ -96,57 +96,64 @@ function handle_class_status_update(): void
         exit;
     }
 
-    // --- Fetch current class status ---
-    $pdo  = wecoza_db()->getPdo();
-    $stmt = $pdo->prepare('SELECT class_status, order_nr FROM classes WHERE class_id = :class_id');
-    $stmt->execute([':class_id' => $classId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$row) {
-        wp_send_json_error(['message' => __('Class not found.', 'wecoza-core')], 404);
-        exit;
-    }
-
-    $currentStatus = wecoza_resolve_class_status($row);
-
-    // --- Idempotency guard (CC3) ---
-    if ($currentStatus === $newStatus) {
-        wp_send_json_error(
-            ['message' => sprintf(__('Class is already %s.', 'wecoza-core'), $newStatus)],
-            400
-        );
-        exit;
-    }
-
-    // --- Transition validation ---
+    // --- Pre-validate inputs that don't need DB state ---
     $currentUserId = get_current_user_id();
 
-    if ($currentStatus === 'draft' && $newStatus === 'active') {
-        // draft→active: require order_nr
+    if ($newStatus === 'active') {
         $normalisedOrderNr = \WeCoza\Events\Services\TaskManager::normaliseOrderNumber($orderNr);
-        if ($normalisedOrderNr === '') {
-            wp_send_json_error(['message' => __('An order number is required to activate this class.', 'wecoza-core')], 400);
-            exit;
-        }
-    } elseif ($currentStatus === 'active' && $newStatus === 'stopped') {
-        // active→stopped: require valid stop_reason
-        if (!in_array($stopReason, CLASS_STATUS_STOP_REASONS, true)) {
-            wp_send_json_error(['message' => __('A valid stop reason is required.', 'wecoza-core')], 400);
-            exit;
-        }
-    } elseif ($currentStatus === 'stopped' && $newStatus === 'active') {
-        // stopped→active: no extra requirements (order_nr already exists)
-    } else {
-        wp_send_json_error(
-            ['message' => sprintf(__('Invalid status transition: %s → %s.', 'wecoza-core'), $currentStatus, $newStatus)],
-            400
-        );
+    }
+
+    if ($newStatus === 'stopped' && !in_array($stopReason, CLASS_STATUS_STOP_REASONS, true)) {
+        wp_send_json_error(['message' => __('A valid stop reason is required.', 'wecoza-core')], 400);
         exit;
     }
 
-    // --- DB Transaction (CC2) ---
+    // --- DB Transaction (CC2) with row-level lock for concurrency safety ---
+    $pdo = wecoza_db()->getPdo();
     $pdo->beginTransaction();
     try {
+        // Lock the row and fetch current status inside the transaction
+        $stmt = $pdo->prepare('SELECT class_status, order_nr FROM classes WHERE class_id = :class_id FOR UPDATE');
+        $stmt->execute([':class_id' => $classId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            $pdo->rollBack();
+            wp_send_json_error(['message' => __('Class not found.', 'wecoza-core')], 404);
+            exit;
+        }
+
+        $currentStatus = wecoza_resolve_class_status($row);
+
+        // --- Idempotency guard (CC3) ---
+        if ($currentStatus === $newStatus) {
+            $pdo->rollBack();
+            wp_send_json_error(
+                ['message' => sprintf(__('Class is already %s.', 'wecoza-core'), $newStatus)],
+                400
+            );
+            exit;
+        }
+
+        // --- Transition validation ---
+        if ($currentStatus === 'draft' && $newStatus === 'active') {
+            if ($normalisedOrderNr === '') {
+                $pdo->rollBack();
+                wp_send_json_error(['message' => __('An order number is required to activate this class.', 'wecoza-core')], 400);
+                exit;
+            }
+        } elseif ($currentStatus === 'active' && $newStatus === 'stopped') {
+            // stop_reason already validated above
+        } elseif ($currentStatus === 'stopped' && $newStatus === 'active') {
+            // no extra requirements (order_nr already exists)
+        } else {
+            $pdo->rollBack();
+            wp_send_json_error(
+                ['message' => sprintf(__('Invalid status transition: %s → %s.', 'wecoza-core'), $currentStatus, $newStatus)],
+                400
+            );
+            exit;
+        }
         if ($currentStatus === 'draft' && $newStatus === 'active') {
             // Write order_nr and order_nr_metadata for CC7 compatibility
             $metadata = json_encode([
