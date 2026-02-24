@@ -39,6 +39,37 @@ function verify_attendance_nonce(): void
 }
 
 /**
+ * Guard attendance capture/exception endpoints to active classes only.
+ *
+ * Queries class_status via wecoza_resolve_class_status() and rejects non-active
+ * classes with a 403 response. Does NOT guard view-only or admin-delete endpoints —
+ * those remain accessible on any class status for audit integrity.
+ *
+ * Note: class_status = 'stopped' is class deactivation (access control).
+ *       stop_restart_dates is schedule-pause logic. These are distinct concepts.
+ *
+ * @param int $classId The class ID to check.
+ */
+function require_active_class(int $classId): void
+{
+    $pdo  = wecoza_db()->getPdo();
+    $stmt = $pdo->prepare('SELECT class_status, order_nr FROM classes WHERE class_id = :class_id');
+    $stmt->execute([':class_id' => $classId]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        wp_send_json_error(['message' => __('Class not found.', 'wecoza-core')], 404);
+        exit;
+    }
+
+    $status = wecoza_resolve_class_status($row);
+    if ($status !== 'active') {
+        wp_send_json_error(['message' => __('Attendance capture is only allowed for active classes.', 'wecoza-core')], 403);
+        exit;
+    }
+}
+
+/**
  * Return the session list for a class, merged with captured session status.
  *
  * AJAX action: wecoza_attendance_get_sessions
@@ -81,12 +112,14 @@ function handle_attendance_capture(): void
     try {
         verify_attendance_nonce();
 
-        $classId     = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
+        $classId     = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
         $sessionDate = isset($_POST['session_date']) ? sanitize_text_field($_POST['session_date']) : '';
 
         if ($classId <= 0) {
             throw new Exception('class_id is required.');
         }
+
+        require_active_class($classId);
 
         if (empty($sessionDate) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $sessionDate)) {
             throw new Exception('session_date must be a valid YYYY-MM-DD date.');
@@ -161,11 +194,13 @@ function handle_attendance_mark_exception(): void
     try {
         verify_attendance_nonce();
 
-        $classId = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
+        $classId = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
 
         if ($classId <= 0) {
             throw new Exception('class_id is required.');
         }
+
+        require_active_class($classId);
 
         $sessionDate = isset($_POST['session_date']) ? sanitize_text_field($_POST['session_date']) : '';
 

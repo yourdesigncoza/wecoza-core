@@ -87,6 +87,36 @@ if (empty($class)) {
                </div>
             </div>
          </div>
+         <!-- Class Status Card -->
+         <?php
+         $classStatus = wecoza_resolve_class_status($class);
+         $statusBgClass = match($classStatus) {
+             'active'  => 'bg-success-subtle',
+             'stopped' => 'bg-danger-subtle',
+             default   => 'bg-warning-subtle',
+         };
+         $statusIconClass = match($classStatus) {
+             'active'  => 'bi-check-circle-fill text-success',
+             'stopped' => 'bi-stop-circle-fill text-danger',
+             default   => 'bi-file-earmark-text-fill text-warning',
+         };
+         $statusLabel = match($classStatus) {
+             'active'  => __('Active', 'wecoza-core'),
+             'stopped' => __('Stopped', 'wecoza-core'),
+             default   => __('Draft', 'wecoza-core'),
+         };
+         ?>
+         <div class="col-sm-auto">
+            <div class="d-flex align-items-center border-start-sm ps-sm-5">
+               <div class="d-flex <?= esc_attr($statusBgClass); ?> rounded flex-center me-3" style="width:32px; height:32px">
+                  <i class="bi <?= esc_attr($statusIconClass); ?>"></i>
+               </div>
+               <div>
+                  <p class="fw-bold mb-1"><?= esc_html__('Status', 'wecoza-core'); ?></p>
+                  <h5 class="fw-bolder text-nowrap"><?= esc_html($statusLabel); ?></h5>
+               </div>
+            </div>
+         </div>
       </div>
    </div>
 </div>

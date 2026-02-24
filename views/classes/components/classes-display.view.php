@@ -268,21 +268,28 @@ $controller = $controller ?? null;
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-2 fs-8 white-space-nowrap">
-                                        <?php 
-                                        // Determine class status based on order_nr field
-                                        $isDraft = empty($class['order_nr']);
-                                        if ($isDraft): 
+                                        <?php
+                                        $classStatus = wecoza_resolve_class_status($class);
+                                        $badgeClass = match($classStatus) {
+                                            'active'  => 'badge-phoenix-success',
+                                            'stopped' => 'badge-phoenix-danger',
+                                            default   => 'badge-phoenix-warning',
+                                        };
+                                        $badgeLabel = match($classStatus) {
+                                            'active'  => __('Active', 'wecoza-core'),
+                                            'stopped' => __('Stopped', 'wecoza-core'),
+                                            default   => __('Draft', 'wecoza-core'),
+                                        };
+                                        $badgeIcon = match($classStatus) {
+                                            'active'  => 'bi-check-circle',
+                                            'stopped' => 'bi-stop-circle',
+                                            default   => 'bi-file-earmark-text',
+                                        };
                                         ?>
-                                        <span class="badge badge-phoenix fs-10 badge-phoenix-warning">
-                                            <span class="badge-label">Draft</span>
-                                            <i class="bi bi-file-earmark-text ms-1"></i>
+                                        <span class="badge badge-phoenix fs-10 <?= esc_attr($badgeClass); ?>">
+                                            <span class="badge-label"><?= esc_html($badgeLabel); ?></span>
+                                            <i class="<?= esc_attr($badgeIcon); ?> ms-1"></i>
                                         </span>
-                                        <?php else: ?>
-                                        <span class="badge badge-phoenix fs-10 badge-phoenix-success">
-                                            <span class="badge-label">Active</span>
-                                            <i class="bi bi-check-circle ms-1"></i>
-                                        </span>
-                                        <?php endif; ?>
                                     </td>
                                     <td class="py-2 fs-8 white-space-nowrap">
                                         <?php if ($class['seta_funded']): ?>

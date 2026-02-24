@@ -393,7 +393,7 @@ class ClassController extends BaseController
 
             $activeClassesCount = 0;
             foreach ($classes as $class) {
-                if (!$this->isClassCurrentlyStopped($class)) {
+                if (wecoza_resolve_class_status($class) === 'active') {
                     $activeClassesCount++;
                 }
             }
