@@ -144,16 +144,18 @@ echo $assets;
                                 <td class="py-2 align-middle text-center fs-8 white-space-nowrap">
                                     <span class="badge fs-10 badge-phoenix badge-phoenix-secondary">#<?php echo esc_html((string) $class['id']); ?></span>
                                 </td>
-                                <td data-role="status-cell">
-                                    <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['status']['class']); ?>" data-role="status-badge">
-                                        <?php echo esc_html($class['status']['label']); ?>
-                                    </span>
-                                    <?php if (!empty($class['class_status_badge'])): ?>
-                                    <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['class_status_badge']['class']); ?>">
-                                        <span class="badge-label"><?php echo esc_html($class['class_status_badge']['label']); ?></span>
-                                        <span class="ms-1 <?php echo esc_attr($class['class_status_badge']['icon']); ?>"></span>
-                                    </span>
-                                    <?php endif; ?>
+                                <td data-role="status-cell" class="align-middle text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap">
+                                        <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['status']['class']); ?>" data-role="status-badge">
+                                            <?php echo esc_html($class['status']['label']); ?>
+                                        </span>
+                                        <?php if (!empty($class['class_status_badge'])): ?>
+                                        <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['class_status_badge']['class']); ?>">
+                                            <span class="badge-label"><?php echo esc_html($class['class_status_badge']['label']); ?></span>
+                                            <span class="ms-1 <?php echo esc_attr($class['class_status_badge']['icon']); ?>"></span>
+                                        </span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                                 <td>
                                     <span class="badge badge-phoenix fs-10 <?php echo esc_attr($class['change']['class']); ?>">

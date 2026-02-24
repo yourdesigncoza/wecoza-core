@@ -150,11 +150,11 @@ class ScheduleService
         $entries = [];
         $current = clone $startDate;
 
-        $current->setDate($current->format('Y'), $current->format('n'), $dayOfMonth);
+        $current->setDate((int) $current->format('Y'), (int) $current->format('n'), $dayOfMonth);
 
         if ($current < $startDate) {
             $current->add(new DateInterval('P1M'));
-            $current->setDate($current->format('Y'), $current->format('n'), $dayOfMonth);
+            $current->setDate((int) $current->format('Y'), (int) $current->format('n'), $dayOfMonth);
         }
 
         while ($current <= $endDate) {
@@ -168,8 +168,8 @@ class ScheduleService
             }
 
             $current->add(new DateInterval('P1M'));
-            $targetDay = min($dayOfMonth, $current->format('t'));
-            $current->setDate($current->format('Y'), $current->format('n'), $targetDay);
+            $targetDay = min($dayOfMonth, (int) $current->format('t'));
+            $current->setDate((int) $current->format('Y'), (int) $current->format('n'), $targetDay);
         }
 
         return $entries;
