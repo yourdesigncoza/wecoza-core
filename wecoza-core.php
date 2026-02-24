@@ -671,6 +671,19 @@ add_action(
         require_once WECOZA_CORE_PATH .
             "src/Classes/Ajax/AttendanceAjaxHandlers.php";
 
+        /*
+        |--------------------------------------------------------------------------
+        | Load Class Status AJAX Handlers
+        |--------------------------------------------------------------------------
+        |
+        | AJAX handlers for class status transitions: activate, stop, reactivate,
+        | and status history retrieval. Requires manage_options capability.
+        |
+        */
+
+        require_once WECOZA_CORE_PATH .
+            "src/Classes/Ajax/ClassStatusAjaxHandler.php";
+
         // Auto-detect shortcode context for the feedback widget
         add_filter('do_shortcode_tag', function (string $output, string $tag): string {
             if (str_starts_with($tag, 'wecoza_') && !str_contains($output, 'data-wecoza-shortcode')) {
