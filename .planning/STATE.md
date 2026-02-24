@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v6.0 Agent Attendance Capture — Phase 51: Frontend
+**Current focus:** v6.0 Class Activation Logic — Phase 52
 
 ## Current Position
 
-Phase: 51 of 51 (Frontend)
-Plan: 1 of 2 in current phase — Plan 01 complete
+Phase: 52 of 52 (Class Activation Logic)
+Plan: 1 of 6 in current phase — Plan 01 complete
 Status: In progress
-Last activity: 2026-02-23 — Phase 51 Plan 01 complete: Attendance PHP view component with 3 summary cards, month tabs, session table, capture/detail/exception modals; wired into single-class-display with attendance-capture.js enqueue and learnerIds localization
+Last activity: 2026-02-24 — Phase 52 Plan 01 complete: DB migration SQL (class_status column + class_status_history table), wecoza_resolve_class_status() helper in functions.php, ClassModel classStatus property/getter/setter/status-methods, ClassRepository column whitelists + SELECT updated
 
 Progress: [████████████████████] 49/51 phases in progress
 
@@ -60,6 +60,12 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 51-01]: attendance-capture.js depends on wecoza-single-class-display-js so WeCozaSingleClass config is available before attendance JS runs
 - [Phase 51-01]: learnerIds decoded from JSON string to PHP array before wp_localize_script — JS receives plain array
 - [Phase 51-01]: Admin delete button rendered conditionally via current_user_can('manage_options') in PHP template
+- [Phase 52]: wecoza_resolve_class_status() uses null-coalescing fallback for migration window compatibility
+- [Phase 52]: ClassModel classStatus defaults to 'draft' matching DB column default
+
+### Roadmap Evolution
+
+- Phase 52 added: Class Activation Logic (WEC-179/180)
 
 ### Pending Todos
 
@@ -73,8 +79,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Completed 51-frontend-01-PLAN.md (all tasks)
+Last session: 2026-02-24
+Stopped at: Completed 52-01-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 51 Plan 01 complete. Proceed to Phase 51 Plan 02 (attendance-capture.js implementation).
+**Next action:** Phase 52 Plan 01 complete. Proceed to Phase 52 Plan 02 (TaskManager auto-activate on order_nr assign).
