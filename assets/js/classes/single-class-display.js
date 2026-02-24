@@ -50,6 +50,9 @@
 
             // Initialize notes filtering when models are ready
             this.initializeNotesWhenReady();
+
+            // Initialize class status action handlers (activate, stop, reactivate, history)
+            this.initializeStatusActions();
         },
 
         /**
@@ -714,6 +717,168 @@
             const div = document.createElement('div');
             div.textContent = String(str);
             return div.innerHTML;
+        },
+
+        /**
+         * Initialize class status action handlers (activate, stop, reactivate, history)
+         *
+         * Wires the status management UI from Plan 05 to the AJAX endpoints:
+         * - wecoza_class_status_update  (activate, stop, reactivate)
+         * - wecoza_class_status_history (lazy-loaded on collapse expand)
+         *
+         * Uses config (WeCozaSingleClass) for ajaxUrl, classNonce, classId.
+         * showStatusToast defined locally — separate scope from attendance-capture.js.
+         */
+        initializeStatusActions: function() {
+            if (!config.classId || !config.classNonce) return;
+
+            // ---------------------------------------------------------------
+            // Local toast utility — scoped here, independent of attendance-capture.js
+            // ---------------------------------------------------------------
+            function showStatusToast(message, type) {
+                var bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : 'bg-warning';
+                var $toast = $('<div>').addClass('toast align-items-center text-white border-0 show ' + bgClass)
+                    .css({ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, minWidth: '260px' })
+                    .html('<div class="d-flex"><div class="toast-body">' + $('<span>').text(message).html() + '</div>' +
+                          '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>');
+                $('body').append($toast);
+                setTimeout(function() { $toast.fadeOut(400, function() { $(this).remove(); }); }, 4000);
+            }
+
+            // ---------------------------------------------------------------
+            // Activate Class — collects order_nr, sends AJAX, reloads on success
+            // ---------------------------------------------------------------
+            $('#btn-confirm-activate').on('click', function() {
+                var orderNr = $('#activate-order-nr').val().trim();
+                if (!orderNr) {
+                    showStatusToast('Please enter an order number.', 'danger');
+                    return;
+                }
+                var $btn = $(this);
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Processing...');
+
+                $.post(config.ajaxUrl, {
+                    action: 'wecoza_class_status_update',
+                    nonce: config.classNonce,
+                    class_id: config.classId,
+                    new_status: 'active',
+                    order_nr: orderNr
+                }, function(response) {
+                    if (response.success) {
+                        showStatusToast('Class activated successfully.', 'success');
+                        setTimeout(function() { location.reload(); }, 1000);
+                    } else {
+                        showStatusToast((response.data && response.data.message) ? response.data.message : 'Activation failed.', 'danger');
+                        $btn.prop('disabled', false).html('<i class="bi bi-check-circle me-1"></i>Activate');
+                    }
+                }).fail(function() {
+                    showStatusToast('Network error. Please try again.', 'danger');
+                    $btn.prop('disabled', false).html('<i class="bi bi-check-circle me-1"></i>Activate');
+                });
+            });
+
+            // ---------------------------------------------------------------
+            // Stop Class — collects reason (required) + notes (optional), reloads on success
+            // ---------------------------------------------------------------
+            $('#btn-confirm-stop').on('click', function() {
+                var reason = $('#stop-reason').val();
+                if (!reason) {
+                    showStatusToast('Please select a stop reason.', 'danger');
+                    return;
+                }
+                var notes = $('#stop-notes').val().trim();
+                var $btn = $(this);
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Processing...');
+
+                $.post(config.ajaxUrl, {
+                    action: 'wecoza_class_status_update',
+                    nonce: config.classNonce,
+                    class_id: config.classId,
+                    new_status: 'stopped',
+                    stop_reason: reason,
+                    notes: notes
+                }, function(response) {
+                    if (response.success) {
+                        showStatusToast('Class stopped.', 'success');
+                        setTimeout(function() { location.reload(); }, 1000);
+                    } else {
+                        showStatusToast((response.data && response.data.message) ? response.data.message : 'Stop failed.', 'danger');
+                        $btn.prop('disabled', false).html('<i class="bi bi-stop-circle me-1"></i>Stop Class');
+                    }
+                }).fail(function() {
+                    showStatusToast('Network error. Please try again.', 'danger');
+                    $btn.prop('disabled', false).html('<i class="bi bi-stop-circle me-1"></i>Stop Class');
+                });
+            });
+
+            // ---------------------------------------------------------------
+            // Reactivate Class — native confirm dialog, no modal needed
+            // ---------------------------------------------------------------
+            $('#btn-reactivate-class').on('click', function() {
+                if (!confirm('Are you sure you want to reactivate this class?')) return;
+                var $btn = $(this);
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Processing...');
+
+                $.post(config.ajaxUrl, {
+                    action: 'wecoza_class_status_update',
+                    nonce: config.classNonce,
+                    class_id: config.classId,
+                    new_status: 'active'
+                }, function(response) {
+                    if (response.success) {
+                        showStatusToast('Class reactivated.', 'success');
+                        setTimeout(function() { location.reload(); }, 1000);
+                    } else {
+                        showStatusToast((response.data && response.data.message) ? response.data.message : 'Reactivation failed.', 'danger');
+                        $btn.prop('disabled', false).html('<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivate Class');
+                    }
+                }).fail(function() {
+                    showStatusToast('Network error. Please try again.', 'danger');
+                    $btn.prop('disabled', false).html('<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivate Class');
+                });
+            });
+
+            // ---------------------------------------------------------------
+            // Status History — lazy-loads on first Bootstrap collapse expand
+            // ---------------------------------------------------------------
+            var historyLoaded = false;
+            $('#statusHistoryCollapse').on('show.bs.collapse', function() {
+                if (historyLoaded) return;
+                historyLoaded = true;
+
+                $.post(config.ajaxUrl, {
+                    action: 'wecoza_class_status_history',
+                    nonce: config.classNonce,
+                    class_id: config.classId
+                }, function(response) {
+                    if (response.success && response.data.history && response.data.history.length > 0) {
+                        var html = '<table class="table table-sm fs-10"><thead><tr>' +
+                            '<th>Date</th><th>From</th><th>To</th><th>Reason</th><th>Changed By</th><th>Notes</th></tr></thead><tbody>';
+                        response.data.history.forEach(function(row) {
+                            var oldBadge = row.old_status === 'active' ? 'success' : row.old_status === 'stopped' ? 'danger' : 'warning';
+                            var newBadge = row.new_status === 'active' ? 'success' : row.new_status === 'stopped' ? 'danger' : 'warning';
+                            html += '<tr>' +
+                                '<td>' + $('<span>').text(row.changed_at).html() + '</td>' +
+                                '<td><span class="badge badge-phoenix fs-10 badge-phoenix-' + oldBadge + '">' +
+                                    $('<span>').text(row.old_status).html() + '</span></td>' +
+                                '<td><span class="badge badge-phoenix fs-10 badge-phoenix-' + newBadge + '">' +
+                                    $('<span>').text(row.new_status).html() + '</span></td>' +
+                                '<td>' + $('<span>').text(row.reason || '-').html() + '</td>' +
+                                '<td>' + $('<span>').text(row.changed_by_name || 'Unknown').html() + '</td>' +
+                                '<td>' + $('<span>').text(row.notes || '-').html() + '</td>' +
+                            '</tr>';
+                        });
+                        html += '</tbody></table>';
+                        $('#status-history-content').html(html);
+                    } else if (response.success) {
+                        $('#status-history-content').html('<p class="text-body-tertiary mb-0">No status changes recorded.</p>');
+                    } else {
+                        $('#status-history-content').html('<p class="text-danger mb-0">Failed to load history.</p>');
+                    }
+                }).fail(function() {
+                    $('#status-history-content').html('<p class="text-danger mb-0">Failed to load history.</p>');
+                });
+            });
         }
     };
 
