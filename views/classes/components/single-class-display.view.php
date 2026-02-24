@@ -130,6 +130,118 @@ $component_data = [
           </div>
       </div>
 
+      <!-- Status Management (manage_options only) -->
+      <?php if (current_user_can('manage_options')): ?>
+      <?php $classStatus = wecoza_resolve_class_status($class); ?>
+
+      <!-- Status Management Card -->
+      <div class="card mb-3">
+          <div class="card-body">
+              <h5 class="card-title mb-3"><?= esc_html__('Class Status Management', 'wecoza-core'); ?></h5>
+              <div class="d-flex gap-2 align-items-center">
+                  <?php if ($classStatus === 'draft'): ?>
+                      <span class="badge badge-phoenix badge-phoenix-warning me-2"><i class="bi bi-file-earmark-text me-1"></i><?= esc_html__('Draft', 'wecoza-core'); ?></span>
+                      <button type="button" class="btn btn-phoenix-success btn-sm" data-bs-toggle="modal" data-bs-target="#activateClassModal">
+                          <i class="bi bi-check-circle me-1"></i><?= esc_html__('Activate Class', 'wecoza-core'); ?>
+                      </button>
+                  <?php elseif ($classStatus === 'active'): ?>
+                      <span class="badge badge-phoenix badge-phoenix-success me-2"><i class="bi bi-check-circle me-1"></i><?= esc_html__('Active', 'wecoza-core'); ?></span>
+                      <button type="button" class="btn btn-phoenix-danger btn-sm" data-bs-toggle="modal" data-bs-target="#stopClassModal">
+                          <i class="bi bi-stop-circle me-1"></i><?= esc_html__('Stop Class', 'wecoza-core'); ?>
+                      </button>
+                  <?php elseif ($classStatus === 'stopped'): ?>
+                      <span class="badge badge-phoenix badge-phoenix-danger me-2"><i class="bi bi-stop-circle me-1"></i><?= esc_html__('Stopped', 'wecoza-core'); ?></span>
+                      <button type="button" class="btn btn-phoenix-success btn-sm" id="btn-reactivate-class">
+                          <i class="bi bi-arrow-counterclockwise me-1"></i><?= esc_html__('Reactivate Class', 'wecoza-core'); ?>
+                      </button>
+                  <?php endif; ?>
+              </div>
+          </div>
+      </div>
+
+      <!-- Activate Class Modal -->
+      <div class="modal fade" id="activateClassModal" tabindex="-1" aria-labelledby="activateClassModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="activateClassModalLabel"><?= esc_html__('Activate Class', 'wecoza-core'); ?></h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= esc_attr__('Close', 'wecoza-core'); ?>"></button>
+                  </div>
+                  <div class="modal-body">
+                      <p><?= esc_html__('Enter the order number to activate this class.', 'wecoza-core'); ?></p>
+                      <div class="mb-3">
+                          <label for="activate-order-nr" class="form-label"><?= esc_html__('Order Number', 'wecoza-core'); ?> <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" id="activate-order-nr" placeholder="<?= esc_attr__('e.g. ORD-2024-001', 'wecoza-core'); ?>" required>
+                          <div class="invalid-feedback"><?= esc_html__('Order number is required.', 'wecoza-core'); ?></div>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><?= esc_html__('Cancel', 'wecoza-core'); ?></button>
+                      <button type="button" class="btn btn-phoenix-success btn-sm" id="btn-confirm-activate">
+                          <i class="bi bi-check-circle me-1"></i><?= esc_html__('Activate', 'wecoza-core'); ?>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Stop Class Modal -->
+      <div class="modal fade" id="stopClassModal" tabindex="-1" aria-labelledby="stopClassModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="stopClassModalLabel"><?= esc_html__('Stop Class', 'wecoza-core'); ?></h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= esc_attr__('Close', 'wecoza-core'); ?>"></button>
+                  </div>
+                  <div class="modal-body">
+                      <p><?= esc_html__('Select a reason for stopping this class.', 'wecoza-core'); ?></p>
+                      <div class="mb-3">
+                          <label for="stop-reason" class="form-label"><?= esc_html__('Reason', 'wecoza-core'); ?> <span class="text-danger">*</span></label>
+                          <select class="form-select" id="stop-reason" required>
+                              <option value=""><?= esc_html__('Select reason...', 'wecoza-core'); ?></option>
+                              <option value="programme_ended"><?= esc_html__('Programme Ended', 'wecoza-core'); ?></option>
+                              <option value="temporary_hold"><?= esc_html__('Temporary Hold / Pause', 'wecoza-core'); ?></option>
+                              <option value="annual_stop"><?= esc_html__('Annual Stop', 'wecoza-core'); ?></option>
+                          </select>
+                          <div class="invalid-feedback"><?= esc_html__('Please select a reason.', 'wecoza-core'); ?></div>
+                      </div>
+                      <div class="mb-3">
+                          <label for="stop-notes" class="form-label"><?= esc_html__('Notes (optional)', 'wecoza-core'); ?></label>
+                          <textarea class="form-control" id="stop-notes" rows="3" placeholder="<?= esc_attr__('Additional context...', 'wecoza-core'); ?>"></textarea>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><?= esc_html__('Cancel', 'wecoza-core'); ?></button>
+                      <button type="button" class="btn btn-phoenix-danger btn-sm" id="btn-confirm-stop">
+                          <i class="bi bi-stop-circle me-1"></i><?= esc_html__('Stop Class', 'wecoza-core'); ?>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Status History Panel -->
+      <div class="card mb-3">
+          <div class="card-header">
+              <h5 class="mb-0">
+                  <button class="btn btn-link btn-sm text-decoration-none p-0 collapsed" type="button"
+                          data-bs-toggle="collapse" data-bs-target="#statusHistoryCollapse"
+                          aria-expanded="false" aria-controls="statusHistoryCollapse">
+                      <i class="bi bi-clock-history me-1"></i><?= esc_html__('Status History', 'wecoza-core'); ?>
+                  </button>
+              </h5>
+          </div>
+          <div id="statusHistoryCollapse" class="collapse">
+              <div class="card-body">
+                  <div id="status-history-content">
+                      <p class="text-body-tertiary"><?= esc_html__('Click to load status history...', 'wecoza-core'); ?></p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <?php endif; /* end manage_options */ ?>
+
       <!-- Top Summary Cards -->
       <?php echo wecoza_view('classes/components/single-class/summary-cards', $component_data); ?>
 
