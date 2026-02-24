@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 52 of 52 (Class Activation Logic)
-Plan: 3 of 6 in current phase — Plan 03 complete
+Plan: 4 of 6 in current phase — Plan 04 complete
 Status: In progress
-Last activity: 2026-02-24 — Phase 52 Plan 03 complete: attendance view lock gate (alert-subtle-warning for draft/stopped), classStatus/isAttendanceLocked/orderNr in WeCozaSingleClass JS config, require_active_class() AJAX guard on capture and exception handlers
+Last activity: 2026-02-24 — Phase 52 Plan 04 complete: three-way Draft/Active/Stopped Phoenix badge on classes listing (wecoza_resolve_class_status()), 6th status summary card on single-class detail page, ClassController active_count updated to use class_status rather than legacy schedule-pause check
 
 Progress: [████████████████████] 49/51 phases in progress
 
@@ -67,6 +67,7 @@ See: .planning/ROADMAP.md for current milestone detail
 - [Phase 52-02]: wecoza_resolve_class_status() used in ClassTaskPresenter badge formatter for migration-window NULL safety
 - [Phase 52-03]: require_active_class() calls wp_send_json_error + exit directly — consistent with verify_attendance_nonce() pattern in same file
 - [Phase 52-03]: Attendance view/delete endpoints unguarded — capture/exception only; history remains accessible regardless of class status
+- [Phase 52]: Active count uses wecoza_resolve_class_status() === 'active' not legacy isClassCurrentlyStopped() schedule-pause check
 
 ### Roadmap Evolution
 
@@ -85,7 +86,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 52-03-PLAN.md (all tasks)
+Stopped at: Completed 52-04-PLAN.md (all tasks)
 Resume file: —
 
-**Next action:** Phase 52 Plan 03 complete. Proceed to Phase 52 Plan 04 (event tasks badge — ClassTaskRepository + Presenter + main.php).
+**Next action:** Phase 52 Plan 04 complete. Proceed to Phase 52 Plan 05 (status management UI — activate/stop/reactivate actions, modal + AJAX handler).
