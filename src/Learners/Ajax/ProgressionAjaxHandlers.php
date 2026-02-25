@@ -496,6 +496,22 @@ function handle_get_progression_hours_log(): void
         $repository = new LearnerProgressionRepository();
         $hoursLog   = $repository->getHoursLog($trackingId);
 
+        // Resolve created_by user IDs to display names
+        $userCache = [];
+        foreach ($hoursLog as &$entry) {
+            $createdBy = isset($entry['created_by']) ? (int) $entry['created_by'] : 0;
+            if ($createdBy > 0) {
+                if (!isset($userCache[$createdBy])) {
+                    $userData = get_userdata($createdBy);
+                    $userCache[$createdBy] = $userData ? $userData->display_name : 'Unknown User';
+                }
+                $entry['created_by_name'] = $userCache[$createdBy];
+            } else {
+                $entry['created_by_name'] = null;
+            }
+        }
+        unset($entry);
+
         wp_send_json_success([
             'progression' => [
                 'tracking_id'      => $progression->getTrackingId(),

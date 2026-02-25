@@ -316,9 +316,9 @@
         sorted.forEach(function(prog) {
             const status      = prog.status || 'in_progress';
             const duration    = parseFloat(prog.subject_duration) || 0;
-            const hoursPresent = parseFloat(prog.hours_present)    || 0;
+            const hoursTrained = parseFloat(prog.hours_trained)    || 0;
             const progressPct = duration > 0
-                ? Math.min(100, Math.round((hoursPresent / duration) * 100))
+                ? Math.min(100, Math.round((hoursTrained / duration) * 100))
                 : 0;
 
             const dateRange = prog.start_date
@@ -353,7 +353,7 @@
             $meta.append($('<span>').addClass('mx-1').html('&middot;'));
             $meta.append($('<span>').text(dateRange));
             $meta.append($('<span>').addClass('mx-1').html('&middot;'));
-            $meta.append($('<span>').text('Hours: ' + hoursPresent + '/' + (prog.subject_duration || '?')));
+            $meta.append($('<span>').text('Hours: ' + hoursTrained + '/' + (prog.subject_duration || '?')));
 
             $colContent.append($titleRow).append($meta);
 

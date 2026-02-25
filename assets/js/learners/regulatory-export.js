@@ -269,8 +269,8 @@
 
     /**
      * Populate the client filter dropdown from rows data.
-     * Extracts unique client names, sorts alphabetically, appends options.
-     * Uses client_name as both value key and display text.
+     * Extracts unique client_id / client_name pairs, sorts alphabetically,
+     * and appends options using client_id as the value.
      *
      * @param {Array} rows
      */
@@ -286,25 +286,25 @@
             return;
         }
 
-        // Collect unique client names
+        // Collect unique clients by ID
         const seen    = {};
         const clients = [];
 
         rows.forEach(function(row) {
-            if (row.client_name && !seen[row.client_name]) {
-                seen[row.client_name] = true;
-                clients.push(row.client_name);
+            if (row.client_id && row.client_name && !seen[row.client_id]) {
+                seen[row.client_id] = true;
+                clients.push({ id: row.client_id, name: row.client_name });
             }
         });
 
-        // Sort alphabetically
+        // Sort alphabetically by name
         clients.sort(function(a, b) {
-            return a.localeCompare(b);
+            return a.name.localeCompare(b.name);
         });
 
-        clients.forEach(function(name) {
+        clients.forEach(function(client) {
             $select.append(
-                $('<option>').val(name).text(name)
+                $('<option>').val(client.id).text(client.name)
             );
         });
     }

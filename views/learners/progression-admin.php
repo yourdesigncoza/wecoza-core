@@ -194,6 +194,8 @@ if (!defined('ABSPATH')) {
                                     <th>Hours Trained</th>
                                     <th>Hours Present</th>
                                     <th>Source</th>
+                                    <th>Captured By</th>
+                                    <th>Session</th>
                                     <th>Notes</th>
                                 </tr>
                             </thead>

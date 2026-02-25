@@ -741,6 +741,7 @@ class LearnerProgressionRepository extends BaseRepository
                 cts.subject_name   AS lp_name,
                 cts.subject_duration AS lp_duration_hours,
                 c.class_code,
+                cl.client_id,
                 cl.client_name,
                 emp.employer_name,
                 lpt.start_date,

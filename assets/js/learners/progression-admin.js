@@ -630,19 +630,20 @@
      */
     function renderHoursLogSummary(data) {
         const $summary = $('#hours-log-summary').empty();
+        const prog = data.progression || {};
 
         const $row = $('<div>').addClass('d-flex align-items-center flex-wrap gap-2');
 
-        $('<strong>').text(data.learner_name || '').appendTo($row);
+        $('<strong>').text(prog.learner_name || '').appendTo($row);
 
         $('<span>').addClass('badge fs-10 badge-phoenix badge-phoenix-info ms-2')
-            .text(data.subject_name || '').appendTo($row);
+            .text(prog.subject_name || '').appendTo($row);
 
-        $('<span>').addClass('badge fs-10 badge-phoenix ' + statusBadgeClass(data.status))
-            .text(statusLabel(data.status)).appendTo($row);
+        $('<span>').addClass('badge fs-10 badge-phoenix ' + statusBadgeClass(prog.status))
+            .text(statusLabel(prog.status)).appendTo($row);
 
         $('<span>').addClass('text-muted ms-2 fs-9')
-            .text('Hours: ' + (data.hours_trained || 0) + ' / ' + (data.subject_duration || 0) + ' trained')
+            .text('Hours: ' + (prog.hours_trained || 0) + ' / ' + (prog.subject_duration || 0) + ' trained')
             .appendTo($row);
 
         $summary.append($row);
@@ -680,6 +681,16 @@
             $('<span>').addClass('badge fs-10 badge-phoenix badge-phoenix-secondary')
                 .text(source).appendTo($sourceTd);
             $tr.append($sourceTd);
+
+            // Captured By column
+            const capturedBy = entry.created_by_name
+                ? entry.created_by_name
+                : (entry.created_by ? 'User #' + entry.created_by : '\u2014');
+            $tr.append($('<td>').text(capturedBy));
+
+            // Session column
+            const sessionId = entry.session_id ? '#' + entry.session_id : '\u2014';
+            $tr.append($('<td>').text(sessionId));
 
             const $notesTd = $('<td>');
             if (notes.length > 50) {
