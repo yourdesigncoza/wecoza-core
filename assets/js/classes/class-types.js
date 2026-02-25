@@ -66,7 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const classSubjectWrapper = classSubjectSelect ? classSubjectSelect.closest('.col-md-3') : null;
 
     // Progression types don't need subject selection
-    const progressionTypes = ['GETC', 'BA2', 'BA3', 'BA4'];
+    const progressionTypes = (typeof wecozaClass !== 'undefined' && Array.isArray(wecozaClass.progressionTypes))
+        ? wecozaClass.progressionTypes
+        : [];
 
     // Class subjects data (will be populated via AJAX)
     let classSubjectsData = {};

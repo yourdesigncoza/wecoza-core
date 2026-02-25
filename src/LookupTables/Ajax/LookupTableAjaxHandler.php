@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace WeCoza\LookupTables\Ajax;
 
+use WeCoza\Classes\Controllers\ClassTypesController;
 use WeCoza\Core\Helpers\AjaxSecurity;
 use WeCoza\LookupTables\Controllers\LookupTableController;
 use WeCoza\LookupTables\Repositories\LookupTableRepository;
@@ -131,6 +132,7 @@ class LookupTableAjaxHandler
                 return;
             }
 
+            $this->maybeClearClassTypesCache($config);
             AjaxSecurity::sendSuccess(['id' => $newId], 'Item created successfully.');
         } catch (\Throwable $e) {
             wecoza_log('LookupTableAjaxHandler::handleCreate error: ' . $e->getMessage(), 'error');
@@ -162,6 +164,7 @@ class LookupTableAjaxHandler
                 return;
             }
 
+            $this->maybeClearClassTypesCache($config);
             AjaxSecurity::sendSuccess(['success' => true], 'Item updated successfully.');
         } catch (\Throwable $e) {
             wecoza_log('LookupTableAjaxHandler::handleUpdate error: ' . $e->getMessage(), 'error');
@@ -190,6 +193,7 @@ class LookupTableAjaxHandler
                 return;
             }
 
+            $this->maybeClearClassTypesCache($config);
             AjaxSecurity::sendSuccess(['success' => true], 'Item deleted successfully.');
         } catch (\Throwable $e) {
             wecoza_log('LookupTableAjaxHandler::handleDelete error: ' . $e->getMessage(), 'error');
@@ -202,6 +206,23 @@ class LookupTableAjaxHandler
     | Private Helpers
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Clear class type transient caches when the class_types table is modified.
+     *
+     * The class_types table is cached by ClassTypesController::getClassTypes() with
+     * a 2-hour TTL. Without this invalidation, changes made via the lookup table
+     * manager would not appear in the Class Type dropdown for up to 2 hours.
+     *
+     * @param array $config Table config (checked for table === 'class_types')
+     * @return void
+     */
+    private function maybeClearClassTypesCache(array $config): void
+    {
+        if (($config['table'] ?? '') === 'class_types') {
+            ClassTypesController::clearCache();
+        }
+    }
 
     /**
      * Sanitize POST values for whitelisted column names, type-aware.

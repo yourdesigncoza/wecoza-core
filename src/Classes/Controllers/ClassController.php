@@ -234,7 +234,11 @@ class ClassController extends BaseController
             'nonce' => wp_create_nonce('wecoza_class_nonce'),
             'siteAddresses' => ClassRepository::getSiteAddresses(),
             'debug' => defined('WP_DEBUG') && WP_DEBUG,
-            'conflictCheckEnabled' => true
+            'conflictCheckEnabled' => true,
+            'progressionTypes' => array_values(array_map(
+                fn($t) => $t['id'],
+                array_filter(ClassTypesController::getClassTypes(), fn($t) => $t['mode'] === 'progression')
+            )),
         ]);
 
         try {
