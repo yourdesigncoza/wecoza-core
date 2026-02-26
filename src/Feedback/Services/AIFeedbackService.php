@@ -7,7 +7,7 @@ use WeCoza\Feedback\Support\SchemaContext;
 
 final class AIFeedbackService
 {
-    private const MODEL = 'gpt-5-mini';
+    private const MODEL = 'gpt-4.1';
     private const TIMEOUT = 30;
     private const API_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -163,7 +163,7 @@ PROMPT;
         $body = wp_json_encode([
             'model'       => self::MODEL,
             'messages'    => $messages,
-            'max_completion_tokens' => 2048,
+            'max_tokens' => 2048,
         ]);
 
         $response = wp_remote_post(self::API_URL, [
