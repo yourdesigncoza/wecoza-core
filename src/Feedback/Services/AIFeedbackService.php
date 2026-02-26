@@ -41,7 +41,7 @@ final class AIFeedbackService
         $categoryRules = match ($category) {
             'bug_report'      => 'Bug Report: The user must describe what happened AND what they expected to happen.',
             'feature_request' => 'Feature Request: The user must describe what they want AND why they need it.',
-            default           => 'Comment: Any substantive text with actionable content is fine.',
+            default           => 'Comment: Must identify a specific topic with a concrete observation (not just "good" or "fine").',
         };
 
         $systemPrompt = <<<PROMPT
@@ -62,6 +62,17 @@ Rules:
 - NEVER repeat or rephrase a question already asked in this conversation. Ask about something NEW.
 - If the user has answered your previous questions, evaluate the COMBINED context to decide if feedback is now clear.
 - When a shortcode or page URL is provided, you already know the page/screen context — do NOT ask which page or section the issue is on.
+
+Handling dismissive or vague answers:
+- If the user answers with dismissive phrases like "everything", "all of it", "nothing works", "I don't know", "it's all broken", or similarly unhelpful responses, do NOT rephrase the same question or ask the user to "elaborate" — that frustrates users.
+- Instead, ask for ONE specific concrete example, e.g.: "Can you give me one specific example of what went wrong?"
+- Always mark as vague and ask a follow-up when the answer is dismissive — the system will enforce the max round limit separately.
+
+Example flow:
+User: "it's broken"
+You: {"is_clear": false, "follow_up": "What were you trying to do when it broke? For example, were you saving a form, loading a page, or clicking a button?"}
+User: "everything"
+You: {"is_clear": false, "follow_up": "Can you give me one specific example of something that went wrong?"}
 PROMPT;
 
         $messages = [['role' => 'system', 'content' => $systemPrompt]];

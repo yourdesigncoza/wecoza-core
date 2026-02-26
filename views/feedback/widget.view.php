@@ -88,6 +88,9 @@ if (!defined('ABSPATH')) {
                     <button type="button" class="btn btn-phoenix-primary btn-sm" id="wecoza-feedback-followup-submit">
                         <span class="fas fa-paper-plane me-1"></span>Send Response
                     </button>
+                    <button type="button" class="btn btn-phoenix-secondary btn-sm ms-2" id="wecoza-feedback-skip-submit">
+                        <span class="fas fa-forward me-1"></span>Submit As-Is
+                    </button>
                     <small class="text-body-tertiary ms-2" id="wecoza-feedback-round-info"></small>
                 </div>
             </div>

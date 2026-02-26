@@ -11,7 +11,7 @@ use WeCoza\Feedback\Services\TrelloService;
 final class FeedbackController
 {
     private const NONCE_ACTION = 'wecoza_feedback';
-    private const MAX_FOLLOWUP_ROUNDS = 3;
+    private const MAX_FOLLOWUP_ROUNDS = 2;
     private const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024; // 2MB
 
     private FeedbackRepository $repository;
@@ -132,6 +132,7 @@ final class FeedbackController
         $feedbackId = (int) ($_POST['feedback_id'] ?? 0);
         $answer     = wecoza_sanitize_value($_POST['answer'] ?? '', 'string');
         $round      = (int) ($_POST['round'] ?? 1);
+        $skip       = (int) ($_POST['skip'] ?? 0);
 
         if ($feedbackId <= 0 || empty(trim($answer))) {
             wp_send_json_error(['message' => 'Invalid follow-up data'], 400);
@@ -149,12 +150,12 @@ final class FeedbackController
         }
 
         $lastIdx = count($conversation) - 1;
-        if ($lastIdx >= 0) {
+        if ($lastIdx >= 0 && !$skip) {
             $conversation[$lastIdx]['answer'] = $answer;
         }
 
-        // If max rounds reached, go straight to enrichment
-        if ($round >= self::MAX_FOLLOWUP_ROUNDS) {
+        // If skip flag set or max rounds reached, go straight to enrichment
+        if ($skip || $round >= self::MAX_FOLLOWUP_ROUNDS) {
             $this->repository->update($feedbackId, [
                 'ai_conversation' => wp_json_encode($conversation),
                 'updated_at'      => date('Y-m-d H:i:s'),

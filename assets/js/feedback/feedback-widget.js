@@ -8,7 +8,7 @@
     'use strict';
 
     const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024; // 2MB
-    const MAX_FOLLOWUP_ROUNDS = 3;
+    const MAX_FOLLOWUP_ROUNDS = 2;
 
     let state = {
         category: 'bug_report',
@@ -221,7 +221,7 @@
         $('#wecoza-feedback-footer').addClass('d-none');
 
         const remaining = MAX_FOLLOWUP_ROUNDS - state.round;
-        if (remaining <= 1) {
+        if (remaining <= 0) {
             $('#wecoza-feedback-round-info').html(
                 '<span class="badge badge-phoenix badge-phoenix-warning px-3 py-2 fs-9">' +
                 '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="height:14px;width:14px;"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>' +
@@ -253,7 +253,8 @@
             nonce: wecozaFeedback.nonce,
             feedback_id: state.feedbackId,
             answer: answer,
-            round: state.round
+            round: state.round,
+            skip: 0
         })
             .done(function (response) {
                 if (!response.success) {
@@ -267,6 +268,40 @@
                 } else {
                     handleSuccess(result);
                 }
+            })
+            .fail(function () {
+                showToast('Network error. Please try again.', true);
+            })
+            .always(function () {
+                state.submitting = false;
+                setLoading($btn, false);
+            });
+    }
+
+    /**
+     * Submit as-is (skip further AI follow-ups)
+     */
+    function submitAsIs() {
+        if (state.submitting) return;
+
+        state.submitting = true;
+        const $btn = $('#wecoza-feedback-skip-submit');
+        setLoading($btn, true);
+
+        $.post(wecozaFeedback.ajaxUrl, {
+            action: 'wecoza_feedback_followup',
+            nonce: wecozaFeedback.nonce,
+            feedback_id: state.feedbackId,
+            answer: $('#wecoza-feedback-followup-answer').val().trim() || '(submitted as-is)',
+            round: state.round,
+            skip: 1
+        })
+            .done(function (response) {
+                if (!response.success) {
+                    showToast(response.data?.message || 'Submission failed.', true);
+                    return;
+                }
+                handleSuccess(response.data);
             })
             .fail(function () {
                 showToast('Network error. Please try again.', true);
@@ -332,6 +367,9 @@
 
         // Submit follow-up
         $('#wecoza-feedback-followup-submit').on('click', submitFollowUp);
+
+        // Submit as-is (skip AI)
+        $('#wecoza-feedback-skip-submit').on('click', submitAsIs);
 
         // Reset on modal close
         $('#wecoza-feedback-modal').on('hidden.bs.modal', resetModal);
