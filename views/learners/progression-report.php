@@ -43,6 +43,9 @@ if (!defined('ABSPATH')) {
                         </h4>
                     </div>
                     <div class="col-auto">
+                        <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'progressionReportHelp']); ?>
+                    </div>
+                    <div class="col-auto">
                         <input type="text" id="report-search"
                                class="form-control form-control-sm"
                                placeholder="Search learner..."
@@ -101,5 +104,7 @@ if (!defined('ABSPATH')) {
         </div><!-- /card -->
 
     </div><!-- /report-content -->
+
+    <?php echo wecoza_component('form-help-panel', ['form_key' => 'progression-report', 'offcanvas_id' => 'progressionReportHelp']); ?>
 
 </div><!-- /progression-report-container -->

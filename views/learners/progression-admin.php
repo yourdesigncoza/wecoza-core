@@ -37,6 +37,7 @@ if (!defined('ABSPATH')) {
                         <h4 class="mb-0">Progression Management <i class="bi bi-mortarboard ms-1"></i></h4>
                     </div>
                     <div class="col-auto">
+                        <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'progressionAdminHelp']); ?>
                         <button id="btn-start-new-lp" class="btn btn-phoenix-primary btn-sm">
                             <i class="bi bi-plus-circle me-1"></i> Start New LP
                         </button>
@@ -238,5 +239,7 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
     </div>
+
+    <?php echo wecoza_component('form-help-panel', ['form_key' => 'progression-admin', 'offcanvas_id' => 'progressionAdminHelp']); ?>
 
 </div><!-- /progression-admin-container -->

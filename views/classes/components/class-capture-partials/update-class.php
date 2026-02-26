@@ -157,6 +157,10 @@ if (isset($data["class_data"]) && $data["class_data"]):
 <?php
 endif; ?>
 
+<div class="d-flex justify-content-end mb-2">
+   <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'updateClassHelp']); ?>
+</div>
+
 <!-- Classes Capture Form -->
 <form id="classes-form" class="needs-validation ydcoza-compact-form" novalidate method="POST" enctype="multipart/form-data">
    <!-- Hidden fields for update mode -->
@@ -2043,6 +2047,7 @@ $data["class_data"]["seta"] == $seta["id"]
 
 <!-- Alert container for form messages -->
 <div id="form-messages" class="mt-3"></div>
+<?php echo wecoza_component('form-help-panel', ['form_key' => 'update-class', 'offcanvas_id' => 'updateClassHelp']); ?>
 
 <!-- Form Validation Script -->
 <script>

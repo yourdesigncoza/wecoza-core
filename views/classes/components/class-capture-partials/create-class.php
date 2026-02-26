@@ -1,6 +1,7 @@
 <!-- Classes Capture Form -->
 <div class="d-flex justify-content-between align-items-center mb-3">
    <h4 class="mb-0">Create New Class</h4>
+   <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'createClassHelp']); ?>
 </div>
 <p class="text-muted small mb-5">   <span class="badge badge-phoenix fs-10 badge-phoenix-warning"><i class="bi bi-file-earmark-text me-1"></i><span class="badge-label">INIT. Status Draft</span></span> New classes are created as drafts. They will become active when an order number is assigned.</p>
 <form id="classes-form" class="needs-validation ydcoza-compact-form" novalidate method="POST" enctype="multipart/form-data">
@@ -1056,3 +1057,4 @@
 </form>
 <!-- Alert container for form messages -->
 <div id="form-messages" class="mt-3"></div>
+<?php echo wecoza_component('form-help-panel', ['form_key' => 'create-class', 'offcanvas_id' => 'createClassHelp']); ?>
