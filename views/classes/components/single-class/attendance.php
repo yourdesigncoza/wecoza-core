@@ -182,7 +182,7 @@ if ($isAttendanceLocked) {
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-subtle-secondary" data-bs-dismiss="modal">Close</button>
-                <?php if (current_user_can('manage_options')): ?>
+                <?php if (is_user_logged_in()): ?>
                 <button type="button" class="btn btn-subtle-danger" id="btn-admin-delete-session">
                     <i class="bi bi-trash me-1"></i>Delete &amp; Reverse Hours
                 </button>

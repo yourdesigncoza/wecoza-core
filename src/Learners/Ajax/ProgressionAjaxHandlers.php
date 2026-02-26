@@ -76,11 +76,6 @@ function handle_mark_progression_complete(): void
     try {
         verify_learner_access('learners_nonce');
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
-
         $trackingId = isset($_POST['tracking_id']) ? intval($_POST['tracking_id']) : 0;
         if (!$trackingId) {
             throw new Exception('Tracking ID is required.');
@@ -120,11 +115,6 @@ function handle_upload_progression_portfolio(): void
 {
     try {
         verify_learner_access('learners_nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
 
         $trackingId = isset($_POST['tracking_id']) ? intval($_POST['tracking_id']) : 0;
         if (!$trackingId) {
@@ -197,11 +187,6 @@ function handle_log_collision_acknowledgement(): void
 {
     try {
         verify_learner_access('wecoza_class_nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
 
         $learnerIds = isset($_POST['learner_ids']) && is_array($_POST['learner_ids'])
             ? array_map('intval', $_POST['learner_ids'])
@@ -359,11 +344,6 @@ function handle_get_admin_progressions(): void
     try {
         verify_learner_access('learners_nonce');
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
-
         // Build validated filters from GET params
         $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
         $filters = [];
@@ -413,11 +393,6 @@ function handle_bulk_complete_progressions(): void
 {
     try {
         verify_learner_access('learners_nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
 
         if (!isset($_POST['tracking_ids']) || !is_array($_POST['tracking_ids'])) {
             throw new Exception('tracking_ids must be a non-empty array.');
@@ -540,11 +515,6 @@ function handle_start_learner_progression(): void
     try {
         verify_learner_access('learners_nonce');
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
-
         $learnerId = isset($_POST['learner_id']) ? intval($_POST['learner_id']) : 0;
         if (!$learnerId) {
             throw new Exception('learner_id is required.');
@@ -580,11 +550,6 @@ function handle_toggle_progression_hold(): void
 {
     try {
         verify_learner_access('learners_nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
 
         $trackingId = isset($_POST['tracking_id']) ? intval($_POST['tracking_id']) : 0;
         if (!$trackingId) {
@@ -639,11 +604,6 @@ function handle_get_progression_report(): void
 {
     try {
         verify_learner_access('learners_nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
 
         // Build validated filters from GET params
         $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
@@ -723,11 +683,6 @@ function handle_get_regulatory_report(): void
     try {
         verify_learner_access('learners_nonce');
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
-
         $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
         $filters         = [];
 
@@ -775,10 +730,6 @@ function handle_get_regulatory_report(): void
 function handle_export_regulatory_csv(): void
 {
     verify_learner_access('learners_nonce');
-
-    if (!current_user_can('manage_options')) {
-        wp_die('Unauthorized access', 403);
-    }
 
     $allowedStatuses = ['in_progress', 'completed', 'on_hold'];
     $filters         = [];

@@ -29,7 +29,7 @@ use WeCoza\Learners\Services\ProgressionService;
 $progressionService = new ProgressionService();
 $currentLP = $progressionService->getCurrentLPDetails($learner->id);
 $history = $progressionService->getProgressionHistory($learner->id);
-$isAdmin = current_user_can('manage_options');
+$isAdmin = is_user_logged_in();
 
 // Calculate progress bar color
 $progressPercentage = $currentLP['progress_percentage'] ?? 0;

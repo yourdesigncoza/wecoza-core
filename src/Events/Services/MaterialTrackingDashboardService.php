@@ -10,8 +10,6 @@ if (!defined('ABSPATH')) {
 use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Events\Repositories\MaterialTrackingRepository;
 
-use function current_user_can;
-
 /**
  * Service for managing material tracking dashboard
  */
@@ -101,6 +99,6 @@ final class MaterialTrackingDashboardService
      */
     public function canManageMaterialTracking(): bool
     {
-        return current_user_can('manage_material_tracking') || current_user_can('manage_options');
+        return is_user_logged_in();
     }
 }

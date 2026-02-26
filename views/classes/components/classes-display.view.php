@@ -334,12 +334,12 @@ $view_url = add_query_arg(
                                             <a href="<?php echo esc_url( $view_url ); ?>" class="btn btn-sm btn-outline-secondary border-0" title="View Details">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <?php if (current_user_can('edit_posts') || current_user_can('manage_options')): ?>
+                                            <?php if (is_user_logged_in()): ?>
                                             <a href="<?php echo esc_url( $edit_url ); ?>" class="btn btn-sm btn-outline-secondary border-0" title="Edit Class">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                             <?php endif; ?>
-                                            <?php if (current_user_can('manage_options')): ?>
+                                            <?php if (is_user_logged_in()): ?>
                                             <button type="button" class="btn btn-sm btn-outline-secondary border-0 delete-class-btn" 
                                                     data-class-id="<?php echo $class['class_id']; ?>" 
                                                     title="Delete Class"
@@ -407,7 +407,7 @@ function viewClassDetails(classId) {
 
 function deleteClass(classId) {
     // Check if user is administrator
-    const isAdmin = <?php echo current_user_can('manage_options') ? 'true' : 'false'; ?>;
+    const isAdmin = <?php echo is_user_logged_in() ? 'true' : 'false'; ?>;
     if (!isAdmin) {
         alert('Only administrators can delete classes.');
         return;

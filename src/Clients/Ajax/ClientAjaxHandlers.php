@@ -46,10 +46,6 @@ class ClientAjaxHandlers {
     public function saveClient(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
-        if (!current_user_can('manage_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.', 403);
-        }
-
         try {
             $clientId = isset($_POST['id']) ? intval($_POST['id']) : 0;
             $result = $this->clientService->handleClientSubmission($_POST, $clientId);
@@ -74,10 +70,6 @@ class ClientAjaxHandlers {
     public function getClient(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.', 403);
-        }
-
         $clientId = isset($_GET['id']) ? intval($_GET['id']) : 0;
         if (!$clientId) {
             AjaxSecurity::sendError('Invalid client ID.', 400);
@@ -98,10 +90,6 @@ class ClientAjaxHandlers {
     public function getClientDetails(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.', 403);
-        }
-
         $clientId = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
         if (!$clientId) {
             AjaxSecurity::sendError('Invalid client ID.', 400);
@@ -121,10 +109,6 @@ class ClientAjaxHandlers {
      */
     public function deleteClient(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('manage_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.', 403);
-        }
 
         $clientId = isset($_POST['id']) ? intval($_POST['id']) : 0;
         if (!$clientId) {
@@ -151,10 +135,6 @@ class ClientAjaxHandlers {
     public function searchClients(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
 
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.', 403);
-        }
-
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
         $limit = isset($_GET['limit']) ? intval($_GET['limit']) : AppConstants::SEARCH_RESULT_LIMIT;
 
@@ -168,10 +148,6 @@ class ClientAjaxHandlers {
      */
     public function getBranchClients(): void {
         AjaxSecurity::requireNonce('clients_nonce_action');
-
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('Permission denied.', 403);
-        }
 
         $clientId = isset($_GET['client_id']) ? intval($_GET['client_id']) : 0;
         if (!$clientId) {
@@ -190,10 +166,6 @@ class ClientAjaxHandlers {
         // Check nonce manually for export
         if (!wp_verify_nonce($_REQUEST['nonce'] ?? '', 'clients_nonce_action')) {
             wp_die('Security check failed.');
-        }
-
-        if (!current_user_can('export_wecoza_clients')) {
-            wp_die('Permission denied.');
         }
 
         $csvData = $this->clientService->exportClientsAsCsv();
@@ -244,10 +216,6 @@ class ClientAjaxHandlers {
 
         if (!wp_verify_nonce($nonce, 'submit_locations_form')) {
             AjaxSecurity::sendError('Security check failed. Please reload the page and try again.', 403);
-        }
-
-        if (!current_user_can('view_wecoza_clients')) {
-            AjaxSecurity::sendError('You do not have permission to perform this action.', 403);
         }
 
         $streetAddress = isset($_POST['street_address']) ? sanitize_text_field(wp_unslash($_POST['street_address'])) : '';

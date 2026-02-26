@@ -264,8 +264,6 @@ function handle_attendance_get_detail(): void
 /**
  * Admin delete: remove a session and reverse any associated learner hours.
  *
- * Requires manage_options capability — admin-only operation for audit integrity.
- *
  * AJAX action: wecoza_attendance_admin_delete
  * Method: POST
  * Params: session_id (int, required)
@@ -274,11 +272,6 @@ function handle_attendance_admin_delete(): void
 {
     try {
         verify_attendance_nonce();
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized access']);
-            return;
-        }
 
         $sessionId = isset($_POST['session_id']) ? intval($_POST['session_id']) : 0;
 
