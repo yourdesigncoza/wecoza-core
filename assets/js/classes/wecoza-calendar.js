@@ -250,6 +250,15 @@
         },
 
         /**
+         * Force calendar to recalculate dimensions
+         */
+        updateSize: function() {
+            if (calendar) {
+                calendar.updateSize();
+            }
+        },
+
+        /**
          * Get calendar instance
          * @returns {Object|null} FullCalendar instance
          */

@@ -23,23 +23,42 @@
         init: function() {
             console.log('SingleClassApp initializing...', config);
 
-            // Hide loading indicator and show content after a brief delay
+            const self = this;
+
+            // Hide loading indicator and show content, then initialize calendar
             if (config.showLoading) {
                 setTimeout(function() {
-                    const loading = document.getElementById('single-class-loading');
-                    const content = document.getElementById('single-class-content');
+                    var loading = document.getElementById('single-class-loading');
+                    var content = document.getElementById('single-class-content');
 
                     if (loading) loading.classList.add('d-none');
                     if (content) content.classList.remove('d-none');
-                }, 500);
-            }
 
-            // Initialize FullCalendar if the calendar container exists
-            if (document.getElementById('classCalendar')) {
-                console.log('Calendar container found, initializing...');
-                this.initializeClassCalendar();
+                    // Initialize FullCalendar AFTER content is visible so it can measure dimensions
+                    // Use requestAnimationFrame to ensure browser has completed layout reflow
+                    requestAnimationFrame(function() {
+                        if (document.getElementById('classCalendar')) {
+                            console.log('Calendar container found, initializing after content reveal...');
+                            self.initializeClassCalendar();
+                            // Force size recalculation after render
+                            requestAnimationFrame(function() {
+                                if (window.WeCozaCalendar) {
+                                    window.WeCozaCalendar.updateSize();
+                                }
+                            });
+                        } else {
+                            console.log('Calendar container not found');
+                        }
+                    });
+                }, 500);
             } else {
-                console.log('Calendar container not found');
+                // No loading overlay — content already visible, initialize immediately
+                if (document.getElementById('classCalendar')) {
+                    console.log('Calendar container found, initializing...');
+                    this.initializeClassCalendar();
+                } else {
+                    console.log('Calendar container not found');
+                }
             }
 
             // Initialize view toggle functionality
@@ -132,8 +151,13 @@
                 console.log('Switched to calendar view');
                 localStorage.setItem('wecoza_schedule_view_preference', 'calendar');
 
-                if (typeof window.WeCozaCalendar !== 'undefined' && window.WeCozaCalendar.refreshEvents) {
-                    window.WeCozaCalendar.refreshEvents();
+                if (typeof window.WeCozaCalendar !== 'undefined') {
+                    if (window.WeCozaCalendar.updateSize) {
+                        window.WeCozaCalendar.updateSize();
+                    }
+                    if (window.WeCozaCalendar.refreshEvents) {
+                        window.WeCozaCalendar.refreshEvents();
+                    }
                 }
             });
 
