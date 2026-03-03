@@ -1,301 +1,325 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-02-02
+**Analysis Date:** 2026-03-03
 
 ## Naming Patterns
 
 **Files:**
-- PHP classes: PascalCase (e.g., `LearnerModel.php`, `BaseController.php`)
-- PHP files (non-classes): kebab-case with descriptive names (e.g., `security-test.php`, `ajax-utils.js`)
-- Directories: kebab-case (e.g., `views/components/`, `assets/js/`)
-- WordPress shortcodes: Use `wecoza_` prefix (e.g., `[wecoza_display_learners]`, `[wecoza_capture_class]`)
-- AJAX actions: Use `wecoza_` prefix (e.g., `wp_ajax_wecoza_get_learner`)
-
-**Classes:**
-- Extend from base abstractions: `BaseController`, `BaseRepository`, `BaseModel`
-- Example: `class LearnerController extends BaseController` in `src/Learners/Controllers/LearnerController.php`
-- Example: `class LearnerRepository extends BaseRepository` in `src/Learners/Repositories/LearnerRepository.php`
+- PHP classes: PascalCase, match class name (e.g., `LearnerRepository.php` for class `LearnerRepository`)
+- PHP functions: snake_case with `wecoza_` prefix for global helpers (e.g., `wecoza_view()`, `wecoza_config()`)
+- PHP test files: `{FeatureName}Test.php` with test runner functions inside (e.g., `EmailNotificationTest.php`)
+- JavaScript files: kebab-case (e.g., `class-capture.js`, `ajax-utils.js`, `learner-selection-table.js`)
+- Directories: kebab-case (e.g., `form-fillers/`, `event-tasks/`, `classes/`)
 
 **Functions:**
-- Global helper functions use `wecoza_` prefix (e.g., `wecoza_view()`, `wecoza_db()`, `wecoza_sanitize_value()`)
-- Protected/private methods in classes use camelCase (e.g., `registerHooks()`, `getRepository()`, `findByIdWithMappings()`)
-- Public methods use camelCase (e.g., `getLearner()`, `createLearner()`, `updateLearner()`)
+- PHP methods: camelCase (e.g., `findByIdWithMappings()`, `getAllowedOrderColumns()`, `ensureRequiredPages()`)
+- JavaScript functions: camelCase in modern code (e.g., `showCustomAlert()`, `getDayIndex()`) or PascalCase for constructors
+- Private/protected PHP methods: camelCase with leading underscore discouraged; use visibility modifiers instead
+- Trait methods: Follow parent class naming; prefix with `__` only for magic methods (e.g., `detectPIIPattern()`, `maskSouthAfricanID()`)
 
 **Variables:**
-- Local variables and properties: camelCase (e.g., `$learnerModel`, `$repository`, `$response`)
-- Class properties: camelCase with type hints (e.g., `protected ?LearnerRepository $repository = null`)
-- Database columns: snake_case (e.g., `first_name`, `sa_id_no`, `created_at`)
-- Model properties: camelCase, matching database columns via conversion (e.g., `$firstName`, `$saIdNo`)
-- HTML/form data in POST/GET: snake_case (e.g., `$_POST['first_name']`)
+- PHP properties: camelCase with type hints (e.g., `private ?PostgresConnection $db`, `protected string $table`)
+- JavaScript variables: camelCase (e.g., `holidayOverrides`, `loadingIndicator`, `maxRetries`)
+- Constants: UPPERCASE_SNAKE_CASE (e.g., `DEFAULT_CONFIG`, `TIMEOUT_SECONDS`, `LOADING_TEMPLATE`)
+- Database columns: snake_case (e.g., `first_name`, `city_town_id`, `created_at`)
 
-**Types & Constants:**
-- Class constants: UPPER_SNAKE_CASE (not observed in current code, use when needed)
-- Database table names: plural, lowercase (e.g., `learners`, `classes`)
-- Model types in `$casts`: lowercase types (e.g., `'id' => 'int'`, `'created_at' => 'date'`)
+**Types:**
+- PHP: Use type hints on all parameters and return types (mandatory `declare(strict_types=1);`)
+- Nullable types: `?Type` (e.g., `?int`, `?string`, `?PostgresConnection`)
+- Union types: `Type1|Type2` (e.g., `string|int`, `array|null`)
+- Array types: Use generic syntax in docblocks (e.g., `@var array<string, mixed>`)
+- Classes: Full namespace path in imports via `use` statements at top of file
 
 ## Code Style
 
 **Formatting:**
-- No explicit formatter configured (not ESLint, Prettier, or PHPStan found in repo)
-- Follow PSR-12 standard conventions (PHP naming/spacing)
-- Line length: Not enforced (files use natural line breaks)
-- Indentation: 4 spaces (PHP) and 4 spaces (JavaScript)
+- No specific auto-formatter enforced (no .prettierrc or eslint config found)
+- 4-space indentation for PHP (observed in all files)
+- 2-space indentation for JavaScript (observed in JS files)
+- Line endings: Unix (LF)
+- Max line length: Not enforced; some lines exceed 100 characters
 
-**PHP:**
-- Use strict typing: All files begin with namespace declarations and have type hints
-- Example: `public function findById(int $id): ?array`
-- Use null coalescing: `$value ?? $default`
-- Use null-safe operator in PHP 8+: `$object?->method()`
-- Arrow functions in closures: `fn($key) => in_array($key, $allowed, true)`
-- Match expressions for type-safe conditionals: Supported by PHP 8.0+ requirement
+**Linting:**
+- No linting configuration detected (no .eslintrc, .phpcs.xml, or biome.json)
+- Code adheres to PSR-12 (PHP-FIG) style guide implicitly through manual review
+- PHP: `declare(strict_types=1);` at top of every class file (mandatory)
+- PHP: `if (!defined('ABSPATH')) { exit; }` security check after namespace declaration in all plugin files
 
-**JavaScript:**
-- Use strict mode: `'use strict';` at top of IIFE/modules
-- Arrow functions: `function(data) => { ... }` in promises, callbacks
-- Template literals for dynamic strings: `` `[WeCozaAjax] ${method} ${action}` ``
-- Use `const` for variables that won't be reassigned, `let` for those that will
+**Declaration Blocks:**
+All PHP files follow this header order:
+1. Opening tag: `<?php`
+2. Strict types: `declare(strict_types=1);`
+3. DocBlock comment (file-level)
+4. Namespace declaration
+5. Use statements (imports)
+6. Security check: `if (!defined('ABSPATH')) { exit; }`
+7. Code
 
-**Comments:**
-- PHPDoc headers on classes and public methods (see `BaseController.php`, `BaseRepository.php`)
-- Inline comments for non-obvious logic
-- Section comments using banner style: `/* |--- Section Name --- |*/ `
-- Example: See organization of `BaseController.php` sections
+Example from `LearnerModel.php`:
+```php
+<?php
+declare(strict_types=1);
+
+/**
+ * WeCoza Core - Learner Model
+ * ...
+ */
+
+namespace WeCoza\Learners\Models;
+
+use WeCoza\Core\Abstract\AppConstants;
+use WeCoza\Core\Abstract\BaseModel;
+use WeCoza\Learners\Repositories\LearnerRepository;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+```
 
 ## Import Organization
 
-**PHP - Class imports (use statements):**
-1. Core/vendor classes (WordPress, external libraries)
-2. Internal WeCoza Core classes
-3. Module-specific classes
+**Order:**
+1. Built-in PHP classes/interfaces (e.g., `use PDO;`, `use Exception;`, `use DateTime;`)
+2. Standard library utilities (e.g., `use Closure;`, `use ReflectionFunction;`)
+3. WeCoza\Core namespace imports (e.g., `use WeCoza\Core\Abstract\BaseRepository;`)
+4. Application-specific imports in this order:
+   - Abstract base classes
+   - Models
+   - Repositories
+   - Services
+   - Controllers
+   - Helpers
+5. Same-package imports last (e.g., in Learners module, import other Learners classes last)
 
-Order example from `LearnerController.php`:
+Example from `AttendanceService.php`:
 ```php
-use WeCoza\Core\Abstract\BaseController;
-use WeCoza\Learners\Models\LearnerModel;
-use WeCoza\Learners\Repositories\LearnerRepository;
-```
-
-**JavaScript - Module imports:**
-1. DOM/jQuery selectors at top of IIFE
-2. Configuration objects
-3. Utility functions
-
-Example from `ajax-utils.js`:
-```javascript
-(function(global, $) {
-    'use strict';
-    const DEFAULT_CONFIG = { ... };
-    const LOADING_TEMPLATE = `...`;
-    const WeCozaAjax = { ... };
+use WeCoza\Classes\Repositories\AttendanceRepository;
+use WeCoza\Classes\Repositories\ClassRepository;
+use WeCoza\Learners\Services\ProgressionService;
+use WeCoza\Learners\Repositories\LearnerProgressionRepository;
+use DateTime;
+use Exception;
 ```
 
 **Path Aliases:**
-- None detected in current setup
-- Composer autoload uses PSR-4 mapping: `WeCoza\Core\` → `core/`, `WeCoza\Learners\` → `src/Learners/`, `WeCoza\Classes\` → `src/Classes/`
+- No path aliases configured (PSR-4 autoloading via Composer)
+- Namespaces map directly to directory structure (e.g., `WeCoza\Learners\` → `src/Learners/`)
+
+**Function Imports (PHP 5.6+ use):**
+Functions are imported at top of files that use them extensively:
+```php
+use function array_merge;
+use function count;
+use function is_array;
+use function wp_json_encode;
+use const JSON_PRETTY_PRINT;
+```
+This improves performance and readability in functions-heavy files.
 
 ## Error Handling
 
-**PHP Error Handling:**
+**Patterns:**
+- **Try-catch blocks:** Wrap database operations and external API calls
+- **Exception types:** Use built-in PHP exceptions (`Exception`, `PDOException`) with descriptive messages
+- **Custom exceptions:** Not used; standard `Exception` with clear context
+- **Error suppression:** Not used (no `@` operator)
+- **Logging:** Errors logged via `error_log()` (mapped to WordPress debug log) or `wecoza_log()`
 
-**Exceptions:**
-- Catch generic `Exception` in try-catch blocks: `catch (Exception $e)`
-- Log errors to WordPress error log: `error_log("WeCoza Core: Message: " . $e->getMessage())`
-- Return safe defaults on error: `return null;`, `return [];`, `return false;`
-
-Example from `BaseRepository.php`:
+Example from `LearnerRepository::findByIdWithMappings()`:
 ```php
 try {
-    // Database operation
-    $result = $this->db->query($sql, $params);
-    return $result;
+    $stmt = $this->db->query($sql, ['id' => $id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ?: null;
 } catch (Exception $e) {
-    error_log("WeCoza Core: Repository operation error: " . $e->getMessage());
-    return null; // or [] or false depending on context
+    error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::findByIdWithMappings'));
+    return null;
 }
 ```
 
-**Security-First Error Handling:**
-- SQL injection: Use column whitelisting in repositories via `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, etc.
-- No raw column names in queries. Always validate via whitelist.
-- Example from `BaseRepository.php`:
-```php
-protected function validateOrderColumn(string $orderBy, string $default = 'created_at'): string
-{
-    $allowed = $this->getAllowedOrderColumns();
-    return in_array($orderBy, $allowed, true) ? $orderBy : $default;
-}
-```
-
-**AJAX/Security Error Responses:**
-- Use `sendError($message, $code)` from BaseController or AjaxSecurity
-- Always verify nonce: `$this->requireNonce('action_name', 'nonce')`
-- Always check capability: `$this->requireCapability('manage_learners')`
-- Exit after sending error: `exit;` (prevents further execution)
-
-Example from `LearnerController.php`:
-```php
-$this->requireNonce('learners_nonce_action', 'nonce');
-$this->requireCapability('manage_learners');
-// Process request...
-```
-
-**JavaScript Error Handling:**
-- Use Promise `.catch()` for AJAX errors
-- Log errors in debug mode: `if (config.debug) console.error(...)`
-- Return error objects with status, statusText, and xhr: See `ajax-utils.js` line 272
+**Error Responses:**
+- Services throw exceptions with descriptive messages (e.g., `throw new Exception("Class not found: {$classId}")`)
+- AJAX handlers catch exceptions and return JSON error responses via `JsonResponder`
+- Controllers propagate exceptions to handlers (not caught at controller level)
 
 ## Logging
 
-**Framework:** `error_log()` (native PHP error logging) and WordPress `error_log()`
+**Framework:** WordPress native (`error_log()`, `wecoza_log()`)
 
 **Patterns:**
-- Only log when `WP_DEBUG` is true: Check in `wecoza_log()` function
-- Prefix logs with module name: `"[WeCoza Core][Level]"` format
-- Log in try-catch blocks on database errors
-
-Example from `wecoza_log()`:
-```php
-function wecoza_log(string $message, string $level = 'info'): void {
-    if (!defined('WP_DEBUG') || !WP_DEBUG) {
-        return;
-    }
-    $prefix = sprintf('[WeCoza Core][%s]', strtoupper($level));
-    error_log("{$prefix} {$message}");
-}
-```
-
-**JavaScript Logging:**
-- Use `console.log()`, `console.error()` for development/debugging
-- Wrap in debug mode checks: `if (config.debug) console.log(...)`
-
-Example from `ajax-utils.js`:
-```javascript
-if (config.debug) {
-    console.log(`[WeCozaAjax] ${method} ${action}`, requestData);
-}
-```
+- **Development logging:** Use `wecoza_log($msg, $level)` for WeCoza-specific messages
+  - Levels: `'info'`, `'warning'`, `'error'`
+  - Example: `wecoza_log('Client validation errors: ' . wp_json_encode($errors), 'warning');`
+- **System errors:** Use `error_log()` for PHP errors and exceptions
+  - Often combined with `wecoza_sanitize_exception()` to avoid logging sensitive data
+  - Example: `error_log(wecoza_sanitize_exception($e->getMessage(), 'LearnerRepository::findByIdWithMappings'));`
+- **Condition:** All logging only executes when `WP_DEBUG` is enabled
+- **Output:** `/opt/lampp/htdocs/wecoza/wp-content/debug.log`
 
 ## Comments
 
 **When to Comment:**
-- Complex logic: Why something is done a certain way (not what it does)
-- Security considerations: Explain why column whitelisting is necessary
-- Non-obvious workarounds: Document temporary solutions or gotchas
-- Architecture notes: See `LearnerModel.php` comments on property design
+- Complex algorithms (e.g., CTE queries with multiple joins): Use multi-line comments above the block
+- Business logic that's not obvious: Brief inline comment explaining intent
+- Workarounds for WordPress quirks: Always document why
+- Security-sensitive code: Always explain the protection mechanism
+- Don't comment obvious code (e.g., `$count = count($items);` needs no comment)
 
-Example from `LearnerModel.php` (lines 8-12):
-```php
-/**
- * ARCHITECTURE NOTE: Some properties hold display values (names) instead of raw IDs
- * because the DB query transforms them via JOINs/CASE statements. This is intentional:
- * - Display: Model holds "NL2" (name) for direct template output
- * - Forms: Compare by name for pre-selection, submit IDs
- */
-```
+**JSDoc/TSDoc:**
+- PHP: Use DocBlocks for classes, methods, and functions (mandatory)
+  - Format: `/** Description */` for single line, `/** @return type Description */` for detailed
+  - Include `@param`, `@return`, `@throws` tags for public methods
+  - Example from `BaseRepository`:
+    ```php
+    /**
+     * Get columns allowed for ORDER BY clauses
+     * Override in child classes to expand the list
+     *
+     * @return array List of allowed column names
+     */
+    protected function getAllowedOrderColumns(): array
+    ```
+- JavaScript: Use single-line (`//`) and multi-line (`/* */`) comments, no formal JSDoc
+  - Block comments describe intent above functions/objects
+  - Inline comments explain non-obvious code
+  - Example from `ajax-utils.js`:
+    ```javascript
+    /**
+     * AJAX Utilities - Standardized AJAX response handling for WeCoza Classes Plugin
+     *
+     * Provides consistent patterns for:
+     * - WordPress AJAX requests with nonce handling
+     * - Standardized success/error response processing
+     * ...
+     */
+    ```
 
-**JSDoc/PHPDoc:**
-- Use on all public methods and classes
-- Include `@param`, `@return`, `@throws` tags
-- Reference file paths in examples
-
-Example from `BaseController.php`:
-```php
-/**
- * Find records by criteria
- *
- * @param array $criteria Field => value pairs
- * @param int $limit Max records
- * @return array Array of matching records
- */
-public function findBy(array $criteria, int $limit = 50): array
-```
+**Special Comments:**
+- TODO/FIXME: Not systematically used; tech debt tracked in CONCERNS.md
+- HACK/XXX: Used sparingly in code for temporary workarounds (documented with context)
+- Architecture notes: Used in model docblocks for non-obvious design decisions
+  - Example from `LearnerModel.php`:
+    ```php
+    /**
+     * ARCHITECTURE NOTE: Some properties hold display values (names) instead of raw IDs
+     * because the DB query transforms them via JOINs/CASE statements. This is intentional:
+     * - Display: Model holds "NL2" (name) for direct template output
+     * - Forms: Compare by name for pre-selection, submit IDs
+     * - Updates: AJAX receives IDs from form, passes to DB
+     */
+    ```
 
 ## Function Design
 
-**Size Guidelines:**
-- Keep functions focused on single responsibility
-- Private helper methods for common patterns
-- Example: `validateOrderColumn()` is 4 lines - validates and returns safe value
+**Size:** No strict limit enforced; range from 5 lines (utility) to 50+ lines (complex queries)
+- Average service method: 15-30 lines
+- Average repository method: 20-40 lines (especially with error handling)
+- Complex methods documented with section comments (e.g., `// ===== Setup Phase =====`)
 
 **Parameters:**
-- Use type hints on all parameters: `function findById(int $id): ?array`
-- Use named parameters for clarity: `: string $orderBy = 'created_at'`
-- Use default values for optional parameters
-- Avoid boolean parameters (use named constants/enums instead)
+- Maximum 3-4 parameters for public methods (long signatures indicate design smell)
+- Use arrays/objects for multiple related parameters
+- Type-hint all parameters (enforce with `declare(strict_types=1)`)
+- Default values for optional parameters
+
+Example from `AISummaryService::generateSummary()`:
+```php
+public function generateSummary(array $context, ?array $existing = null): SummaryResultDTO
+```
 
 **Return Values:**
-- Explicit return types: `void`, `bool`, `?string`, `array`, etc.
-- Return null for "not found" cases: `return null;`
-- Return empty array for "no results": `return [];`
-- Return boolean for success/failure: `return true;` / `return false;`
-- Return object instances from factory methods: `return new static($data);`
+- Always type-hint return types
+- Return `null` for "not found" rather than `false`
+- Return `array` for collections (never return `null` for empty results; return `[]`)
+- Return DTOs/objects for complex data structures (not arrays)
 
-**Example from `BaseRepository.php`:**
+Example pattern:
 ```php
-public function findById(int $id): ?array { return ... }
-public function findAll(int $limit = 50, int $offset = 0): array { return ... }
-public function insert(array $data): ?int { return ... }
-public function update(int $id, array $data): bool { return ... }
-public function delete(int $id): bool { return ... }
+public function findByIdWithMappings(int $id): ?array   // null if not found
+public function getAllowedOrderColumns(): array          // [] if none
+public function generateSummary(array $context): SummaryResultDTO  // complex result object
 ```
 
 ## Module Design
 
 **Exports:**
-- PHP classes export via namespace
-- Global helper functions registered in `core/Helpers/functions.php`
-- JavaScript exports via IIFE with global assignment: `global.WeCozaAjax = WeCozaAjax;`
-
-Example from `ajax-utils.js`:
-```javascript
-(function(global, $) {
-    const WeCozaAjax = { ... };
-    global.WeCozaAjax = WeCozaAjax;
-})(window, jQuery);
-```
+- PHP: No explicit export mechanism (no barrel files); import directly from class files
+- JavaScript: Modules export via `window.NamespaceName` (global namespace pattern)
+  - Example: `WeCozaAjax`, `WeCozaUtils`
+- All exports are public; no internal-only export pattern
 
 **Barrel Files:**
-- Not used in this codebase
-- Each module is self-contained
+- PHP: Not used
+- JavaScript: Not used (each JS file loads independently via `wp_enqueue_script()`)
 
-**Repository Pattern:**
-- All data access through Repository classes
-- Controllers depend on Models, Models delegate to Repositories
-- Example: `LearnerController` → `LearnerModel` → `LearnerRepository` → Database
+**Visibility:**
+- PHP: Use explicit visibility (`public`, `protected`, `private`)
+  - Most properties are `protected` to allow subclass extension
+  - Most methods are `public` for direct use
+- Private methods: Used for internal implementation details (not exposed in tests)
+- Static methods: Used for factories and utilities (e.g., `NotificationProcessor::boot()`)
 
-**Model/View/Controller Organization:**
-- Models: `src/[Module]/Models/` - Contain properties, getters, setters
-- Repositories: `src/[Module]/Repositories/` - Contain CRUD operations
-- Controllers: `src/[Module]/Controllers/` - Contain business logic, hook registration
-- Views: `views/` - PHP templates
-- Services: `src/[Module]/Services/` - Optional: Complex business logic (e.g., `ProgressionService`)
+## Trait Usage
 
-## Security Conventions
+**Pattern:** Traits used for cross-cutting concerns:
+- `DataObfuscator`: PII masking and data sanitization (used by `AISummaryService`, `PIIDetector`)
+- `PIIDetector`: Pattern matching for sensitive data detection
+- Applied via `use TraitName;` at class level
 
-**Input Validation:**
+Example from `AISummaryService.php`:
+```php
+final class AISummaryService
+{
+    use DataObfuscator;
+    // ... implementation
+}
+```
+
+## Class Design
+
+**Abstract Base Classes:**
+- `BaseModel`: Base for all data models with type casting and persistence
+- `BaseRepository`: Base for data access with column whitelisting and connection management
+- `BaseController`: Base for WordPress integration with hook registration and asset enqueueing
+
+**Final Classes:**
+- Some service classes marked `final` to prevent subclassing (e.g., `AISummaryService`)
+- Controllers and repositories not marked final (allow extension in dependent plugins)
+
+**Constructor Dependency Injection:**
+- Services accept dependencies via constructor
+- Example from `AISummaryService::__construct()`:
+  ```php
+  public function __construct(
+      private readonly OpenAIConfig $config,
+      ?callable $httpClient = null,
+      private readonly int $maxAttempts = 3
+  )
+  ```
+- Properties marked `private readonly` when intended as immutable
+
+## Security-First Conventions
+
+**Column Whitelisting (SQL Injection Prevention):**
+- Every Repository must override: `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, `getAllowedInsertColumns()`, `getAllowedUpdateColumns()`
+- Example from `LearnerRepository`:
+  ```php
+  protected function getAllowedOrderColumns(): array {
+      return ['id', 'first_name', 'surname', 'email_address', 'created_at', 'updated_at', ...];
+  }
+  ```
+- Used in queries to validate column names before building SQL
+
+**Input Sanitization:**
 - Use `wecoza_sanitize_value($value, $type)` for type-safe sanitization
 - Supported types: `string`, `int`, `float`, `bool`, `email`, `url`, `json`, `array`, `date`, `datetime`, `raw`
 - Always sanitize before database queries
 
-**Column Whitelisting:**
-- Every Repository must override `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, `getAllowedInsertColumns()`, `getAllowedUpdateColumns()`
-- Example from `LearnerRepository.php`:
-```php
-protected function getAllowedOrderColumns(): array {
-    return ['id', 'first_name', 'surname', 'email_address', 'created_at', 'updated_at', ...];
-}
-```
-
-**CSRF Protection:**
-- All AJAX handlers require nonce verification: `$this->requireNonce('action_name')`
-- Create nonces in templates with `wp_create_nonce('action_name')`
-- Use `AjaxSecurity::requireNonce()` as static alternative
-
-**Capabilities:**
-- Use custom capability `manage_learners` for learner data
-- Check capability before processing: `$this->requireCapability('manage_learners')`
-- Registered on plugin activation in `wecoza-core.php`
+**AJAX/Capability Checks:**
+- All AJAX handlers require nonce verification: `AjaxSecurity::requireNonce('action_name')`
+- Check capability before processing: `AjaxSecurity::checkCapability('manage_learners')`
+- No unauthenticated endpoints (no `wp_ajax_nopriv_` hooks registered)
 
 ---
 
-*Convention analysis: 2026-02-02*
+*Convention analysis: 2026-03-03*

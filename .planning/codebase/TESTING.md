@@ -1,361 +1,442 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-02-02
+**Analysis Date:** 2026-03-03
 
 ## Test Framework
 
 **Runner:**
-- Custom test runner: `tests/security-test.php`
-- Execution method: `php tests/security-test.php` from CLI or `wp eval-file tests/security-test.php` via WP-CLI
-- No PHPUnit, Jest, or Vitest configured
+- WordPress CLI (`wp eval-file`) for PHP integration tests
+- No formal test framework (PHPUnit, Pest, etc.)
+- Tests written as standalone PHP scripts that bootstrap WordPress
+
+**Assertion Library:**
+- Custom `test_result()` function for tracking pass/fail
+- No formal assertion library (manual boolean checks)
 
 **Run Commands:**
 ```bash
-# Run all security tests
+# Email Notification Tests
+wp eval-file tests/Events/EmailNotificationTest.php --path=/opt/lampp/htdocs/wecoza
+
+# AI Summarization Tests
+php wp-cli.phar eval-file wp-content/plugins/wecoza-core/tests/Events/AISummarizationTest.php --path=/opt/lampp/htdocs/wecoza
+
+# PII Detection Tests
+php tests/Events/PIIDetectorTest.php
+
+# Architecture Verification
+php tests/verify-architecture.php
+
+# Security Tests
 php tests/security-test.php
 
-# Run via WordPress CLI
-wp eval-file tests/security-test.php
+# Feature Parity Tests
+php tests/integration/agents-feature-parity.php
+php tests/integration/clients-feature-parity.php
 ```
-
-**Assertion Library:**
-- Custom assertions in `SecurityTestRunner` class: `$this->pass()`, `$this->fail()` methods
-- No external assertion library (e.g., PHPUnit, Jest)
 
 ## Test File Organization
 
 **Location:**
-- Tests stored in `tests/` directory at plugin root
-- Separate from production code in `core/`, `src/`
-- One test file currently: `tests/security-test.php`
+- `tests/` directory at plugin root
+- Subdirectories by domain: `tests/Events/`, `tests/integration/`, etc.
+- Tests alongside source code (not co-located with implementations)
 
 **Naming:**
-- Pattern: `[test-name]-test.php` (e.g., `security-test.php`)
-- Not co-located with source files
+- Pattern: `{FeatureName}Test.php`
+- Examples: `EmailNotificationTest.php`, `PIIDetectorTest.php`, `AISummarizationTest.php`
 
 **Structure:**
 ```
 tests/
-├── security-test.php   # Security regression tests
+├── Events/
+│   ├── EmailNotificationTest.php
+│   ├── AISummarizationTest.php
+│   ├── PIIDetectorTest.php
+│   ├── MaterialTrackingTest.php
+│   └── TaskManagementTest.php
+├── integration/
+│   ├── agents-feature-parity.php
+│   ├── clients-feature-parity.php
+│   └── ...
+├── verify-architecture.php
+├── security-test.php
+└── ...
 ```
 
 ## Test Structure
 
 **Suite Organization:**
+Tests organized into logical sections within a single test file via comment headers and echo output:
 
-Test runner class in `tests/security-test.php`:
 ```php
-class SecurityTestRunner
-{
-    private array $results = [];
-    private int $passed = 0;
-    private int $failed = 0;
+// ============================================================================
+// SECTION NAME
+// ============================================================================
 
-    public function run(): void
-    {
-        echo "\n=== WeCoza Core Security Tests ===\n\n";
+echo "--- Section Title ---\n\n";
 
-        $this->testSqlInjectionInOrderBy();
-        $this->testSqlInjectionInFilterColumns();
-        $this->testSqlInjectionInInsertColumns();
-        $this->testSqlInjectionInUpdateColumns();
-        $this->testCapabilityRegistration();
-        $this->testNoPrivHooksRemoved();
+// Individual test calls
+test_result('Test name 1', $condition1, $error_message);
+test_result('Test name 2', $condition2, '');
+```
 
-        $this->printResults();
+**Patterns:**
+
+1. **Global State Tracking:**
+```php
+$results = [
+    'total' => 0,
+    'passed' => 0,
+    'failed' => 0,
+    'tests' => []
+];
+```
+
+2. **Test Runner Function:**
+```php
+function test_result(string $name, bool $passed, string $message = ''): void {
+    global $results;
+
+    $results['total']++;
+    if ($passed) {
+        $results['passed']++;
+        echo "✓ PASS: {$name}\n";
+    } else {
+        $results['failed']++;
+        echo "✗ FAIL: {$name}\n";
+        if ($message) {
+            echo "  Error: {$message}\n";
+        }
     }
-}
 
-// Instantiate and run
-$runner = new SecurityTestRunner();
-$runner->run();
-```
-
-**Setup/Teardown:**
-- WordPress environment loaded via `wp-load.php` (lines 24-31 in `security-test.php`)
-- CLI-only execution guard: `php_sapi_name() !== 'cli'` check
-- No test setup/teardown hooks (stateless tests)
-
-**Assertion Patterns:**
-
-Success assertion:
-```php
-private function pass(string $testName, string $message): void
-{
-    $this->passed++;
-    $this->results[] = [
-        'status' => 'PASS',
-        'name' => $testName,
-        'message' => $message,
+    $results['tests'][] = [
+        'name' => $name,
+        'passed' => $passed,
+        'message' => $message
     ];
-    echo "✓ PASS: {$testName}\n  {$message}\n\n";
 }
 ```
 
-Failure assertion:
+3. **Bootstrap Section:**
 ```php
-private function fail(string $testName, string $message): void
-{
-    $this->failed++;
-    $this->results[] = [
-        'status' => 'FAIL',
-        'name' => $testName,
-        'message' => $message,
-    ];
-    echo "✗ FAIL: {$testName}\n  {$message}\n\n";
+// Bootstrap WordPress if not running via WP-CLI
+if (!function_exists('get_option')) {
+    require_once '/opt/lampp/htdocs/wecoza/wp-load.php';
 }
 ```
 
-## Test Types
+4. **Setup Before Tests:**
+- Configure cron: `wp_schedule_event(time(), 'hourly', 'wecoza_email_notifications_process')`
+- Register settings: `\WeCoza\Events\Admin\SettingsPage::registerSettings()`
+- Load test data via WordPress options: `update_option('wecoza_notification_class_created', 'test@example.com')`
 
-**Security Tests (All tests in current suite):**
-- **Scope:** Verify security controls are in place
-- **Approach:** Use try-catch to test malicious inputs, reflection to access protected methods
-- **Location:** `tests/security-test.php`
+5. **Cleanup After Tests:**
+- Remove test options: `delete_option('wecoza_notification_class_created')`
+- Reset state to avoid cross-test contamination
 
-**Test 1: SQL Injection in ORDER BY (`testSqlInjectionInOrderBy`)**
-- Verifies: `LearnerRepository.findAll()` rejects malicious ORDER BY column names
-- Input: `'id; DROP TABLE learners; --'`
-- Assertion: Malicious input is sanitized via `validateOrderColumn()` whitelist
-- Pattern:
+6. **Final Summary:**
 ```php
-$maliciousOrderBy = 'id; DROP TABLE learners; --';
-$result = $repo->findAll(10, 0, $maliciousOrderBy, 'DESC');
-// If query executes safely, malicious input was filtered
-$this->pass($testName, 'Malicious ORDER BY was sanitized');
-```
+echo "====================================\n";
+echo "TEST SUMMARY\n";
+echo "====================================\n\n";
 
-**Test 2: SQL Injection in Filter Columns (`testSqlInjectionInFilterColumns`)**
-- Verifies: `LearnerRepository.findBy()` rejects malicious column names in WHERE clause
-- Input: `['id' => 1, 'id; DROP TABLE learners; --' => 'malicious']`
-- Assertion: Non-whitelisted column keys are filtered out
-- Pattern: Same as Test 1 - if query executes, malicious key was removed
+echo "Total tests: {$results['total']}\n";
+echo "Passed: {$results['passed']}\n";
+echo "Failed: {$results['failed']}\n";
 
-**Test 3: SQL Injection in INSERT Columns (`testSqlInjectionInInsertColumns`)**
-- Verifies: `BaseRepository.insert()` filters non-whitelisted columns
-- Approach: Use Reflection to access protected `getAllowedInsertColumns()` method
-- Input: `['first_name' => 'Test', 'malicious_col; DROP TABLE--' => 'injected']`
-- Assertion: Array filter removes malicious key before database operation
-- Pattern:
-```php
-$reflection = new \ReflectionMethod($repo, 'getAllowedInsertColumns');
-$reflection->setAccessible(true);
-$allowedColumns = $reflection->invoke($repo);
+$pass_rate = $results['total'] > 0 ? round(($results['passed'] / $results['total']) * 100, 2) : 0;
+echo "Pass rate: {$pass_rate}%\n\n";
 
-$filteredData = array_filter($maliciousData,
-    fn($key) => in_array($key, $allowedColumns, true),
-    ARRAY_FILTER_USE_KEY
-);
-
-if (!isset($filteredData['malicious_col; DROP TABLE--'])) {
-    $this->pass($testName, 'Malicious INSERT column was filtered out');
-}
-```
-
-**Test 4: SQL Injection in UPDATE Columns (`testSqlInjectionInUpdateColumns`)**
-- Verifies: UPDATE whitelist contains only safe column names
-- Approach: Check `getAllowedUpdateColumns()` for dangerous patterns
-- Dangerous patterns checked: `;`, `--`, `DROP`, `DELETE`, `INSERT`, `UPDATE`
-- Assertion:
-```php
-$dangerousPatterns = [';', '--', 'DROP', 'DELETE', 'INSERT', 'UPDATE'];
-foreach ($allowedColumns as $col) {
-    foreach ($dangerousPatterns as $pattern) {
-        if (stripos($col, $pattern) !== false) {
-            $this->fail($testName, 'Dangerous pattern found');
+if ($results['failed'] > 0) {
+    echo "FAILED TESTS:\n";
+    foreach ($results['tests'] as $test) {
+        if (!$test['passed']) {
+            echo "  - {$test['name']}\n";
+            if ($test['message']) {
+                echo "    {$test['message']}\n";
+            }
         }
     }
 }
-$this->pass($testName, 'Update column whitelist contains only safe column names');
+
+// Exit with code
+exit($pass_rate === 100.0 ? 0 : 1);
 ```
-
-**Test 5: Custom Capability Registration (`testCapabilityRegistration`)**
-- Verifies: `manage_learners` capability is registered for administrators
-- Pattern:
-```php
-$admin = get_role('administrator');
-if ($admin && $admin->has_cap('manage_learners')) {
-    $this->pass($testName, 'Administrator role has manage_learners capability');
-} else {
-    $this->fail($testName, 'Administrator role MISSING manage_learners capability');
-}
-```
-
-**Test 6: No-priv AJAX Hooks Removed (`testNoPrivHooksRemoved`)**
-- Verifies: Unauthenticated AJAX handlers (`wp_ajax_nopriv_`) are not registered
-- Checked hooks:
-  - `wp_ajax_nopriv_wecoza_get_learner`
-  - `wp_ajax_nopriv_wecoza_get_learners`
-  - `wp_ajax_nopriv_wecoza_update_learner`
-  - `wp_ajax_nopriv_wecoza_delete_learner`
-- Pattern:
-```php
-global $wp_filter;
-foreach ($noprivHooks as $hook) {
-    if (isset($wp_filter[$hook]) && !empty($wp_filter[$hook]->callbacks)) {
-        $foundHooks[] = $hook;
-    }
-}
-if (empty($foundHooks)) {
-    $this->pass($testName, 'All nopriv AJAX hooks have been removed');
-}
-```
-
-## Coverage
-
-**Requirements:** No explicit code coverage tool (no phpunit.xml, no jest config)
-
-**Current Coverage:**
-- Security controls: 6 test cases covering SQL injection, authentication, authorization
-- Core Repository patterns tested indirectly through security tests
-- No unit tests for Models, Controllers, Services
-
-**Gap Areas:**
-- No AJAX handler testing (integration level)
-- No Model save/update/delete testing
-- No form validation testing
-- No service layer testing (e.g., `ProgressionService`)
-- No JavaScript/frontend testing (no Jest, Vitest, or Cypress configured)
 
 ## Mocking
 
-**Framework:** Not used
+**Framework:** No mocking framework used (Mockery, PHPUnit mocks, etc.)
 
-**Approach:** Tests use real database connection and repositories
-- Example: `new LearnerRepository()` queries actual PostgreSQL database
-- Exception handling used instead of mocks: `try-catch` verifies error handling
+**Patterns:**
 
-**Pattern to Add Mocks (if needed):**
-Since no mocking framework exists, future tests should either:
-1. Use test database with fixtures
-2. Use Reflection to test private methods (as done in Tests 3-4)
-3. Mock external dependencies manually (WordPress functions are real in tests)
-
-## Fixtures and Test Data
-
-**Test Data:**
-- No fixtures or factories defined currently
-- Security tests use hardcoded malicious input strings:
-  - `'id; DROP TABLE learners; --'`
-  - `'malicious_col; DROP TABLE--'`
-- No factory pattern for creating test records
-
-**Location:** None (tests are stateless and don't require fixtures)
-
-**Pattern for Fixtures (if needed):**
+1. **Dependency Injection for Testing:**
+Services accept test dependencies via constructor:
 ```php
-// Example fixture factory (not implemented)
-class LearnerFactory {
-    public static function create(array $overrides = []): int {
-        $repo = new LearnerRepository();
-        $data = array_merge([
-            'first_name' => 'Test',
-            'surname' => 'User',
-            'email_address' => 'test@example.com',
-        ], $overrides);
-        return $repo->insert($data);
+// Production
+$service = new AISummaryService($config);
+
+// Testing: Pass mock HTTP client
+$service = new AISummaryService(
+    $config,
+    $mockHttpClient,  // Callable that returns test responses
+    $maxAttempts
+);
+```
+
+2. **Fake Implementations:**
+Test classes implement required interfaces inline:
+```php
+class AITestRunner
+{
+    private $total = 0;
+    private $passed = 0;
+    private $failed = 0;
+    private $tests = [];
+
+    public function test(string $name, bool $passed, string $message = ''): void
+    {
+        // Custom test runner implementation
     }
 }
 ```
+
+3. **WordPress Helpers as Boundaries:**
+Tests directly call WordPress functions (get_option, update_option, wp_schedule_event) which are assumed to work:
+```php
+update_option('wecoza_notification_class_created', 'test-insert@example.com');
+$recipient = $settings->getRecipientForOperation('INSERT');
+$correct_insert = $recipient === 'test-insert@example.com';
+test_result('Settings option works', $correct_insert);
+delete_option('wecoza_notification_class_created');
+```
+
+4. **Reflection for Private Method Testing:**
+From `PIIDetectorTest.php`, test class exposes private methods:
+```php
+class PIIDetectorTestClass
+{
+    use \WeCoza\Events\Services\Traits\PIIDetector;
+
+    // Expose private methods for testing
+    public function testLooksLikeSouthAfricanID(string $value): bool
+    {
+        return $this->looksLikeSouthAfricanID($value);
+    }
+}
+```
+
+**What to Mock:**
+- External APIs: HTTP calls (OpenAI, Stripe, etc.) - pass test callable to constructor
+- WordPress functions: Do NOT mock; assume WordPress is loaded and works
+
+**What NOT to Mock:**
+- Database operations (PostgreSQL): Test against real database
+- WordPress core functions (get_option, add_action, etc.): Assume these work correctly
+- Service dependencies: Pass real implementations unless specifically testing error cases
+
+## Fixtures and Factories
+
+**Test Data:**
+No formal fixture system. Data created inline using WordPress functions:
+
+```php
+// Create test option
+update_option('wecoza_notification_class_created', 'test@example.com');
+
+// Create test array (from EmailNotificationTest.php)
+$test_context = [
+    'operation' => 'INSERT',
+    'row' => ['class_id' => '123', 'changed_at' => '2026-02-02T13:00:00Z'],
+    'recipient' => 'test@example.com',
+    'new_row' => ['class_code' => 'TEST-001', 'class_subject' => 'Test Subject'],
+    'old_row' => [],
+    'diff' => [],
+    'summary' => ['status' => 'success', 'summary' => 'Test summary text'],
+    'email_context' => ['alias_map' => [], 'obfuscated' => []],
+];
+```
+
+**Location:**
+- Inline within test files (no separate fixtures directory)
+- Data pools for form fillers in development code: `src/Dev/FormFiller/data-pools.js`
+
+## Coverage
+
+**Requirements:** No coverage requirements enforced
+
+**View Coverage:**
+- No coverage reporting tool configured
+- Manual inspection: Check test results pass/fail rate from final summary
+
+## Test Types
+
+**Unit Tests:**
+- Scope: Individual class methods and functions
+- Approach: Create instance, call method, assert return value
+- Example from `PIIDetectorTest.php`:
+  ```php
+  $detector = new PIIDetectorTestClass();
+
+  test_result(
+      'SA ID: 13 digits detected',
+      $detector->testLooksLikeSouthAfricanID('9001015800087')
+  );
+  ```
+
+**Integration Tests:**
+- Scope: Multiple classes working together with real WordPress/PostgreSQL
+- Approach: Set up data, call service/controller methods, verify state changes and side effects
+- Examples:
+  - `tests/integration/agents-feature-parity.php`: Verify agents plugin functions work after migration
+  - `tests/integration/clients-feature-parity.php`: Verify clients plugin functions work after migration
+- Database: Tests use real PostgreSQL database (not mocked)
+
+**Architecture Verification Tests:**
+- Scope: Verify architectural requirements are met
+- Approach: Static code analysis - check file existence, namespace declarations, method presence
+- File: `tests/verify-architecture.php`
+- Checks: Correct namespaces, required methods, file organization, inheritance chains
+
+**Security Tests:**
+- File: `tests/security-test.php`
+- Scope: Verify CSRF protection, capability checks, input sanitization
+- Approach: Check WordPress hooks, nonce registration, capability enforcement
+- Example tests:
+  - SQL injection in ORDER BY, WHERE, INSERT, UPDATE columns
+  - Capability registration (manage_learners)
+  - No unauthenticated AJAX handlers (`wp_ajax_nopriv_` hooks removed)
+
+**Feature Parity Tests:**
+- Scope: Verify migrated plugins work identically after integration into core
+- Approach: Compare output/behavior before/after migration
+- Files: `tests/integration/agents-feature-parity.php`, `tests/integration/clients-feature-parity.php`
 
 ## Common Patterns
 
-**CLI Test Guard:**
+**Async Testing:**
+Not needed - WordPress is synchronous. Some tests use `wp_schedule_event()` to verify cron scheduling but don't wait for execution.
+
+**Error Testing:**
+Tests verify error conditions by checking exception messages and return values:
+
 ```php
-// Prevent web access - CLI only
-if (php_sapi_name() !== 'cli' && !defined('WP_CLI')) {
-    die('This script can only be run from command line.');
+// Test exception is thrown
+try {
+    $service->processInvalid();
+    $error_occurred = false;
+} catch (Exception $e) {
+    $error_occurred = true;
+    $correct_message = strpos($e->getMessage(), 'Expected error') !== false;
+}
+test_result('Service throws correct exception', $error_occurred && $correct_message);
+```
+
+**Conditional Testing:**
+Tests skip sections if prerequisites aren't met:
+
+```php
+// From EmailNotificationTest.php - test only if admin functions available
+if (function_exists('add_settings_section')) {
+    $insert_field_registered = isset($wp_settings_fields[...]);
+    test_result('Settings field registered', $insert_field_registered);
+} else {
+    // Test alternative method instead
+    $has_register_method = method_exists('WeCoza\\Events\\Admin\\SettingsPage', 'registerSettings');
+    test_result('SettingsPage has registerSettings() method', $has_register_method);
 }
 ```
 
-**WordPress Environment Loading:**
+**WordPress Option Testing:**
+Set options, test against them, then clean up:
+
 ```php
-// Load WordPress if not already loaded
-if (!defined('ABSPATH')) {
-    $wp_load = dirname(__FILE__, 6) . '/wp-load.php';
-    if (file_exists($wp_load)) {
-        require_once $wp_load;
-    } else {
-        die("Could not find wp-load.php.\n");
-    }
-}
+// Set
+update_option('wecoza_notification_class_created', 'admin@example.com');
+
+// Test
+$retrieved = get_option('wecoza_notification_class_created');
+$correct = $retrieved === 'admin@example.com';
+test_result('Option is settable and retrievable', $correct);
+
+// Clean
+delete_option('wecoza_notification_class_created');
 ```
 
-**Test Method Pattern:**
+**Class Instantiation Testing:**
+Verify classes can be instantiated and have expected methods:
+
 ```php
-private function testFeature(): void
-{
-    $testName = 'Feature Name';
+$processor_exists = class_exists('WeCoza\\Events\\Services\\NotificationProcessor');
+test_result('NotificationProcessor class exists', $processor_exists);
 
-    try {
-        // Perform test action
-        $result = /* ... */;
+if ($processor_exists) {
+    $has_boot = method_exists('WeCoza\\Events\\Services\\NotificationProcessor', 'boot');
+    test_result('NotificationProcessor has boot() static method', $has_boot);
 
-        // Assert result
-        if ($result === expected) {
-            $this->pass($testName, 'Reason for success');
-        } else {
-            $this->fail($testName, 'Reason for failure');
+    if ($has_boot) {
+        try {
+            $processor = \WeCoza\Events\Services\NotificationProcessor::boot();
+            $returns_instance = $processor instanceof \WeCoza\Events\Services\NotificationProcessor;
+            test_result('boot() returns valid instance', $returns_instance);
+        } catch (Exception $e) {
+            test_result('boot() execution', false, $e->getMessage());
         }
-    } catch (\Exception $e) {
-        $this->fail($testName, 'Unexpected exception: ' . $e->getMessage());
     }
 }
 ```
 
-**Using Reflection to Test Protected Methods:**
+**PII Detection Testing (from PIIDetectorTest.php):**
+Tests validate pattern matching for sensitive data:
 ```php
-$reflection = new \ReflectionMethod($object, 'protectedMethodName');
-$reflection->setAccessible(true);
-$result = $reflection->invoke($object, ...args);
+// Valid SA IDs (13 digits)
+test_result('SA ID: 13 digits detected', $detector->testLooksLikeSouthAfricanID('9001015800087'));
+test_result('SA ID: 13 digits with spaces detected', $detector->testLooksLikeSouthAfricanID('900101 5800 087'));
+
+// Invalid SA IDs
+test_result('SA ID: 12 digits not detected', !$detector->testLooksLikeSouthAfricanID('123456789012'));
 ```
 
-**Print Results:**
-```php
-private function printResults(): void
-{
-    echo "=================================\n";
-    echo "Results: {$this->passed} passed, {$this->failed} failed\n";
-    echo "=================================\n";
+## Test Execution Flow
 
-    if ($this->failed > 0) {
-        exit(1);  // Exit with error code
-    }
+1. **Bootstrap phase:** Load WordPress via `wp-load.php`
+2. **Setup phase:** Register hooks, create test data, schedule cron events
+3. **Test execution phase:** Run test_result() calls to verify conditions
+4. **Cleanup phase:** Remove test options, reset state
+5. **Summary phase:** Print pass rate and failed tests
+6. **Exit code:** 0 on all pass, 1 on any failure
+
+Example from `EmailNotificationTest.php`:
+```php
+if ($pass_rate === 100.0) {
+    echo "✓ ALL REQUIREMENTS VERIFIED\n";
+    exit(0);
+} else {
+    echo "✗ SOME REQUIREMENTS NOT VERIFIED\n";
+    echo "Please review failed tests above and fix any issues.\n";
+    exit(1);
 }
 ```
 
-## Test Execution Requirements
+## Debug Workflow
 
-**Dependencies:**
-- PHP 8.0+ (match expressions, typed properties)
-- WordPress 6.0+
-- PostgreSQL with `pdo_pgsql` PHP extension
-- `pdo` and `pdo_pgsql` PHP extensions must be installed
+**Primary:**
+- Check `/opt/lampp/htdocs/wecoza/wp-content/debug.log` for PHP errors and `wecoza_log()` output
+- All test output goes to stdout (run test file directly or via `wp eval-file`)
 
-**Database:**
-- Tests connect to real PostgreSQL database (from `wecoza_postgres_password` WP option)
-- Must have tables: `learners`, `classes`, `qa_visits`, etc. (from schema)
-- Tests don't modify data (read-only security validation)
-
-**Run Context:**
-- Must be run from WordPress environment (requires `wp-load.php`)
-- Must be CLI execution (not web server)
-- Requires WordPress to be fully initialized
-
-## JavaScript Testing
-
-**Current Status:** Not implemented
-
-**Recommendation for Future Testing:**
-- Framework: Jest or Vitest (lightweight)
-- Target: `assets/js/` files
-- Testing patterns for `WeCozaAjax`:
-  - Mock jQuery/AJAX
-  - Mock WordPress localization (`wecozaClass`, `qaAjax`, etc.)
-  - Test request/response handling
-  - Test loading indicator UI
-  - Test error handling and retries
+**Test-Specific Logging:**
+- Tests echo progress to console: `✓ PASS:` and `✗ FAIL:` markers
+- Use `var_export()` or `wp_json_encode()` in test assertions to debug values:
+  ```php
+  $has_body = isset($result['body']) && is_string($result['body']);
+  $valid_structure = $has_subject && $has_body && $has_headers;
+  test_result(
+      'Structure is valid',
+      $valid_structure,
+      $valid_structure ? '' : 'Missing required keys in returned array'  // Show error message
+  );
+  ```
 
 ---
 
-*Testing analysis: 2026-02-02*
+*Testing analysis: 2026-03-03*

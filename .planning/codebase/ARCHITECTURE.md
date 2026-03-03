@@ -1,215 +1,319 @@
 # Architecture
 
-**Analysis Date:** 2026-02-02
+**Analysis Date:** 2026-03-03
 
 ## Pattern Overview
 
-**Overall:** WordPress MVC Plugin with Module-based Architecture
+**Overall:** Modular MVC with Repository Pattern, Service Layer, and Event-Driven Notifications
 
 **Key Characteristics:**
-- Modular structure with isolated Learners and Classes modules
-- Service-oriented layer for complex business logic
-- Repository pattern for data access with column whitelisting security
-- Dependency injection via constructor initialization
-- PSR-4 autoloading with lazy-loaded database connection
+- **Module-based organization** - Each domain (Learners, Classes, Events, Agents, Clients, Feedback, LookupTables) is a self-contained module with complete stack (Controllers, Models, Repositories, Services, Views, Ajax)
+- **PSR-4 Autoloading** - Namespace-based class loading with zero manual requires for application classes
+- **Base abstractions** - `BaseController`, `BaseModel`, `BaseRepository` provide common patterns and reduce duplication
+- **Database agnostic** - PostgreSQL accessed via singleton `PostgresConnection`, not WordPress `$wpdb`
+- **Security-first** - Column whitelisting, nonce verification, capability checks built into abstraction layers
+- **WordPress integration** - Hooks, shortcodes, AJAX actions wired through controller registration during `plugins_loaded` (priority 5)
+- **Async processing** - Action Scheduler (WooCommerce vendor library) for background notifications and AI enrichment
 
 ## Layers
 
-**Presentation Layer (Controllers):**
-- Purpose: Handle WordPress hooks, shortcodes, and AJAX requests
-- Location: `src/Learners/Controllers/`, `src/Classes/Controllers/`
-- Contains: Controller classes extending `BaseController`
-- Depends on: Models, Repositories, Services, Views
-- Used by: WordPress hooks (init, wp_ajax_*, wp_enqueue_scripts)
-- Pattern: Each controller instantiates in `plugins_loaded` hook (priority 5)
+**Presentation (Shortcodes & AJAX):**
+- Purpose: Entry points for user interactions - renders forms, lists, and processes input
+- Location: `src/{Module}/Shortcodes/*.php`, `src/{Module}/Ajax/*.php`
+- Contains: Shortcode registration, AJAX action handlers, direct output rendering
+- Depends on: Controllers, Services, Models
+- Used by: Front-end forms, AJAX requests, WordPress hooks
 
-**Business Logic Layer (Services):**
-- Purpose: Complex operations requiring multiple data sources or external logic
-- Location: `src/Learners/Services/`, `src/Classes/Services/`
-- Contains: `ProgressionService`, `PortfolioUploadService`, `ScheduleService`, `UploadService`, `FormDataProcessor`
-- Depends on: Models, Repositories
-- Used by: Controllers
-- Pattern: Services encapsulate workflows; called by controllers to handle domain logic
+**Controller:**
+- Purpose: Orchestrates business logic, coordinates services, renders views, manages HTTP lifecycle
+- Location: `src/{Module}/Controllers/{Module}Controller.php`, `src/{Module}/Controllers/{Module}AjaxController.php`
+- Contains: Shortcode callbacks, AJAX handlers, hook registration, view rendering via `wecoza_view()` or `wecoza_component()`
+- Depends on: Services, Models, Views
+- Used by: Plugin bootstrap (`wecoza-core.php`), WordPress hooks
+- Pattern: Controllers inherit from `BaseController`, override `registerHooks()` to wire WordPress actions/filters
 
-**Model Layer:**
-- Purpose: Data representation and entity-level operations
-- Location: `src/Learners/Models/`, `src/Classes/Models/`
-- Contains: Classes extending `BaseModel` with type casting, hydration, property access
-- Depends on: Repositories for persistence
-- Used by: Controllers, Services
-- Pattern: Models are hydrated from database arrays; provide type-safe property access via `__get` magic method
+**Service:**
+- Purpose: Business logic layer - CRUD operations, data transformations, cross-entity orchestration
+- Location: `src/{Module}/Services/{Module}Service.php`
+- Contains: Public methods for create, read, update, delete, bulk operations, calculations
+- Depends on: Repositories, Models
+- Used by: Controllers, other Services, special-purpose handlers
+- Pattern: Services instantiate repositories, call repository methods, return hydrated Models
 
-**Data Access Layer (Repositories):**
-- Purpose: Database queries with SQL injection prevention via column whitelisting
-- Location: `src/Learners/Repositories/`, `src/Classes/Repositories/`
-- Contains: Classes extending `BaseRepository` implementing CRUD and pagination
-- Depends on: `PostgresConnection` singleton
-- Used by: Models, Services
-- Pattern: All column names validated against whitelists; prepared statements for all queries
+**Model:**
+- Purpose: Data representation with type casting, hydration, and persistence helpers
+- Location: `src/{Module}/Models/{Module}Model.php`
+- Contains: Properties matching DB columns, type definitions, static methods for data access (delegates to Repository)
+- Depends on: Repository (for persistence), Enums
+- Used by: Services, Controllers, Views
+- Pattern: Models extend `BaseModel`, use static `$table`, `$casts`, `$fillable`, provide magic getters/setters for snake_case ↔ camelCase conversion
 
-**Framework Layer (Core):**
-- Purpose: Shared infrastructure and abstractions
+**Repository:**
+- Purpose: Data access layer - all database queries encapsulated here
+- Location: `src/{Module}/Repositories/{Module}Repository.php`
+- Contains: SELECT queries with column whitelisting, JOIN logic, result hydration to Models
+- Depends on: PostgresConnection (singleton)
+- Used by: Services, Models (static persistence methods)
+- Pattern: Repositories extend `BaseRepository`, whitelist columns via `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, `getAllowedInsertColumns()`, `getAllowedUpdateColumns()`
+
+**View:**
+- Purpose: HTML template rendering with data passed from controllers
+- Location: `views/{module}/{view-name}.view.php` or `views/{module}/{view-name}.php`
+- Contains: HTML markup, PHP loops, conditional rendering, no business logic
+- Depends on: Nothing (receives pure data)
+- Used by: Controllers via `wecoza_view()` helper
+- Pattern: Templates use extracted variables, call `wecoza_component()` for partials
+
+**Core Infrastructure:**
+- Purpose: Framework abstractions and database connection
 - Location: `core/Abstract/`, `core/Database/`, `core/Helpers/`
-- Contains: `BaseController`, `BaseModel`, `BaseRepository`, `PostgresConnection`, helper functions
-- Depends on: WordPress, PHP 8.0+
+- Contains: `BaseController`, `BaseModel`, `BaseRepository`, `PostgresConnection` (singleton), helper functions
+- Depends on: Nothing (foundational)
 - Used by: All modules
-- Pattern: Base classes provide common functionality; global helper functions available everywhere
 
-**View Layer:**
-- Purpose: HTML output and user interface
-- Location: `views/learners/`, `views/classes/`, `views/components/`
-- Contains: PHP template files (.php or .view.php extensions)
-- Depends on: Controller data via `wecoza_view()`, `wecoza_component()`
-- Used by: Controllers via `render()` and `component()` methods
-- Pattern: Templates receive data as extracted variables; components in `views/components/` for reusable partials
+## Layers (Detail by Module)
+
+**Learners Module:**
+- Controllers: `LearnerController` (shortcodes), AJAX handlers in `Ajax/LearnerAjaxHandlers.php`, `ProgressionAjaxHandlers.php`
+- Services: `LearnerService`, `ProgressionService`, `PortfolioUploadService`
+- Models: `LearnerModel`, `LearnerProgressionModel`
+- Repositories: `LearnerRepository`, `LearnerProgressionRepository`
+- Shortcodes: display, capture, update, progression admin, progression report, regulatory export
+
+**Classes Module:**
+- Controllers: `ClassController`, `ClassAjaxController`, `QAController`, `PublicHolidaysController`, `ClassTypesController`
+- Services: `ScheduleService`, `UploadService`, `AttendanceService`, `FormDataProcessor`
+- Models: `ClassModel`, `QAModel`, `QAVisitModel`
+- Repositories: `ClassRepository`, `AttendanceRepository`
+- AJAX: `AttendanceAjaxHandlers.php`, `ClassStatusAjaxHandler.php`
+- Shortcodes: capture, display, single display
+
+**Events Module (Complex):**
+- Controllers: `TaskController`, `MaterialTrackingController`
+- Services: `EventDispatcher` (captures changes), `NotificationProcessor`, `NotificationEnricher` (async), `NotificationEmailer` (async), `MaterialNotificationService`
+- Models: `ClassEventModel` (no file, DTO-based), `ClassTaskModel`
+- Repositories: `ClassEventRepository`, `ClassTaskRepository`, `MaterialTrackingRepository`
+- DTOs: `ClassEventDTO` (captures event metadata)
+- Enums: `EventType` (INSERT, UPDATE, DELETE)
+- Views: Templates for tasks, material tracking, AI summary, system pulse
+- Presenters: `ClassTaskPresenter`, `MaterialTrackingPresenter`, `AISummaryPresenter`, `NotificationEmailPresenter`
+- Shortcodes: event tasks, material tracking, AI summary, LP collision audit, system pulse
+- Admin: Settings page for notifications config
+
+**Agents Module:**
+- Controllers: `AgentsController`
+- Models: `AgentModel`
+- Repositories: `AgentRepository`
+- Ajax: `AgentsAjaxHandlers.php`
+- Services: None (CRUD via repository directly)
+- Shortcodes: capture, display, single display
+- Views: capture form, display table/list, single agent display
+
+**Clients Module:**
+- Controllers: `ClientsController`, `LocationsController`
+- Models: `ClientModel`, `LocationModel`
+- Repositories: `ClientRepository`, `LocationRepository`
+- Ajax: `ClientAjaxHandlers.php`
+- Services: None (CRUD via repository directly)
+- Shortcodes: capture clients, display clients, update clients, capture locations, list locations, edit locations
+- Views: client forms, client display table, location forms, location list
+
+**Feedback Module:**
+- Controllers: `FeedbackController`
+- Services: `FeedbackService` (rounds limiting, AI enrichment)
+- Repositories: `FeedbackRepository`
+- Ajax: Direct handlers in controller
+- Shortcodes: feedback widget, feedback dashboard
+- Views: widget form, dashboard display
+
+**LookupTables Module:**
+- Controllers: `LookupTableController`
+- Repositories: `LookupTableRepository` (generic table CRUD)
+- Ajax: `LookupTableAjaxHandler.php`
+- No models (generic record handling)
+- Shortcodes: manage lookup tables
+
+**Settings Module:**
+- Controllers: `SettingsPage` (register admin menu page)
+- No models/repos (stores data via WP options)
+
+**ShortcodeInspector Module:**
+- Controllers: `ShortcodeInspector` (register Tools menu page)
+- Purpose: Debugging - lists all registered shortcodes and their attributes
+
+**Dev Module:**
+- Controllers: `DevToolbarController` (debug mode only, registers debug toolbar in footer)
 
 ## Data Flow
 
-**Shortcode Rendering Flow:**
+**Form Submission (Learner Create Example):**
 
-1. WordPress page loads shortcode e.g. `[wecoza_display_learners]`
-2. `LearnerController::registerShortcodes()` has registered callback in `init` hook
-3. Controller callback method called (e.g., `renderLearnerList()`)
-4. Controller method calls `$repository->findAll()` to fetch data
-5. `Repository->findAll()` validates column whitelist, queries `PostgresConnection`
-6. Database returns array of records
-7. Controller instantiates Model objects with returned data
-8. Models are hydrated and passed to template via `$this->render('view', ['data' => $models])`
-9. `wecoza_view()` extracts data to local scope and includes PHP template
-10. Template outputs HTML directly or via component partials
+1. User fills `[wecoza_learners_form]` shortcode → HTML form
+2. Form POSTs to `/wp-admin/admin-ajax.php?action=update_learner`
+3. AJAX handler in `src/Learners/Ajax/LearnerAjaxHandlers.php::handle_update_learner()`
+   - Verifies nonce via `check_ajax_referer('learners_nonce', 'nonce', false)`
+   - Sanitizes POST fields via `wecoza_sanitize_value()` helpers
+   - Calls `LearnerService::createLearner($sanitized_data)`
+4. Service validates and delegates to Repository
+5. Repository constructs INSERT via `PostgresConnection::prepare()` → PDO statement
+6. Database executes, returns inserted row
+7. Repository hydrates returned row to `LearnerModel` instance
+8. Service returns model to AJAX handler
+9. Handler sends JSON response with model data via `wp_send_json_success()`
+10. Frontend JavaScript processes response, redirects or updates DOM
 
-**AJAX Request Flow:**
+**Event Notification Pipeline (Class Change Capture):**
 
-1. Frontend JavaScript calls `wp_ajax_wecoza_get_learner` with nonce
-2. WordPress routes to registered AJAX handler (Controller method)
-3. `BaseController::requireNonce()` validates CSRF token
-4. `BaseController::requireCapability()` checks user permissions
-5. `BaseController::input()` sanitizes POST data via `wecoza_sanitize_value()`
-6. Controller calls service or repository method with cleaned data
-7. Service/Repository performs database operation
-8. Result passed to `BaseController::sendSuccess()` or `sendError()`
-9. Response returned as JSON via `wp_send_json_*()` WordPress functions
+1. Class updated via form → `ClassController::updateClass()` shortcode callback
+2. Controller calls `EventDispatcher::dispatchClassEvent(EventType::UPDATE, $classId, $newRow, $oldRow)`
+3. Dispatcher compares `$oldRow` and `$newRow` against `SIGNIFICANT_CLASS_FIELDS` list
+4. If significant change detected:
+   - Creates `ClassEventDTO` with event metadata, field changes, user info
+   - Inserts to `class_events` table via `ClassEventRepository`
+   - Schedules async action: `as_enqueue_async_action('wecoza_process_event', [$eventId])`
+5. Action Scheduler cron fires (hourly) → `wecoza_process_event` hook
+   - `NotificationEnricher::enrich($eventId)` loads event, determines recipients
+   - Enriches with AI summary if configured and OpenAI enabled
+   - For each recipient: `as_enqueue_async_action('wecoza_send_notification_email', [...])`
+6. Action Scheduler cron fires → `wecoza_send_notification_email` hook
+   - `NotificationEmailer::send($eventId, $recipient, $emailContext)`
+   - Renders email template via `NotificationEmailPresenter`
+   - Sends via WordPress `wp_mail()`
+   - Logs result
 
-**Class Assignment with LP Progression (WEC-168):**
+**Material Tracking Notifications (Separate Flow):**
 
-1. Admin assigns learner to class via ClassController AJAX handler
-2. Handler calls `ProgressionService::createLPForClassAssignment()`
-3. Service checks for active LP collision via `LearnerProgressionModel::getCurrentForLearner()`
-4. If collision exists and no override flag: returns warning with collision data
-5. If collision exists and override flag: puts current LP on hold via `$current->putOnHold()`
-6. Creates new `LearnerProgressionModel` with status 'in_progress'
-7. Service calls `$progression->save()` to persist to database
-8. Returns success result with new progression tracking ID
+1. Daily cron fires (scheduled on activation) → `wecoza_material_notifications_check` hook
+2. `MaterialNotificationService::findOrangeStatusClasses()` (7-day warning)
+   - Queries classes with material delivery < 7 days away
+   - Sends notification email to relevant staff
+3. `MaterialNotificationService::findRedStatusClasses()` (5-day critical)
+   - Queries classes with material delivery < 5 days away
+   - Sends critical notification email
 
 **State Management:**
-
-- **Request State:** Passed through method parameters; no global state
-- **Application State:** Lazy-loaded singleton `PostgresConnection` maintains database connection
-- **User State:** Relies on WordPress authentication and capability system
-- **Business State:** Learner progression tracked in `learner_progressions` table with statuses: `in_progress`, `completed`, `on_hold`
+- **Request scope:** Controllers pass data via method parameters and return values
+- **Module scope:** Services instantiated per-request (no static state except singletons like `PostgresConnection`)
+- **Persistent state:** All long-lived state stored in PostgreSQL (`learners`, `classes`, `agents`, `clients`, `class_events`, `class_tasks`, etc.)
+- **WordPress option scope:** Plugin settings stored via `get_option()` / `update_option()` (e.g., `wecoza_postgres_password`)
+- **Transient caching:** Form validation errors, UI state via `set_transient()` / `get_transient()` (expires hourly, daily, etc.)
 
 ## Key Abstractions
 
 **BaseController:**
-- Purpose: Common WordPress integration for all controllers
-- Examples: `LearnerController`, `ClassController`, `ClassAjaxController`, `QAController`
-- Pattern: Provides `registerHooks()` override point; helper methods for nonce/capability checking, input sanitization, JSON responses
+- Purpose: Common controller functionality - database access, view rendering, AJAX helpers
+- Examples: `LearnerController`, `ClassController`, `AgentsController`, `ClientsController`
+- Pattern: Child classes override `registerHooks()` to wire WordPress actions/filters, implement shortcode callbacks and AJAX methods
+- Protected methods: `db()` (get PostgresConnection), `render()` (output view), `component()` (render partial), `sendSuccess()`/`sendError()` (AJAX JSON responses), `requireNonce()`, `requireCapability()`
 
 **BaseModel:**
-- Purpose: Entity representation with type casting and magic property access
-- Examples: `LearnerModel`, `ClassModel`, `LearnerProgressionModel`, `QAModel`
-- Pattern: Properties defined as protected; `__get()` handles both snake_case and camelCase access; hydration from database arrays
+- Purpose: Data representation with type casting, property hydration, array conversion
+- Examples: `LearnerModel`, `ClassModel`, `AgentModel`, `ClientModel`
+- Pattern: Define static `$table`, `$casts`, `$fillable` properties; access properties via magic getters/setters with automatic snake_case ↔ camelCase conversion
+- Static methods: `getById()`, `getAll()`, `count()` - delegate to Repository static methods
+- Instance methods: `toArray()`, `fillable()`, `hydrate()`
 
 **BaseRepository:**
-- Purpose: Common CRUD patterns with SQL injection protection
-- Examples: `LearnerRepository`, `ClassRepository`, `LearnerProgressionRepository`
-- Pattern: Column whitelisting enforced via `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, `getAllowedInsertColumns()`, `getAllowedUpdateColumns()`; all user input validated before SQL construction
+- Purpose: Data access with security controls (column whitelisting) and result hydration
+- Examples: `LearnerRepository`, `ClassRepository`, `AgentRepository`
+- Pattern: Override `getAllowedOrderColumns()`, `getAllowedFilterColumns()`, `getAllowedInsertColumns()`, `getAllowedUpdateColumns()` to whitelist safe columns; implement SELECT logic
+- Query methods: `findById()`, `findAll()`, `find()` (with WHERE/ORDER BY), `create()`, `update()`, `delete()`, `count()`
+- Security: All WHERE/ORDER BY column names validated against whitelists before SQL construction
 
-**PostgresConnection:**
-- Purpose: Singleton PDO wrapper with lazy loading
-- Pattern: Not connected until first query; SSL support for remote databases; transaction methods available to repositories
+**EventDispatcher:**
+- Purpose: Bridge between domain changes (class create/update) and notification pipeline
+- Examples: `src/Events/Services/EventDispatcher.php`
+- Pattern: Compares old/new data, creates `ClassEventDTO`, inserts to `class_events`, schedules async processing
+- Detection: Only captures events for `SIGNIFICANT_CLASS_FIELDS` (class_status, start_date, end_date, learner_ids, etc.) to avoid notification spam
+- Returns: Event ID (0 if skipped due to non-significant fields)
 
-**ProgressionService:**
-- Purpose: Complex LP assignment logic with collision detection
-- Pattern: Orchestrates model operations; returns result arrays with success/warning data instead of throwing exceptions for foreseeable collisions
+**Shortcode Pattern:**
+- Purpose: Convert shortcode registration into controller methods
+- Examples: `[wecoza_display_learners]` → `LearnerController::renderLearnerList()`, `[wecoza_capture_class]` → `ClassController::captureClassShortcode()`
+- Pattern: `add_shortcode()` in `registerHooks()`, shortcode callback renders view via `wecoza_view()` helper
+- Benefits: Shortcodes feel like WordPress but are actually controller methods with full access to services/models
+
+**DTO (Data Transfer Object):**
+- Purpose: Immutable data objects for passing structured data through pipelines
+- Examples: `ClassEventDTO` (event metadata for notification pipeline)
+- Pattern: Holds only properties, no logic; passed through service → repository → storage
+- Benefits: Type-safe, serializable, clear contracts between layers
 
 ## Entry Points
 
-**WordPress Initialization:**
-- Location: `wecoza-core.php` lines 135-227
-- Triggers: `plugins_loaded` hook (priority 5)
-- Responsibilities: PSR-4 autoloader registration, config loading, module initialization, shortcode/AJAX handler registration
+**Plugin Bootstrap:**
+- Location: `wecoza-core.php` lines 166-701
+- Triggers: WordPress `plugins_loaded` hook (priority 5)
+- Responsibilities:
+  - Registers PSR-4 autoloader for all `WeCoza\*` namespaces
+  - Requires helper functions from `core/Helpers/functions.php`
+  - Loads Action Scheduler from vendor directory
+  - Fires `do_action('wecoza_core_loaded')` for dependent plugins
+  - Instantiates all module controllers (LearnerController, ClassController, etc.)
+  - Registers AJAX handlers for notifications dashboard
+  - Schedules cron jobs (material notifications, notification processor)
+  - Enqueues frontend assets (CSS, JS with nonces)
 
-**Module Initialization (Learners):**
-- Location: `src/Learners/Controllers/LearnerController.php` constructor
-- Triggers: Instantiated in `plugins_loaded` hook
-- Responsibilities: Registers shortcodes in `init` hook, registers AJAX handlers
-
-**Module Initialization (Classes):**
-- Location: `src/Classes/Controllers/ClassController.php::initialize()`
-- Triggers: Called in `plugins_loaded` hook
-- Responsibilities: Registers shortcodes, enqueues frontend assets, ensures required WordPress pages exist
-
-**Shortcode Handlers:**
-- Location: Various shortcode classes in `src/Learners/Shortcodes/` and controller methods
-- Triggers: WordPress shortcode parser
-- Examples: `[wecoza_display_learners]`, `[wecoza_capture_class]`, `[wecoza_display_single_class]`
+**Shortcode Callbacks:**
+- Location: `src/{Module}/Controllers/` or `src/{Module}/Shortcodes/`
+- Triggers: WordPress shortcode processor (when user embeds `[wecoza_*]`)
+- Responsibilities: Fetch data via service, render view via `wecoza_view()`, return HTML
 
 **AJAX Handlers:**
-- Location: `src/Learners/Ajax/LearnerAjaxHandlers.php`, controller AJAX methods
-- Triggers: WordPress AJAX request with `action=` parameter matching registered handler
-- Pattern: Functions registered via `add_action('wp_ajax_*')` and `wp_ajax_nopriv_*` (where applicable)
+- Location: `src/{Module}/Ajax/*.php`
+- Triggers: JavaScript `wp.ajax.post()` or `jQuery.post()` to `/wp-admin/admin-ajax.php?action=...`
+- Responsibilities: Verify nonce, sanitize input, call service, return JSON response via `wp_send_json_success()` or `wp_send_json_error()`
+- Pattern: Procedural functions registered via `add_action('wp_ajax_*')`, not class methods
 
-**Frontend Assets:**
-- Location: `assets/js/learners/`, `assets/js/classes/`, `assets/css/`
-- Enqueued: In controller `wp_enqueue_scripts` hooks or plugin main file
+**WP-CLI Commands:**
+- Location: `wecoza-core.php` lines 884-917
+- Triggers: `wp wecoza test-db` or `wp wecoza version`
+- Responsibilities: Test database connection, show version info
+
+**WordPress Hooks (Cron Jobs):**
+- `wecoza_material_notifications_check` (daily) → `MaterialNotificationService::findOrangeStatusClasses()` / `findRedStatusClasses()`
+- `wecoza_process_notifications` (hourly) → `NotificationProcessor::process()`
+- `wecoza_process_event` (async) → `NotificationEnricher::enrich($eventId)`
+- `wecoza_send_notification_email` (async) → `NotificationEmailer::send($eventId, $recipient, $context)`
+
+**Activation/Deactivation:**
+- Location: `wecoza-core.php` lines 710-847
+- Triggers: Plugin activation/deactivation
+- Responsibilities: Check PHP/extension versions, set default options, register capabilities, schedule cron jobs
 
 ## Error Handling
 
-**Strategy:** Errors logged to WordPress debug log; exceptions caught at service level; JSON responses indicate success/failure status
+**Strategy:** Exceptions bubble up from Repository → Service → Controller, caught at boundary (AJAX handler, shortcode callback), converted to user-friendly JSON or HTML error messages.
 
 **Patterns:**
-
-- **Repository Methods:** Return null/empty array on failure; log error to error_log
-- **Service Methods:** Throw exceptions for programming errors (shouldn't happen); return result arrays for expected collisions
-- **AJAX Handlers:** Catch exceptions, validate inputs, call `sendError()` with HTTP status code and message
-- **Models:** Validation errors stored in model instance; caller checks via return value or exception
-
-**Example Error Response:**
-```
-{
-  "success": false,
-  "data": {
-    "message": "Invalid security token.",
-    "missing_fields": ["title", "surname"]
-  },
-  "statusCode": 403
-}
-```
+- **Database errors:** `PDOException` caught in Repository, wrapped in `RuntimeException` with context message, logged via `wecoza_log()`
+- **Validation errors:** Service methods throw `InvalidArgumentException` or `DomainException` with user-facing message
+- **Authorization errors:** Controller methods check `current_user_can()` early, throw before accessing data
+- **Logging:** `wecoza_log($msg, $level)` writes to `/opt/lampp/htdocs/wecoza/wp-content/debug.log` (only if `WP_DEBUG` enabled)
+- **User feedback:** `wp_send_json_error(['message' => '...'], 403)` for AJAX, admin notices for critical issues
 
 ## Cross-Cutting Concerns
 
 **Logging:**
-- Via `error_log()` in repositories and database class
-- Only when `WP_DEBUG` constant is defined
-- Messages prefixed with "WeCoza Core:" for identification
-- Location: WordPress debug.log file
+- Framework: `wecoza_log($msg, $level = 'info')` function writes to debug.log
+- Enabled: Only when `WP_DEBUG` and `WP_DEBUG_LOG` constants defined
+- Usage: Services log significant operations (learner created, event processed, email sent), errors always logged
 
 **Validation:**
-- Input: `BaseController::input()` and `sanitizeArray()` methods using `wecoza_sanitize_value()`
-- Database: Repository column whitelisting in `getAllowedInsertColumns()` and `getAllowedUpdateColumns()`
-- Required fields: `BaseController::requireFields()` validates presence before operation
+- Input sanitization: `wecoza_sanitize_value($value, $type)` validates and casts (`string`, `email`, `int`, `float`, `bool`, `json`, `date`)
+- Form validation: Services throw exceptions for invalid state (learner must have first/last name, class dates must be valid)
+- Database schema validation: Repositories whitelist columns to prevent SQL injection
 
 **Authentication:**
-- Entire plugin requires WordPress login (no pages accessible to unauthenticated users)
-- Learner PII access requires `manage_learners` capability (Admin only)
-- AJAX handlers use nonce verification via `wp_verify_nonce()` wrapped in `BaseController::requireNonce()`
+- Entire WP environment requires login (no public pages)
+- All shortcodes/AJAX check `current_user_can()` before accessing data
+- Special capability `manage_learners` required to access learner PII (registered on activation)
 
 **Authorization:**
-- Capabilities checked via `current_user_can()` in controller methods
-- `manage_learners` and `manage_options` are primary capabilities
-- Added to admin role on plugin activation; removed on deactivation
+- Capabilities: `manage_learners`, `view_material_tracking`, `manage_material_tracking`, `manage_wecoza_clients`, `manage_wecoza_agents` (admin-only)
+- Checks: Controllers verify capability at handler entry point, fail early with error
+- Data access: Repositories don't filter by user (assumption: if you have capability, you can see all data)
 
 ---
 
-*Architecture analysis: 2026-02-02*
+*Architecture analysis: 2026-03-03*
