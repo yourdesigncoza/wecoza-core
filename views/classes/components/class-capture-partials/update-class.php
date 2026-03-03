@@ -592,14 +592,20 @@ endif; ?>
              foreach ($perDayTimes as $day => $times) {
                  // Only process valid day names, skip numeric keys
                  if (in_array($day, $validDays) && is_array($times)) {
-                     $normalizedPerDayTimes[$day] = [
-                         "startTime" =>
-                             $times["start_time"] ??
-                             ($times["startTime"] ?? ""),
-                         "endTime" =>
-                             $times["end_time"] ?? ($times["endTime"] ?? ""),
-                         "duration" => $times["duration"] ?? "",
-                     ];
+                     if (isset($times["intervals"]) && is_array($times["intervals"])) {
+                         // NEW format: pass through intervals as-is
+                         $normalizedPerDayTimes[$day] = $times;
+                     } else {
+                         // OLD format: flat startTime/endTime
+                         $normalizedPerDayTimes[$day] = [
+                             "startTime" =>
+                                 $times["start_time"] ??
+                                 ($times["startTime"] ?? ""),
+                             "endTime" =>
+                                 $times["end_time"] ?? ($times["endTime"] ?? ""),
+                             "duration" => $times["duration"] ?? "",
+                         ];
+                     }
                  }
              }
 
@@ -2624,62 +2630,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     <?php endif; ?>
 
-    // Initialize schedule data for update mode
-    <?php if (
-        isset($data["class_data"]["schedule_data"]) &&
-        !empty($data["class_data"]["schedule_data"])
-    ): ?>
-    <?php
-    // Use the normalized schedule data that was processed above
-    // This ensures we pass the cleaned data with proper camelCase format
-    $scheduleDataForJS = $scheduleData; // This now contains the normalized perDayTimes
-
-    // Additional debug to verify the data structure
-    if (isset($_GET["debug"]) && $_GET["debug"] === "1") {
-        echo "<script>\n";
-        echo "console.log('=== Schedule Data for JS (PHP side) ===');\n";
-        echo "console.log('scheduleDataForJS:', " .
-            json_encode($scheduleDataForJS) .
-            ");\n";
-        echo "</script>\n";
-    }
-    ?>
-    // Pass schedule data to the scheduling JavaScript
-    window.existingScheduleData = <?php echo json_encode(
-        $scheduleDataForJS,
-    ); ?>;
-
-    // Enhanced debug logging
-    <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
-    console.log('=== Schedule Data Debug ===');
-    console.log('Raw Schedule Data from PHP:', window.existingScheduleData);
-    console.log('Schedule Pattern:', window.existingScheduleData?.pattern);
-    console.log('Selected Days:', window.existingScheduleData?.selectedDays);
-    console.log('Time Data:', window.existingScheduleData?.timeData);
-    console.log('Per Day Times:', window.existingScheduleData?.timeData?.perDayTimes);
-
-    // Check if perDayTimes exists and has data
-    if (window.existingScheduleData?.timeData?.perDayTimes) {
-        const perDayTimes = window.existingScheduleData.timeData.perDayTimes;
-        console.log('Per Day Times Object:', perDayTimes);
-        console.log('Per Day Times Keys:', Object.keys(perDayTimes));
-
-        // Log each day's time data
-        Object.entries(perDayTimes).forEach(([day, times]) => {
-            console.log(`${day} times:`, times);
-        });
-    } else {
-        console.warn('No perDayTimes data found in schedule!');
-    }
-    console.log('=== End Schedule Data Debug ===');
-    <?php endif; ?>
-
-    // Ensure the schedule form JavaScript can access this data
-    if (window.existingScheduleData && typeof window.loadExistingScheduleData === 'function') {
-        // The schedule form JS will handle loading this data
-        console.log('Schedule data is ready for loading');
-    }
-    <?php endif; ?>
+    // Schedule data already assigned to window.existingScheduleData above (line ~1178)
 
     // Log form submission data in debug mode
     <?php if (isset($_GET["debug"]) && $_GET["debug"] === "1"): ?>
