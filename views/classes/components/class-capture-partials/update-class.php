@@ -806,65 +806,64 @@ endif; ?>
             <div id="day-time-section-template" class="per-day-time-section col-sm-6 col-md-4 col-lg-3 d-none" data-day="">
                <div class="card h-100 border">
                   <div class="card-body">
-                     <div class="d-flex justify-content-between align-items-center ">
-                        <h6 class="card-title  day-name"></h6>
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="card-title mb-0 day-name"></h6>
                         <button type="button" class="btn btn-sm btn-subtle-secondary copy-to-all-btn" title="Copy to all days">
                         <i class="bi bi-files"></i>
                         </button>
                      </div>
-                     <div class="">
-                        <label class="form-label">Start Time <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-sm day-start-time" data-day="" required>
-                           <option value="">Select</option>
-                           <?php
-                           // Generate time options from 6:00 AM to 8:00 PM in 30-minute increments
-                           $start = strtotime("06:00:00");
-                           $end = strtotime("20:00:00");
-                           $interval = 30 * 60; // 30 minutes in seconds
-
-                           for (
-                               $time = $start;
-                               $time <= $end;
-                               $time += $interval
-                           ) {
-                               $timeStr = wp_date("H:i", $time);
-                               echo '<option value="' .
-                                   $timeStr .
-                                   '">' .
-                                   wp_date("g:i A", $time) .
-                                   "</option>";
-                           }
-                           ?>
-                        </select>
-                        <div class="invalid-feedback">Please select a start time.</div>
+                     <div class="intervals-container">
+                        <div class="interval-row" data-interval-index="0">
+                           <div class="d-flex align-items-end gap-2">
+                              <div class="flex-grow-1">
+                                 <label class="form-label">Start <span class="text-danger">*</span></label>
+                                 <select class="form-select form-select-sm interval-start-time" data-day="" required>
+                                    <option value="">Select</option>
+                                    <?php
+                                    // Generate time options from 6:00 AM to 8:00 PM in 30-minute increments
+                                    $start = strtotime("06:00:00");
+                                    $end = strtotime("20:00:00");
+                                    $interval = 30 * 60;
+                                    for ($time = $start; $time <= $end; $time += $interval) {
+                                        $timeStr = wp_date("H:i", $time);
+                                        echo '<option value="' . $timeStr . '">' . wp_date("g:i A", $time) . "</option>";
+                                    }
+                                    ?>
+                                 </select>
+                                 <div class="invalid-feedback">Please select a start time.</div>
+                              </div>
+                              <div class="flex-grow-1">
+                                 <label class="form-label">End <span class="text-danger">*</span></label>
+                                 <select class="form-select form-select-sm interval-end-time" data-day="" required>
+                                    <option value="">Select</option>
+                                    <?php
+                                    // Generate time options from 6:30 AM to 8:30 PM in 30-minute increments
+                                    $start = strtotime("06:30:00");
+                                    $end = strtotime("20:30:00");
+                                    $interval = 30 * 60;
+                                    for ($time = $start; $time <= $end; $time += $interval) {
+                                        $timeStr = wp_date("H:i", $time);
+                                        echo '<option value="' . $timeStr . '">' . wp_date("g:i A", $time) . "</option>";
+                                    }
+                                    ?>
+                                 </select>
+                                 <div class="invalid-feedback">Please select an end time.</div>
+                              </div>
+                              <div class="align-self-end" style="min-width:30px;">
+                                 <!-- Remove button hidden on first interval -->
+                                 <button type="button" class="btn btn-sm btn-link text-danger remove-interval-btn p-0 d-none" title="Remove interval">
+                                 <i class="bi bi-x-circle"></i>
+                                 </button>
+                              </div>
+                           </div>
+                        </div>
                      </div>
-                     <div class="mb-2">
-                        <label class="form-label">End Time <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-sm day-end-time" data-day="" required>
-                           <option value="">Select</option>
-                           <?php
-                           // Generate time options from 6:30 AM to 8:30 PM in 30-minute increments
-                           $start = strtotime("06:30:00");
-                           $end = strtotime("20:30:00");
-                           $interval = 30 * 60; // 30 minutes in seconds
-
-                           for (
-                               $time = $start;
-                               $time <= $end;
-                               $time += $interval
-                           ) {
-                               $timeStr = wp_date("H:i", $time);
-                               echo '<option value="' .
-                                   $timeStr .
-                                   '">' .
-                                   wp_date("g:i A", $time) .
-                                   "</option>";
-                           }
-                           ?>
-                        </select>
-                        <div class="invalid-feedback">Please select an end time.</div>
+                     <button type="button" class="btn btn-sm btn-subtle-primary add-interval-btn mt-2" title="Add another time interval">
+                     <i class="bi bi-plus-circle me-1"></i>Add Interval
+                     </button>
+                     <div class="mt-2">
+                        <small class="text-muted day-duration-display d-none">Total: <span class="duration-value badge badge-phoenix badge-phoenix-info">-</span> hours</small>
                      </div>
-                     <small class="text-muted day-duration-display  d-none">Duration: <span class="duration-value badge badge-phoenix badge-phoenix-info">-</span> hours</small>
                   </div>
                </div>
             </div>

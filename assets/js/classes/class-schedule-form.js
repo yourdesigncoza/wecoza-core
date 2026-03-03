@@ -337,10 +337,8 @@
             $section.find('.day-name').text(day);
 
             // Update data-day attributes for form elements
-            $section.find('.day-start-time').attr('data-day', day).attr('name', 'day_start_time[' + day + ']');
-            $section.find('.day-end-time').attr('data-day', day).attr('name', 'day_end_time[' + day + ']');
-
-            // Don't set default times - let user choose
+            $section.find('.interval-start-time').attr('data-day', day);
+            $section.find('.interval-end-time').attr('data-day', day);
 
             // Show copy button only on first day
             if (index === 0) {
@@ -365,21 +363,130 @@
     }
 
     /**
+     * Add a new interval row to a day section
+     * Max 4 intervals per day
+     */
+    function addIntervalRow($daySection) {
+        const $container = $daySection.find('.intervals-container');
+        const $existingRows = $container.find('.interval-row');
+        const MAX_INTERVALS = 4;
+
+        if ($existingRows.length >= MAX_INTERVALS) {
+            return; // Max reached
+        }
+
+        // Clone the first interval row as template
+        const $firstRow = $container.find('.interval-row').first();
+        const $newRow = $firstRow.clone();
+        const newIndex = $existingRows.length;
+
+        // Update index
+        $newRow.attr('data-interval-index', newIndex);
+
+        // Clear selected values
+        $newRow.find('.interval-start-time').val('');
+        $newRow.find('.interval-end-time').val('');
+
+        // Show the remove button on new row
+        $newRow.find('.remove-interval-btn').removeClass('d-none');
+
+        // Clear any validation states
+        $newRow.find('select').removeClass('is-invalid is-valid');
+
+        $container.append($newRow);
+
+        // Disable add button if max reached
+        if ($container.find('.interval-row').length >= MAX_INTERVALS) {
+            $daySection.find('.add-interval-btn').prop('disabled', true);
+        }
+
+        // Recalculate duration and update schedule data
+        const day = $daySection.attr('data-day');
+        calculatePerDayDuration(day);
+        updateScheduleData();
+    }
+
+    /**
+     * Remove an interval row and re-index remaining rows
+     */
+    function removeIntervalRow($row) {
+        const $daySection = $row.closest('.per-day-time-section');
+        const $container = $daySection.find('.intervals-container');
+
+        // Don't remove if it's the only row
+        if ($container.find('.interval-row').length <= 1) {
+            return;
+        }
+
+        $row.remove();
+
+        // Re-index remaining rows
+        $container.find('.interval-row').each(function (idx) {
+            $(this).attr('data-interval-index', idx);
+            // Ensure first row has no remove button
+            if (idx === 0) {
+                $(this).find('.remove-interval-btn').addClass('d-none');
+            }
+        });
+
+        // Re-enable add button
+        if ($container.find('.interval-row').length < 4) {
+            $daySection.find('.add-interval-btn').prop('disabled', false);
+        }
+
+        // Recalculate duration and update schedule data
+        const day = $daySection.attr('data-day');
+        calculatePerDayDuration(day);
+        updateScheduleData();
+    }
+
+    /**
+     * Normalize per-day times data to ensure every day entry has an intervals array.
+     * Handles both old format (startTime/endTime at top level) and new format (intervals array).
+     */
+    function normalizePerDayTimes(perDayTimes) {
+        if (!perDayTimes || typeof perDayTimes !== 'object') {
+            return {};
+        }
+
+        const normalized = {};
+        Object.keys(perDayTimes).forEach(function (day) {
+            const dayData = perDayTimes[day];
+            if (dayData.intervals && Array.isArray(dayData.intervals)) {
+                // Already new format
+                normalized[day] = dayData;
+            } else if (dayData.startTime || dayData.start_time) {
+                // Old format: wrap into single-element intervals array
+                const st = dayData.startTime || dayData.start_time;
+                const et = dayData.endTime || dayData.end_time;
+                const dur = dayData.duration || calculateTimeDuration(st, et);
+                normalized[day] = {
+                    intervals: [{ startTime: st, endTime: et }],
+                    duration: parseFloat(dur) || 0
+                };
+            } else {
+                normalized[day] = dayData;
+            }
+        });
+        return normalized;
+    }
+
+    /**
      * Initialize time selection for per-day sections
      * Ensures each section has proper time selection behavior
      */
     function initPerDayTimeSections() {
         $('.per-day-time-section').each(function () {
             const day = $(this).attr('data-day');
-            const $startTime = $(this).find('.day-start-time');
-            const $endTime = $(this).find('.day-end-time');
             const $durationContainer = $(this).find('.day-duration-display');
 
             // Initially hide duration display
             $durationContainer.addClass('d-none');
 
-            // Calculate initial duration if times are already set
-            if ($startTime.val() && $endTime.val()) {
+            // Calculate initial duration if any interval has times set
+            const $firstStart = $(this).find('.interval-start-time').first();
+            const $firstEnd = $(this).find('.interval-end-time').first();
+            if ($firstStart.val() && $firstEnd.val()) {
                 calculatePerDayDuration(day);
             }
         });
@@ -387,91 +494,147 @@
 
     /**
      * Initialize event handlers for per-day time controls
-     * Enhanced to use unified time validation and duration calculation
+     * Uses event delegation to handle dynamically added interval rows
      */
     function initPerDayTimeHandlers() {
-        // Handle time changes for validation and duration calculation
-        $('.day-start-time, .day-end-time').off('change.perday').on('change.perday', function () {
-            const day = $(this).attr('data-day');
-            const $section = $('.per-day-time-section[data-day="' + day + '"]');
-            const $startTime = $section.find('.day-start-time');
-            const $endTime = $section.find('.day-end-time');
+        // Use event delegation on per-day sections container for time changes
+        $('#per-day-sections-container').off('change.perday').on('change.perday', '.interval-start-time, .interval-end-time', function () {
+            const $row = $(this).closest('.interval-row');
+            const $section = $(this).closest('.per-day-time-section');
+            const day = $section.attr('data-day');
+            const $startTime = $row.find('.interval-start-time');
+            const $endTime = $row.find('.interval-end-time');
 
-            // Validate individual time selection
+            // Validate individual interval time selection
             validateTimeSelection($startTime, $endTime);
 
-            // Calculate duration using unified calculation
+            // Calculate total duration across all intervals for this day
             calculatePerDayDuration(day);
 
             // Perform comprehensive validation across all days
             setTimeout(() => {
                 validateAllTimeSelections();
                 updateTimeValidationIndicators();
-            }, 100); // Small delay to ensure all DOM updates are complete
+            }, 100);
 
             // Update schedule data
             updateScheduleData();
         });
 
-        // Handle copy to all days functionality
+        // Handle Add Interval button clicks
+        $('#per-day-sections-container').off('click.addinterval').on('click.addinterval', '.add-interval-btn', function () {
+            const $daySection = $(this).closest('.per-day-time-section');
+            addIntervalRow($daySection);
+        });
+
+        // Handle Remove Interval button clicks
+        $('#per-day-sections-container').off('click.removeinterval').on('click.removeinterval', '.remove-interval-btn', function () {
+            const $row = $(this).closest('.interval-row');
+            removeIntervalRow($row);
+        });
+
+        // Handle copy to all days functionality (copies ALL intervals)
         $('.copy-to-all-btn').off('click.perday').on('click.perday', function () {
-            const $section = $(this).closest('.per-day-time-section');
-            const startTime = $section.find('.day-start-time').val();
-            const endTime = $section.find('.day-end-time').val();
+            const $sourceSection = $(this).closest('.per-day-time-section');
+            const $sourceContainer = $sourceSection.find('.intervals-container');
+            const $sourceRows = $sourceContainer.find('.interval-row');
 
-            if (startTime && endTime) {
-                // Validate source times first
-                const $startTimeElement = $section.find('.day-start-time');
-                const $endTimeElement = $section.find('.day-end-time');
-
-                if (validateTimeSelection($startTimeElement, $endTimeElement)) {
-                    // Copy times to all other day sections
-                    $('.per-day-time-section').not($section).each(function () {
-                        const $targetStartTime = $(this).find('.day-start-time');
-                        const $targetEndTime = $(this).find('.day-end-time');
-
-                        $targetStartTime.val(startTime);
-                        $targetEndTime.val(endTime);
-
-                        // Trigger change events to update validation and duration
-                        $targetStartTime.trigger('change');
-                        $targetEndTime.trigger('change');
-                    });
+            // Validate all source intervals first
+            let allValid = true;
+            $sourceRows.each(function () {
+                const $st = $(this).find('.interval-start-time');
+                const $et = $(this).find('.interval-end-time');
+                if ($st.val() && $et.val()) {
+                    if (!validateTimeSelection($st, $et)) {
+                        allValid = false;
+                    }
                 }
+            });
+
+            if (!allValid) {
+                return;
             }
+
+            // Collect source intervals data
+            const sourceIntervals = [];
+            $sourceRows.each(function () {
+                const st = $(this).find('.interval-start-time').val();
+                const et = $(this).find('.interval-end-time').val();
+                if (st && et) {
+                    sourceIntervals.push({ startTime: st, endTime: et });
+                }
+            });
+
+            if (sourceIntervals.length === 0) {
+                return;
+            }
+
+            // Apply to all other day sections
+            $('.per-day-time-section').not($sourceSection).each(function () {
+                const $targetSection = $(this);
+                const $targetContainer = $targetSection.find('.intervals-container');
+
+                // Remove all interval rows except the first
+                $targetContainer.find('.interval-row').not(':first').remove();
+
+                // Set first interval
+                const $firstRow = $targetContainer.find('.interval-row').first();
+                $firstRow.find('.interval-start-time').val(sourceIntervals[0].startTime);
+                $firstRow.find('.interval-end-time').val(sourceIntervals[0].endTime);
+
+                // Add additional intervals
+                for (let i = 1; i < sourceIntervals.length; i++) {
+                    addIntervalRow($targetSection);
+                    const $newRow = $targetContainer.find('.interval-row').last();
+                    $newRow.find('.interval-start-time').val(sourceIntervals[i].startTime);
+                    $newRow.find('.interval-end-time').val(sourceIntervals[i].endTime);
+                }
+
+                // Re-enable add button if below max
+                if ($targetContainer.find('.interval-row').length < 4) {
+                    $targetSection.find('.add-interval-btn').prop('disabled', false);
+                }
+
+                // Recalculate duration
+                const day = $targetSection.attr('data-day');
+                calculatePerDayDuration(day);
+            });
+
+            updateScheduleData();
         });
     }
 
     /**
-     * Calculate duration for a specific day using unified calculation
-     * Only shows duration display when both time fields are valid
+     * Calculate total duration for a specific day across all intervals
+     * Only shows duration display when at least one interval is valid
      */
     function calculatePerDayDuration(day) {
         const $section = $('.per-day-time-section[data-day="' + day + '"]');
-        const startTime = $section.find('.day-start-time').val();
-        const endTime = $section.find('.day-end-time').val();
         const $durationDisplay = $section.find('.duration-value');
         const $durationContainer = $section.find('.day-duration-display');
-        const $startTimeElement = $section.find('.day-start-time');
-        const $endTimeElement = $section.find('.day-end-time');
+        let totalDuration = 0;
+        let hasValidInterval = false;
 
-        if (startTime && endTime) {
-            // Validate the time selection first
-            const isValid = validateTimeSelection($startTimeElement, $endTimeElement);
+        $section.find('.interval-row').each(function () {
+            const startTime = $(this).find('.interval-start-time').val();
+            const endTime = $(this).find('.interval-end-time').val();
 
-            if (isValid) {
-                // Use unified duration calculation
-                const duration = calculateTimeDuration(startTime, endTime);
-                $durationDisplay.text(duration.toFixed(1));
+            if (startTime && endTime) {
+                const $st = $(this).find('.interval-start-time');
+                const $et = $(this).find('.interval-end-time');
+                const isValid = validateTimeSelection($st, $et);
 
-                // Show duration display only when valid
-                $durationContainer.removeClass('d-none');
-            } else {
-                // Hide duration display when invalid
-                $durationContainer.addClass('d-none');
+                if (isValid) {
+                    totalDuration += calculateTimeDuration(startTime, endTime);
+                    hasValidInterval = true;
+                }
             }
+        });
+
+        if (hasValidInterval) {
+            $durationDisplay.text(totalDuration.toFixed(1));
+            $durationContainer.removeClass('d-none');
         } else {
-            // Hide duration display when fields are empty
             $durationContainer.addClass('d-none');
             $durationDisplay.text('-');
         }
@@ -636,6 +799,7 @@
     /**
      * Get all time data from the form (single or per-day)
      * Returns an object with the current time configuration
+     * Per-day mode now uses intervals array per day
      */
     function getAllTimeData() {
         const selectedDays = getSelectedDays();
@@ -653,14 +817,23 @@
             const perDayTimes = {};
             $('.per-day-time-section').each(function () {
                 const day = $(this).attr('data-day');
-                const startTime = $(this).find('.day-start-time').val();
-                const endTime = $(this).find('.day-end-time').val();
+                const intervals = [];
+                let totalDuration = 0;
 
-                if (startTime && endTime) {
+                $(this).find('.interval-row').each(function () {
+                    const startTime = $(this).find('.interval-start-time').val();
+                    const endTime = $(this).find('.interval-end-time').val();
+
+                    if (startTime && endTime) {
+                        intervals.push({ startTime: startTime, endTime: endTime });
+                        totalDuration += calculateTimeDuration(startTime, endTime);
+                    }
+                });
+
+                if (intervals.length > 0) {
                     perDayTimes[day] = {
-                        startTime: startTime,
-                        endTime: endTime,
-                        duration: calculateTimeDuration(startTime, endTime)
+                        intervals: intervals,
+                        duration: totalDuration
                     };
                 }
             });
@@ -694,39 +867,68 @@
 
     /**
      * Comprehensive validation for per-day time selections
-     * Includes individual validation and overlap detection
+     * Validates each interval individually and checks for overlaps within same day
      */
     function validatePerDayTimeSelections() {
         let allValid = true;
         const dayTimes = [];
 
-        // First pass: validate each day individually and collect time data
+        // For each day section, validate each interval and check for overlaps
         $('.per-day-time-section').each(function () {
             const day = $(this).attr('data-day');
-            const $startTime = $(this).find('.day-start-time');
-            const $endTime = $(this).find('.day-end-time');
-            const startTime = $startTime.val();
-            const endTime = $endTime.val();
+            const $section = $(this);
+            const dayIntervals = [];
 
-            if (startTime && endTime) {
-                // Validate individual day times
-                if (!validateTimeSelection($startTime, $endTime)) {
-                    allValid = false;
+            // Validate each interval row
+            $section.find('.interval-row').each(function () {
+                const $startTime = $(this).find('.interval-start-time');
+                const $endTime = $(this).find('.interval-end-time');
+                const startTime = $startTime.val();
+                const endTime = $endTime.val();
+
+                if (startTime && endTime) {
+                    // Validate individual interval
+                    if (!validateTimeSelection($startTime, $endTime)) {
+                        allValid = false;
+                    } else {
+                        dayIntervals.push({
+                            startMinutes: timeToMinutes(startTime),
+                            endMinutes: timeToMinutes(endTime),
+                            $endTime: $endTime
+                        });
+                    }
                 }
+            });
 
-                // Collect time data for overlap detection
+            // Check for overlaps between intervals on the same day
+            if (dayIntervals.length > 1) {
+                // Sort by start time
+                dayIntervals.sort(function (a, b) { return a.startMinutes - b.startMinutes; });
+
+                for (let i = 1; i < dayIntervals.length; i++) {
+                    if (dayIntervals[i].startMinutes < dayIntervals[i - 1].endMinutes) {
+                        // Overlap detected
+                        dayIntervals[i].$endTime.addClass('is-invalid');
+                        dayIntervals[i].$endTime.siblings('.invalid-feedback').text('Intervals overlap. Start must be after previous end.');
+                        allValid = false;
+                    }
+                }
+            }
+
+            // Collect aggregated time data for cross-day consistency check
+            if (dayIntervals.length > 0) {
+                const totalStart = dayIntervals[0].startMinutes;
+                const totalEnd = dayIntervals[dayIntervals.length - 1].endMinutes;
                 dayTimes.push({
                     day: day,
-                    startTime: startTime,
-                    endTime: endTime,
-                    startMinutes: timeToMinutes(startTime),
-                    endMinutes: timeToMinutes(endTime),
-                    $section: $(this)
+                    startMinutes: totalStart,
+                    endMinutes: totalEnd,
+                    $section: $section
                 });
             }
         });
 
-        // Second pass: check for potential scheduling conflicts
+        // Cross-day consistency check
         if (allValid && dayTimes.length > 1) {
             allValid = validateTimeConsistency(dayTimes);
         }
@@ -809,7 +1011,7 @@
 
     /**
      * Validate that all required time fields are filled
-     * Returns validation result with details
+     * Checks each interval row has both start and end times
      */
     function validateRequiredTimeFields() {
         const selectedDays = getSelectedDays();
@@ -820,29 +1022,39 @@
         };
 
         if (selectedDays.length === 0) {
-            // No days selected - no validation needed
             result.isValid = true;
         } else {
-            // Any days selected: check each selected day has times
+            // Check each selected day has at least one complete interval
             selectedDays.forEach(day => {
                 const $section = $('.per-day-time-section[data-day="' + day + '"]');
-                const startTime = $section.find('.day-start-time').val();
-                const endTime = $section.find('.day-end-time').val();
+                let hasCompleteInterval = false;
 
-                if (!startTime) {
-                    result.missingFields.push(`${day} Start Time`);
-                    $section.find('.day-start-time').addClass('is-invalid');
-                }
-                if (!endTime) {
-                    result.missingFields.push(`${day} End Time`);
-                    $section.find('.day-end-time').addClass('is-invalid');
+                $section.find('.interval-row').each(function (idx) {
+                    const startTime = $(this).find('.interval-start-time').val();
+                    const endTime = $(this).find('.interval-end-time').val();
+
+                    if (!startTime) {
+                        result.missingFields.push(day + ' Interval ' + (idx + 1) + ' Start Time');
+                        $(this).find('.interval-start-time').addClass('is-invalid');
+                    }
+                    if (!endTime) {
+                        result.missingFields.push(day + ' Interval ' + (idx + 1) + ' End Time');
+                        $(this).find('.interval-end-time').addClass('is-invalid');
+                    }
+                    if (startTime && endTime) {
+                        hasCompleteInterval = true;
+                    }
+                });
+
+                if (!hasCompleteInterval) {
+                    result.missingFields.push(day + ' requires at least one complete time interval');
                 }
             });
         }
 
         if (result.missingFields.length > 0) {
             result.isValid = false;
-            result.message = `Please fill in the following required fields: ${result.missingFields.join(', ')}`;
+            result.message = 'Please fill in the following required fields: ' + result.missingFields.join(', ');
         }
 
         return result;
@@ -913,24 +1125,32 @@
     function updatePerDayTimeIndicators() {
         $('.per-day-time-section').each(function () {
             const $section = $(this);
-            const day = $section.attr('data-day');
-            const $startTime = $section.find('.day-start-time');
-            const $endTime = $section.find('.day-end-time');
 
             // Remove existing status indicators
             $section.find('.time-validation-status').remove();
 
-            if ($startTime.val() && $endTime.val()) {
-                const isValid = validateTimeSelection($startTime, $endTime);
-                const statusClass = isValid ? 'text-success' : 'text-danger';
-                const statusIcon = isValid ? 'bi-check-circle' : 'bi-exclamation-circle';
-                const statusText = isValid ? 'Valid' : 'Invalid';
+            // Check if all intervals are valid
+            let allValid = true;
+            let hasAnyTimes = false;
 
-                const statusHtml = `
-                    <div class="time-validation-status ${statusClass} small">
-                        <i class="bi ${statusIcon} me-1"></i>${statusText}
-                    </div>
-                `;
+            $section.find('.interval-row').each(function () {
+                const $st = $(this).find('.interval-start-time');
+                const $et = $(this).find('.interval-end-time');
+                if ($st.val() && $et.val()) {
+                    hasAnyTimes = true;
+                    if (!validateTimeSelection($st, $et)) {
+                        allValid = false;
+                    }
+                }
+            });
+
+            if (hasAnyTimes) {
+                const statusClass = allValid ? 'text-success' : 'text-danger';
+                const statusIcon = allValid ? 'bi-check-circle' : 'bi-exclamation-circle';
+                const statusText = allValid ? 'Valid' : 'Invalid';
+
+                const statusHtml = '<div class="time-validation-status ' + statusClass + ' small">' +
+                    '<i class="bi ' + statusIcon + ' me-1"></i>' + statusText + '</div>';
 
                 $section.find('.day-duration-display').after(statusHtml);
             }
@@ -2252,6 +2472,7 @@
 
     /**
      * Apply per-day times to the generated sections
+     * Handles both old format (startTime/endTime) and new format (intervals array)
      */
     function applyPerDayTimes(perDayTimes) {
 
@@ -2260,28 +2481,35 @@
             return;
         }
 
-        Object.keys(perDayTimes).forEach(day => {
-            const dayData = perDayTimes[day];
-            const $section = $(`.per-day-time-section[data-day="${day}"]`);
+        // Normalize to ensure all entries have intervals array
+        const normalized = normalizePerDayTimes(perDayTimes);
 
+        Object.keys(normalized).forEach(day => {
+            const dayData = normalized[day];
+            const $section = $('.per-day-time-section[data-day="' + day + '"]');
 
-            if ($section.length > 0) {
-                const $startTime = $section.find('.day-start-time');
-                const $endTime = $section.find('.day-end-time');
+            if ($section.length > 0 && dayData.intervals && dayData.intervals.length > 0) {
+                const $container = $section.find('.intervals-container');
 
-                if ($startTime.length && dayData.startTime) {
-                    $startTime.val(dayData.startTime);
+                // Set the first interval
+                const $firstRow = $container.find('.interval-row').first();
+                const firstInterval = dayData.intervals[0];
+                $firstRow.find('.interval-start-time').val(firstInterval.startTime || firstInterval.start_time || '');
+                $firstRow.find('.interval-end-time').val(firstInterval.endTime || firstInterval.end_time || '');
+
+                // Add additional interval rows
+                for (let i = 1; i < dayData.intervals.length; i++) {
+                    addIntervalRow($section);
+                    const $newRow = $container.find('.interval-row').last();
+                    const interval = dayData.intervals[i];
+                    $newRow.find('.interval-start-time').val(interval.startTime || interval.start_time || '');
+                    $newRow.find('.interval-end-time').val(interval.endTime || interval.end_time || '');
                 }
 
-                if ($endTime.length && dayData.endTime) {
-                    $endTime.val(dayData.endTime);
-                }
-
-                // Trigger change events to update duration and validation
-                $startTime.trigger('change');
-                $endTime.trigger('change');
+                // Calculate duration
+                calculatePerDayDuration(day);
             } else {
-                console.warn(`No time section found for day: ${day}`);
+                console.warn('No time section found for day: ' + day);
             }
         });
     }
@@ -2458,15 +2686,20 @@
             createHiddenField($container, 'schedule_data[end_time]', scheduleData.timeData.endTime);
             createHiddenField($container, 'schedule_data[duration]', scheduleData.timeData.duration);
         } else {
-            // Per-day time mode - new format
+            // Per-day time mode - intervals format
             createHiddenField($container, 'schedule_data[time_mode]', 'per_day');
 
-            // Create fields for each day's times
+            // Create fields for each day's intervals
             Object.keys(scheduleData.timeData.perDayTimes).forEach(day => {
                 const dayData = scheduleData.timeData.perDayTimes[day];
-                createHiddenField($container, `schedule_data[per_day_times][${day}][start_time]`, dayData.startTime);
-                createHiddenField($container, `schedule_data[per_day_times][${day}][end_time]`, dayData.endTime);
-                createHiddenField($container, `schedule_data[per_day_times][${day}][duration]`, dayData.duration.toFixed(2));
+                const intervals = dayData.intervals || [{ startTime: dayData.startTime, endTime: dayData.endTime }];
+
+                intervals.forEach((interval, idx) => {
+                    createHiddenField($container, 'schedule_data[per_day_times][' + day + '][intervals][' + idx + '][start_time]', interval.startTime);
+                    createHiddenField($container, 'schedule_data[per_day_times][' + day + '][intervals][' + idx + '][end_time]', interval.endTime);
+                });
+
+                createHiddenField($container, 'schedule_data[per_day_times][' + day + '][duration]', (dayData.duration || 0).toFixed(2));
             });
         }
 
