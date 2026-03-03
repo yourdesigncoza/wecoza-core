@@ -74,7 +74,7 @@ final class FeedbackDashboardShortcode
         }
 
         $feedbackId = (int) ($_POST['feedback_id'] ?? 0);
-        $commentText = sanitize_textarea_field($_POST['comment_text'] ?? '');
+        $commentText = sanitize_textarea_field(wp_unslash($_POST['comment_text'] ?? ''));
 
         if ($feedbackId <= 0 || $commentText === '') {
             wp_send_json_error(['message' => 'Feedback ID and comment text are required'], 400);

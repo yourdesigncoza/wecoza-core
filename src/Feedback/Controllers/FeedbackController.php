@@ -41,14 +41,14 @@ final class FeedbackController
             wp_send_json_error(['message' => 'Authentication required'], 401);
         }
 
-        // Sanitize inputs
-        $category     = wecoza_sanitize_value($_POST['category'] ?? '', 'string');
-        $feedbackText = wecoza_sanitize_value($_POST['feedback_text'] ?? '', 'string');
-        $pageUrl      = wecoza_sanitize_value($_POST['page_url'] ?? '', 'string');
-        $pageTitle    = wecoza_sanitize_value($_POST['page_title'] ?? '', 'string');
-        $shortcode    = wecoza_sanitize_value($_POST['shortcode'] ?? '', 'string');
-        $browserInfo  = wecoza_sanitize_value($_POST['browser_info'] ?? '', 'string');
-        $viewport     = wecoza_sanitize_value($_POST['viewport'] ?? '', 'string');
+        // Sanitize inputs (wp_unslash removes magic quotes added by wp_magic_quotes())
+        $category     = wecoza_sanitize_value(wp_unslash($_POST['category'] ?? ''), 'string');
+        $feedbackText = wecoza_sanitize_value(wp_unslash($_POST['feedback_text'] ?? ''), 'string');
+        $pageUrl      = wecoza_sanitize_value(wp_unslash($_POST['page_url'] ?? ''), 'string');
+        $pageTitle    = wecoza_sanitize_value(wp_unslash($_POST['page_title'] ?? ''), 'string');
+        $shortcode    = wecoza_sanitize_value(wp_unslash($_POST['shortcode'] ?? ''), 'string');
+        $browserInfo  = wecoza_sanitize_value(wp_unslash($_POST['browser_info'] ?? ''), 'string');
+        $viewport     = wecoza_sanitize_value(wp_unslash($_POST['viewport'] ?? ''), 'string');
 
         // Validate required fields
         if (!in_array($category, ['bug_report', 'feature_request', 'comment'], true)) {
@@ -61,7 +61,7 @@ final class FeedbackController
         // Handle URL params
         $urlParams = '{}';
         if (!empty($_POST['url_params'])) {
-            $decoded = json_decode(stripslashes($_POST['url_params']), true);
+            $decoded = json_decode(wp_unslash($_POST['url_params']), true);
             if (is_array($decoded)) {
                 $urlParams = wp_json_encode($decoded);
             }
@@ -130,7 +130,7 @@ final class FeedbackController
         }
 
         $feedbackId = (int) ($_POST['feedback_id'] ?? 0);
-        $answer     = wecoza_sanitize_value($_POST['answer'] ?? '', 'string');
+        $answer     = wecoza_sanitize_value(wp_unslash($_POST['answer'] ?? ''), 'string');
         $round      = (int) ($_POST['round'] ?? 1);
         $skip       = (int) ($_POST['skip'] ?? 0);
 
