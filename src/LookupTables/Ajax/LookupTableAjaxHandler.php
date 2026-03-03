@@ -111,14 +111,14 @@ class LookupTableAjaxHandler
     }
 
     /**
-     * Handle create sub-action (nonce + capability required)
+     * Handle create sub-action (nonce required; login is the access gate)
      *
      * @param array $config Table config
      * @return void
      */
     private function handleCreate(array $config): void
     {
-        AjaxSecurity::requireAuth('lookup_table_nonce', $config['capability']);
+        AjaxSecurity::requireNonce('lookup_table_nonce');
 
         // Sanitize only whitelisted columns
         $data = $this->sanitizeColumns($config);
@@ -141,14 +141,14 @@ class LookupTableAjaxHandler
     }
 
     /**
-     * Handle update sub-action (nonce + capability required)
+     * Handle update sub-action (nonce required; login is the access gate)
      *
      * @param array $config Table config
      * @return void
      */
     private function handleUpdate(array $config): void
     {
-        AjaxSecurity::requireAuth('lookup_table_nonce', $config['capability']);
+        AjaxSecurity::requireNonce('lookup_table_nonce');
 
         $id = AjaxSecurity::requireValidId($_POST['id'] ?? 0, 'id');
 
@@ -173,14 +173,14 @@ class LookupTableAjaxHandler
     }
 
     /**
-     * Handle delete sub-action (nonce + capability required)
+     * Handle delete sub-action (nonce required; login is the access gate)
      *
      * @param array $config Table config
      * @return void
      */
     private function handleDelete(array $config): void
     {
-        AjaxSecurity::requireAuth('lookup_table_nonce', $config['capability']);
+        AjaxSecurity::requireNonce('lookup_table_nonce');
 
         $id = AjaxSecurity::requireValidId($_POST['id'] ?? 0, 'id');
 
