@@ -356,6 +356,12 @@
         // Initialize time selection for each new section
         initPerDayTimeSections();
 
+        // Apply pending per-day times immediately (sections just created, guaranteed to exist)
+        if (window.pendingPerDayTimes) {
+            applyPerDayTimes(window.pendingPerDayTimes);
+            delete window.pendingPerDayTimes;
+        }
+
         // Initialize validation indicators
         setTimeout(() => {
             updateTimeValidationIndicators();
@@ -2407,17 +2413,10 @@
                     }
                 });
 
-                // Trigger day selection update then apply saved times
+                // Trigger day selection update — applyPerDayTimes is called
+                // inside generatePerDaySections when pendingPerDayTimes exists
                 setTimeout(() => {
                     updatePerDayTimeControls();
-
-                    // Apply pending per-day times after sections are created
-                    setTimeout(() => {
-                        if (window.pendingPerDayTimes) {
-                            applyPerDayTimes(window.pendingPerDayTimes);
-                            delete window.pendingPerDayTimes;
-                        }
-                    }, 150);
                 }, 100);
             } else {
             }
