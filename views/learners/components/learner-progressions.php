@@ -259,7 +259,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                                 </span>
                                                 <span class="ms-3">
                                                     <i class="bi bi-clock me-1"></i>
-                                                    <?php echo number_format($lp['hours_trained'], 1); ?> / <?php echo number_format($lp['subject_duration'], 1); ?> hrs
+                                                    <?php echo number_format((float) ($lp['hours_trained'] ?? 0), 1); ?> / <?php echo number_format((float) ($lp['subject_duration'] ?? 0), 1); ?> hrs
                                                 </span>
                                             </div>
                                         </div>
