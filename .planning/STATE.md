@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 52 of 52 (all milestones complete)
 Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-02-24 — Milestone archived
+Last activity: 2026-03-03 - Completed quick task 15: Fix backslash escaping in feedback dashboard comments
 
 Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
 
@@ -53,6 +53,12 @@ None.
 |--------|-------|--------|
 | v4.0 tech debt | Address dual-write period active, old agent address columns remain | Must eventually remove old columns |
 | ScheduleService | declare(strict_types=1) broke setDate() for monthly-pattern classes — fixed with (int) casts | Deploy latest code to production |
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 15 | Fix backslash escaping in feedback dashboard comments | 2026-03-03 | 4ece1dd | [15-fix-backslash-escaping-in-feedback-dashb](./quick/15-fix-backslash-escaping-in-feedback-dashb/) |
 
 ## Session Continuity
 
