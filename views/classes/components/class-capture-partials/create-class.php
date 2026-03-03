@@ -242,7 +242,7 @@
                                     $interval = 30 * 60;
                                     for ($time = $start; $time <= $end; $time += $interval) {
                                         $timeStr = wp_date("H:i", $time);
-                                        echo '<option value="' . $timeStr . '">' . wp_date("g:i A", $time) . "</option>";
+                                        echo '<option value="' . $timeStr . '">' . wp_date("H:i", $time) . "</option>";
                                     }
                                     ?>
                                  </select>
@@ -259,7 +259,7 @@
                                     $interval = 30 * 60;
                                     for ($time = $start; $time <= $end; $time += $interval) {
                                         $timeStr = wp_date("H:i", $time);
-                                        echo '<option value="' . $timeStr . '">' . wp_date("g:i A", $time) . "</option>";
+                                        echo '<option value="' . $timeStr . '">' . wp_date("H:i", $time) . "</option>";
                                     }
                                     ?>
                                  </select>

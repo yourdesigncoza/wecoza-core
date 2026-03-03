@@ -786,9 +786,7 @@
                 return false;
             }
 
-            // All validations passed
-            $startTimeElement.addClass('is-valid');
-            $endTimeElement.addClass('is-valid');
+            // All validations passed — green border via parent .has-success, no checkmark
             $endTimeElement.siblings('.invalid-feedback').text('Please select an end time.');
             return true;
         }
@@ -815,8 +813,10 @@
         } else {
             // Any days selected: use per-day time mode (even for single day)
             const perDayTimes = {};
-            $('.per-day-time-section').each(function () {
+            const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            $('.per-day-time-section').not('#day-time-section-template').each(function () {
                 const day = $(this).attr('data-day');
+                if (!day || !validDays.includes(day)) return; // skip template/invalid
                 const intervals = [];
                 let totalDuration = 0;
 
@@ -2407,15 +2407,17 @@
                     }
                 });
 
-                // Trigger day selection update
+                // Trigger day selection update then apply saved times
                 setTimeout(() => {
                     updatePerDayTimeControls();
 
-                    // Apply pending per-day times if available
-                    if (window.pendingPerDayTimes) {
-                        applyPerDayTimes(window.pendingPerDayTimes);
-                        delete window.pendingPerDayTimes;
-                    }
+                    // Apply pending per-day times after sections are created
+                    setTimeout(() => {
+                        if (window.pendingPerDayTimes) {
+                            applyPerDayTimes(window.pendingPerDayTimes);
+                            delete window.pendingPerDayTimes;
+                        }
+                    }, 150);
                 }, 100);
             } else {
             }
@@ -2483,8 +2485,9 @@
 
         // Normalize to ensure all entries have intervals array
         const normalized = normalizePerDayTimes(perDayTimes);
+        const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-        Object.keys(normalized).forEach(day => {
+        Object.keys(normalized).filter(day => validDays.includes(day)).forEach(day => {
             const dayData = normalized[day];
             const $section = $('.per-day-time-section[data-day="' + day + '"]');
 
