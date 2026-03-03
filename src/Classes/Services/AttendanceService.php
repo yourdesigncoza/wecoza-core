@@ -220,12 +220,29 @@ class AttendanceService
 
         // CRITICAL FORMAT MAPPING: DB stores perDayTimes with start_time/end_time keys,
         // but ScheduleService::getTimesForDay() expects perDay with startTime/endTime AND mode='per-day'.
+        // Now also handles multi-interval format (intervals array per day).
         if (!empty($timeData['perDayTimes']) && is_array($timeData['perDayTimes'])) {
             foreach ($timeData['perDayTimes'] as $day => $times) {
-                $timeData['perDay'][$day] = [
-                    'startTime' => $times['start_time'] ?? $times['startTime'] ?? '09:00',
-                    'endTime'   => $times['end_time'] ?? $times['endTime'] ?? '17:00',
-                ];
+                if (isset($times['intervals']) && is_array($times['intervals'])) {
+                    // Multi-interval format: normalize each interval
+                    $intervals = [];
+                    foreach ($times['intervals'] as $interval) {
+                        $intervals[] = [
+                            'startTime' => $interval['start_time'] ?? $interval['startTime'] ?? '09:00',
+                            'endTime'   => $interval['end_time'] ?? $interval['endTime'] ?? '17:00',
+                        ];
+                    }
+                    $timeData['perDay'][$day] = [
+                        'intervals' => $intervals,
+                        'duration'  => $times['duration'] ?? 0,
+                    ];
+                } else {
+                    // Old single-interval format
+                    $timeData['perDay'][$day] = [
+                        'startTime' => $times['start_time'] ?? $times['startTime'] ?? '09:00',
+                        'endTime'   => $times['end_time'] ?? $times['endTime'] ?? '17:00',
+                    ];
+                }
             }
             // Set mode flag so getTimesForDay() enters the per-day branch
             $timeData['mode'] = 'per-day';
@@ -259,18 +276,40 @@ class AttendanceService
             $sessionsByDate[$session['session_date']] = $session;
         }
 
-        // Map each schedule entry to the result format
-        $sessions = [];
+        // Group schedule entries by date (multi-interval support: sum hours across intervals)
+        $entriesByDate = [];
         foreach ($scheduleEntries as $entry) {
-            $date            = $entry['date'];
+            $date = $entry['date'];
+            if (!isset($entriesByDate[$date])) {
+                $entriesByDate[$date] = [
+                    'date'       => $date,
+                    'start_time' => $entry['start_time'],
+                    'end_time'   => $entry['end_time'],
+                    'total_hours' => 0.0,
+                ];
+            }
+            $entriesByDate[$date]['total_hours'] += $this->calculateHoursFromTimes($entry['start_time'], $entry['end_time']);
+            // Keep the latest end_time for display purposes
+            if ($entry['end_time'] > $entriesByDate[$date]['end_time']) {
+                $entriesByDate[$date]['end_time'] = $entry['end_time'];
+            }
+            // Keep the earliest start_time for display purposes
+            if ($entry['start_time'] < $entriesByDate[$date]['start_time']) {
+                $entriesByDate[$date]['start_time'] = $entry['start_time'];
+            }
+        }
+
+        // Map each date to the result format
+        $sessions = [];
+        foreach ($entriesByDate as $date => $dateEntry) {
             $existingSession = $sessionsByDate[$date] ?? null;
 
             $sessions[] = [
                 'date'            => $date,
                 'day'             => date('l', strtotime($date)),
-                'start_time'      => $entry['start_time'],
-                'end_time'        => $entry['end_time'],
-                'scheduled_hours' => $this->calculateHoursFromTimes($entry['start_time'], $entry['end_time']),
+                'start_time'      => $dateEntry['start_time'],
+                'end_time'        => $dateEntry['end_time'],
+                'scheduled_hours' => $dateEntry['total_hours'],
                 'session_id'      => $existingSession['session_id'] ?? null,
                 'status'          => $existingSession['status'] ?? 'pending',
                 'captured_by'     => $existingSession['captured_by'] ?? null,

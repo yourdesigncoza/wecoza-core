@@ -39,6 +39,8 @@ class ScheduleService
 
         if (isset($v2Data['timeData']['perDay'])) {
             $legacyData['per_day_times'] = $v2Data['timeData']['perDay'];
+        } elseif (isset($v2Data['timeData']['perDayTimes'])) {
+            $legacyData['per_day_times'] = $v2Data['timeData']['perDayTimes'];
         } elseif (isset($v2Data['per_day_times'])) {
             $legacyData['per_day_times'] = $v2Data['per_day_times'];
         }
@@ -71,6 +73,7 @@ class ScheduleService
 
     /**
      * Generate weekly schedule entries
+     * Now generates one entry per interval per date
      */
     public static function generateWeeklyEntries(
         DateTime $startDate,
@@ -85,13 +88,16 @@ class ScheduleService
             $dayName = $current->format('l');
 
             if (in_array($dayName, $selectedDays)) {
-                $times = self::getTimesForDay($timeData, $dayName);
-                if ($times) {
-                    $entries[] = [
-                        'date' => $current->format('Y-m-d'),
-                        'start_time' => $times['startTime'],
-                        'end_time' => $times['endTime']
-                    ];
+                $intervals = self::getTimesForDay($timeData, $dayName);
+                if ($intervals) {
+                    foreach ($intervals as $idx => $interval) {
+                        $entries[] = [
+                            'date' => $current->format('Y-m-d'),
+                            'start_time' => $interval['startTime'],
+                            'end_time' => $interval['endTime'],
+                            'interval_index' => $idx,
+                        ];
+                    }
                 }
             }
 
@@ -103,6 +109,7 @@ class ScheduleService
 
     /**
      * Generate biweekly schedule entries
+     * Now generates one entry per interval per date
      */
     public static function generateBiweeklyEntries(
         DateTime $startDate,
@@ -118,13 +125,16 @@ class ScheduleService
             $dayName = $current->format('l');
 
             if ($weekCount % 2 === 0 && in_array($dayName, $selectedDays)) {
-                $times = self::getTimesForDay($timeData, $dayName);
-                if ($times) {
-                    $entries[] = [
-                        'date' => $current->format('Y-m-d'),
-                        'start_time' => $times['startTime'],
-                        'end_time' => $times['endTime']
-                    ];
+                $intervals = self::getTimesForDay($timeData, $dayName);
+                if ($intervals) {
+                    foreach ($intervals as $idx => $interval) {
+                        $entries[] = [
+                            'date' => $current->format('Y-m-d'),
+                            'start_time' => $interval['startTime'],
+                            'end_time' => $interval['endTime'],
+                            'interval_index' => $idx,
+                        ];
+                    }
                 }
             }
 
@@ -140,6 +150,7 @@ class ScheduleService
 
     /**
      * Generate monthly schedule entries
+     * Now generates one entry per interval per date
      */
     public static function generateMonthlyEntries(
         DateTime $startDate,
@@ -158,13 +169,16 @@ class ScheduleService
         }
 
         while ($current <= $endDate) {
-            $times = self::getTimesForDay($timeData, null);
-            if ($times) {
-                $entries[] = [
-                    'date' => $current->format('Y-m-d'),
-                    'start_time' => $times['startTime'],
-                    'end_time' => $times['endTime']
-                ];
+            $intervals = self::getTimesForDay($timeData, null);
+            if ($intervals) {
+                foreach ($intervals as $idx => $interval) {
+                    $entries[] = [
+                        'date' => $current->format('Y-m-d'),
+                        'start_time' => $interval['startTime'],
+                        'end_time' => $interval['endTime'],
+                        'interval_index' => $idx,
+                    ];
+                }
             }
 
             $current->add(new DateInterval('P1M'));
@@ -177,22 +191,41 @@ class ScheduleService
 
     /**
      * Get times for a specific day from time data
+     * Returns an array of interval objects: [['startTime' => ..., 'endTime' => ...], ...]
+     * For backward compatibility, normalizes old single-pair format into one-element array.
      */
     public static function getTimesForDay(array $timeData, ?string $dayName = null): ?array
     {
         $mode = $timeData['mode'] ?? 'single';
 
-        if ($mode === 'per-day' && $dayName && isset($timeData['perDay'][$dayName])) {
-            $dayData = $timeData['perDay'][$dayName];
-            return [
-                'startTime' => $dayData['startTime'] ?? '09:00',
-                'endTime' => $dayData['endTime'] ?? '17:00'
-            ];
+        // Check both perDay and perDayTimes keys (both are used in different code paths)
+        $perDayData = $timeData['perDay'] ?? $timeData['perDayTimes'] ?? [];
+
+        if ($mode === 'per-day' && $dayName && isset($perDayData[$dayName])) {
+            $dayData = $perDayData[$dayName];
+
+            // New format: intervals array
+            if (isset($dayData['intervals']) && is_array($dayData['intervals']) && !empty($dayData['intervals'])) {
+                $intervals = [];
+                foreach ($dayData['intervals'] as $interval) {
+                    $intervals[] = [
+                        'startTime' => $interval['startTime'] ?? $interval['start_time'] ?? '09:00',
+                        'endTime' => $interval['endTime'] ?? $interval['end_time'] ?? '17:00'
+                    ];
+                }
+                return $intervals;
+            }
+
+            // Old format: single startTime/endTime -- wrap into one-element array
+            return [[
+                'startTime' => $dayData['startTime'] ?? $dayData['start_time'] ?? '09:00',
+                'endTime' => $dayData['endTime'] ?? $dayData['end_time'] ?? '17:00'
+            ]];
         } elseif ($mode === 'single' && isset($timeData['single'])) {
-            return [
+            return [[
                 'startTime' => $timeData['single']['startTime'] ?? '09:00',
                 'endTime' => $timeData['single']['endTime'] ?? '17:00'
-            ];
+            ]];
         }
 
         return null;
@@ -325,9 +358,10 @@ class ScheduleService
                 if (is_numeric($key) && is_array($schedule) && isset($schedule['date']) && isset($schedule['start_time']) && isset($schedule['end_time'])) {
                     $duration = $this->calculateEventDuration($schedule['start_time'], $schedule['end_time']);
                     $dayName = $schedule['day'] ?? wp_date('l', strtotime($schedule['date']));
+                    $intervalIdx = $schedule['interval_index'] ?? 0;
 
                     $events[] = [
-                        'id' => 'class_' . $class['class_id'] . '_' . $schedule['date'],
+                        'id' => 'class_' . $class['class_id'] . '_' . $schedule['date'] . '_' . $intervalIdx,
                         'title' => $dayName . ': ' . $schedule['start_time'] . ' - ' . $schedule['end_time'] . ' (' . $duration . 'h)',
                         'start' => $schedule['date'] . 'T' . $schedule['start_time'],
                         'end' => $schedule['date'] . 'T' . $schedule['end_time'],
@@ -381,9 +415,10 @@ class ScheduleService
                     if (isset($schedule['date']) && isset($schedule['start_time']) && isset($schedule['end_time'])) {
                         $date = new DateTime($schedule['date'], $tz);
                         $dayName = $date->format('l');
+                        $intervalIdx = $schedule['interval_index'] ?? 0;
 
                         $events[] = [
-                            'id' => 'class_' . $class['class_id'] . '_' . $schedule['date'],
+                            'id' => 'class_' . $class['class_id'] . '_' . $schedule['date'] . '_' . $intervalIdx,
                             'title' => $this->formatV2EventTitle($schedule, $dayName, $timeData),
                             'start' => $schedule['date'] . 'T' . $schedule['start_time'],
                             'end' => $schedule['date'] . 'T' . $schedule['end_time'],

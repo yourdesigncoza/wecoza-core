@@ -318,6 +318,35 @@ class FormDataProcessor
             }
         }
 
+        // Normalize per_day_times entries that have intervals arrays from the multi-interval form
+        if (!empty($scheduleData['per_day_times'])) {
+            foreach ($scheduleData['per_day_times'] as $day => &$dayData) {
+                if (isset($dayData['intervals']) && is_array($dayData['intervals'])) {
+                    // Intervals submitted from form - normalize each interval
+                    $intervals = [];
+                    $totalDuration = 0.0;
+                    foreach ($dayData['intervals'] as $interval) {
+                        $st = $interval['start_time'] ?? $interval['startTime'] ?? '';
+                        $et = $interval['end_time'] ?? $interval['endTime'] ?? '';
+                        if (!empty($st) && !empty($et)) {
+                            $dur = self::calculateDuration($st, $et);
+                            $intervals[] = [
+                                'startTime' => $st,
+                                'endTime' => $et,
+                                'duration' => $dur
+                            ];
+                            $totalDuration += $dur;
+                        }
+                    }
+                    $dayData = [
+                        'intervals' => $intervals,
+                        'duration' => $totalDuration
+                    ];
+                }
+            }
+            unset($dayData);
+        }
+
         if (empty($scheduleData['exception_dates']) && isset($data['exception_dates']) && is_array($data['exception_dates'])) {
             $scheduleData['exception_dates'] = [];
             $exceptionDates = $data['exception_dates'];
@@ -425,9 +454,14 @@ class FormDataProcessor
         }
 
         if (isset($data['per_day_times']) && is_array($data['per_day_times']) && !empty($data['per_day_times'])) {
+            // Normalize per_day_times entries to use intervals format
+            $normalizedPerDay = [];
+            foreach ($data['per_day_times'] as $day => $dayEntry) {
+                $normalizedPerDay[$day] = self::normalizePerDayEntry($dayEntry);
+            }
             $validated['timeData'] = [
                 'mode' => 'per-day',
-                'perDayTimes' => $data['per_day_times']
+                'perDayTimes' => $normalizedPerDay
             ];
         }
 
@@ -478,8 +512,12 @@ class FormDataProcessor
             $validated['single'] = self::validateSingleTimeData($timeData['single']);
         }
 
-        if ($validated['mode'] === 'per-day' && isset($timeData['perDay'])) {
-            $validated['perDay'] = self::validatePerDayTimeData($timeData['perDay']);
+        if ($validated['mode'] === 'per-day') {
+            if (isset($timeData['perDay'])) {
+                $validated['perDay'] = self::validatePerDayTimeData($timeData['perDay']);
+            } elseif (isset($timeData['perDayTimes'])) {
+                $validated['perDayTimes'] = self::validatePerDayTimeData($timeData['perDayTimes']);
+            }
         }
 
         return $validated;
@@ -514,7 +552,7 @@ class FormDataProcessor
     }
 
     /**
-     * Validate per-day time data
+     * Validate per-day time data with multi-interval support
      */
     public static function validatePerDayTimeData(array $perDayData): array
     {
@@ -523,11 +561,71 @@ class FormDataProcessor
 
         foreach ($perDayData as $day => $dayData) {
             if (in_array($day, $allowedDays) && is_array($dayData)) {
-                $validated[$day] = self::validateSingleTimeData($dayData);
+                $normalized = self::normalizePerDayEntry($dayData);
+                $validatedIntervals = [];
+                $totalDuration = 0.0;
+
+                foreach ($normalized['intervals'] as $interval) {
+                    $validInterval = self::validateSingleTimeData($interval);
+                    if ($validInterval['startTime'] && $validInterval['endTime']) {
+                        $validatedIntervals[] = $validInterval;
+                        $totalDuration += $validInterval['duration'];
+                    }
+                }
+
+                // Validate no overlaps: sort by startTime, ensure each start >= previous end
+                if (count($validatedIntervals) > 1) {
+                    usort($validatedIntervals, function ($a, $b) {
+                        return strcmp($a['startTime'], $b['startTime']);
+                    });
+                    for ($i = 1; $i < count($validatedIntervals); $i++) {
+                        if (strtotime($validatedIntervals[$i]['startTime']) < strtotime($validatedIntervals[$i - 1]['endTime'])) {
+                            wecoza_log("Interval overlap detected on {$day}: interval {$i} starts before previous ends", 'warning');
+                        }
+                    }
+                }
+
+                if (!empty($validatedIntervals)) {
+                    $validated[$day] = [
+                        'intervals' => $validatedIntervals,
+                        'duration' => $totalDuration
+                    ];
+                }
             }
         }
 
         return $validated;
+    }
+
+    /**
+     * Normalize a per-day entry to ensure it has an intervals array.
+     * Handles both old format (startTime/endTime at top level) and new format (intervals array).
+     */
+    private static function normalizePerDayEntry(array $dayData): array
+    {
+        if (isset($dayData['intervals']) && is_array($dayData['intervals'])) {
+            // New format: already has intervals array
+            return $dayData;
+        }
+
+        // Old format: wrap single startTime/endTime into intervals array
+        $startTime = $dayData['startTime'] ?? $dayData['start_time'] ?? null;
+        $endTime = $dayData['endTime'] ?? $dayData['end_time'] ?? null;
+
+        if ($startTime && $endTime) {
+            $duration = isset($dayData['duration']) && is_numeric($dayData['duration'])
+                ? floatval($dayData['duration'])
+                : self::calculateDuration($startTime, $endTime);
+
+            return [
+                'intervals' => [
+                    ['startTime' => $startTime, 'endTime' => $endTime, 'duration' => $duration]
+                ],
+                'duration' => $duration
+            ];
+        }
+
+        return ['intervals' => [], 'duration' => 0];
     }
 
     /**

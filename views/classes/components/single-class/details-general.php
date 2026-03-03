@@ -181,7 +181,7 @@ $schedule_data = $schedule_data ?? null;
             <td class="py-2">
                <div class="fw-semibold mb-0">
                   <?php
-                     // Display class schedule (days and times)
+                     // Display class schedule (days and times) with multi-interval support
                      if (!empty($schedule_data) && isset($schedule_data['selectedDays'])) {
                          $schedule_output = [];
                          $selected_days = $schedule_data['selectedDays'];
@@ -195,14 +195,32 @@ $schedule_data = $schedule_data ?? null;
                                  isset($time_data['perDayTimes'][$day])) {
                                  $day_times = $time_data['perDayTimes'][$day];
 
-                                 // Handle both camelCase and snake_case field names
-                                 $start_field = isset($day_times['startTime']) ? 'startTime' : 'start_time';
-                                 $end_field = isset($day_times['endTime']) ? 'endTime' : 'end_time';
+                                 // Check for multi-interval format (intervals array)
+                                 if (isset($day_times['intervals']) && is_array($day_times['intervals'])) {
+                                     $interval_displays = [];
+                                     foreach ($day_times['intervals'] as $interval) {
+                                         $sf = isset($interval['startTime']) ? 'startTime' : 'start_time';
+                                         $ef = isset($interval['endTime']) ? 'endTime' : 'end_time';
+                                         if (isset($interval[$sf], $interval[$ef])) {
+                                             $s = wp_date('g:i A', strtotime($interval[$sf]));
+                                             $e = wp_date('g:i A', strtotime($interval[$ef]));
+                                             $interval_displays[] = "{$s} - {$e}";
+                                         }
+                                     }
+                                     if (!empty($interval_displays)) {
+                                         $day_display .= ': ' . implode(' & ', $interval_displays);
+                                     }
+                                 }
+                                 // Backward compat: old format without intervals array
+                                 else {
+                                     $start_field = isset($day_times['startTime']) ? 'startTime' : 'start_time';
+                                     $end_field = isset($day_times['endTime']) ? 'endTime' : 'end_time';
 
-                                 if (isset($day_times[$start_field], $day_times[$end_field])) {
-                                     $start_time = wp_date('g:i A', strtotime($day_times[$start_field]));
-                                     $end_time = wp_date('g:i A', strtotime($day_times[$end_field]));
-                                     $day_display .= ": {$start_time} - {$end_time}";
+                                     if (isset($day_times[$start_field], $day_times[$end_field])) {
+                                         $start_time = wp_date('g:i A', strtotime($day_times[$start_field]));
+                                         $end_time = wp_date('g:i A', strtotime($day_times[$end_field]));
+                                         $day_display .= ": {$start_time} - {$end_time}";
+                                     }
                                  }
                              }
                              // Check if we have single time mode

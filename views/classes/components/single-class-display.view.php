@@ -304,19 +304,38 @@ $component_data = [
                           $end_time = new DateTime($time_data['endTime'], $tz);
                           $daily_hours = ($end_time->getTimestamp() - $start_time->getTimestamp()) / 3600;
                       } elseif ($time_data['mode'] === 'per-day' && isset($time_data['perDayTimes'])) {
-                          // Average hours across all configured days
+                          // Average hours across all configured days (with multi-interval support)
                           $total_hours = 0;
                           $day_count = 0;
                           foreach ($time_data['perDayTimes'] as $day_times) {
-                              // Handle both camelCase (startTime) and snake_case (start_time) field names
-                              $start_field = isset($day_times['startTime']) ? 'startTime' : 'start_time';
-                              $end_field = isset($day_times['endTime']) ? 'endTime' : 'end_time';
-
-                              if (isset($day_times[$start_field], $day_times[$end_field])) {
-                                  $start_time = new DateTime($day_times[$start_field], $tz);
-                                  $end_time = new DateTime($day_times[$end_field], $tz);
-                                  $total_hours += ($end_time->getTimestamp() - $start_time->getTimestamp()) / 3600;
+                              // Check for multi-interval format
+                              if (isset($day_times['intervals']) && is_array($day_times['intervals'])) {
+                                  // Sum all interval durations for this day
+                                  if (isset($day_times['duration']) && is_numeric($day_times['duration'])) {
+                                      $total_hours += floatval($day_times['duration']);
+                                  } else {
+                                      foreach ($day_times['intervals'] as $interval) {
+                                          $sf = isset($interval['startTime']) ? 'startTime' : 'start_time';
+                                          $ef = isset($interval['endTime']) ? 'endTime' : 'end_time';
+                                          if (isset($interval[$sf], $interval[$ef])) {
+                                              $s = new DateTime($interval[$sf], $tz);
+                                              $e = new DateTime($interval[$ef], $tz);
+                                              $total_hours += ($e->getTimestamp() - $s->getTimestamp()) / 3600;
+                                          }
+                                      }
+                                  }
                                   $day_count++;
+                              } else {
+                                  // Old format: single startTime/endTime
+                                  $start_field = isset($day_times['startTime']) ? 'startTime' : 'start_time';
+                                  $end_field = isset($day_times['endTime']) ? 'endTime' : 'end_time';
+
+                                  if (isset($day_times[$start_field], $day_times[$end_field])) {
+                                      $start_time = new DateTime($day_times[$start_field], $tz);
+                                      $end_time = new DateTime($day_times[$end_field], $tz);
+                                      $total_hours += ($end_time->getTimestamp() - $start_time->getTimestamp()) / 3600;
+                                      $day_count++;
+                                  }
                               }
                           }
                           $daily_hours = $day_count > 0 ? $total_hours / $day_count : 0;
