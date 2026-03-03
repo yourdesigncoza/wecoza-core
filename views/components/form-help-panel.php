@@ -51,32 +51,32 @@ $sections = $help['sections'] ?? [];
                 continue;
             }
         ?>
-        <div class="mb-4">
-            <h6 class="text-body-secondary mb-2">
-                <i class="bi <?php echo esc_attr($sIcon); ?> me-1"></i><?php echo esc_html($heading); ?>
+        <div class="mb-3 wecoza-help-section">
+            <h6 class="text-body-emphasis mb-2">
+                <i class="bi <?php echo esc_attr($sIcon); ?> me-1 text-body-tertiary"></i><?php echo esc_html($heading); ?>
             </h6>
 
             <?php if ($type === 'checklist'): ?>
                 <ul class="list-unstyled mb-0">
                     <?php foreach ($items as $item): ?>
-                        <li class="mb-1">
+                        <li class="mb-1 text-body-secondary">
                             <i class="bi bi-check-lg text-success me-1"></i><?php echo wp_kses_post($item); ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
 
             <?php elseif ($type === 'ordered'): ?>
-                <ol class="wecoza-help-ordered mb-0 ps-3">
+                <ol class="wecoza-help-ordered mb-0">
                     <?php foreach ($items as $item): ?>
-                        <li class="mb-1"><?php echo wp_kses_post($item); ?></li>
+                        <li class="mb-1 text-body-secondary"><?php echo wp_kses_post($item); ?></li>
                     <?php endforeach; ?>
                 </ol>
 
             <?php elseif ($type === 'tips'): ?>
                 <dl class="mb-0">
                     <?php foreach ($items as $field => $tip): ?>
-                        <dt class="fw-semibold small"><?php echo esc_html($field); ?></dt>
-                        <dd class="wecoza-help-tip ms-0 mb-2 ps-3 small text-body-secondary">
+                        <dt class="fw-semibold"><?php echo esc_html($field); ?></dt>
+                        <dd class="wecoza-help-tip ms-0 mb-2 ps-3 text-body-tertiary">
                             <?php echo wp_kses_post($tip); ?>
                         </dd>
                     <?php endforeach; ?>
@@ -84,7 +84,7 @@ $sections = $help['sections'] ?? [];
             <?php endif; ?>
 
             <?php if (!empty($section['note'])): ?>
-                <p class="small text-body-secondary fst-italic mt-2 mb-0">
+                <p class="text-body-tertiary fst-italic mt-2 mb-0" style="font-size: 0.75rem;">
                     <i class="bi bi-lightbulb me-1"></i><?php echo wp_kses_post($section['note']); ?>
                 </p>
             <?php endif; ?>
