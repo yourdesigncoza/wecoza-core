@@ -557,7 +557,7 @@ function handle_toggle_progression_hold(): void
         }
 
         $allowedActions = ['hold', 'resume'];
-        $action = isset($_POST['action']) ? sanitize_key($_POST['action']) : '';
+        $action = isset($_POST['toggle']) ? sanitize_key($_POST['toggle']) : '';
         if (!in_array($action, $allowedActions, true)) {
             throw new Exception("action must be 'hold' or 'resume'.");
         }
