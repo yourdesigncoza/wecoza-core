@@ -399,17 +399,18 @@ final class EventTasksShortcode
                         ? '<div class="invalid-feedback small">' + escapeHtml(task.note_required_message) + '</div>'
                         : '';
                     return '' +
-                        '<li class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2 m-1" data-task-id="' + escapeHtml(task.id) + '">' +
-                            '<div class="fw-semibold text-body w-30">' + escapeHtml(task.label) +
-                                (task.event_date ? '<div class="text-body-tertiary small">' + escapeHtml(task.event_date) + '</div>' : '') +
-                            '</div>' +
-                            '<div class="d-flex flex-row gap-2 align-items-start flex-grow-1">' +
-                                '<div class="flex-grow-1">' +
+                        '<li class="list-group-item m-1" data-task-id="' + escapeHtml(task.id) + '">' +
+                            '<div class="row g-2 align-items-center">' +
+                                '<div class="col-5">' +
+                                    '<div class="fw-semibold text-body text-truncate">' + escapeHtml(task.label) + '</div>' +
+                                    (task.event_date ? '<div class="text-body-tertiary small">' + escapeHtml(task.event_date) + '</div>' : '') +
+                                '</div>' +
+                                '<div class="col">' +
                                     '<label class="visually-hidden" for="' + escapeHtml(noteId) + '">' + escapeHtml(task.note_label) + '</label>' +
                                     '<input id="' + escapeHtml(noteId) + '" class="form-control form-control-sm wecoza-task-note" type="text" placeholder="' + escapeHtml(task.note_placeholder) + '"' + noteRequiredAttr + ariaRequiredAttr + ' ' + (disabled ? 'disabled' : '') + '>' +
                                     requiredFeedback +
                                 '</div>' +
-                                '<div class="d-flex">' +
+                                '<div class="col-auto">' +
                                     '<button type="button" class="btn btn-subtle-success btn-sm wecoza-task-action" data-action="complete" ' + (disabled ? 'disabled' : '') + '>' + escapeHtml(task.complete_label) + '</button>' +
                                 '</div>' +
                             '</div>' +

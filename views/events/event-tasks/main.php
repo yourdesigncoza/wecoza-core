@@ -233,15 +233,15 @@ echo $assets;
                                                     <div class="card-body p-0">
                                                         <ul class="list-group list-group-flush wecoza-task-list wecoza-task-list-open" data-role="open-list">
                                                             <?php foreach ($class['tasks']['open'] as $task): ?>
-                                                                <li class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2 m-1" data-task-id="<?php echo esc_attr($task['id']); ?>">
-                                                                    <div class="fw-semibold text-body w-30">
-                                                                        <?php echo esc_html($task['label']); ?>
-                                                                        <?php if (!empty($task['event_date'])): ?>
-                                                                            <div class="text-body-tertiary small"><?php echo esc_html($task['event_date']); ?></div>
-                                                                        <?php endif; ?>
-                                                                    </div>
-                                                                    <div class="d-flex flex-row gap-2 align-items-start flex-grow-1">
-                                                                        <div class="flex-grow-1">
+                                                                <li class="list-group-item m-1" data-task-id="<?php echo esc_attr($task['id']); ?>">
+                                                                    <div class="row g-2 align-items-center">
+                                                                        <div class="col-5">
+                                                                            <div class="fw-semibold text-body text-truncate"><?php echo esc_html($task['label']); ?></div>
+                                                                            <?php if (!empty($task['event_date'])): ?>
+                                                                                <div class="text-body-tertiary small"><?php echo esc_html($task['event_date']); ?></div>
+                                                                            <?php endif; ?>
+                                                                        </div>
+                                                                        <div class="col">
                                                                             <label class="visually-hidden" for="wecoza-note-<?php echo esc_attr($class['id'] . '-' . $task['id']); ?>"><?php echo esc_html($task['note_label']); ?></label>
                                                                             <input
                                                                                 id="wecoza-note-<?php echo esc_attr($class['id'] . '-' . $task['id']); ?>"
@@ -259,7 +259,7 @@ echo $assets;
                                                                                 </div>
                                                                             <?php endif; ?>
                                                                         </div>
-                                                                        <div class="d-flex">
+                                                                        <div class="col-auto">
                                                                             <button
                                                                                 type="button"
                                                                                 class="btn btn-subtle-success btn-sm wecoza-task-action"
