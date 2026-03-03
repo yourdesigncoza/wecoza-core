@@ -17,6 +17,9 @@
     let currentFilters = {};
     const selectedIds  = new Set();
 
+    // Pending action context set when date modal opens; executed on modal confirm
+    let pendingAction = null;
+
     // Cache of full dataset from first load used to populate filter dropdowns
     let filterOptionsCache = {
         clients:  [],
@@ -500,6 +503,7 @@
 
     /**
      * Open the bulk complete confirmation modal.
+     * Pre-fills the effective date with today.
      */
     function handleBulkCompleteClick() {
         const ids = getCheckedIds();
@@ -507,16 +511,28 @@
             return;
         }
         $('#bulk-complete-count').text(ids.length);
+
+        // Default effective date to today
+        const today = new Date().toISOString().split('T')[0];
+        $('#bulk-complete-effective-date').val(today);
+
         const modal = new bootstrap.Modal(document.getElementById('bulkCompleteModal'));
         modal.show();
     }
 
     /**
      * Execute bulk complete after user confirms.
+     * Reads effective date from the bulk complete modal input.
      */
     function handleBulkCompleteConfirm() {
         const ids = getCheckedIds();
         if (ids.length === 0) {
+            return;
+        }
+
+        const effectiveDate = $('#bulk-complete-effective-date').val();
+        if (!effectiveDate) {
+            showAlert('#bulkCompleteModal .modal-body', 'Please select an effective date.', 'danger');
             return;
         }
 
@@ -529,9 +545,10 @@
             url:  config.ajaxurl,
             type: 'POST',
             data: {
-                action:       'bulk_complete_progressions',
-                nonce:        config.nonce,
-                tracking_ids: ids,
+                action:         'bulk_complete_progressions',
+                nonce:          config.nonce,
+                tracking_ids:   ids,
+                effective_date: effectiveDate,
             },
             success: function(response) {
                 const modalEl = document.getElementById('bulkCompleteModal');
@@ -541,7 +558,7 @@
                 if (response.success && response.data) {
                     const completed = response.data.completed || ids.length;
                     const failed    = response.data.failed    || 0;
-                    const msg = completed + ' progression(s) completed.' +
+                    const msg = completed + ' progression(s) completed (effective ' + effectiveDate + ').' +
                         (failed > 0 ? ' ' + failed + ' failed.' : '');
                     showToast(msg, 'success');
                 } else {
@@ -780,11 +797,61 @@
     }
 
     // =========================================================
-    // SECTION 7: HOLD / RESUME TOGGLE
+    // SECTION 7: ACTION DATE MODAL (Hold / Resume / Single Complete)
+    // =========================================================
+
+    /**
+     * Open the action date picker modal.
+     * Sets pendingAction so the confirm button knows what to execute.
+     *
+     * @param {string}   title        Modal title text
+     * @param {string}   description  Explanatory paragraph shown in modal body
+     * @param {Function} onConfirm    Callback(effectiveDate) invoked when user confirms
+     */
+    function openActionDateModal(title, description, onConfirm) {
+        // Store pending callback
+        pendingAction = onConfirm;
+
+        // Populate modal text
+        $('#action-date-modal-title').text(title);
+        $('#action-date-modal-description').text(description);
+
+        // Default date to today
+        const today = new Date().toISOString().split('T')[0];
+        $('#action-effective-date').val(today);
+
+        const modal = new bootstrap.Modal(document.getElementById('actionDateModal'));
+        modal.show();
+    }
+
+    /**
+     * Handle confirm click inside the action date modal.
+     * Validates date, hides modal, then invokes the stored pendingAction callback.
+     */
+    function handleActionDateConfirm() {
+        const effectiveDate = $('#action-effective-date').val();
+        if (!effectiveDate) {
+            showAlert('#actionDateModal .modal-body .mb-3', 'Please select an effective date.', 'danger');
+            return;
+        }
+
+        const modalEl = document.getElementById('actionDateModal');
+        const modal   = bootstrap.Modal.getInstance(modalEl);
+        if (modal) { modal.hide(); }
+
+        if (typeof pendingAction === 'function') {
+            pendingAction(effectiveDate);
+            pendingAction = null;
+        }
+    }
+
+    // =========================================================
+    // SECTION 8: HOLD / RESUME TOGGLE
     // =========================================================
 
     /**
      * Toggle hold or resume status for a progression row.
+     * Opens date picker modal before executing the AJAX call.
      *
      * @param {Event} e
      */
@@ -795,22 +862,41 @@
         const trackingId = $link.data('tracking-id');
         const action     = $link.data('action'); // 'hold' or 'resume'
 
+        const title = action === 'hold' ? 'Put Progression on Hold' : 'Resume Progression';
+        const description = action === 'hold'
+            ? 'Select the date from which this progression is placed on hold.'
+            : 'Select the date from which this progression is resumed.';
+
+        openActionDateModal(title, description, function(effectiveDate) {
+            executeToggleHold(trackingId, action, effectiveDate);
+        });
+    }
+
+    /**
+     * Execute the hold/resume AJAX call with a confirmed effective date.
+     *
+     * @param {number} trackingId
+     * @param {string} action          'hold' or 'resume'
+     * @param {string} effectiveDate   YYYY-MM-DD
+     */
+    function executeToggleHold(trackingId, action, effectiveDate) {
         $.ajax({
             url:  config.ajaxurl,
             type: 'POST',
             data: {
-                action:      'toggle_progression_hold',
-                nonce:       config.nonce,
-                tracking_id: trackingId,
-                toggle:      action,
+                action:         'toggle_progression_hold',
+                nonce:          config.nonce,
+                tracking_id:    trackingId,
+                toggle:         action,
+                effective_date: effectiveDate,
             },
             success: function(response) {
                 if (response.success) {
                     const newStatus = action === 'hold' ? 'on_hold' : 'in_progress';
                     updateRowStatus(trackingId, newStatus);
                     const msg = action === 'hold'
-                        ? 'Progression put on hold.'
-                        : 'Progression resumed.';
+                        ? 'Progression put on hold (effective ' + effectiveDate + ').'
+                        : 'Progression resumed (effective ' + effectiveDate + ').';
                     showToast(msg, 'success');
                 } else {
                     const msg = (response.data && response.data.message)
@@ -858,6 +944,7 @@
 
     /**
      * Handle single-row mark complete from the actions dropdown.
+     * Opens date picker modal before executing the AJAX call.
      *
      * @param {Event} e
      */
@@ -865,22 +952,35 @@
         e.preventDefault();
 
         const trackingId = $(e.currentTarget).data('tracking-id');
-        // Native confirm — simple and adequate for an admin action
-        if (!confirm('Mark this progression as complete? (No portfolio required for admin single/bulk complete)')) {
-            return;
-        }
 
+        openActionDateModal(
+            'Mark Progression Complete',
+            'Select the effective completion date for this progression. No portfolio upload is required for admin completions.',
+            function(effectiveDate) {
+                executeMarkSingleComplete(trackingId, effectiveDate);
+            }
+        );
+    }
+
+    /**
+     * Execute the single-complete AJAX call with a confirmed effective date.
+     *
+     * @param {number} trackingId
+     * @param {string} effectiveDate   YYYY-MM-DD
+     */
+    function executeMarkSingleComplete(trackingId, effectiveDate) {
         $.ajax({
             url:  config.ajaxurl,
             type: 'POST',
             data: {
-                action:       'bulk_complete_progressions',
-                nonce:        config.nonce,
-                tracking_ids: [trackingId],
+                action:         'bulk_complete_progressions',
+                nonce:          config.nonce,
+                tracking_ids:   [trackingId],
+                effective_date: effectiveDate,
             },
             success: function(response) {
                 if (response.success) {
-                    showToast('Progression marked as complete.', 'success');
+                    showToast('Progression marked as complete (effective ' + effectiveDate + ').', 'success');
                     loadProgressions();
                 } else {
                     const msg = (response.data && response.data.message)
@@ -921,6 +1021,9 @@
         $('#progression-admin-tbody').on('click', '.btn-mark-single-complete', handleMarkSingleComplete);
         $('#btn-start-new-lp').on('click', handleStartNewLPClick);
         $('#btn-submit-start-lp').on('click', handleStartNewLPSubmit);
+
+        // Action date modal confirm button
+        $('#btn-confirm-action-date').on('click', handleActionDateConfirm);
     }
 
     // =========================================================

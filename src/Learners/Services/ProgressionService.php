@@ -166,9 +166,13 @@ class ProgressionService
     /**
      * Mark LP as complete with portfolio upload
      *
+     * @param int         $trackingId    Progression tracking ID
+     * @param int         $completedBy   WP user ID
+     * @param array|null  $portfolioFile Optional uploaded file from $_FILES
+     * @param string|null $effectiveDate Optional effective completion date (Y-m-d). Defaults to today.
      * @throws Exception if LP not found or already completed
      */
-    public function markLPComplete(int $trackingId, int $completedBy, ?array $portfolioFile = null): LearnerProgressionModel
+    public function markLPComplete(int $trackingId, int $completedBy, ?array $portfolioFile = null, ?string $effectiveDate = null): LearnerProgressionModel
     {
         $progression = LearnerProgressionModel::getById($trackingId);
         if (!$progression) {
@@ -190,7 +194,7 @@ class ProgressionService
             $portfolioPath = $result['file_path'];
         }
 
-        if (!$progression->markComplete($completedBy, $portfolioPath)) {
+        if (!$progression->markComplete($completedBy, $portfolioPath, $effectiveDate)) {
             throw new Exception("Failed to mark LP as complete");
         }
 

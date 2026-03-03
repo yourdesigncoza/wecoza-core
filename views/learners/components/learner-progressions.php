@@ -296,10 +296,20 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
             </div>
             <div class="modal-body">
                 <p>You are about to mark <strong id="confirm-lp-name"></strong> as complete.</p>
-                <ul class="list-unstyled text-muted">
+                <ul class="list-unstyled text-muted mb-3">
                     <li><i class="bi bi-graph-up me-2"></i>Progress: <span id="confirm-lp-progress"></span></li>
                     <li><i class="bi bi-clock me-2"></i>Hours: <span id="confirm-lp-hours"></span></li>
                 </ul>
+                <div class="mb-3">
+                    <label for="confirm-effective-date" class="form-label fw-semibold">
+                        <i class="bi bi-calendar-event me-1"></i>Effective Completion Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           id="confirm-effective-date"
+                           class="form-control"
+                           required>
+                    <div class="form-text">The date on which this LP was completed.</div>
+                </div>
                 <div class="alert alert-info mb-0">
                     <i class="bi bi-info-circle me-2"></i>A portfolio file upload is required to complete this LP.
                 </div>

@@ -269,11 +269,15 @@ class LearnerProgressionModel extends BaseModel
 
     /**
      * Mark LP as complete
+     *
+     * @param int         $completedBy    WP user ID
+     * @param string|null $portfolioPath  Optional uploaded portfolio file path
+     * @param string|null $effectiveDate  Optional effective completion date (Y-m-d). Defaults to today.
      */
-    public function markComplete(int $completedBy, ?string $portfolioPath = null): bool
+    public function markComplete(int $completedBy, ?string $portfolioPath = null, ?string $effectiveDate = null): bool
     {
         $this->status = 'completed';
-        $this->completionDate = wp_date('Y-m-d');
+        $this->completionDate = $effectiveDate ?? wp_date('Y-m-d');
         $this->markedCompleteBy = $completedBy;
         $this->markedCompleteDate = current_time('mysql');
 
@@ -287,25 +291,46 @@ class LearnerProgressionModel extends BaseModel
 
     /**
      * Put LP on hold
+     *
+     * @param string|null $notes          Optional notes
+     * @param string|null $effectiveDate  Optional effective hold date (Y-m-d). Appended to notes for audit.
      */
-    public function putOnHold(?string $notes = null): bool
+    public function putOnHold(?string $notes = null, ?string $effectiveDate = null): bool
     {
         $this->status = 'on_hold';
-        if ($notes) {
-            $this->notes = $notes;
+
+        $noteParts = [];
+        if ($effectiveDate) {
+            $noteParts[] = 'Effective from: ' . $effectiveDate;
         }
+        if ($notes) {
+            $noteParts[] = $notes;
+        }
+
+        if (!empty($noteParts)) {
+            $this->notes = implode(' | ', $noteParts);
+        }
+
         return $this->update();
     }
 
     /**
      * Resume LP from hold
+     *
+     * @param string|null $effectiveDate  Optional effective resume date (Y-m-d). Appended to notes for audit.
      */
-    public function resume(): bool
+    public function resume(?string $effectiveDate = null): bool
     {
         if ($this->status !== 'on_hold') {
             return false;
         }
         $this->status = 'in_progress';
+
+        if ($effectiveDate) {
+            $this->notes = 'Resumed from hold. Effective from: ' . $effectiveDate
+                . ($this->notes ? ' | ' . $this->notes : '');
+        }
+
         return $this->update();
     }
 

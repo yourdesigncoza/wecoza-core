@@ -75,6 +75,7 @@
         /**
          * Open confirmation modal when Mark Complete is clicked.
          * Populates modal with LP details from data attributes.
+         * Defaults effective date to today.
          */
         openConfirmModal: function(e) {
             e.preventDefault();
@@ -91,6 +92,10 @@
             $('#confirm-lp-progress').text(progressPct + '%');
             $('#confirm-lp-hours').text(hoursPresent + ' / ' + productDuration + ' hrs');
 
+            // Default effective date to today
+            const today = new Date().toISOString().split('T')[0];
+            $('#confirm-effective-date').val(today);
+
             // Show the modal
             const modal = new bootstrap.Modal(document.getElementById('markCompleteConfirmModal'));
             modal.show();
@@ -98,9 +103,24 @@
 
         /**
          * "Proceed to Upload" clicked in confirmation modal:
-         * close modal, hide mark-complete button, reveal upload section.
+         * validates effective date, closes modal, hides mark-complete button, reveals upload section.
          */
         proceedToUpload: function() {
+            const effectiveDate = $('#confirm-effective-date').val();
+            if (!effectiveDate) {
+                this.showAlert('danger', 'Please select an effective completion date before proceeding.');
+                return;
+            }
+
+            // Store effective date on the upload form as a hidden input
+            $('#portfolio-upload-form').find('#hidden-effective-date').remove();
+            $('<input>').attr({
+                type:  'hidden',
+                id:    'hidden-effective-date',
+                name:  'effective_date',
+                value: effectiveDate,
+            }).appendTo('#portfolio-upload-form');
+
             // Close the modal
             const modalEl = document.getElementById('markCompleteConfirmModal');
             const modal = bootstrap.Modal.getInstance(modalEl);

@@ -91,8 +91,14 @@ function handle_mark_progression_complete(): void
             throw new Exception($validation['error']);
         }
 
+        // Optional effective date: must match YYYY-MM-DD format if supplied
+        $effectiveDate = null;
+        if (!empty($_POST['effective_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['effective_date'])) {
+            $effectiveDate = sanitize_text_field($_POST['effective_date']);
+        }
+
         $service = new ProgressionService();
-        $result = $service->markLPComplete($trackingId, get_current_user_id(), $validation['file']);
+        $result = $service->markLPComplete($trackingId, get_current_user_id(), $validation['file'], $effectiveDate);
 
         wp_send_json_success([
             'message'         => 'LP marked as complete successfully.',
@@ -409,6 +415,12 @@ function handle_bulk_complete_progressions(): void
             throw new Exception('Maximum 50 progressions can be bulk-completed at once.');
         }
 
+        // Optional effective date: must match YYYY-MM-DD format if supplied
+        $effectiveDate = null;
+        if (!empty($_POST['effective_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['effective_date'])) {
+            $effectiveDate = sanitize_text_field($_POST['effective_date']);
+        }
+
         $completedBy = get_current_user_id();
         $completed   = [];
         $failed      = [];
@@ -426,7 +438,7 @@ function handle_bulk_complete_progressions(): void
                 }
 
                 // Bypass portfolio requirement — direct model call (intentional for bulk admin)
-                if (!$model->markComplete($completedBy)) {
+                if (!$model->markComplete($completedBy, null, $effectiveDate)) {
                     throw new Exception("Failed to update progression record.");
                 }
 
@@ -562,6 +574,12 @@ function handle_toggle_progression_hold(): void
             throw new Exception("action must be 'hold' or 'resume'.");
         }
 
+        // Optional effective date: must match YYYY-MM-DD format if supplied
+        $effectiveDate = null;
+        if (!empty($_POST['effective_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['effective_date'])) {
+            $effectiveDate = sanitize_text_field($_POST['effective_date']);
+        }
+
         $model = LearnerProgressionModel::getById($trackingId);
         if (!$model) {
             throw new Exception('Progression not found.');
@@ -571,18 +589,19 @@ function handle_toggle_progression_hold(): void
             if (!$model->isInProgress()) {
                 throw new Exception("Cannot put on hold: LP status is '{$model->getStatus()}', expected 'in_progress'.");
             }
-            $model->putOnHold('Put on hold by admin');
+            $model->putOnHold('Put on hold by admin', $effectiveDate);
         } else {
             if (!$model->isOnHold()) {
                 throw new Exception("Cannot resume: LP status is '{$model->getStatus()}', expected 'on_hold'.");
             }
-            $model->resume();
+            $model->resume($effectiveDate);
         }
 
         wp_send_json_success([
-            'tracking_id' => $trackingId,
-            'new_status'  => $model->getStatus(),
-            'message'     => $action === 'hold'
+            'tracking_id'   => $trackingId,
+            'new_status'    => $model->getStatus(),
+            'effective_date' => $effectiveDate,
+            'message'       => $action === 'hold'
                 ? 'LP has been put on hold.'
                 : 'LP has been resumed.',
         ]);

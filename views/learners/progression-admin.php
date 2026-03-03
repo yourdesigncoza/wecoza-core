@@ -214,6 +214,42 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- =====================================================================
+         Action Date Picker Modal (Hold / Resume / Single Complete)
+         ===================================================================== -->
+    <div class="modal fade" id="actionDateModal" tabindex="-1" aria-labelledby="actionDateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionDateModalLabel">
+                        <i class="bi bi-calendar-event me-2"></i>
+                        <span id="action-date-modal-title">Select Effective Date</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="action-date-modal-description" class="text-muted mb-3"></p>
+                    <div class="mb-3">
+                        <label for="action-effective-date" class="form-label fw-semibold">
+                            Effective Date <span class="text-danger">*</span>
+                        </label>
+                        <input type="date"
+                               id="action-effective-date"
+                               class="form-control"
+                               required>
+                        <div class="form-text">The date from which this action takes effect.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-phoenix-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-confirm-action-date" class="btn btn-phoenix-primary btn-sm">
+                        <i class="bi bi-check-lg me-1"></i> Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
          Bulk Complete Confirmation Modal
          ===================================================================== -->
     <div class="modal fade" id="bulkCompleteModal" tabindex="-1" aria-labelledby="bulkCompleteModalLabel" aria-hidden="true">
@@ -225,7 +261,17 @@ if (!defined('ABSPATH')) {
                 </div>
                 <div class="modal-body">
                     <p>You are about to mark <strong id="bulk-complete-count">0</strong> progression(s) as completed.</p>
-                    <p class="text-warning">
+                    <div class="mb-3">
+                        <label for="bulk-complete-effective-date" class="form-label fw-semibold">
+                            Effective Date <span class="text-danger">*</span>
+                        </label>
+                        <input type="date"
+                               id="bulk-complete-effective-date"
+                               class="form-control"
+                               required>
+                        <div class="form-text">The completion date to record for all selected progressions.</div>
+                    </div>
+                    <p class="text-warning mb-0">
                         <i class="bi bi-exclamation-triangle me-1"></i>
                         Note: Bulk complete does not require portfolio uploads. Individual completions with portfolios should use the learner view.
                     </p>
