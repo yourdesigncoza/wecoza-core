@@ -303,13 +303,24 @@
         // Admin delete
         $('#btn-admin-delete-session').on('click', adminDeleteSession);
 
-        // Hours present input change -> auto-calculate hours absent
+        // Hours present input change -> auto-calculate hours absent + over-hours warning
         $('#capture-learners-tbody').on('input change', '.hours-present-input', function() {
-            const $row   = $(this).closest('tr');
+            const $input  = $(this);
+            const $row    = $input.closest('tr');
             const trained = parseFloat($row.find('.hours-trained-val').text()) || 0;
-            const present = parseFloat($(this).val()) || 0;
+            const present = parseFloat($input.val()) || 0;
             const absent  = Math.max(0, trained - present);
             $row.find('.hours-absent-val').text(absent.toFixed(1));
+
+            // Soft amber warning when hours exceed scheduled
+            var maxHours = parseFloat($input.attr('max')) || 0;
+            if (present > maxHours && maxHours > 0) {
+                if (!$input.next('.hours-over-warning').length) {
+                    $input.after('<span class="hours-over-warning text-warning ms-1" title="Exceeds scheduled hours"><i class="bi bi-exclamation-triangle-fill"></i></span>');
+                }
+            } else {
+                $input.next('.hours-over-warning').remove();
+            }
         });
     }
 
@@ -398,9 +409,8 @@
 
             const $input = $(this).find('.hours-present-input');
             const hoursPresent = parseFloat($input.val());
-            const maxHours = parseFloat($input.attr('max'));
 
-            if (isNaN(hoursPresent) || hoursPresent < 0 || hoursPresent > maxHours) {
+            if (isNaN(hoursPresent) || hoursPresent < 0) {
                 isValid = false;
                 $input.addClass('is-invalid');
             } else {
@@ -413,7 +423,7 @@
         });
 
         if (!isValid) {
-            showAlert('#capture-alert', 'Please ensure all hours are between 0 and the scheduled maximum.', 'danger');
+            showAlert('#capture-alert', 'Please ensure all hours are valid (0 or above).', 'danger');
             $btn.prop('disabled', false).html(
                 '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
             );
