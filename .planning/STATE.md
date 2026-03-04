@@ -5,15 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v6.0 shipped — planning next milestone
+**Current focus:** v7.0 Agent Attendance Access — defining requirements
 
 ## Current Position
 
-Phase: 52 of 52 (all milestones complete)
-Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-03-04 - Completed quick task 22: WEC-182 Progression Admin LP description as class_type + subject + level
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-04 — Milestone v7.0 started
 
-Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v7.0 Agent Attendance Access)
 
 ## Milestone History
 
@@ -82,7 +83,7 @@ Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 22 (WEC-182 [3b] LP description todo housekeeping).
+Stopped at: Milestone v7.0 started — defining requirements.
 Resume file: ---
 
-**Next action:** `/gsd:new-milestone` to define next milestone, or deploy v6.0 to production.
+**Next action:** Complete requirements definition, then create roadmap.

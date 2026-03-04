@@ -75,7 +75,14 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(No active milestone — use `/gsd:new-milestone` to start next milestone)
+## Current Milestone: v7.0 Agent Attendance Access
+
+**Goal:** Complete remaining WEC-182 attendance feedback — agent-restricted capture page, exception button UX, and stopped-class capture until stop date.
+
+**Target features:**
+- Agent-restricted attendance capture page (dedicated page for agents who are not WP users)
+- Exception button UX improvement (visible labelled button instead of icon-only)
+- Stopped-class capture allowed until stop date (last capturable session = stop date)
 
 ### Out of Scope
 
@@ -207,4 +214,4 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Phoenix Feather SVG for status badges | Consistent with Phoenix theme; DRY helper across 5 views | ✓ v6.0 |
 
 ---
-*Last updated: 2026-02-24 after v6.0 milestone*
+*Last updated: 2026-03-04 after v7.0 milestone start*
