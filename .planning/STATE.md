@@ -55,7 +55,7 @@ Remaining todos from WEC-182 (priority order from Mario meeting 2026-03-04):
 | 5 | Monthly summary totals row per month | attendance | Done — quick-20 |
 | — | Report generation: extractable field list | learners | Waiting on Mario (ETA 2026-03-05) |
 
-Resolved: [1b] not needed, [1c] quick-17, [1d] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16, [4] quick-20, [5] quick-20.
+Resolved: [1b] not needed, [1c] quick-17, [1d] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16, [P4] quick-20, [P5] quick-20, [P3-calendar] quick-21.
 
 Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 
