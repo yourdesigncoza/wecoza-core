@@ -52,10 +52,10 @@ class AgentAccessController
     }
 
     /**
-     * Auto-create the /app/agent-attendance/ WP page if it does not exist.
+     * Auto-create the /app/agent-attendance/ CPT post if it does not exist.
      *
      * Uses the same transient-guarded pattern as ClassController::ensureRequiredPages().
-     * Creates as a child of the /app/ page (same pattern as display-single-class).
+     * Creates as an 'app' custom post type (matching all other WeCoza app pages).
      * Only runs for admin users to avoid unnecessary DB queries on every frontend request.
      *
      * @return void
@@ -68,36 +68,23 @@ class AgentAccessController
 
         set_transient('wecoza_agent_attendance_page_checked', true, HOUR_IN_SECONDS);
 
-        if (!get_page_by_path('app/agent-attendance')) {
-            $appPage = get_page_by_path('app');
-            $appPageId = 0;
+        $existing = get_posts([
+            'post_type'   => 'app',
+            'name'        => 'agent-attendance',
+            'post_status' => 'publish',
+            'numberposts' => 1,
+        ]);
 
-            if (!$appPage) {
-                $appPageId = wp_insert_post([
-                    'post_title'     => 'App',
-                    'post_content'   => '<h2>WeCoza Application</h2><p>Welcome to the WeCoza training management system.</p>',
-                    'post_status'    => 'publish',
-                    'post_type'      => 'page',
-                    'post_name'      => 'app',
-                    'comment_status' => 'closed',
-                    'ping_status'    => 'closed',
-                ]);
-            } else {
-                $appPageId = $appPage->ID;
-            }
-
-            if ($appPageId && !is_wp_error($appPageId)) {
-                wp_insert_post([
-                    'post_title'     => 'Agent Attendance',
-                    'post_content'   => '[wecoza_agent_attendance]',
-                    'post_status'    => 'publish',
-                    'post_type'      => 'page',
-                    'post_name'      => 'agent-attendance',
-                    'post_parent'    => $appPageId,
-                    'comment_status' => 'closed',
-                    'ping_status'    => 'closed',
-                ]);
-            }
+        if (empty($existing)) {
+            wp_insert_post([
+                'post_title'     => 'Agent Attendance',
+                'post_content'   => '[wecoza_agent_attendance]',
+                'post_status'    => 'publish',
+                'post_type'      => 'app',
+                'post_name'      => 'agent-attendance',
+                'comment_status' => 'closed',
+                'ping_status'    => 'closed',
+            ]);
         }
     }
 
@@ -237,12 +224,11 @@ class AgentAccessController
      * Enforce the agent page cage: wp_agent users may only visit the
      * attendance landing page and the single-class view.
      *
-     * Allowlist:
-     *   - /app/agent-attendance/        (get_page_by_path('app/agent-attendance'))
-     *   - /app/display-single-class/    (get_page_by_path match)
+     * Allowlist (all 'app' CPT posts):
+     *   - /app/agent-attendance/       (agent-attendance slug)
+     *   - /app/display-single-class/   (display-single-class slug)
      *
-     * If the attendance page itself does not exist in WP, the redirect is
-     * skipped with a log entry to prevent an infinite-redirect loop.
+     * If the attendance post doesn't exist, skip redirect to prevent infinite loop.
      *
      * @return void
      */
@@ -258,24 +244,31 @@ class AgentAccessController
             return;
         }
 
-        // Resolve allowlisted pages once
-        $attendancePage    = get_page_by_path('app/agent-attendance');
-        $singleClassPage   = get_page_by_path('app/display-single-class');
-
-        // Safety: if the attendance page doesn't exist, don't redirect — prevents infinite loop
-        if (!$attendancePage) {
-            wecoza_log('AgentAccessController: attendance page not found — skipping template_redirect cage', 'warning');
+        // Allow WordPress login/logout URLs
+        if (is_login()) {
             return;
         }
 
-        // Build allowlist of page IDs
-        $allowedIds = [(int) $attendancePage->ID];
+        // On an 'app' CPT single post — check slug allowlist
+        if (is_singular('app')) {
+            $allowedSlugs = ['agent-attendance', 'display-single-class'];
+            $currentSlug  = get_queried_object()->post_name ?? '';
 
-        if ($singleClassPage) {
-            $allowedIds[] = (int) $singleClassPage->ID;
+            if (in_array($currentSlug, $allowedSlugs, true)) {
+                return;
+            }
         }
 
-        if (is_page($allowedIds)) {
+        // Safety: verify attendance post exists before redirecting
+        $attendancePost = get_posts([
+            'post_type'   => 'app',
+            'name'        => 'agent-attendance',
+            'post_status' => 'publish',
+            'numberposts' => 1,
+        ]);
+
+        if (empty($attendancePost)) {
+            wecoza_log('AgentAccessController: attendance app post not found — skipping template_redirect cage', 'warning');
             return;
         }
 
