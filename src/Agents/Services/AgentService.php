@@ -92,11 +92,17 @@ class AgentService
     /**
      * Delete agent (soft delete)
      *
+     * Removes wp_agent role from linked WP user before soft-deleting the agent.
+     *
      * @param int $agentId Agent ID
      * @return bool Success status
      */
     public function deleteAgent(int $agentId): bool
     {
+        // Remove wp_agent role before soft-deleting
+        $wpUserService = new AgentWpUserService($this->repository);
+        $wpUserService->removeAgentRole($agentId);
+
         return $this->repository->deleteAgent($agentId);
     }
 
@@ -174,6 +180,10 @@ class AgentService
         if (!empty($file_data)) {
             $this->repository->updateAgent($saved_agent_id, $file_data);
         }
+
+        // Sync WordPress user account
+        $wpUserService = new AgentWpUserService($this->repository);
+        $wpUserService->syncWpUser($saved_agent_id, $data, $currentAgent);
 
         // Reload agent data
         $agent = $this->repository->getAgent($saved_agent_id);
