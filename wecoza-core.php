@@ -703,6 +703,34 @@ add_action(
 
 /*
 |--------------------------------------------------------------------------
+| Register attendance capture capabilities
+|--------------------------------------------------------------------------
+|
+| Uses plugins_loaded (not just activation hook) so capabilities survive
+| plugin updates. add_cap() is idempotent — safe to call on every load.
+|
+*/
+
+add_action(
+    "plugins_loaded",
+    function () {
+        // Add capture_attendance to wp_agent role
+        $agentRole = get_role('wp_agent');
+        if ($agentRole) {
+            $agentRole->add_cap('capture_attendance');
+        }
+
+        // Add capture_attendance to administrator role
+        $adminRole = get_role('administrator');
+        if ($adminRole) {
+            $adminRole->add_cap('capture_attendance');
+        }
+    },
+    6,
+);
+
+/*
+|--------------------------------------------------------------------------
 | Activation & Deactivation Hooks
 |--------------------------------------------------------------------------
 */
@@ -745,6 +773,15 @@ register_activation_hook(__FILE__, function () {
 
     // Flush rewrite rules
     flush_rewrite_rules();
+
+    // Register custom roles
+    if (!get_role("wp_agent")) {
+        add_role("wp_agent", __("Agent", "wecoza-core"), [
+            "read" => true,
+            "edit_posts" => true,
+            "upload_files" => true,
+        ]);
+    }
 
     // Register custom capabilities for learner management
     // Only Administrators should have access to PII data
@@ -796,6 +833,9 @@ register_activation_hook(__FILE__, function () {
 register_deactivation_hook(__FILE__, function () {
     // Flush rewrite rules
     flush_rewrite_rules();
+
+    // Remove custom roles
+    remove_role("wp_agent");
 
     // Remove custom capabilities
     $admin = get_role("administrator");
