@@ -131,6 +131,7 @@ if ($classStatus === 'stopped') {
                     </tr>
                 </thead>
                 <tbody id="attendance-sessions-tbody"></tbody>
+                <tfoot id="attendance-sessions-tfoot" class="border-top"></tfoot>
             </table>
         </div>
 

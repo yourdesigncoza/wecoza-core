@@ -160,6 +160,7 @@
             $('#attendance-sessions-tbody').html(
                 '<tr><td colspan="6" class="text-center text-muted py-3">No sessions found for this period.</td></tr>'
             );
+            $('#attendance-sessions-tfoot').html('');
             return;
         }
 
@@ -195,6 +196,63 @@
         });
 
         $('#attendance-sessions-tbody').html(html);
+        renderSummaryRow();
+    }
+
+    // =========================================================
+    // SECTION 4-SUMMARY: MONTHLY SUMMARY TOTALS ROW
+    // =========================================================
+
+    /**
+     * Render a summary row in the session table tfoot showing
+     * total scheduled hours, captured/total session count, and
+     * a color-coded attendance percentage badge.
+     */
+    function renderSummaryRow() {
+        var $tfoot = $('#attendance-sessions-tfoot');
+        var filtered = currentMonth === 'all'
+            ? allSessions
+            : allSessions.filter(function(s) {
+                return s.date && s.date.substring(0, 7) === currentMonth;
+            });
+
+        if (filtered.length === 0) {
+            $tfoot.html('');
+            return;
+        }
+
+        // Only count captured sessions (not pending/blocked/exception)
+        var capturedSessions = filtered.filter(function(s) {
+            return s.status === 'captured';
+        });
+
+        var totalScheduled = 0;
+
+        // Scheduled hours: sum ALL non-blocked sessions (the full schedule)
+        filtered.forEach(function(s) {
+            if (!s.is_blocked) {
+                totalScheduled += parseFloat(s.scheduled_hours) || 0;
+            }
+        });
+
+        var capturedCount = capturedSessions.length;
+        var totalCount = filtered.filter(function(s) { return !s.is_blocked; }).length;
+        var pct = totalCount > 0 ? Math.round((capturedCount / totalCount) * 100) : 0;
+
+        var badgeCls = pct >= 80 ? 'badge-phoenix-success'
+            : pct >= 50 ? 'badge-phoenix-warning'
+            : 'badge-phoenix-danger';
+
+        $tfoot.html(
+            '<tr class="bg-body-highlight fw-semibold">'
+            + '<td class="ps-3" colspan="3">Summary</td>'
+            + '<td>' + totalScheduled.toFixed(1) + '</td>'
+            + '<td colspan="2" class="text-end pe-3">'
+            + '<span class="me-3">' + capturedCount + ' / ' + totalCount + ' sessions</span>'
+            + '<span class="badge badge-phoenix ' + badgeCls + '">' + pct + '%</span>'
+            + '</td>'
+            + '</tr>'
+        );
     }
 
     // =========================================================
