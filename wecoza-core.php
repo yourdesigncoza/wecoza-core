@@ -731,6 +731,49 @@ add_action(
 
 /*
 |--------------------------------------------------------------------------
+| WP Profile Email Lockdown for wp_agent Role
+|--------------------------------------------------------------------------
+|
+| Agent email is controlled via the agent capture form (source of truth).
+| WP profile email field is hidden for wp_agent users, and POST-based
+| email changes are blocked as a safety net.
+|
+*/
+
+add_action('admin_head-profile.php', function () {
+    $user = wp_get_current_user();
+    if (in_array('wp_agent', $user->roles, true)) {
+        echo '<style>#your-profile .user-email-wrap { display: none !important; }</style>';
+    }
+});
+
+add_action('admin_head-user-edit.php', function () {
+    $editedUserId = isset($_GET['user_id']) ? absint($_GET['user_id']) : 0;
+    if ($editedUserId) {
+        $editedUser = get_userdata($editedUserId);
+        if ($editedUser && in_array('wp_agent', $editedUser->roles, true)) {
+            echo '<style>#your-profile .user-email-wrap { display: none !important; }</style>';
+        }
+    }
+});
+
+// Safety net: prevent email change via POST for wp_agent users
+add_action('user_profile_update_errors', function (\WP_Error $errors, bool $update, \stdClass $user) {
+    if (!$update) {
+        return;
+    }
+    $existingUser = get_userdata($user->ID);
+    if (!$existingUser || !in_array('wp_agent', $existingUser->roles, true)) {
+        return;
+    }
+    // If email was changed, revert it
+    if ($user->user_email !== $existingUser->user_email) {
+        $user->user_email = $existingUser->user_email;
+    }
+}, 10, 3);
+
+/*
+|--------------------------------------------------------------------------
 | Activation & Deactivation Hooks
 |--------------------------------------------------------------------------
 */
