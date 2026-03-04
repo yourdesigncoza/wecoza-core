@@ -308,6 +308,9 @@ add_action(
         if (class_exists(\WeCoza\Agents\Ajax\AgentsAjaxHandlers::class)) {
             new \WeCoza\Agents\Ajax\AgentsAjaxHandlers();
         }
+        if (class_exists(\WeCoza\Agents\Controllers\AgentAccessController::class)) {
+            new \WeCoza\Agents\Controllers\AgentAccessController();
+        }
 
         // Initialize Lookup Tables Module
         if (
