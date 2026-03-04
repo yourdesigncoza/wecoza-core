@@ -22,8 +22,8 @@ Requirements for v7.0 Agent Attendance Access. Each maps to roadmap phases.
 
 - [x] **AGT-01**: Plugin registers `wp_agent` WordPress role with `capture_attendance` capability on activation and update
 - [x] **AGT-02**: Administrator role also receives `capture_attendance` capability
-- [ ] **AGT-03**: `agents` table has `wp_user_id` column linking to WordPress user accounts
-- [ ] **AGT-04**: AJAX attendance handlers check `capture_attendance` capability (not just logged-in)
+- [x] **AGT-03**: `agents` table has `wp_user_id` column linking to WordPress user accounts
+- [x] **AGT-04**: AJAX attendance handlers check `capture_attendance` capability (not just logged-in)
 - [ ] **AGT-05**: Agent sees only their assigned classes (primary + backup) on dedicated attendance page
 - [ ] **AGT-06**: Agent-dedicated attendance shortcode renders minimal page with existing attendance capture UI
 - [ ] **AGT-07**: Agent is redirected away from WP admin and other WeCoza pages — can only access attendance page
@@ -62,8 +62,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STP-03 | Phase 53 | Complete (quick-17, 2026-03-04) |
 | AGT-01 | Phase 54 | Complete |
 | AGT-02 | Phase 54 | Complete |
-| AGT-03 | Phase 54 | Pending |
-| AGT-04 | Phase 54 | Pending |
+| AGT-03 | Phase 54 | Complete |
+| AGT-04 | Phase 54 | Complete |
 | AGT-05 | Phase 55 | Pending |
 | AGT-06 | Phase 55 | Pending |
 | AGT-07 | Phase 55 | Pending |
