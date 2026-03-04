@@ -171,7 +171,7 @@ Plans:
   2. Administrator role retains `capture_attendance` capability — admins can still capture attendance without interruption
   3. `agents` table has a `wp_user_id` INTEGER column in the database
   4. Attendance capture and exception-marking AJAX endpoints return a permissions error when called by a logged-in user without `capture_attendance` capability
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 54-01: Role registration + capability wiring
@@ -186,11 +186,11 @@ Plans:
   2. Attendance page lists only the classes where the agent is the primary agent or a backup agent
   3. Agent can capture attendance for their listed classes using the existing capture UI
   4. Navigating away from the attendance page redirects the agent back to it — no other WeCoza pages are accessible
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 55-01: AgentAccessController + shortcode + class lookup
-- [ ] 55-02: Minimal page template + login redirect + admin redirect guard
+- [ ] 55-01-PLAN.md — AgentAccessController + shortcode + class lookup + view� AgentAccessController + shortcode + class lookup + view
+- [ ] 55-02-PLAN.md — Login redirect + admin guard + page cage + bootstrap wiring� Login redirect + admin guard + page cage + bootstrap wiring
 
 ## Progress
 
