@@ -123,6 +123,7 @@ class AgentRepository extends BaseRepository
             'status',
             'residential_suburb',
             'location_id',
+            'wp_user_id',
             'created_at',
             'updated_at',
             'created_by',
@@ -257,6 +258,23 @@ class AgentRepository extends BaseRepository
         }
 
         return $this->resolveAddressFields($result);
+    }
+
+    /**
+     * Find an agent by their WordPress user ID
+     *
+     * @param int $wpUserId WordPress user ID
+     * @return array|null Agent record or null if not found
+     */
+    public function findByWpUserId(int $wpUserId): ?array
+    {
+        $db   = wecoza_db();
+        $stmt = $db->prepare(
+            "SELECT * FROM agents WHERE wp_user_id = :wp_user_id AND status <> 'deleted' LIMIT 1"
+        );
+        $stmt->execute([':wp_user_id' => $wpUserId]);
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 
     /**
@@ -585,6 +603,9 @@ class AgentRepository extends BaseRepository
 
             // Location reference
             'location_id' => 'absint',
+
+            // WordPress user link (Phase 54+)
+            'wp_user_id' => 'absint',
         ];
 
         $cleanData = [];
@@ -598,6 +619,11 @@ class AgentRepository extends BaseRepository
         // Handle location_id: convert 0 or empty to null to avoid FK violation
         if (isset($cleanData['location_id']) && empty($cleanData['location_id'])) {
             $cleanData['location_id'] = null;
+        }
+
+        // Handle wp_user_id: convert 0 or empty to null to avoid storing 0
+        if (isset($cleanData['wp_user_id']) && empty($cleanData['wp_user_id'])) {
+            $cleanData['wp_user_id'] = null;
         }
 
         return $cleanData;
