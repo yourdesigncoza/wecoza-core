@@ -77,11 +77,12 @@ Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 | 19 | WEC-182 [1d]: resolved stale block exception days todo (already done in quick-16) | 2026-03-04 | 75be76c | [19-wec-182-1d-block-exception-days-in-atten](./quick/19-wec-182-1d-block-exception-days-in-atten/) |
 | 20 | WEC-182: hours validation warning + monthly summary row | 2026-03-04 | 2ece533 | [20-wec-182-hours-validation-warning-monthly](./quick/20-wec-182-hours-validation-warning-monthly/) |
 | 21 | WEC-182: monthly calendar grid for attendance | 2026-03-04 | 34306b7 | [21-wec-182-horizontal-scrollable-calendar-t](./quick/21-wec-182-horizontal-scrollable-calendar-t/) |
+| 22 | WEC-182 [3b]: resolved stale LP description todo (already done in quick-17) | 2026-03-04 | 4d8cdd8 | [22-wec-182-progression-admin-lp-description](./quick/22-wec-182-progression-admin-lp-description/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 21 (WEC-182 monthly calendar grid for attendance).
+Stopped at: Completed quick task 22 (WEC-182 [3b] LP description todo housekeeping).
 Resume file: ---
 
 **Next action:** `/gsd:new-milestone` to define next milestone, or deploy v6.0 to production.
