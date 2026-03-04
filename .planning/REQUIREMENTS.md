@@ -9,14 +9,14 @@ Requirements for v7.0 Agent Attendance Access. Each maps to roadmap phases.
 
 ### Exception UX
 
-- [ ] **EXC-01**: Agent can see a clearly labelled "Report Exception" button (not icon-only) in the attendance session list
-- [ ] **EXC-02**: Exception button styling uses Phoenix badge/button patterns for visibility
+- [x] **EXC-01**: Agent can see a clearly labelled "Report Exception" button (not icon-only) in the attendance session list
+- [x] **EXC-02**: Exception button styling uses Phoenix badge/button patterns for visibility
 
 ### Stopped-Class Capture
 
-- [ ] **STP-01**: Agent can capture attendance on stopped classes for session dates up to and including the stop date
-- [ ] **STP-02**: Server-side AJAX guard allows capture on stopped classes when session date ≤ stop date
-- [ ] **STP-03**: Sessions after stop date remain locked (no capture allowed)
+- [x] **STP-01**: Agent can capture attendance on stopped classes for session dates up to and including the stop date
+- [x] **STP-02**: Server-side AJAX guard allows capture on stopped classes when session date ≤ stop date
+- [x] **STP-03**: Sessions after stop date remain locked (no capture allowed)
 
 ### Agent Access
 
@@ -55,25 +55,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXC-01 | — | Pending |
-| EXC-02 | — | Pending |
-| STP-01 | — | Pending |
-| STP-02 | — | Pending |
-| STP-03 | — | Pending |
-| AGT-01 | — | Pending |
-| AGT-02 | — | Pending |
-| AGT-03 | — | Pending |
-| AGT-04 | — | Pending |
-| AGT-05 | — | Pending |
-| AGT-06 | — | Pending |
-| AGT-07 | — | Pending |
-| AGT-08 | — | Pending |
+| EXC-01 | Phase 53 | Complete (quick-17, 2026-03-04) |
+| EXC-02 | Phase 53 | Complete (quick-17, 2026-03-04) |
+| STP-01 | Phase 53 | Complete (quick-17, 2026-03-04) |
+| STP-02 | Phase 53 | Complete (quick-17, 2026-03-04) |
+| STP-03 | Phase 53 | Complete (quick-17, 2026-03-04) |
+| AGT-01 | Phase 54 | Pending |
+| AGT-02 | Phase 54 | Pending |
+| AGT-03 | Phase 54 | Pending |
+| AGT-04 | Phase 54 | Pending |
+| AGT-05 | Phase 55 | Pending |
+| AGT-06 | Phase 55 | Pending |
+| AGT-07 | Phase 55 | Pending |
+| AGT-08 | Phase 55 | Pending |
 
 **Coverage:**
 - v7.0 requirements: 13 total
-- Mapped to phases: 0
-- Unmapped: 13 ⚠️
+- Mapped to phases: 13 (100%) ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after initial definition*
+*Last updated: 2026-03-04 — traceability complete after roadmap creation*
