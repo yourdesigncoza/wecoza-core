@@ -143,7 +143,7 @@ See: `.planning/milestones/v6.0-ROADMAP.md`
 
 - [x] **Phase 53: Attendance UX Fixes** - Exception button label + stopped-class capture gate (shipped via quick-17, 2026-03-04)
 - [x] **Phase 54: Agent Foundation** - WordPress role, DB schema, capability guards (completed 2026-03-04)
-- [ ] **Phase 55: Agent Attendance Page** - Shortcode, minimal template, login redirect
+- [ ] **Phase 55: Agent Attendance Page** - Shortcode, minimal template, login redirect (Plan 01 complete)
 
 ## Phase Details
 
@@ -189,8 +189,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 55-01-PLAN.md — AgentAccessController + shortcode + class lookup + view� AgentAccessController + shortcode + class lookup + view
-- [ ] 55-02-PLAN.md — Login redirect + admin guard + page cage + bootstrap wiring� Login redirect + admin guard + page cage + bootstrap wiring
+- [x] 55-01-PLAN.md — AgentAccessController + shortcode + class lookup + view (completed 2026-03-04)
+- [ ] 55-02-PLAN.md — Login redirect + admin guard + page cage + bootstrap wiring
 
 ## Progress
 
@@ -211,9 +211,9 @@ Plans:
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53 | v7.0 | 1/1 | Complete | 2026-03-04 |
 | 54 | 3/3 | Complete    | 2026-03-04 | - |
-| 55 | v7.0 | 0/2 | Not started | - |
+| 55 | v7.0 | 1/2 | In progress | - |
 
-**Total: 53 phases complete (Phase 53 pre-shipped), 112 plans executed across 11 milestones + v7.0**
+**Total: 53 phases complete (Phase 53 pre-shipped), 113 plans executed across 11 milestones + v7.0**
 
 ---
-*Last updated: 2026-03-04 — v7.0 roadmap created; Phase 53 pre-shipped via quick-17*
+*Last updated: 2026-03-04 — Phase 55 Plan 01 complete: AgentAccessController + [wecoza_agent_attendance] shortcode + view*

@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v7.0 Agent Attendance Access — Phase 54 (Agent Foundation)
+**Current focus:** v7.0 Agent Attendance Access — Phase 55 (Agent Attendance Page)
 
 ## Current Position
 
-Phase: 54 of 55 in v7.0 (Agent Foundation)
-Plan: 3 of 3 in Phase 54 (COMPLETE)
-Status: Phase 54 complete — ready for Phase 55
-Last activity: 2026-03-04 — Plan 54-03 complete — WP user auto-creation, email sync, profile lockdown, and bulk migration CLI added
+Phase: 55 of 55 in v7.0 (Agent Attendance Page)
+Plan: 1 of 2 in Phase 55 (IN PROGRESS)
+Status: Phase 55 Plan 01 complete — ready for Plan 02 (redirect guards)
+Last activity: 2026-03-04 — Plan 55-01 complete — AgentAccessController with [wecoza_agent_attendance] shortcode, JSONB class lookup, and attendance view created
 
-Progress: [████░░░░░░] 67% (v7.0: 1/2 phases complete — Phase 54 done)
+Progress: [█████░░░░░] 75% (v7.0: 1/2 phases complete — Phase 54 done, Phase 55 in progress)
 
 ## Milestone History
 
@@ -53,6 +53,8 @@ See: .planning/MILESTONES.md for full details
 - [Phase 54]: plugins_loaded priority 6 hook chosen (not activation-only) so capture_attendance capability survives plugin updates without manual reactivation
 - [Phase 54-agent-foundation]: Agent email is source of truth — WP profile email hidden and POST changes reverted for wp_agent users
 - [Phase 54-agent-foundation]: Bulk migration sync-agent-users suppresses email notifications (demo data assumption)
+- [Phase 55-01]: AgentAccessController is standalone (not extending BaseController) — consistent with codebase conventions
+- [Phase 55-01]: JSONB query casts agent_id to int to match stored format [{"agent_id": 5}] — prevents silent miss for backup agents
 
 ### Pending Todos
 
@@ -69,7 +71,7 @@ See: .planning/MILESTONES.md for full details
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 54-03-PLAN.md — Phase 54 fully complete. WP user auto-creation active for agents; bulk migration CLI ready.
+Stopped at: Completed 55-01-PLAN.md — AgentAccessController + [wecoza_agent_attendance] shortcode + view created. Phase 55 Plan 01 complete.
 Resume file: None
 
-**Next action:** `/gsd:execute-phase 55` (Phase 55 — Agent Page)
+**Next action:** Execute Phase 55 Plan 02 (login redirect + admin guard + template_redirect cage)
