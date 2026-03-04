@@ -997,4 +997,67 @@ if (defined("WP_CLI") && WP_CLI) {
     if (class_exists(\WeCoza\Events\CLI\AISummaryStatusCommand::class)) {
         \WeCoza\Events\CLI\AISummaryStatusCommand::register();
     }
+
+    // Bulk migration: create WP users for agents that don't have one yet
+    WP_CLI::add_command('wecoza sync-agent-users', function ($args, $assoc_args) {
+        $repository = new \WeCoza\Agents\Repositories\AgentRepository();
+        $wpUserService = new \WeCoza\Agents\Services\AgentWpUserService($repository);
+
+        // Get all active agents without wp_user_id
+        $db = wecoza_db();
+        $stmt = $db->prepare(
+            "SELECT agent_id, first_name, surname, email_address
+             FROM agents
+             WHERE status = 'active'
+               AND (wp_user_id IS NULL OR wp_user_id = 0)
+             ORDER BY agent_id"
+        );
+        $stmt->execute();
+        $agents = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (empty($agents)) {
+            WP_CLI::success('No agents need WP user accounts.');
+            return;
+        }
+
+        WP_CLI::log(sprintf('Found %d agents without WP users.', count($agents)));
+
+        $created = 0;
+        $linked  = 0;
+        $skipped = 0;
+
+        foreach ($agents as $agent) {
+            $agentId = (int) $agent['agent_id'];
+            $email   = trim($agent['email_address'] ?? '');
+
+            if (empty($email) || !is_email($email)) {
+                WP_CLI::warning("Agent {$agentId}: skipped — invalid/empty email");
+                $skipped++;
+                continue;
+            }
+
+            // Check before sync to distinguish created vs linked in output
+            $alreadyExists = (bool) get_user_by('email', $email);
+
+            $wpUserId = $wpUserService->syncWpUser($agentId, $agent, null, false);
+
+            if ($wpUserId) {
+                if ($alreadyExists) {
+                    WP_CLI::log("Agent {$agentId}: linked to existing WP user {$wpUserId}");
+                    $linked++;
+                } else {
+                    WP_CLI::log("Agent {$agentId}: created WP user {$wpUserId}");
+                    $created++;
+                }
+            } else {
+                WP_CLI::warning("Agent {$agentId}: failed to create/link WP user");
+                $skipped++;
+            }
+        }
+
+        WP_CLI::success(sprintf(
+            'Done. Created: %d, Linked: %d, Skipped: %d',
+            $created, $linked, $skipped
+        ));
+    });
 }
