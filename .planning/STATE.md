@@ -45,7 +45,18 @@ None — between milestones.
 
 ### Pending Todos
 
-None.
+6 todos awaiting Mario's clarification on WEC-182:
+
+| # | Title | Area | Blocked By |
+|---|-------|------|------------|
+| 1 | [1b] Attendance: compulsory field per learner | attendance | mario-clarification |
+| 2 | [1c] Attendance: agent absent / client cancelled UX | attendance | mario-clarification |
+| 3 | [1d] Attendance: block exception days JS rendering | attendance | mario-clarification |
+| 4 | [1e] Attendance: stopped class capture until stop date | attendance | mario-clarification |
+| 5 | [3b] Progression Admin: LP description detail | learners | mario-clarification |
+| 6 | Report generation: extractable field list from Mario | learners | mario-field-list |
+
+Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/2026-03-04-wec-182-*.md`
 
 ### Blockers/Concerns
 
