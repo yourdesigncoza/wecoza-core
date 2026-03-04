@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 52 of 52 (all milestones complete)
 Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-03-04 - Completed quick task 20: hours validation warning + monthly summary row
+Last activity: 2026-03-04 - Completed quick task 21: monthly calendar grid for attendance
 
 Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
 
@@ -50,7 +50,7 @@ Remaining todos from WEC-182 (priority order from Mario meeting 2026-03-04):
 | Priority | Title | Area | Status |
 |----------|-------|------|--------|
 | 1 | Agent-restricted attendance capture page | attendance | Ready — needs GSD milestone |
-| 3 | Calendar timeline — horizontal scrollable session view | attendance | Ready — significant feature |
+| 3 | Calendar timeline — monthly calendar grid | attendance | Done — quick-21 |
 | 4 | Hours validation warning (soft) when > scheduled | attendance | Done — quick-20 |
 | 5 | Monthly summary totals row per month | attendance | Done — quick-20 |
 | — | Report generation: extractable field list | learners | Waiting on Mario (ETA 2026-03-05) |
@@ -76,11 +76,12 @@ Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 | 18 | WEC-182: update Linear + todos from Mario meeting notes | 2026-03-04 | 62f437e | [18-wec-182-update-linear-todos-from-mario-m](./quick/18-wec-182-update-linear-todos-from-mario-m/) |
 | 19 | WEC-182 [1d]: resolved stale block exception days todo (already done in quick-16) | 2026-03-04 | 75be76c | [19-wec-182-1d-block-exception-days-in-atten](./quick/19-wec-182-1d-block-exception-days-in-atten/) |
 | 20 | WEC-182: hours validation warning + monthly summary row | 2026-03-04 | 2ece533 | [20-wec-182-hours-validation-warning-monthly](./quick/20-wec-182-hours-validation-warning-monthly/) |
+| 21 | WEC-182: monthly calendar grid for attendance | 2026-03-04 | 34306b7 | [21-wec-182-horizontal-scrollable-calendar-t](./quick/21-wec-182-horizontal-scrollable-calendar-t/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 20 (WEC-182 hours validation warning + monthly summary row).
-Resume file: —
+Stopped at: Completed quick task 21 (WEC-182 monthly calendar grid for attendance).
+Resume file: ---
 
 **Next action:** `/gsd:new-milestone` to define next milestone, or deploy v6.0 to production.
