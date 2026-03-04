@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 52 of 52 (all milestones complete)
 Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-03-04 - Completed quick task 19: resolved stale [1d] block exception days todo (already done in quick-16)
+Last activity: 2026-03-04 - Completed quick task 20: hours validation warning + monthly summary row
 
 Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
 
@@ -51,11 +51,11 @@ Remaining todos from WEC-182 (priority order from Mario meeting 2026-03-04):
 |----------|-------|------|--------|
 | 1 | Agent-restricted attendance capture page | attendance | Ready — needs GSD milestone |
 | 3 | Calendar timeline — horizontal scrollable session view | attendance | Ready — significant feature |
-| 4 | Hours validation warning (soft) when > scheduled | attendance | Ready — small JS change |
-| 5 | Monthly summary totals row per month | attendance | Ready — small JS change |
+| 4 | Hours validation warning (soft) when > scheduled | attendance | Done — quick-20 |
+| 5 | Monthly summary totals row per month | attendance | Done — quick-20 |
 | — | Report generation: extractable field list | learners | Waiting on Mario (ETA 2026-03-05) |
 
-Resolved: [1b] not needed, [1c] quick-17, [1d] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16.
+Resolved: [1b] not needed, [1c] quick-17, [1d] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16, [4] quick-20, [5] quick-20.
 
 Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 
@@ -74,12 +74,13 @@ Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 | 16 | Implement WEC-182 feedback: hours default 0.0, per-row Start LP, race/gender export | 2026-03-04 | 962608b | [16-implement-clear-wec-182-feedback-hours-d](./quick/16-implement-clear-wec-182-feedback-hours-d/) |
 | 17 | WEC-182: exception button label, stopped-class capture gate, LP description format | 2026-03-04 | e20f8bf | [17-wec-182-implement-mario-feedback-items](./quick/17-wec-182-implement-mario-feedback-items/) |
 | 18 | WEC-182: update Linear + todos from Mario meeting notes | 2026-03-04 | 62f437e | [18-wec-182-update-linear-todos-from-mario-m](./quick/18-wec-182-update-linear-todos-from-mario-m/) |
-| 19 | WEC-182 [1d]: resolved stale block exception days todo (already done in quick-16) | 2026-03-04 | pending | [19-wec-182-1d-block-exception-days-in-atten](./quick/19-wec-182-1d-block-exception-days-in-atten/) |
+| 19 | WEC-182 [1d]: resolved stale block exception days todo (already done in quick-16) | 2026-03-04 | 75be76c | [19-wec-182-1d-block-exception-days-in-atten](./quick/19-wec-182-1d-block-exception-days-in-atten/) |
+| 20 | WEC-182: hours validation warning + monthly summary row | 2026-03-04 | 2ece533 | [20-wec-182-hours-validation-warning-monthly](./quick/20-wec-182-hours-validation-warning-monthly/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 17 (WEC-182 Mario feedback items).
+Stopped at: Completed quick task 20 (WEC-182 hours validation warning + monthly summary row).
 Resume file: —
 
 **Next action:** `/gsd:new-milestone` to define next milestone, or deploy v6.0 to production.
