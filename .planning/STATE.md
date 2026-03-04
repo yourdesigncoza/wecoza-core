@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 52 of 52 (all milestones complete)
 Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-03-04 - Completed quick task 18: WEC-182: update Linear + todos from Mario meeting notes
+Last activity: 2026-03-04 - Completed quick task 19: resolved stale [1d] block exception days todo (already done in quick-16)
 
 Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
 
@@ -50,13 +50,12 @@ Remaining todos from WEC-182 (priority order from Mario meeting 2026-03-04):
 | Priority | Title | Area | Status |
 |----------|-------|------|--------|
 | 1 | Agent-restricted attendance capture page | attendance | Ready — needs GSD milestone |
-| 2 | Block exception days — grey out + remove actions in JS | attendance | Ready — backend done, JS pending |
 | 3 | Calendar timeline — horizontal scrollable session view | attendance | Ready — significant feature |
 | 4 | Hours validation warning (soft) when > scheduled | attendance | Ready — small JS change |
 | 5 | Monthly summary totals row per month | attendance | Ready — small JS change |
 | — | Report generation: extractable field list | learners | Waiting on Mario (ETA 2026-03-05) |
 
-Resolved: [1b] not needed, [1c] quick-17, [1d-backend] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16.
+Resolved: [1b] not needed, [1c] quick-17, [1d] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16.
 
 Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 
@@ -74,7 +73,8 @@ Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 | 15 | Fix backslash escaping in feedback dashboard comments | 2026-03-03 | 4ece1dd | [15-fix-backslash-escaping-in-feedback-dashb](./quick/15-fix-backslash-escaping-in-feedback-dashb/) |
 | 16 | Implement WEC-182 feedback: hours default 0.0, per-row Start LP, race/gender export | 2026-03-04 | 962608b | [16-implement-clear-wec-182-feedback-hours-d](./quick/16-implement-clear-wec-182-feedback-hours-d/) |
 | 17 | WEC-182: exception button label, stopped-class capture gate, LP description format | 2026-03-04 | e20f8bf | [17-wec-182-implement-mario-feedback-items](./quick/17-wec-182-implement-mario-feedback-items/) |
-| 18 | WEC-182: update Linear + todos from Mario meeting notes | 2026-03-04 | pending | [18-wec-182-update-linear-todos-from-mario-m](./quick/18-wec-182-update-linear-todos-from-mario-m/) |
+| 18 | WEC-182: update Linear + todos from Mario meeting notes | 2026-03-04 | 62f437e | [18-wec-182-update-linear-todos-from-mario-m](./quick/18-wec-182-update-linear-todos-from-mario-m/) |
+| 19 | WEC-182 [1d]: resolved stale block exception days todo (already done in quick-16) | 2026-03-04 | pending | [19-wec-182-1d-block-exception-days-in-atten](./quick/19-wec-182-1d-block-exception-days-in-atten/) |
 
 ## Session Continuity
 

@@ -3,7 +3,9 @@ created: 2026-03-04T10:15:12.303Z
 title: "WEC-182 [1d] Attendance: grey out blocked exception days"
 area: attendance
 linear: https://linear.app/wecoza/issue/WEC-182
-status: ready
+status: resolved
+resolved: 2026-03-04
+resolved_by: quick-16 (commit 962608b)
 files:
   - assets/js/classes/attendance-capture.js
   - src/Classes/Services/AttendanceService.php
