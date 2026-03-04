@@ -1,3 +1,16 @@
+---
+gsd_state_version: 1.0
+milestone: v7.0
+milestone_name: Agent Attendance Access
+status: unknown
+last_updated: "2026-03-04T18:22:51.265Z"
+progress:
+  total_phases: 2
+  completed_phases: 1
+  total_plans: 4
+  completed_plans: 3
+---
+
 # Project State
 
 ## Project Reference
@@ -10,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 54 of 55 in v7.0 (Agent Foundation)
-Plan: 0 of 2 in Phase 54
-Status: Ready to plan
-Last activity: 2026-03-04 — Roadmap created; Phase 53 confirmed pre-shipped via quick-17
+Plan: 1 of 2 in Phase 54
+Status: In progress
+Last activity: 2026-03-04 — Plan 54-01 complete — capture_attendance capability registered on wp_agent and administrator roles
 
 Progress: [██░░░░░░░░] 33% (v7.0: 1/3 phases complete)
 
@@ -37,6 +50,7 @@ See: .planning/MILESTONES.md for full details
 - Phase 53 (EXC/STP requirements): Pre-shipped as quick-17 (2026-03-04) before roadmap was created. All 5 requirements verified complete. Exception button uses `btn-phoenix-warning` with "Exception" text. Stopped-class gate uses `wecoza_get_effective_stop_date()` helper (DRY, reused in view + AJAX handler).
 - Token-based agent auth rejected: WP role approach (`wecoza_agent` role + `capture_attendance` cap) chosen — simpler, secure, nonce-compatible.
 - `wecoza_agent` role registration: Must use `plugins_loaded` guard (not activation-only) to survive plugin updates.
+- [Phase 54]: plugins_loaded priority 6 hook chosen (not activation-only) so capture_attendance capability survives plugin updates without manual reactivation
 
 ### Pending Todos
 
@@ -48,12 +62,12 @@ See: .planning/MILESTONES.md for full details
 | Source | Issue | Impact |
 |--------|-------|--------|
 | Phase 54 | SQL DDL required: `ALTER TABLE agents ADD COLUMN wp_user_id INTEGER` + unique partial index | User must run manually before Phase 55 can be tested |
-| Phase 54 | `capture_attendance` must be added to `administrator` role — must not break existing admin capture workflows | Verify after role registration |
+| Phase 54 | `capture_attendance` added to `administrator` role — verified intact via WP-CLI check (PASS) | RESOLVED |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Roadmap created — Phase 53 confirmed complete, Phase 54 ready to plan.
+Stopped at: Completed 54-01-PLAN.md — capture_attendance capability registered on wp_agent and administrator roles.
 Resume file: None
 
-**Next action:** `/gsd:plan-phase 54`
+**Next action:** `/gsd:execute-phase 54` (Plan 54-02 — AJAX guards)

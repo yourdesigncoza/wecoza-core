@@ -163,11 +163,11 @@ Plans:
 - [x] 53-00: Pre-shipped via quick-17 (exception button label + stopped-class capture gate)
 
 ### Phase 54: Agent Foundation
-**Goal**: The `wecoza_agent` WordPress role exists with the `capture_attendance` capability, the `agents` table has a `wp_user_id` column, and all attendance AJAX handlers enforce the capability server-side
+**Goal**: The `wp_agent` WordPress role exists with the `capture_attendance` capability, the `agents` table has a `wp_user_id` column, and all attendance AJAX handlers enforce the capability server-side
 **Depends on**: Phase 53
 **Requirements**: AGT-01, AGT-02, AGT-03, AGT-04
 **Success Criteria** (what must be TRUE):
-  1. `wecoza_agent` WordPress role is present after plugin activation AND after plugin update (no manual reactivation required)
+  1. `wp_agent` WordPress role is present after plugin activation AND after plugin update (no manual reactivation required)
   2. Administrator role retains `capture_attendance` capability — admins can still capture attendance without interruption
   3. `agents` table has a `wp_user_id` INTEGER column in the database
   4. Attendance capture and exception-marking AJAX endpoints return a permissions error when called by a logged-in user without `capture_attendance` capability
@@ -210,7 +210,7 @@ Plans:
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53 | v7.0 | 1/1 | Complete | 2026-03-04 |
-| 54 | v7.0 | 0/2 | Not started | - |
+| 54 | 1/2 | In Progress|  | - |
 | 55 | v7.0 | 0/2 | Not started | - |
 
 **Total: 53 phases complete (Phase 53 pre-shipped), 112 plans executed across 11 milestones + v7.0**
