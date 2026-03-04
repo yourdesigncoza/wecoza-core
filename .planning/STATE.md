@@ -47,14 +47,14 @@ None — between milestones.
 
 Remaining todos from WEC-182:
 
-| # | Title | Area | Blocked By |
-|---|-------|------|------------|
-| 1 | [1b] Attendance: compulsory field per learner | attendance | mario-clarification |
-| 2 | Report generation: extractable field list from Mario | learners | mario-field-list |
+| # | Title | Area | Status |
+|---|-------|------|--------|
+| 1 | Agent-restricted attendance capture page | attendance | Ready — needs GSD milestone |
+| 2 | Report generation: extractable field list | learners | Waiting on Mario (ETA 2026-03-05) |
 
-Resolved in quick-17: [1c] exception button, [1d] blocked rows (quick-16), [1e] stopped-class gate, [3b] LP description, [4a] race/gender export (quick-16).
+Resolved: [1b] not needed, [1c] quick-17, [1d] quick-16, [1e] quick-17, [3b] quick-17, [4a] quick-16.
 
-Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/2026-03-04-wec-182-*.md`
+Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/`
 
 ### Blockers/Concerns
 
