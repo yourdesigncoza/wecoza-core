@@ -8,6 +8,7 @@ files:
   - src/Classes/Ajax/AttendanceAjaxHandlers.php
   - assets/js/classes/attendance-capture.js
   - views/classes/components/single-class/attendance.php
+  - views/templates/agent-minimal.php (NEW)
   - schema/wecoza_db_schema_bu_march_04.sql
 ---
 
@@ -29,15 +30,23 @@ Quote from Mario: "They are the ones that will capture, so not sure how you plan
 - Links PG agent record to WP user account
 - Lookup: WP user → `wp_user_id` → `agent_id` → `classes.class_agent`
 
-### 3. Shortcode: `[wecoza_agent_attendance_management]`
+### 3. Minimal Page Template (plugin-registered)
+- Register a custom page template from the plugin via `theme_page_templates` filter
+- Lives in `views/templates/agent-minimal.php` — not theme-dependent
+- Bare-bones HTML shell: WeCoza logo, page title, shortcode content, logout button
+- NO nav menu, NO sidebar, NO footer links — agents see nothing else
+- Only loads the CSS/JS assets needed for attendance capture
+- Admin assigns this template to a WP page (e.g., `/agent-attendance/`)
+- If more agent features are added later, same template is reused — just add content to the page
+
+### 4. Shortcode: `[wecoza_agent_attendance_management]`
 - Capability-gated: requires `capture_attendance`
 - Queries classes where `class_agent = agent_id` (via wp_user_id lookup)
 - Also includes classes where agent is in `backup_agent_ids` jsonb array
 - Reuses existing attendance capture JS/AJAX — no duplication
 - Exception reporting included (made more visible per Mario's feedback)
-- No navigation links to other WeCoza pages
 
-### 4. Access Control
+### 5. Access Control
 - Agents redirected to their attendance page on login (skip WP admin)
 - Hide WP admin bar for `wecoza_agent` role
 - If agent tries other WeCoza pages → redirect back to attendance page
@@ -63,6 +72,7 @@ CREATE UNIQUE INDEX idx_agents_wp_user_id ON agents(wp_user_id) WHERE wp_user_id
 ### What we BUILD NEW
 - `wecoza_agent` role registration (plugin activation hook)
 - `wp_user_id` column on agents table
+- Minimal page template: `views/templates/agent-minimal.php` (registered via plugin filter)
 - `[wecoza_agent_attendance_management]` shortcode + view
 - Agent-class lookup query (agent's classes via wp_user_id → agent_id)
 - Login redirect for agent role
