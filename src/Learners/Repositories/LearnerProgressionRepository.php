@@ -41,20 +41,24 @@ class LearnerProgressionRepository extends BaseRepository
      */
     private function baseQuery(): string
     {
-        // Complex query: 5-table JOIN for full progression context (includes client via class)
+        // Complex query: 6-table JOIN for full progression context with class_type for LP description
         return "
             SELECT
                 lpt.*,
                 cts.subject_name,
+                cts.subject_code,
                 cts.subject_duration,
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
                 c.class_code,
+                c.class_subject,
+                ct.class_type_name,
                 cl.client_id,
                 cl.client_name
             FROM learner_lp_tracking lpt
             LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
             LEFT JOIN classes c ON lpt.class_id = c.class_id
+            LEFT JOIN class_types ct ON c.class_type = ct.class_type_id
             LEFT JOIN clients cl ON c.client_id = cl.client_id
         ";
     }

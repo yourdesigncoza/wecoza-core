@@ -141,8 +141,8 @@
             // Col 2: Learner name
             $tr.append($('<td>').text(row.learner_name || ''));
 
-            // Col 3: LP name
-            $tr.append($('<td>').text(row.subject_name || ''));
+            // Col 3: LP description (class_type + subject + code)
+            $tr.append($('<td>').text(buildLpDescription(row)));
 
             // Col 4: Class code
             $tr.append($('<td>').text(row.class_code || '\u2014'));
@@ -346,8 +346,8 @@
             if (row.class_id && row.class_code && !classes[row.class_id]) {
                 classes[row.class_id] = row.class_code;
             }
-            if (row.class_type_subject_id && row.subject_name && !subjects[row.class_type_subject_id]) {
-                subjects[row.class_type_subject_id] = row.subject_name;
+            if (row.class_type_subject_id && !subjects[row.class_type_subject_id]) {
+                subjects[row.class_type_subject_id] = buildLpDescription(row);
             }
             if (row.learner_id && row.learner_name && !learners[row.learner_id]) {
                 learners[row.learner_id] = row.learner_name;
@@ -666,7 +666,7 @@
         $('<strong>').text(prog.learner_name || '').appendTo($row);
 
         $('<span>').addClass('badge fs-10 badge-phoenix badge-phoenix-info ms-2')
-            .text(prog.subject_name || '').appendTo($row);
+            .text(buildLpDescription(prog)).appendTo($row);
 
         $('<span>').addClass('badge fs-10 badge-phoenix ' + statusBadgeClass(prog.status))
             .text(statusLabel(prog.status)).appendTo($row);
@@ -1050,6 +1050,28 @@
     // =========================================================
     // UTILITY FUNCTIONS
     // =========================================================
+
+    /**
+     * Build an LP description string from a progression row.
+     *
+     * Format: "class_type_name class_subject subject_code"
+     * Example: "AET Communication CL1" or "GETC AET - LO4"
+     * Fallback: subject_name if class_type_name is not available.
+     *
+     * @param {Object} row  Progression row (from table or modal data)
+     * @returns {string}
+     */
+    function buildLpDescription(row) {
+        if (row.class_type_name) {
+            var desc = row.class_type_name;
+            desc += row.class_subject ? ' ' + row.class_subject : ' -';
+            if (row.subject_code) {
+                desc += ' ' + row.subject_code;
+            }
+            return desc.trim();
+        }
+        return row.subject_name || '';
+    }
 
     /**
      * Return the Phoenix badge CSS class for a given progression status.
