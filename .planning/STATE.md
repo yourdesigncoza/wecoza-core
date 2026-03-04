@@ -45,16 +45,14 @@ None — between milestones.
 
 ### Pending Todos
 
-6 todos awaiting Mario's clarification on WEC-182:
+Remaining todos from WEC-182:
 
 | # | Title | Area | Blocked By |
 |---|-------|------|------------|
 | 1 | [1b] Attendance: compulsory field per learner | attendance | mario-clarification |
-| 2 | [1c] Attendance: agent absent / client cancelled UX | attendance | mario-clarification |
-| 3 | [1d] Attendance: block exception days JS rendering | attendance | mario-clarification |
-| 4 | [1e] Attendance: stopped class capture until stop date | attendance | mario-clarification |
-| 5 | [3b] Progression Admin: LP description detail | learners | mario-clarification |
-| 6 | Report generation: extractable field list from Mario | learners | mario-field-list |
+| 2 | Report generation: extractable field list from Mario | learners | mario-field-list |
+
+Resolved in quick-17: [1c] exception button, [1d] blocked rows (quick-16), [1e] stopped-class gate, [3b] LP description, [4a] race/gender export (quick-16).
 
 Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/2026-03-04-wec-182-*.md`
 
@@ -71,11 +69,12 @@ Ref: `memory/wec-182-implementation.md` + `.planning/todos/pending/2026-03-04-we
 |---|-------------|------|--------|-----------|
 | 15 | Fix backslash escaping in feedback dashboard comments | 2026-03-03 | 4ece1dd | [15-fix-backslash-escaping-in-feedback-dashb](./quick/15-fix-backslash-escaping-in-feedback-dashb/) |
 | 16 | Implement WEC-182 feedback: hours default 0.0, per-row Start LP, race/gender export | 2026-03-04 | 962608b | [16-implement-clear-wec-182-feedback-hours-d](./quick/16-implement-clear-wec-182-feedback-hours-d/) |
+| 17 | WEC-182: exception button label, stopped-class capture gate, LP description format | 2026-03-04 | e20f8bf | [17-wec-182-implement-mario-feedback-items](./quick/17-wec-182-implement-mario-feedback-items/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 16 (WEC-182 UX feedback).
+Stopped at: Completed quick task 17 (WEC-182 Mario feedback items).
 Resume file: —
 
 **Next action:** `/gsd:new-milestone` to define next milestone, or deploy v6.0 to production.
