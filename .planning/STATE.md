@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 52 of 52 (all milestones complete)
 Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-03-03 - Completed quick task 15: Fix backslash escaping in feedback dashboard comments
+Last activity: 2026-03-04 - Completed quick task 16: Implement WEC-182 feedback (hours default, per-row Start LP, race/gender export)
 
 Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
 
@@ -59,11 +59,12 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 15 | Fix backslash escaping in feedback dashboard comments | 2026-03-03 | 4ece1dd | [15-fix-backslash-escaping-in-feedback-dashb](./quick/15-fix-backslash-escaping-in-feedback-dashb/) |
+| 16 | Implement WEC-182 feedback: hours default 0.0, per-row Start LP, race/gender export | 2026-03-04 | 962608b | [16-implement-clear-wec-182-feedback-hours-d](./quick/16-implement-clear-wec-182-feedback-hours-d/) |
 
 ## Session Continuity
 
-Last session: 2026-02-24
-Stopped at: v6.0 milestone archived.
+Last session: 2026-03-04
+Stopped at: Completed quick task 16 (WEC-182 UX feedback).
 Resume file: —
 
 **Next action:** `/gsd:new-milestone` to define next milestone, or deploy v6.0 to production.
