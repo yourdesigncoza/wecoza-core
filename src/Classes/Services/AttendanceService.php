@@ -16,6 +16,7 @@ namespace WeCoza\Classes\Services;
 
 use WeCoza\Classes\Repositories\AttendanceRepository;
 use WeCoza\Classes\Repositories\ClassRepository;
+use WeCoza\Classes\Controllers\PublicHolidaysController;
 use WeCoza\Learners\Services\ProgressionService;
 use WeCoza\Learners\Repositories\LearnerProgressionRepository;
 use DateTime;
@@ -206,6 +207,18 @@ class AttendanceService
         $classData    = $this->getClassData($classId);
         $scheduleData = $this->parseScheduleData($classData);
 
+        // Extract exception dates (dates blocked at schedule level)
+        $rawExceptions = $scheduleData['exception_dates'] ?? $scheduleData['exceptionDates'] ?? [];
+        if (is_string($rawExceptions)) {
+            $rawExceptions = json_decode($rawExceptions, true) ?: [];
+        }
+        $exceptionDateMap = [];
+        foreach ($rawExceptions as $exc) {
+            if (!empty($exc['date'])) {
+                $exceptionDateMap[$exc['date']] = $exc['reason'] ?? 'Exception';
+            }
+        }
+
         // Extract schedule parameters
         $pattern      = $scheduleData['pattern'] ?? 'weekly';
         $startDateStr = $scheduleData['startDate'] ?? $scheduleData['start_date'] ?? null;
@@ -259,6 +272,19 @@ class AttendanceService
             $endDate = new DateTime('today', $tz);
         }
 
+        // Load public holidays for the date range to flag blocked sessions
+        $holidayController = new PublicHolidaysController();
+        $startYear         = (int) $startDate->format('Y');
+        $endYear           = (int) $endDate->format('Y');
+        $publicHolidayMap  = [];
+        for ($y = $startYear; $y <= $endYear; $y++) {
+            foreach ($holidayController->getHolidaysByYear($y) as $h) {
+                if (!empty($h['date'])) {
+                    $publicHolidayMap[$h['date']] = $h['name'];
+                }
+            }
+        }
+
         // Generate scheduled entries via ScheduleService
         $scheduleEntries = ScheduleService::generateScheduleEntries(
             $pattern,
@@ -304,6 +330,8 @@ class AttendanceService
         foreach ($entriesByDate as $date => $dateEntry) {
             $existingSession = $sessionsByDate[$date] ?? null;
 
+            $blockReason = $exceptionDateMap[$date] ?? $publicHolidayMap[$date] ?? null;
+
             $sessions[] = [
                 'date'            => $date,
                 'day'             => date('l', strtotime($date)),
@@ -315,6 +343,8 @@ class AttendanceService
                 'captured_by'     => $existingSession['captured_by'] ?? null,
                 'captured_at'     => $existingSession['captured_at'] ?? null,
                 'notes'           => $existingSession['notes'] ?? null,
+                'is_blocked'      => $blockReason !== null,
+                'block_reason'    => $blockReason,
             ];
         }
 
