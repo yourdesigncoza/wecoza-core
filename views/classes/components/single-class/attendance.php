@@ -31,28 +31,54 @@ if (empty($class)) {
     return;
 }
 
-// Attendance lock gate: only active classes allow attendance capture.
+// Attendance lock gate:
+// - draft: always locked
+// - stopped: allow if a valid stop date exists; gate by stop date in JS
+// - active: always open
 // Note: class_status = 'stopped' means class deactivation (access control).
 //       stop_restart_dates = schedule pauses (schedule exclusion). These are distinct concepts.
-$classStatus        = wecoza_resolve_class_status($class);
-$isAttendanceLocked = $classStatus !== 'active';
+$classStatus = wecoza_resolve_class_status($class);
 
-if ($isAttendanceLocked) {
-    $lockMsg = $classStatus === 'stopped'
-        ? __('This class has been stopped. Attendance capture is locked.', 'wecoza-core')
-        : __('This class is in draft status. Attendance capture is not available until the class is activated.', 'wecoza-core');
+// Draft is always locked
+if ($classStatus === 'draft') {
     ?>
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title mb-3"><?= esc_html__('Attendance', 'wecoza-core'); ?></h5>
             <div class="alert alert-subtle-warning d-flex align-items-center mb-0">
                 <i class="bi bi-lock-fill me-3 fs-4"></i>
-                <div><?= esc_html($lockMsg); ?></div>
+                <div><?= esc_html__('This class is in draft status. Attendance capture is not available until the class is activated.', 'wecoza-core'); ?></div>
             </div>
         </div>
     </div>
     <?php
     return;
+}
+
+// Stopped class: allow attendance only up to the effective stop date
+$stopDate = null;
+if ($classStatus === 'stopped') {
+    $scheduleData = $class['schedule_data'] ?? [];
+    if (is_string($scheduleData)) {
+        $scheduleData = json_decode($scheduleData, true) ?: [];
+    }
+    $stopDate = wecoza_get_effective_stop_date($scheduleData);
+
+    if ($stopDate === null) {
+        // No valid stop date found — lock the section
+        ?>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title mb-3"><?= esc_html__('Attendance', 'wecoza-core'); ?></h5>
+                <div class="alert alert-subtle-warning d-flex align-items-center mb-0">
+                    <i class="bi bi-lock-fill me-3 fs-4"></i>
+                    <div><?= esc_html__('This class has been stopped. Attendance capture is locked.', 'wecoza-core'); ?></div>
+                </div>
+            </div>
+        </div>
+        <?php
+        return;
+    }
 }
 ?>
 
@@ -191,6 +217,15 @@ if ($isAttendanceLocked) {
         </div>
     </div>
 </div><!-- /#attendanceDetailModal -->
+
+<?php if ($stopDate !== null): ?>
+<script>
+// Inject stop date for stopped classes — gates capture actions after stop date in attendance-capture.js
+if (window.WeCozaSingleClass) {
+    window.WeCozaSingleClass.stopDate = '<?= esc_js($stopDate) ?>';
+}
+</script>
+<?php endif; ?>
 
 <!-- Mark Exception Modal -->
 <div class="modal fade" id="attendanceExceptionModal" tabindex="-1" aria-labelledby="attendanceExceptionModalLabel" aria-hidden="true">

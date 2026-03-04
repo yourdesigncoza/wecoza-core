@@ -239,11 +239,16 @@
             return '<span class="text-muted">—</span>';
         }
 
+        // Stopped class: no actions for dates after the stop date
+        if (config.stopDate && s.date > config.stopDate) {
+            return '<span class="text-muted">—</span>';
+        }
+
         if (s.status === 'pending') {
             return '<div class="btn-group btn-group-sm">'
                 + '<button class="btn btn-sm btn-phoenix-primary btn-capture" data-date="' + escAttr(s.date) + '">Capture</button>'
-                + '<button class="btn btn-sm btn-subtle-warning btn-exception" data-date="' + escAttr(s.date) + '" title="Mark Exception" aria-label="Mark Exception">'
-                + '<i class="bi bi-exclamation-triangle"></i>'
+                + '<button class="btn btn-sm btn-phoenix-warning btn-exception" data-date="' + escAttr(s.date) + '" title="Report Exception" aria-label="Report Exception">'
+                + '<i class="bi bi-exclamation-triangle-fill me-1"></i>Exception'
                 + '</button>'
                 + '</div>';
         }

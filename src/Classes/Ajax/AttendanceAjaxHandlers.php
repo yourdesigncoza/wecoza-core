@@ -42,8 +42,11 @@ function verify_attendance_nonce(): void
  * Guard attendance capture/exception endpoints to active classes only.
  *
  * Queries class_status via wecoza_resolve_class_status() and rejects non-active
- * classes with a 403 response. Does NOT guard view-only or admin-delete endpoints —
- * those remain accessible on any class status for audit integrity.
+ * classes with a 403 response. Exception: stopped classes are allowed if a valid
+ * session_date is provided and the date falls on or before the effective stop date.
+ *
+ * Does NOT guard view-only or admin-delete endpoints — those remain accessible on
+ * any class status for audit integrity.
  *
  * Note: class_status = 'stopped' is class deactivation (access control).
  *       stop_restart_dates is schedule-pause logic. These are distinct concepts.
@@ -53,7 +56,7 @@ function verify_attendance_nonce(): void
 function require_active_class(int $classId): void
 {
     $pdo  = wecoza_db()->getPdo();
-    $stmt = $pdo->prepare('SELECT class_status, order_nr FROM classes WHERE class_id = :class_id');
+    $stmt = $pdo->prepare('SELECT class_status, order_nr, schedule_data FROM classes WHERE class_id = :class_id');
     $stmt->execute([':class_id' => $classId]);
     $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -63,10 +66,32 @@ function require_active_class(int $classId): void
     }
 
     $status = wecoza_resolve_class_status($row);
-    if ($status !== 'active') {
-        wp_send_json_error(['message' => __('Attendance capture is only allowed for active classes.', 'wecoza-core')], 403);
-        exit;
+
+    if ($status === 'active') {
+        return; // Active classes: always allowed
     }
+
+    // Stopped class exception: allow if session_date is on or before the effective stop date
+    if ($status === 'stopped') {
+        $sessionDate = isset($_POST['session_date'])
+            ? sanitize_text_field($_POST['session_date'])
+            : (isset($_GET['session_date']) ? sanitize_text_field($_GET['session_date']) : '');
+
+        if (!empty($sessionDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $sessionDate)) {
+            $scheduleData = $row['schedule_data'] ?? [];
+            if (is_string($scheduleData)) {
+                $scheduleData = json_decode($scheduleData, true) ?: [];
+            }
+            $stopDate = wecoza_get_effective_stop_date((array) $scheduleData);
+
+            if ($stopDate !== null && $sessionDate <= $stopDate) {
+                return; // Within stop window: allow
+            }
+        }
+    }
+
+    wp_send_json_error(['message' => __('Attendance capture is only allowed for active classes.', 'wecoza-core')], 403);
+    exit;
 }
 
 /**

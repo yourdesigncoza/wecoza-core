@@ -481,6 +481,43 @@ if (!function_exists('wecoza_resolve_class_status')) {
     }
 }
 
+if (!function_exists('wecoza_get_effective_stop_date')) {
+    /**
+     * Extract the effective stop date from a schedule_data stop_restart_dates array.
+     *
+     * The stop_restart_dates array contains objects with 'stop' and optionally 'restart' keys.
+     * The effective stop date is the 'stop' value of the last entry where 'restart' is null/empty.
+     * This represents the final stop without a subsequent restart.
+     *
+     * Used by:
+     * - views/classes/components/single-class/attendance.php (UI gate)
+     * - src/Classes/Ajax/AttendanceAjaxHandlers.php (AJAX write gate)
+     *
+     * @param array $scheduleData Decoded schedule_data array
+     * @return string|null Effective stop date in YYYY-MM-DD format, or null if not found
+     */
+    function wecoza_get_effective_stop_date(array $scheduleData): ?string
+    {
+        $stopRestartDates = $scheduleData['stop_restart_dates'] ?? [];
+
+        if (empty($stopRestartDates) || !is_array($stopRestartDates)) {
+            return null;
+        }
+
+        // Traverse in reverse to find the last entry with a stop but no restart
+        foreach (array_reverse($stopRestartDates) as $entry) {
+            $stop    = $entry['stop']    ?? null;
+            $restart = $entry['restart'] ?? null;
+
+            if (!empty($stop) && empty($restart)) {
+                return $stop;
+            }
+        }
+
+        return null;
+    }
+}
+
 if (!function_exists('wecoza_class_status_badge_svg')) {
     /**
      * Return a Feather SVG icon for a class status, matching Phoenix badge conventions.
