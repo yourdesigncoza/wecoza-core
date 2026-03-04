@@ -38,9 +38,6 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="col-auto">
                         <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'progressionAdminHelp']); ?>
-                        <button id="btn-start-new-lp" class="btn btn-phoenix-primary btn-sm">
-                            <i class="bi bi-plus-circle me-1"></i> Start New LP
-                        </button>
                     </div>
                 </div>
                 <form id="progression-filter-form" class="row g-2 align-items-end">

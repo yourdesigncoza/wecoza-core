@@ -228,6 +228,18 @@
                 $menu.append($completeItem);
             }
 
+            // Start New LP (only for completed or on_hold — learner does not have an active LP)
+            if (row.status !== 'in_progress') {
+                const $startLpItem = $('<li>').append(
+                    $('<a>').addClass('dropdown-item btn-start-lp-for-row')
+                        .attr('href', '#')
+                        .attr('data-learner-id', row.learner_id || '')
+                        .attr('data-learner-name', row.learner_name || '')
+                        .html('<i class="bi bi-plus-circle me-2"></i>Start New LP')
+                );
+                $menu.append($startLpItem);
+            }
+
             $group.append($toggle).append($menu);
             $actionsTd.append($group);
             $tr.append($actionsTd);
@@ -727,11 +739,16 @@
 
     /**
      * Open the Start New LP modal and populate form dropdowns.
+     *
+     * @param {string|number} [preselectedLearnerId]  Optional learner ID to pre-select.
      */
-    function handleStartNewLPClick() {
+    function handleStartNewLPClick(preselectedLearnerId) {
         clearAlert('#start-lp-alert');
         $('#start-lp-form')[0].reset();
         populateStartLPModal();
+        if (preselectedLearnerId) {
+            $('#start-lp-learner').val(preselectedLearnerId);
+        }
         const modal = new bootstrap.Modal(document.getElementById('startNewLPModal'));
         modal.show();
     }
@@ -1019,7 +1036,11 @@
         $('#progression-admin-tbody').on('click', '.btn-hours-log', handleHoursLogClick);
         $('#progression-admin-tbody').on('click', '.btn-toggle-hold', handleToggleHold);
         $('#progression-admin-tbody').on('click', '.btn-mark-single-complete', handleMarkSingleComplete);
-        $('#btn-start-new-lp').on('click', handleStartNewLPClick);
+        $('#progression-admin-tbody').on('click', '.btn-start-lp-for-row', function(e) {
+            e.preventDefault();
+            const learnerId = $(this).data('learner-id');
+            handleStartNewLPClick(learnerId);
+        });
         $('#btn-submit-start-lp').on('click', handleStartNewLPSubmit);
 
         // Action date modal confirm button

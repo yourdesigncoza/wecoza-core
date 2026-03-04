@@ -737,6 +737,8 @@ class LearnerProgressionRepository extends BaseRepository
                 l.surname,
                 l.sa_id_no,
                 l.passport_number,
+                l.race,
+                l.gender,
                 cts.subject_code   AS lp_code,
                 cts.subject_name   AS lp_name,
                 cts.subject_duration AS lp_duration_hours,

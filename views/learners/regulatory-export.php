@@ -88,6 +88,8 @@ if (!defined('ABSPATH')) {
                                 <th class="sort pe-1 align-middle white-space-nowrap">First Name</th>
                                 <th class="sort pe-1 align-middle white-space-nowrap">Surname</th>
                                 <th class="sort pe-1 align-middle white-space-nowrap" style="min-width:8rem">SA ID</th>
+                                <th class="sort pe-1 align-middle white-space-nowrap">Race</th>
+                                <th class="sort pe-1 align-middle white-space-nowrap">Gender</th>
                                 <th class="sort pe-1 align-middle white-space-nowrap" style="min-width:10rem">Programme</th>
                                 <th class="sort pe-1 align-middle white-space-nowrap">Status</th>
                                 <th class="sort pe-1 align-middle white-space-nowrap">Class Code</th>

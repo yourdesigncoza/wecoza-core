@@ -95,7 +95,10 @@
         const exceptions = allSessions.filter(function(s) {
             return s.status === 'client_cancelled' || s.status === 'agent_absent';
         }).length;
-        const pending    = allSessions.filter(function(s) { return s.status === 'pending'; }).length;
+        // Blocked sessions (exception dates / public holidays) are excluded from pending count
+        const pending    = allSessions.filter(function(s) {
+            return s.status === 'pending' && !s.is_blocked;
+        }).length;
 
         $('#att-total-sessions').text(total);
         $('#att-captured-count').text(captured + exceptions);
@@ -162,21 +165,33 @@
 
         let html = '';
         filtered.forEach(function(s) {
-            const statusBadge = getStatusBadge(s.status);
-            const actionBtn   = getActionButton(s);
-            const startTime   = s.start_time || '';
-            const endTime     = s.end_time   || '';
-            const timeRange   = startTime && endTime ? startTime + ' - ' + endTime : startTime || '—';
-            const hours       = s.scheduled_hours ? parseFloat(s.scheduled_hours).toFixed(1) : '—';
+            const startTime = s.start_time || '';
+            const endTime   = s.end_time   || '';
+            const timeRange = startTime && endTime ? startTime + ' - ' + endTime : startTime || '—';
+            const hours     = s.scheduled_hours ? parseFloat(s.scheduled_hours).toFixed(1) : '—';
 
-            html += '<tr data-date="' + escAttr(s.date) + '" data-session-id="' + (s.session_id || '') + '">'
-                + '<td class="align-middle ps-3">' + escHtml(s.date) + '</td>'
-                + '<td class="align-middle">'      + escHtml(s.day || '') + '</td>'
-                + '<td class="align-middle">'      + escHtml(timeRange) + '</td>'
-                + '<td class="align-middle">'      + escHtml(hours) + '</td>'
-                + '<td class="align-middle">'      + statusBadge + '</td>'
-                + '<td class="align-middle text-end pe-3">' + actionBtn + '</td>'
-                + '</tr>';
+            if (s.is_blocked) {
+                const reason = escHtml(s.block_reason || 'Blocked');
+                html += '<tr data-date="' + escAttr(s.date) + '" class="text-muted" style="opacity: 0.6;">'
+                    + '<td class="align-middle ps-3">' + escHtml(s.date) + '</td>'
+                    + '<td class="align-middle">' + escHtml(s.day || '') + '</td>'
+                    + '<td class="align-middle">' + escHtml(timeRange) + '</td>'
+                    + '<td class="align-middle">' + escHtml(hours) + '</td>'
+                    + '<td class="align-middle"><span class="badge badge-phoenix badge-phoenix-secondary">Blocked</span></td>'
+                    + '<td class="align-middle text-end pe-3"><small class="text-muted">' + reason + '</small></td>'
+                    + '</tr>';
+            } else {
+                const statusBadge = getStatusBadge(s.status);
+                const actionBtn   = getActionButton(s);
+                html += '<tr data-date="' + escAttr(s.date) + '" data-session-id="' + (s.session_id || '') + '">'
+                    + '<td class="align-middle ps-3">' + escHtml(s.date) + '</td>'
+                    + '<td class="align-middle">'      + escHtml(s.day || '') + '</td>'
+                    + '<td class="align-middle">'      + escHtml(timeRange) + '</td>'
+                    + '<td class="align-middle">'      + escHtml(hours) + '</td>'
+                    + '<td class="align-middle">'      + statusBadge + '</td>'
+                    + '<td class="align-middle text-end pe-3">' + actionBtn + '</td>'
+                    + '</tr>';
+            }
         });
 
         $('#attendance-sessions-tbody').html(html);
@@ -338,12 +353,12 @@
                     + '<td class="align-middle text-center"><span class="hours-trained-val">' + scheduledHours.toFixed(1) + '</span></td>'
                     + '<td class="align-middle text-center">'
                     + '<input type="number" class="form-control form-control-sm hours-present-input"'
-                    + ' value="' + scheduledHours.toFixed(1) + '"'
+                    + ' value="0.0"'
                     + ' min="0" max="' + scheduledHours.toFixed(1) + '"'
                     + ' step="0.5"'
                     + ' style="width: 80px; display: inline-block;">'
                     + '</td>'
-                    + '<td class="align-middle text-center"><span class="hours-absent-val">0.0</span></td>'
+                    + '<td class="align-middle text-center"><span class="hours-absent-val">' + scheduledHours.toFixed(1) + '</span></td>'
                     + '</tr>';
             });
         }

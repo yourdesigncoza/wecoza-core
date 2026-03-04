@@ -199,6 +199,8 @@
             $mainRow.append($('<td>').addClass(cellClass).text(row.first_name || ''));
             $mainRow.append($('<td>').addClass(cellClass).text(row.surname || ''));
             $mainRow.append($('<td>').addClass(cellClass).text(saId));
+            $mainRow.append($('<td>').addClass(cellClass).text(row.race || ''));
+            $mainRow.append($('<td>').addClass(cellClass).text(row.gender || ''));
             $mainRow.append($('<td>').addClass(cellClass).text(programme));
             $mainRow.append($('<td>').addClass('py-2 align-middle text-center fs-8 white-space-nowrap').html(statusBadge(row.status)));
             $mainRow.append($('<td>').addClass(cellClass).text(row.class_code || '—'));
@@ -216,7 +218,7 @@
 
             // Detail row (collapsible)
             const $detailRow = $('<tr class="reg-detail-row">');
-            const $detailTd  = $('<td colspan="9" class="p-0">');
+            const $detailTd  = $('<td colspan="11" class="p-0">');
             const $collapse  = $('<div class="collapse" id="' + detailId + '">');
             const $content   = $('<div class="reg-detail-content border-top p-3">');
 
