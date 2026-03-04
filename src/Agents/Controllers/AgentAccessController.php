@@ -5,7 +5,8 @@ declare(strict_types=1);
  * Agent Access Controller
  *
  * Provides the [wecoza_agent_attendance] shortcode, auto-creates the /agent-attendance/
- * WP page, and queries classes assigned to the logged-in agent (primary + backup via JSONB).
+ * WP page, queries classes assigned to the logged-in agent (primary + backup via JSONB),
+ * and enforces the agent page cage: login redirect, admin block, and template redirect.
  *
  * @package WeCoza\Agents
  * @since 7.0.0
@@ -33,6 +34,11 @@ class AgentAccessController
     {
         add_action('init', [$this, 'registerShortcodes']);
         add_action('init', [$this, 'ensureAttendancePage']);
+
+        // Redirect cage: login → attendance, admin block, page cage
+        add_filter('login_redirect', [$this, 'redirectAgentOnLogin'], 9, 3);
+        add_action('admin_init', [$this, 'blockAgentAdminAccess']);
+        add_action('template_redirect', [$this, 'enforceAgentPageCage']);
     }
 
     /**
@@ -153,5 +159,107 @@ class AgentAccessController
         ];
 
         return wecoza_db()->getAll($sql, $params) ?: [];
+    }
+
+    // -------------------------------------------------------------------------
+    // Redirect cage hooks
+    // -------------------------------------------------------------------------
+
+    /**
+     * Redirect wp_agent users to the attendance page immediately after login.
+     *
+     * Runs at priority 9 — fires BEFORE the theme's priority-10
+     * ydcoza_force_login_redirect_to_home filter, so agents land on the
+     * attendance page rather than being pushed to home_url() by the theme.
+     *
+     * @param string          $redirectTo URL WordPress would redirect to.
+     * @param string          $request    Requested redirect URL.
+     * @param \WP_User|mixed  $user       The logged-in user (or WP_Error on failure).
+     * @return string Redirect destination URL.
+     */
+    public function redirectAgentOnLogin(string $redirectTo, string $request, $user): string
+    {
+        if (!($user instanceof \WP_User)) {
+            return $redirectTo;
+        }
+
+        if (in_array('wp_agent', $user->roles, true)) {
+            return home_url('/agent-attendance/');
+        }
+
+        return $redirectTo;
+    }
+
+    /**
+     * Block wp_agent users from accessing the WP admin area.
+     *
+     * CRITICAL: AJAX requests to admin-ajax.php must never be blocked —
+     * attendance capture relies on WordPress AJAX (wp_doing_ajax() guard).
+     *
+     * @return void
+     */
+    public function blockAgentAdminAccess(): void
+    {
+        if (wp_doing_ajax()) {
+            return;
+        }
+
+        $user = wp_get_current_user();
+
+        if (in_array('wp_agent', $user->roles, true)) {
+            wp_redirect(home_url('/agent-attendance/'));
+            exit;
+        }
+    }
+
+    /**
+     * Enforce the agent page cage: wp_agent users may only visit the
+     * attendance landing page and the single-class view.
+     *
+     * Allowlist:
+     *   - /agent-attendance/            (is_page('agent-attendance'))
+     *   - /app/display-single-class/    (get_page_by_path match)
+     *
+     * If the attendance page itself does not exist in WP, the redirect is
+     * skipped with a log entry to prevent an infinite-redirect loop.
+     *
+     * @return void
+     */
+    public function enforceAgentPageCage(): void
+    {
+        if (!is_user_logged_in()) {
+            return;
+        }
+
+        $user = wp_get_current_user();
+
+        if (!in_array('wp_agent', $user->roles, true)) {
+            return;
+        }
+
+        // Resolve allowlisted pages once
+        $attendancePage    = get_page_by_path('agent-attendance');
+        $singleClassPage   = get_page_by_path('app/display-single-class');
+
+        // Safety: if the attendance page doesn't exist, don't redirect — prevents infinite loop
+        if (!$attendancePage) {
+            wecoza_log('AgentAccessController: attendance page not found — skipping template_redirect cage', 'warning');
+            return;
+        }
+
+        // Build allowlist of page IDs
+        $allowedIds = [(int) $attendancePage->ID];
+
+        if ($singleClassPage) {
+            $allowedIds[] = (int) $singleClassPage->ID;
+        }
+
+        if (is_page($allowedIds)) {
+            return;
+        }
+
+        // Current page not in allowlist — redirect to attendance page
+        wp_redirect(home_url('/agent-attendance/'));
+        exit;
     }
 }
