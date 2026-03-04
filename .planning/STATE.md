@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 52 of 52 (all milestones complete)
 Status: v6.0 Agent Attendance Capture archived
-Last activity: 2026-03-04 - Completed quick task 21: monthly calendar grid for attendance
+Last activity: 2026-03-04 - Completed quick task 22: WEC-182 Progression Admin LP description as class_type + subject + level
 
 Progress: [████████████████████] 52/52 phases complete (11 milestones shipped)
 
