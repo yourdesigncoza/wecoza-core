@@ -39,6 +39,18 @@ function verify_attendance_nonce(): void
 }
 
 /**
+ * Verify the current user has capture_attendance capability.
+ * Sends 403 JSON error and exits immediately if not authorized.
+ */
+function verify_attendance_capability(): void
+{
+    if (!current_user_can('capture_attendance')) {
+        wp_send_json_error(['message' => 'Insufficient permissions.'], 403);
+        exit;
+    }
+}
+
+/**
  * Guard attendance capture/exception endpoints to active classes only.
  *
  * Queries class_status via wecoza_resolve_class_status() and rejects non-active
@@ -136,6 +148,7 @@ function handle_attendance_capture(): void
 {
     try {
         verify_attendance_nonce();
+        verify_attendance_capability();
 
         $classId     = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
         $sessionDate = isset($_POST['session_date']) ? sanitize_text_field($_POST['session_date']) : '';
@@ -218,6 +231,7 @@ function handle_attendance_mark_exception(): void
 {
     try {
         verify_attendance_nonce();
+        verify_attendance_capability();
 
         $classId = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
 
