@@ -1,26 +1,26 @@
 ---
 created: 2026-03-04T10:15:12.303Z
-title: "WEC-182 [1d] Attendance: block exception days JS rendering"
+title: "WEC-182 [1d] Attendance: grey out blocked exception days"
 area: attendance
 linear: https://linear.app/wecoza/issue/WEC-182
-blocked_by: mario-clarification
+status: ready
 files:
   - assets/js/classes/attendance-capture.js
   - src/Classes/Services/AttendanceService.php
 ---
 
-## Problem
+## Clarification from Mario (2026-03-04)
 
-Mario: "The exception days we created must be blocked, and should not be open to capture."
+"Greyed out - not capturable will be good."
 
-Backend prep is DONE — `AttendanceService::generateSessionList()` now returns `is_blocked` and `block_reason` fields for exception dates and public holidays (commit 826a538).
-
-JS rendering not done yet. Asked Mario: should blocked days be greyed-out visible rows (showing the reason), or hidden completely?
+**Meeting follow-up (2026-03-04):** Mario confirmed action buttons must be completely REMOVED (not just disabled) for blocked sessions. Reason text should be visible inline or on hover.
 
 ## Solution
 
-TBD — depends on Mario's preference for UX.
+Backend prep is DONE — `AttendanceService::generateSessionList()` already returns `is_blocked` and `block_reason` fields (commit 826a538).
 
-- If greyed-out: add conditional rendering in `renderSessionTable()` — muted row, "Blocked" badge, reason text, no action buttons
-- If hidden: filter out `is_blocked` sessions before rendering
-- Either way, update summary stats to exclude blocked from pending count
+JS changes in `renderSessionTable()`:
+- Blocked sessions: muted/greyed row styling
+- Show "Blocked" badge with reason text (inline or hover tooltip)
+- Completely remove Capture AND Exception action buttons (not just disable)
+- Update summary stats to exclude blocked sessions from pending count
