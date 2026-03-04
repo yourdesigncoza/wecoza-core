@@ -106,6 +106,27 @@ if ($classStatus === 'stopped') {
             </div>
         </div>
 
+        <!-- Monthly Calendar View -->
+        <div class="mb-3" id="att-calendar-wrapper">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <button type="button" class="btn btn-sm btn-subtle-secondary" id="att-cal-prev">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <h6 class="text-body-tertiary mb-0" id="att-cal-title">...</h6>
+                <button type="button" class="btn btn-sm btn-subtle-secondary" id="att-cal-next">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+            <div id="att-calendar-grid"></div>
+            <div class="d-flex gap-3 mt-2 flex-wrap">
+                <small class="text-body-tertiary"><span class="att-cal-legend att-cal-captured"></span> Captured</small>
+                <small class="text-body-tertiary"><span class="att-cal-legend att-cal-pending"></span> Pending</small>
+                <small class="text-body-tertiary"><span class="att-cal-legend att-cal-exception"></span> Exception</small>
+                <small class="text-body-tertiary"><span class="att-cal-legend att-cal-blocked"></span> Blocked</small>
+                <small class="text-body-tertiary"><span class="att-cal-legend att-cal-future"></span> Upcoming</small>
+            </div>
+        </div>
+
         <!-- Month Filter -->
         <div class="mb-3 d-flex align-items-center gap-2">
             <label for="attendance-month-select" class="text-body-tertiary text-nowrap mb-0">Month :</label>

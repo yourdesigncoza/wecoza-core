@@ -19,6 +19,7 @@
 
     let allSessions  = [];     // Full session list from server
     let currentMonth = new Date().toISOString().substring(0, 7); // Default to current month
+    let calendarMonth = new Date().toISOString().substring(0, 7); // Calendar view month
 
     // Module-level state for open modals
     let captureDate      = '';
@@ -60,6 +61,8 @@
                 if (response.success && response.data && response.data.sessions) {
                     allSessions = response.data.sessions;
                     updateSummaryCards();
+                    initCalendarMonth();
+                    renderCalendar();
                     buildMonthTabs();
                     renderSessionTable();
                 } else {
@@ -103,6 +106,168 @@
         $('#att-total-sessions').text(total);
         $('#att-captured-count').text(captured + exceptions);
         $('#att-pending-count').text(pending);
+    }
+
+    // =========================================================
+    // SECTION 2B: MONTHLY CALENDAR
+    // =========================================================
+
+    /**
+     * Set calendarMonth to current month if it has sessions,
+     * otherwise to the nearest month with session data.
+     */
+    function initCalendarMonth() {
+        if (allSessions.length === 0) return;
+        var today = new Date().toISOString().substring(0, 7);
+        var months = allSessions.map(function(s) { return s.date ? s.date.substring(0, 7) : ''; }).filter(Boolean);
+        var unique = months.filter(function(v, i, a) { return a.indexOf(v) === i; });
+        unique.sort();
+        if (unique.indexOf(today) !== -1) {
+            calendarMonth = today;
+        } else {
+            calendarMonth = unique[unique.length - 1]; // default to last month
+            for (var i = 0; i < unique.length; i++) {
+                if (unique[i] >= today) { calendarMonth = unique[i]; break; }
+            }
+        }
+    }
+
+    /**
+     * Render the monthly calendar grid from allSessions data.
+     */
+    function renderCalendar() {
+        var $grid = $('#att-calendar-grid');
+        if (!$grid.length) return;
+
+        var parts = calendarMonth.split('-');
+        var year  = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1; // 0-indexed
+
+        // Update title
+        var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        $('#att-cal-title').text(monthNames[month] + ' ' + year);
+
+        // Build session lookup by date for this month
+        var sessionMap = {};
+        allSessions.forEach(function(s) {
+            if (s.date && s.date.substring(0, 7) === calendarMonth) {
+                if (!sessionMap[s.date]) sessionMap[s.date] = [];
+                sessionMap[s.date].push(s);
+            }
+        });
+
+        // Calendar grid: 7 columns (Mon=0 ... Sun=6)
+        var firstDay = new Date(year, month, 1);
+        var lastDay  = new Date(year, month + 1, 0);
+        var startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
+        var totalDays = lastDay.getDate();
+        var today = new Date().toISOString().substring(0, 10);
+
+        var html = '<table class="att-cal-table"><thead><tr>';
+        var dayHeaders = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        dayHeaders.forEach(function(d) {
+            html += '<th>' + d + '</th>';
+        });
+        html += '</tr></thead><tbody><tr>';
+
+        // Empty cells before first day
+        for (var i = 0; i < startDow; i++) {
+            html += '<td class="att-cal-empty"></td>';
+        }
+
+        var cellCount = startDow;
+        for (var day = 1; day <= totalDays; day++) {
+            var dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+            var sessions = sessionMap[dateStr] || [];
+
+            if (sessions.length === 0) {
+                var todayClass = dateStr === today ? ' att-cal-today' : '';
+                html += '<td class="att-cal-noclass' + todayClass + '"><span class="att-cal-daynum">' + day + '</span></td>';
+            } else {
+                var cellClass = getCalendarCellClass(sessions, today, dateStr);
+                var tooltip = getCalendarTooltip(sessions);
+                var clickable = isCalendarClickable(sessions, today, dateStr);
+                var todayMark = dateStr === today ? ' att-cal-today' : '';
+
+                html += '<td class="att-cal-day ' + cellClass + todayMark + (clickable ? ' att-cal-clickable' : '') + '"'
+                      + ' data-date="' + escAttr(dateStr) + '"'
+                      + (tooltip ? ' title="' + escAttr(tooltip) + '"' : '')
+                      + '>'
+                      + '<span class="att-cal-daynum">' + day + '</span>';
+
+                if (sessions.length > 1) {
+                    html += '<span class="att-cal-count">' + sessions.length + '</span>';
+                }
+
+                html += '</td>';
+            }
+
+            cellCount++;
+            if (cellCount % 7 === 0 && day < totalDays) {
+                html += '</tr><tr>';
+            }
+        }
+
+        // Fill remaining cells
+        var remaining = 7 - (cellCount % 7);
+        if (remaining < 7) {
+            for (var r = 0; r < remaining; r++) {
+                html += '<td class="att-cal-empty"></td>';
+            }
+        }
+
+        html += '</tr></tbody></table>';
+        $grid.html(html);
+    }
+
+    /**
+     * Determine CSS class for a calendar day cell based on session statuses.
+     */
+    function getCalendarCellClass(sessions, today, dateStr) {
+        var allBlocked = sessions.every(function(s) { return s.is_blocked; });
+        if (allBlocked) return 'att-cal-blocked';
+
+        var hasException = sessions.some(function(s) {
+            return s.status === 'client_cancelled' || s.status === 'agent_absent';
+        });
+        var allCaptured = sessions.every(function(s) {
+            return s.status === 'captured' || s.is_blocked;
+        });
+        var hasPending = sessions.some(function(s) {
+            return s.status === 'pending' && !s.is_blocked;
+        });
+
+        if (allCaptured) return 'att-cal-captured';
+        if (hasException) return 'att-cal-exception';
+        if (hasPending && dateStr < today) return 'att-cal-pending';
+        if (hasPending) return 'att-cal-future';
+        return '';
+    }
+
+    /**
+     * Build tooltip text for a calendar day cell.
+     */
+    function getCalendarTooltip(sessions) {
+        var tips = [];
+        sessions.forEach(function(s) {
+            if (s.is_blocked) {
+                tips.push(s.block_reason || 'Blocked');
+            } else {
+                var time = (s.start_time || '') + (s.end_time ? ' - ' + s.end_time : '');
+                var hrs = s.scheduled_hours ? parseFloat(s.scheduled_hours).toFixed(1) + 'h' : '';
+                tips.push([time, hrs, s.status].filter(Boolean).join(' | '));
+            }
+        });
+        return tips.join('\n');
+    }
+
+    /**
+     * Determine if a calendar day cell should be clickable.
+     */
+    function isCalendarClickable(sessions, today, dateStr) {
+        if (sessions.every(function(s) { return s.is_blocked; })) return false;
+        if (sessions.every(function(s) { return s.status === 'pending'; }) && dateStr > today) return false;
+        return true;
     }
 
     // =========================================================
@@ -335,6 +500,41 @@
         $('#attendance-month-select').on('change', function() {
             currentMonth = $(this).val();
             renderSessionTable();
+            // Sync calendar with month filter
+            if (currentMonth !== 'all') {
+                calendarMonth = currentMonth;
+                renderCalendar();
+            }
+        });
+
+        // Calendar day click
+        $('#att-calendar-grid').on('click', '.att-cal-clickable', function() {
+            var date = $(this).data('date');
+            if (!date) return;
+            var sessions = allSessions.filter(function(s) { return s.date === date && !s.is_blocked; });
+            if (sessions.length === 0) return;
+            var captured = sessions.find(function(s) { return s.status === 'captured'; });
+            if (captured && captured.session_id) {
+                openDetailModal(captured.session_id);
+            } else {
+                openCaptureModal(date);
+            }
+        });
+
+        // Calendar prev/next month navigation
+        $('#att-cal-prev').on('click', function() {
+            var parts = calendarMonth.split('-');
+            var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 2, 1);
+            calendarMonth = d.toISOString().substring(0, 7);
+            renderCalendar();
+            $('#attendance-month-select').val(calendarMonth).trigger('change');
+        });
+        $('#att-cal-next').on('click', function() {
+            var parts = calendarMonth.split('-');
+            var d = new Date(parseInt(parts[0]), parseInt(parts[1]), 1);
+            calendarMonth = d.toISOString().substring(0, 7);
+            renderCalendar();
+            $('#attendance-month-select').val(calendarMonth).trigger('change');
         });
 
         // Capture button click (delegated — table re-renders on filter change)
