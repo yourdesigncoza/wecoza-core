@@ -72,17 +72,17 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ Three-way class status lifecycle (draft/active/stopped) with manager controls and auto-activate (WEC-179/180) — v6.0
 - ✓ Attendance lock gate on non-active classes (view + server-side guard) — v6.0
 - ✓ Class status history audit trail with FOR UPDATE row lock concurrency safety — v6.0
+- ✓ Exception button UX (visible "Exception" label, Phoenix warning style) — v7.0
+- ✓ Stopped-class capture gate (allow up to stop date, lock after) — v7.0
+- ✓ `wp_agent` WordPress role with `capture_attendance` capability (survives plugin updates) — v7.0
+- ✓ `agents.wp_user_id` column + AgentWpUserService auto-provisioning — v7.0
+- ✓ AJAX capability guards on attendance write handlers — v7.0
+- ✓ Agent attendance page with JSONB class lookup + Phoenix card view — v7.0
+- ✓ Three-hook redirect cage (login, admin, template) locking agents to attendance only — v7.0
 
 ### Active
 
-## Current Milestone: v7.0 Agent Attendance Access
-
-**Goal:** Complete remaining WEC-182 attendance feedback — agent-restricted capture page, exception button UX, and stopped-class capture until stop date.
-
-**Target features:**
-- Agent-restricted attendance capture page (dedicated page for agents who are not WP users)
-- Exception button UX improvement (visible labelled button instead of icon-only)
-- Stopped-class capture allowed until stop date (last capturable session = stop date)
+(No active milestone — use `/gsd:new-milestone` to define next)
 
 ### Out of Scope
 
@@ -99,7 +99,7 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v6.0 Shipped)
+### Current State (v7.0 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
 - **Total:** ~83,500 lines of PHP across 5 modules + LookupTables
@@ -212,6 +212,12 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Attendance lock on non-active classes | Prevents capturing hours on draft/stopped classes | ✓ v6.0 |
 | Status transitions use FOR UPDATE row lock | Concurrency safety for concurrent status changes | ✓ v6.0 |
 | Phoenix Feather SVG for status badges | Consistent with Phoenix theme; DRY helper across 5 views | ✓ v6.0 |
+| WP role approach for agent auth | Simpler than tokens, nonce-compatible, WP-native | ✓ v7.0 |
+| plugins_loaded priority 6 for role registration | Survives plugin updates without manual reactivation | ✓ v7.0 |
+| Agent email as source of truth | WP profile email hidden + POST reverted for wp_agent users | ✓ v7.0 |
+| App CPT for agent attendance page | Consistent with other WeCoza /app/ pages | ✓ v7.0 |
+| login_redirect priority 9 | Fires before theme's priority-10 catch-all redirect | ✓ v7.0 |
+| wp_doing_ajax() guard in admin_init | Prevents blocking attendance AJAX calls | ✓ v7.0 |
 
 ---
-*Last updated: 2026-03-04 after v7.0 milestone start*
+*Last updated: 2026-03-05 after v7.0 milestone*

@@ -1,5 +1,28 @@
 # Project Milestones: WeCoza Core
 
+## v7.0 Agent Attendance Access (Shipped: 2026-03-05)
+
+**Delivered:** Completed WEC-182 attendance feedback — exception button UX, stopped-class capture gate, wp_agent WordPress role with capability guards, agent-to-WP-user linkage, dedicated attendance page with JSONB class lookup, and three-hook redirect cage locking agents to attendance only.
+
+**Phases completed:** 53-55 (3 phases, 7 plans incl. quick-17)
+
+**Key accomplishments:**
+- Exception button label ("Exception" text, not icon-only) + stopped-class capture gate (allow up to stop date, lock after)
+- Registered `wp_agent` WordPress role with `capture_attendance` capability via `plugins_loaded` (survives plugin updates)
+- Added `wp_user_id` column to agents table + AgentWpUserService for auto-provisioning WP accounts on agent create/update
+- AJAX capability guards on attendance write handlers (capture + exception marking)
+- Agent attendance page with JSONB containment query for primary + backup agent class lookup, Phoenix card grid view
+- Three-hook redirect cage (login_redirect priority 9, admin_init with AJAX guard, template_redirect with app CPT slug allowlist)
+
+**Stats:**
+- 62 files changed, 7,823 insertions, 175 deletions
+- 17 feat/fix commits
+- Timeline: 2026-03-04 (1 day)
+
+**Git range:** `4d49e08` → `99b8945`
+
+---
+
 ## v5.0 Learner Progression (Shipped: 2026-02-23)
 
 **Delivered:** Wired up LP progression AJAX handlers (mark-complete, portfolio upload, collision log), built admin progression management panel with filters/bulk-complete/hold-resume, and created WEC-165 learner progression report with employer filter, summary cards, and timeline display.
