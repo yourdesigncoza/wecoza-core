@@ -269,6 +269,8 @@
     function isCalendarClickable(sessions, today, dateStr) {
         if (sessions.every(function(s) { return s.is_blocked; })) return false;
         if (sessions.every(function(s) { return s.status === 'pending'; }) && dateStr > today) return false;
+        var nonBlocked = sessions.filter(function(s) { return !s.is_blocked; });
+        if (nonBlocked.length > 0 && nonBlocked.every(function(s) { return s.status === 'client_cancelled' || s.status === 'agent_absent'; })) return false;
         return true;
     }
 

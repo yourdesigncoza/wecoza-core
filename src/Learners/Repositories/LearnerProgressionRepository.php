@@ -58,7 +58,7 @@ class LearnerProgressionRepository extends BaseRepository
             LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
             LEFT JOIN classes c ON lpt.class_id = c.class_id
-            LEFT JOIN class_types ct ON c.class_type = ct.class_type_id
+            LEFT JOIN class_types ct ON c.class_type = ct.class_type_code
             LEFT JOIN clients cl ON c.client_id = cl.client_id
         ";
     }

@@ -446,6 +446,12 @@ add_action(
                     }
 
                     if ($result["should_email"]) {
+                        // Store email_context in a transient to avoid ActionScheduler arg size limit
+                        $emailContext = $result["email_context"] ?? [];
+                        if (!empty($emailContext)) {
+                            set_transient("wecoza_email_ctx_{$eventId}", $emailContext, HOUR_IN_SECONDS);
+                        }
+
                         // Schedule email for each recipient
                         $recipients = $result["recipients"] ?? [];
                         foreach ($recipients as $recipient) {
@@ -454,7 +460,6 @@ add_action(
                                 [
                                     "event_id" => $eventId,
                                     "recipient" => $recipient,
-                                    "email_context" => $result["email_context"],
                                 ],
                                 "wecoza-notifications",
                             );
@@ -478,7 +483,6 @@ add_action(
             function (
                 int $eventId,
                 string $recipient,
-                array $emailContext = [],
             ) {
                 try {
                     if (
@@ -491,12 +495,21 @@ add_action(
                         );
                     }
 
+                    // Retrieve email_context from transient (stored at enqueue time)
+                    $transientKey = "wecoza_email_ctx_{$eventId}";
+                    $emailContext = get_transient($transientKey) ?: [];
+
                     $emailer = \WeCoza\Events\Services\NotificationEmailer::boot();
                     $result = $emailer->send(
                         $eventId,
                         $recipient,
                         $emailContext,
                     );
+
+                    // Clean up transient after send
+                    if (!empty($emailContext)) {
+                        delete_transient($transientKey);
+                    }
 
                     if (!$result["success"]) {
                         throw new \RuntimeException(
@@ -513,7 +526,7 @@ add_action(
                 }
             },
             10,
-            3,
+            2,
         );
 
         /*
@@ -766,6 +779,13 @@ add_action('admin_head-user-edit.php', function () {
     }
 });
 
+// Hide main sidebar navigation for wp_agent users (keep other sidebar elements like feedback widget)
+add_action('wp_head', function () {
+    if (is_user_logged_in() && in_array('wp_agent', wp_get_current_user()->roles, true)) {
+        echo '<style>#menu-sidebar-menu{display:none!important}</style>';
+    }
+});
+
 // Safety net: prevent email change via POST for wp_agent users
 add_action('user_profile_update_errors', function (\WP_Error $errors, bool $update, \stdClass $user) {
     if (!$update) {
@@ -1007,66 +1027,8 @@ if (defined("WP_CLI") && WP_CLI) {
         \WeCoza\Events\CLI\AISummaryStatusCommand::register();
     }
 
-    // Bulk migration: create WP users for agents that don't have one yet
-    WP_CLI::add_command('wecoza sync-agent-users', function ($args, $assoc_args) {
-        $repository = new \WeCoza\Agents\Repositories\AgentRepository();
-        $wpUserService = new \WeCoza\Agents\Services\AgentWpUserService($repository);
-
-        // Get all active agents without wp_user_id
-        $db = wecoza_db();
-        $stmt = $db->prepare(
-            "SELECT agent_id, first_name, surname, email_address
-             FROM agents
-             WHERE status = 'active'
-               AND (wp_user_id IS NULL OR wp_user_id = 0)
-             ORDER BY agent_id"
-        );
-        $stmt->execute();
-        $agents = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        if (empty($agents)) {
-            WP_CLI::success('No agents need WP user accounts.');
-            return;
-        }
-
-        WP_CLI::log(sprintf('Found %d agents without WP users.', count($agents)));
-
-        $created = 0;
-        $linked  = 0;
-        $skipped = 0;
-
-        foreach ($agents as $agent) {
-            $agentId = (int) $agent['agent_id'];
-            $email   = trim($agent['email_address'] ?? '');
-
-            if (empty($email) || !is_email($email)) {
-                WP_CLI::warning("Agent {$agentId}: skipped — invalid/empty email");
-                $skipped++;
-                continue;
-            }
-
-            // Check before sync to distinguish created vs linked in output
-            $alreadyExists = (bool) get_user_by('email', $email);
-
-            $wpUserId = $wpUserService->syncWpUser($agentId, $agent, null, false);
-
-            if ($wpUserId) {
-                if ($alreadyExists) {
-                    WP_CLI::log("Agent {$agentId}: linked to existing WP user {$wpUserId}");
-                    $linked++;
-                } else {
-                    WP_CLI::log("Agent {$agentId}: created WP user {$wpUserId}");
-                    $created++;
-                }
-            } else {
-                WP_CLI::warning("Agent {$agentId}: failed to create/link WP user");
-                $skipped++;
-            }
-        }
-
-        WP_CLI::success(sprintf(
-            'Done. Created: %d, Linked: %d, Skipped: %d',
-            $created, $linked, $skipped
-        ));
-    });
+    // Agent sync CLI command
+    if (class_exists(\WeCoza\Agents\CLI\SyncAgentUsersCommand::class)) {
+        \WeCoza\Agents\CLI\SyncAgentUsersCommand::register();
+    }
 }

@@ -22,6 +22,7 @@ use function is_numeric;
 use function is_string;
 use function max;
 use function ord;
+use function preg_match;
 use function preg_replace;
 use function str_contains;
 use function strlen;
@@ -168,6 +169,11 @@ trait DataObfuscator
         $normalizedKey = strtolower($key);
         $normalizedParent = $parentKey !== null ? strtolower($parentKey) : '';
 
+        // Never obfuscate dates/timestamps — they are not PII
+        if ($this->looksLikeDateTime($normalizedKey, $value)) {
+            return $value;
+        }
+
         if ($this->shouldAliasName($normalizedKey, $normalizedParent, $value)) {
             return $this->aliasName($value, $state);
         }
@@ -224,11 +230,19 @@ trait DataObfuscator
             return false;
         }
 
+        // Always mask learner IDs (PII context)
         if ($parent === 'learners' && ($key === 'id' || str_contains($key, 'id'))) {
             return true;
         }
 
-        return str_contains($key, 'id') || str_contains($key, 'number');
+        // Mask SA ID and passport numbers (PII)
+        if ($key === 'sa_id_no' || $key === 'sa_id' || str_contains($key, 'passport')) {
+            return true;
+        }
+
+        // Do NOT mask foreign-key reference IDs (client_id, class_id, agent_id, etc.)
+        // These are internal references, not PII
+        return false;
     }
 
     /**
@@ -274,6 +288,28 @@ trait DataObfuscator
         return 'Learner ' . $suffix;
     }
 
+    /**
+     * Detect if a key/value pair looks like a date or timestamp.
+     * Prevents dates from being caught by phone/PII heuristics.
+     */
+    private function looksLikeDateTime(string $key, string $value): bool
+    {
+        // Key-based: common date/time field names
+        $dateKeys = ['date', 'time', '_at', 'created', 'updated', 'deleted', 'started', 'ended', 'validated', 'last_updated'];
+        foreach ($dateKeys as $dateKey) {
+            if (str_contains($key, $dateKey)) {
+                return true;
+            }
+        }
+
+        // Value-based: ISO date (YYYY-MM-DD), ISO datetime, or timestamp with microseconds
+        if (preg_match('/^\d{4}-\d{2}-\d{2}/', $value) === 1) {
+            return true;
+        }
+
+        return false;
+    }
+
     private function looksLikeEmail(string $value): bool
     {
         return str_contains($value, '@');
@@ -282,7 +318,11 @@ trait DataObfuscator
     private function looksLikePhone(string $value): bool
     {
         $digits = preg_replace('/[^0-9]/', '', $value);
-        return $digits !== null && strlen($digits) >= 7;
+        if ($digits === null) {
+            return false;
+        }
+        $length = strlen($digits);
+        return $length >= 7 && $length <= 15;
     }
 
     private function maskEmail(string $value): string

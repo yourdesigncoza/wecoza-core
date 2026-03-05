@@ -112,7 +112,7 @@ final class NotificationProcessor
                     foreach ($recipients as $recipient) {
                         as_enqueue_async_action(
                             'wecoza_send_notification_email',
-                            ['event_id' => $eventId, 'recipient' => $recipient, 'email_context' => []],
+                            ['event_id' => $eventId, 'recipient' => $recipient],
                             'wecoza-notifications'
                         );
                     }
