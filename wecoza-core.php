@@ -728,6 +728,12 @@ add_action(
         if ($adminRole) {
             $adminRole->add_cap('capture_attendance');
         }
+
+        // Add capture_attendance to editor role
+        $editorRole = get_role('editor');
+        if ($editorRole) {
+            $editorRole->add_cap('capture_attendance');
+        }
     },
     6,
 );
