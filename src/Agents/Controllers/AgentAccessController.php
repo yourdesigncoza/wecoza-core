@@ -151,14 +151,18 @@ class AgentAccessController
         $jsonFragment = json_encode([['agent_id' => (int) $agentId]]);
 
         $sql = "
-            SELECT class_id, class_code, class_type, class_subject, class_status,
-                   class_agent, backup_agent_ids, schedule_data, stop_restart_dates,
-                   learner_ids, original_start_date
-            FROM classes
-            WHERE (class_agent = :agent_id
-               OR backup_agent_ids::jsonb @> :json_frag)
-              AND class_status != 'deleted'
-            ORDER BY original_start_date DESC
+            SELECT c.class_id, c.class_code, c.class_type, c.class_subject, c.class_status,
+                   c.class_agent, c.backup_agent_ids, c.schedule_data, c.stop_restart_dates,
+                   c.learner_ids, c.original_start_date, c.class_address_line,
+                   cl.client_name,
+                   s.site_name
+            FROM classes c
+            LEFT JOIN clients cl ON cl.client_id = c.client_id
+            LEFT JOIN sites s ON s.site_id = c.site_id
+            WHERE (c.class_agent = :agent_id
+               OR c.backup_agent_ids::jsonb @> :json_frag)
+              AND c.class_status != 'deleted'
+            ORDER BY c.original_start_date DESC
         ";
 
         $params = [

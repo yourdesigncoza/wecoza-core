@@ -181,7 +181,13 @@ if ($classStatus === 'stopped') {
                             <tr class="bg-body-highlight">
                                 <th class="border-top border-translucent ps-3">Learner</th>
                                 <th class="border-top border-translucent text-center">Hours Trained</th>
-                                <th class="border-top border-translucent text-center">Hours Present</th>
+                                <th class="border-top border-translucent text-center">
+                                    Hours Present
+                                    <button type="button" class="btn btn-link btn-sm p-0 ms-1" id="btn-copy-hours-to-all"
+                                        title="Copy first learner's hours to all" style="display:none; font-size: 0.75rem;">
+                                        <i class="bi bi-clipboard-check me-1"></i>Copy to all
+                                    </button>
+                                </th>
                                 <th class="border-top border-translucent text-center">Hours Absent</th>
                             </tr>
                         </thead>
@@ -189,11 +195,18 @@ if ($classStatus === 'stopped') {
                     </table>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-subtle-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-phoenix-primary" id="btn-submit-capture">
-                    <i class="bi bi-check-lg me-1"></i>Submit Attendance
-                </button>
+            <div class="modal-footer border-0 pt-0 d-flex justify-content-between">
+                <div>
+                    <button type="button" class="btn btn-phoenix-danger btn-sm" id="btn-admin-delete-from-capture" style="display:none;">
+                        <i class="bi bi-trash me-1"></i>Delete &amp; Reverse Hours
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-subtle-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-phoenix-primary" id="btn-submit-capture">
+                        <i class="bi bi-check-lg me-1"></i>Submit Attendance
+                    </button>
+                </div>
             </div>
         </div>
     </div>

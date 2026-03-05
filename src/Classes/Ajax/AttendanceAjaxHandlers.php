@@ -209,7 +209,8 @@ function handle_attendance_capture(): void
             }
         }
 
-        $result = $service->captureAttendance($classId, $sessionDate, $normalizedHours, get_current_user_id());
+        $isUpdate = !empty($_POST['is_update']);
+        $result = $service->captureAttendance($classId, $sessionDate, $normalizedHours, get_current_user_id(), $isUpdate);
 
         wp_send_json_success($result);
 

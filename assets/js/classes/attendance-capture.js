@@ -23,6 +23,8 @@
 
     // Module-level state for open modals
     let captureDate      = '';
+    let captureIsUpdate  = false;  // true when editing a previously captured session
+    let captureSessionId = null;   // session_id when in edit mode
     let exceptionDate    = '';
     let detailSessionId  = 0;
 
@@ -477,7 +479,7 @@
         }
 
         if (s.status === 'captured' && s.session_id) {
-            return '<button class="btn btn-sm btn-subtle-info btn-view-detail" data-session-id="' + escAttr(s.session_id) + '">View</button>';
+            return '<button class="btn btn-sm btn-subtle-info btn-edit-captured" data-session-id="' + escAttr(s.session_id) + '" data-date="' + escAttr(s.date) + '">View / Edit</button>';
         }
 
         // Exception statuses: show View for admin if session_id exists, otherwise dash
@@ -515,7 +517,7 @@
             if (sessions.length === 0) return;
             var captured = sessions.find(function(s) { return s.status === 'captured'; });
             if (captured && captured.session_id) {
-                openDetailModal(captured.session_id);
+                openCaptureModal(date, captured.session_id);
             } else {
                 openCaptureModal(date);
             }
@@ -547,7 +549,12 @@
             openExceptionModal($(this).data('date'));
         });
 
-        // View detail button click
+        // View/Edit captured session — reuse capture modal in edit mode
+        $('#attendance-sessions-tbody').on('click', '.btn-edit-captured', function() {
+            openCaptureModal($(this).data('date'), $(this).data('session-id'));
+        });
+
+        // View exception detail (admin only, read-only)
         $('#attendance-sessions-tbody').on('click', '.btn-view-detail', function() {
             openDetailModal($(this).data('session-id'));
         });
@@ -558,8 +565,16 @@
         // Submit exception
         $('#btn-submit-exception').on('click', submitException);
 
-        // Admin delete
+        // Admin delete (from detail modal)
         $('#btn-admin-delete-session').on('click', adminDeleteSession);
+
+        // Admin delete (from capture/edit modal)
+        $('#btn-admin-delete-from-capture').on('click', function() {
+            if (!captureSessionId) return;
+            detailSessionId = captureSessionId;
+            hideModal('attendanceCaptureModal');
+            adminDeleteSession();
+        });
 
         // Hours present input change -> auto-calculate hours absent + over-hours warning
         $('#capture-learners-tbody').on('input change', '.hours-present-input', function() {
@@ -579,6 +594,18 @@
             } else {
                 $input.next('.hours-over-warning').remove();
             }
+
+            // Show "Copy to all" button when first learner has a non-zero value
+            const $firstInput = $('#capture-learners-tbody tr:first .hours-present-input');
+            const firstVal = parseFloat($firstInput.val()) || 0;
+            $('#btn-copy-hours-to-all').toggle(firstVal > 0);
+        });
+
+        // Copy first learner's hours to all other learners
+        $('#btn-copy-hours-to-all').on('click', function() {
+            const $firstInput = $('#capture-learners-tbody tr:first .hours-present-input');
+            const val = $firstInput.val();
+            $('#capture-learners-tbody .hours-present-input').not($firstInput).val(val).trigger('change');
         });
     }
 
@@ -587,13 +614,17 @@
     // =========================================================
 
     /**
-     * Open the capture modal for a given session date, pre-filling
-     * the learner list with hours inputs at the scheduled default.
+     * Open the capture modal for a given session date.
+     * In new-capture mode: learner hours default to 0.
+     * In edit mode (sessionId provided): fetches saved data and pre-fills inputs.
      *
-     * @param {string} date  Session date in YYYY-MM-DD format
+     * @param {string}      date       Session date in YYYY-MM-DD format
+     * @param {number|null} sessionId  Session ID for edit mode (optional)
      */
-    function openCaptureModal(date) {
-        captureDate = date;
+    function openCaptureModal(date, sessionId) {
+        captureDate      = date;
+        captureIsUpdate  = !!sessionId;
+        captureSessionId = sessionId || null;
 
         // Find the session in the full list
         const session = allSessions.find(function(s) { return s.date === date; });
@@ -605,10 +636,47 @@
         const scheduledHours = parseFloat(session.scheduled_hours) || 0;
         const dayLabel       = session.day || '';
 
+        // Update modal title based on mode
+        $('#attendanceCaptureModalLabel').html(
+            captureIsUpdate
+                ? '<i class="bi bi-pencil-square me-2"></i>Edit Attendance'
+                : '<i class="bi bi-pencil-square me-2"></i>Capture Attendance'
+        );
+
         $('#capture-session-info').text(date + (dayLabel ? ' (' + dayLabel + ')' : ''));
         $('#capture-hours-info').text('Scheduled: ' + scheduledHours.toFixed(1) + ' hours');
 
-        // Build learner rows
+        // Build learner rows with default values
+        buildCaptureRows(scheduledHours);
+        clearAlert('#capture-alert');
+
+        // Set button text based on mode
+        $('#btn-submit-capture').prop('disabled', false).html(
+            captureIsUpdate
+                ? '<i class="bi bi-check-lg me-1"></i>Update Attendance'
+                : '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
+        );
+
+        // Show/hide admin delete button
+        $('#btn-admin-delete-from-capture').toggle(captureIsUpdate && config.isAdmin);
+
+        // Hide copy-to-all initially
+        $('#btn-copy-hours-to-all').hide();
+
+        showModal('attendanceCaptureModal');
+
+        // In edit mode: fetch saved data and pre-fill
+        if (captureIsUpdate && captureSessionId) {
+            fetchAndPrefillCapturedData(captureSessionId, scheduledHours);
+        }
+    }
+
+    /**
+     * Build learner rows in the capture modal with default (zero) hours.
+     *
+     * @param {number} scheduledHours  The scheduled hours for the session
+     */
+    function buildCaptureRows(scheduledHours) {
         const learnerIds = config.learnerIds || [];
         let html = '';
 
@@ -638,14 +706,54 @@
         }
 
         $('#capture-learners-tbody').html(html);
-        clearAlert('#capture-alert');
+    }
 
-        // Reset submit button state
-        $('#btn-submit-capture').prop('disabled', false).html(
-            '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
-        );
+    /**
+     * Fetch saved session data and pre-fill inputs in the capture modal.
+     *
+     * @param {number} sessionId       Session ID to fetch
+     * @param {number} scheduledHours  Scheduled hours for fallback
+     */
+    function fetchAndPrefillCapturedData(sessionId, scheduledHours) {
+        $.ajax({
+            url:  config.ajaxUrl,
+            type: 'GET',
+            data: {
+                action:     'wecoza_attendance_get_detail',
+                nonce:      config.attendanceNonce,
+                session_id: sessionId,
+            },
+            success: function(response) {
+                if (!response.success || !response.data) return;
 
-        showModal('attendanceCaptureModal');
+                var learners = response.data.learners || [];
+                if (learners.length === 0) return;
+
+                // Build a map of learner_id -> hours_present
+                var hoursMap = {};
+                learners.forEach(function(l) {
+                    hoursMap[l.learner_id] = parseFloat(l.hours_present) || 0;
+                });
+
+                // Pre-fill each input
+                $('#capture-learners-tbody tr').each(function() {
+                    var learnerId = parseInt($(this).data('learner-id')) || 0;
+                    if (learnerId && hoursMap[learnerId] !== undefined) {
+                        var $input  = $(this).find('.hours-present-input');
+                        var present = hoursMap[learnerId];
+                        $input.val(present.toFixed(1));
+                        // Update hours absent
+                        var trained = parseFloat($(this).find('.hours-trained-val').text()) || 0;
+                        $(this).find('.hours-absent-val').text(Math.max(0, trained - present).toFixed(1));
+                    }
+                });
+
+                // Show copy-to-all if first learner has non-zero value
+                var $firstInput = $('#capture-learners-tbody tr:first .hours-present-input');
+                var firstVal = parseFloat($firstInput.val()) || 0;
+                $('#btn-copy-hours-to-all').toggle(firstVal > 0);
+            }
+        });
     }
 
     /**
@@ -653,8 +761,9 @@
      */
     function submitCapture() {
         const $btn = $('#btn-submit-capture');
+        const btnLabel = captureIsUpdate ? 'Update Attendance' : 'Submit Attendance';
         $btn.prop('disabled', true).html(
-            '<span class="spinner-border spinner-border-sm me-1"></span>Submitting...'
+            '<span class="spinner-border spinner-border-sm me-1"></span>' + (captureIsUpdate ? 'Updating...' : 'Submitting...')
         );
         clearAlert('#capture-alert');
 
@@ -683,7 +792,7 @@
         if (!isValid) {
             showAlert('#capture-alert', 'Please ensure all hours are valid (0 or above).', 'danger');
             $btn.prop('disabled', false).html(
-                '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
+                '<i class="bi bi-check-lg me-1"></i>' + btnLabel
             );
             return;
         }
@@ -697,24 +806,25 @@
                 class_id:      config.classId,
                 session_date:  captureDate,
                 learner_hours: learnerHours,
+                is_update:     captureIsUpdate ? 1 : 0,
             },
             success: function(response) {
                 if (response.success) {
                     hideModal('attendanceCaptureModal');
-                    showToast('Attendance captured successfully.', 'success');
+                    showToast(captureIsUpdate ? 'Attendance updated successfully.' : 'Attendance captured successfully.', 'success');
                     loadSessions();
                 } else {
                     const msg = (response.data && response.data.message) || 'Failed to capture attendance.';
                     showAlert('#capture-alert', msg, 'danger');
                     $btn.prop('disabled', false).html(
-                        '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
+                        '<i class="bi bi-check-lg me-1"></i>' + btnLabel
                     );
                 }
             },
             error: function() {
                 showAlert('#capture-alert', 'Server error. Please try again.', 'danger');
                 $btn.prop('disabled', false).html(
-                    '<i class="bi bi-check-lg me-1"></i>Submit Attendance'
+                    '<i class="bi bi-check-lg me-1"></i>' + btnLabel
                 );
             }
         });

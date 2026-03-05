@@ -62,7 +62,7 @@ class AttendanceRepository extends BaseRepository
      */
     protected function getAllowedInsertColumns(): array
     {
-        return ['class_id', 'session_date', 'status', 'scheduled_hours', 'notes', 'captured_by', 'captured_at', 'created_at', 'updated_at'];
+        return ['class_id', 'session_date', 'status', 'scheduled_hours', 'notes', 'captured_by', 'captured_at', 'learner_data', 'created_at', 'updated_at'];
     }
 
     /**
@@ -70,7 +70,7 @@ class AttendanceRepository extends BaseRepository
      */
     protected function getAllowedUpdateColumns(): array
     {
-        return ['status', 'scheduled_hours', 'notes', 'captured_by', 'captured_at', 'updated_at'];
+        return ['status', 'scheduled_hours', 'notes', 'captured_by', 'captured_at', 'learner_data', 'updated_at'];
     }
 
     /*

@@ -147,13 +147,15 @@ class AttendanceService
         string $status,
         int $userId,
         float $scheduledHours,
-        ?string $notes = null
+        ?string $notes = null,
+        ?array $learnerData = null,
+        bool $allowRecapture = false
     ): int {
         $existingSession = $this->repository->findByClassAndDate($classId, $sessionDate);
         $sessionId       = null;
 
         if ($existingSession) {
-            if ($existingSession['status'] !== 'pending') {
+            if (!$allowRecapture && $existingSession['status'] !== 'pending') {
                 throw new Exception("Session already captured or marked — cannot re-capture");
             }
             $sessionId = (int) $existingSession['session_id'];
@@ -167,6 +169,7 @@ class AttendanceService
             'notes'           => $notes,
             'captured_by'     => $userId,
             'captured_at'     => $this->now(),
+            'learner_data'    => $learnerData !== null ? json_encode($learnerData) : null,
             'updated_at'      => $this->now(),
         ];
 
@@ -382,15 +385,27 @@ class AttendanceService
      * @param array  $learnerHours Array of ['learner_id' => int, 'hours_present' => float]
      * @param int    $capturedBy   WP user ID of the person capturing
      * @return array ['session_id' => int, 'captured_count' => int, 'errors' => array]
-     * @throws Exception on invalid date, re-capture attempt, or session creation failure
+     * @throws Exception on invalid date or session creation failure
      */
-    public function captureAttendance(int $classId, string $sessionDate, array $learnerHours, int $capturedBy): array
+    public function captureAttendance(int $classId, string $sessionDate, array $learnerHours, int $capturedBy, bool $isUpdate = false): array
     {
         // Validate date + get hours in one generateSessionList() call (not two)
         $scheduledHours = $this->getValidatedScheduledHours($classId, $sessionDate);
 
-        // Create or update session using shared helper
-        $sessionId = $this->createOrUpdateSession($classId, $sessionDate, 'captured', $capturedBy, $scheduledHours);
+        // Build learner_data for JSONB storage on the session (always persisted)
+        $learnerData = [];
+        foreach ($learnerHours as $lh) {
+            $learnerData[] = [
+                'learner_id'    => (int) $lh['learner_id'],
+                'hours_present' => (float) $lh['hours_present'],
+            ];
+        }
+
+        // Create or update session — allowRecapture=true for updates
+        $sessionId = $this->createOrUpdateSession(
+            $classId, $sessionDate, 'captured', $capturedBy, $scheduledHours,
+            null, $learnerData, $isUpdate
+        );
 
         // Log hours for each learner — continue even if individual learners fail
         $successCount = 0;
@@ -478,10 +493,64 @@ class AttendanceService
             throw new Exception("Session not found: {$sessionId}");
         }
 
+        // Try learner_hours_log first, fall back to learner_data JSONB on session
+        $learners = $this->repository->getSessionsWithLearnerHours($sessionId);
+
+        if (empty($learners) && !empty($session['learner_data'])) {
+            $learnerData = is_string($session['learner_data'])
+                ? json_decode($session['learner_data'], true)
+                : $session['learner_data'];
+
+            if (is_array($learnerData)) {
+                $scheduledHours = (float) ($session['scheduled_hours'] ?? 0);
+                $learnerIds     = array_column($learnerData, 'learner_id');
+
+                // Fetch learner names in bulk
+                $nameMap = $this->getLearnerNames($learnerIds);
+
+                foreach ($learnerData as $ld) {
+                    $lid          = (int) $ld['learner_id'];
+                    $hoursPresent = (float) ($ld['hours_present'] ?? 0);
+                    $learners[]   = [
+                        'learner_id'    => $lid,
+                        'learner_name'  => $nameMap[$lid] ?? 'Unknown',
+                        'hours_trained' => number_format($scheduledHours, 2, '.', ''),
+                        'hours_present' => number_format($hoursPresent, 2, '.', ''),
+                        'hours_absent'  => number_format(max(0, $scheduledHours - $hoursPresent), 2, '.', ''),
+                    ];
+                }
+            }
+        }
+
         return [
             'session'  => $session,
-            'learners' => $this->repository->getSessionsWithLearnerHours($sessionId),
+            'learners' => $learners,
         ];
+    }
+
+    /**
+     * Fetch learner names by IDs.
+     *
+     * @param array $learnerIds Array of learner IDs
+     * @return array Map of learner_id => full name
+     */
+    private function getLearnerNames(array $learnerIds): array
+    {
+        if (empty($learnerIds)) {
+            return [];
+        }
+
+        $pdo          = wecoza_db()->getPdo();
+        $placeholders = implode(',', array_fill(0, count($learnerIds), '?'));
+        $stmt         = $pdo->prepare("SELECT id, CONCAT(first_name, ' ', surname) AS name FROM learners WHERE id IN ({$placeholders})");
+        $stmt->execute(array_values($learnerIds));
+
+        $map = [];
+        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $map[(int) $row['id']] = $row['name'];
+        }
+
+        return $map;
     }
 
     /**
