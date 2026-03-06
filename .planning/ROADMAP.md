@@ -14,6 +14,7 @@
 - ✅ **v5.0 Learner Progression** — Phases 44-46 (shipped 2026-02-23)
 - ✅ **v6.0 Agent Attendance Capture** — Phases 48-52 (shipped 2026-02-24)
 - ✅ **v7.0 Agent Attendance Access** — Phases 53-55 (shipped 2026-03-05)
+- **v8.0 Page Tracking & Report Extraction** — Phases 56-58 (in progress)
 
 ## Phases
 
@@ -149,6 +150,16 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 
 </details>
 
+### v8.0 Page Tracking & Report Extraction (In Progress)
+
+**Milestone Goal:** Add workbook page-number tracking to attendance capture, surface page-based progression metrics, and build per-class CSV report extraction.
+
+- [ ] **Phase 56: Page Number Capture** - Add page number field to attendance modal and persist per learner per session
+- [ ] **Phase 57: Page Progression Display** - Calculate and display page-based progression alongside hours-based progression
+- [ ] **Phase 58: Report Extraction** - Per-class CSV report with header, learner details, hours, progression, and demographics
+
+See: `.planning/milestones/v8.0-ROADMAP.md` for full phase details.
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -165,8 +176,11 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
+| 56 | v8.0 | 0/2 | Not started | - |
+| 57 | v8.0 | 0/1 | Not started | - |
+| 58 | v8.0 | 0/2 | Not started | - |
 
-**Total: 55 phases, 120 plans executed across 12 milestones**
+**Total: 58 phases, 120 plans executed across 12 milestones + v8.0 in progress (5 plans planned)**
 
 ---
-*Last updated: 2026-03-05 — v7.0 Agent Attendance Access shipped*
+*Last updated: 2026-03-06 — v8.0 Page Tracking & Report Extraction roadmap created*

@@ -60,23 +60,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PAGE-01 | Pending | Pending |
-| PAGE-02 | Pending | Pending |
-| PAGE-03 | Pending | Pending |
-| PAGE-04 | Pending | Pending |
-| RPT-01 | Pending | Pending |
-| RPT-02 | Pending | Pending |
-| RPT-03 | Pending | Pending |
-| RPT-04 | Pending | Pending |
-| RPT-05 | Pending | Pending |
-| RPT-06 | Pending | Pending |
-| RPT-07 | Pending | Pending |
+| PAGE-01 | Phase 56 | Pending |
+| PAGE-02 | Phase 56 | Pending |
+| PAGE-03 | Phase 57 | Pending |
+| PAGE-04 | Phase 57 | Pending |
+| RPT-01 | Phase 58 | Pending |
+| RPT-02 | Phase 58 | Pending |
+| RPT-03 | Phase 58 | Pending |
+| RPT-04 | Phase 58 | Pending |
+| RPT-05 | Phase 58 | Pending |
+| RPT-06 | Phase 58 | Pending |
+| RPT-07 | Phase 58 | Pending |
 
 **Coverage:**
 - v8.0 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after initial definition*
+*Last updated: 2026-03-06 — traceability updated with phase mappings*
