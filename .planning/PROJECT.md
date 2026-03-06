@@ -82,7 +82,15 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(No active milestone — use `/gsd:new-milestone` to define next)
+#### v8.0 — Page Tracking & Report Extraction
+
+**Goal:** Add workbook page-number tracking to attendance capture for page-based progression measurement, and build per-class report extraction (CSV/Excel) with all fields Mario specified.
+
+**Target features:**
+- Page number capture during attendance (agent records current workbook page per learner per session)
+- Page-based progression metrics (target page vs actual page alongside hours-based progression)
+- Per-class report extraction (CSV/Excel) with: client, site, class type/subject, month, days, times, facilitator, learner details, hours breakdown, and progression metrics
+- Regulatory export inclusion of race & gender (deferred from v5.0)
 
 ### Out of Scope
 
@@ -220,4 +228,4 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | wp_doing_ajax() guard in admin_init | Prevents blocking attendance AJAX calls | ✓ v7.0 |
 
 ---
-*Last updated: 2026-03-05 after v7.0 milestone*
+*Last updated: 2026-03-06 after v8.0 milestone start*

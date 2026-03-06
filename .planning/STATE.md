@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: between_milestones
+milestone: v8.0
+milestone_name: Page Tracking & Report Extraction
+status: defining_requirements
 stopped_at: null
-last_updated: "2026-03-05"
-last_activity: 2026-03-05 — v7.0 Agent Attendance Access milestone complete and archived
+last_updated: "2026-03-06"
+last_activity: 2026-03-06 — Milestone v8.0 started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -18,14 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-05)
+See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** Planning next milestone
+**Current focus:** v8.0 Page Tracking & Report Extraction
 
 ## Current Position
 
-Between milestones. v7.0 Agent Attendance Access shipped 2026-03-05.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-06 — Milestone v8.0 started
 
 ## Milestone History
 
@@ -46,17 +49,16 @@ See: .planning/MILESTONES.md for full details
 
 ### Pending Todos
 
-- Report generation field list (RPT-01) — waiting on Mario's field list. Deferred to future milestone.
 - Agent edit form `wp_user_id` field (AGT-09, AGT-10) — deferred to future milestone.
 
 ### Blockers/Concerns
 
-None.
+- Mario wants a 5-min call to discuss page number logic (target vs actual page progression). May refine requirements after call.
 
 ## Session Continuity
 
-Last session: 2026-03-05
-Stopped at: v7.0 milestone complete
+Last session: 2026-03-06
+Stopped at: Defining v8.0 requirements
 Resume file: None
 
-**Next action:** `/gsd:new-milestone` to define next milestone
+**Next action:** Define requirements, then create roadmap
