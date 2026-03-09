@@ -225,7 +225,6 @@ class ReportService
             return $default;
         }
 
-        // Map full day names to abbreviated forms
         $dayAbbreviations = [
             'Monday' => 'Mon',
             'Tuesday' => 'Tue',
@@ -239,6 +238,64 @@ class ReportService
         $days = [];
         $times = [];
 
+        // v2.0 format: { selectedDays: [...], timeData: { perDayTimes: { Day: {start_time, end_time} } } }
+        if (isset($schedule['version']) && version_compare((string) $schedule['version'], '2.0', '>=')) {
+            $selectedDays = $schedule['selectedDays'] ?? [];
+            foreach ($selectedDays as $dayName) {
+                $abbr = $dayAbbreviations[$dayName] ?? $dayName;
+                if ($abbr !== '' && !in_array($abbr, $days, true)) {
+                    $days[] = $abbr;
+                }
+            }
+
+            $perDayTimes = $schedule['timeData']['perDayTimes'] ?? [];
+            $dayTimeMap = [];
+            foreach ($perDayTimes as $dayName => $dayTimes) {
+                $abbr = $dayAbbreviations[$dayName] ?? $dayName;
+                $ranges = [];
+
+                // Newer format: intervals array with multiple sessions per day
+                if (!empty($dayTimes['intervals']) && is_array($dayTimes['intervals'])) {
+                    foreach ($dayTimes['intervals'] as $interval) {
+                        $start = $interval['startTime'] ?? '';
+                        $end = $interval['endTime'] ?? '';
+                        if ($start !== '' && $end !== '') {
+                            $ranges[] = $start . ' - ' . $end;
+                        }
+                    }
+                } else {
+                    // Older format: single start_time / end_time
+                    $start = $dayTimes['start_time'] ?? '';
+                    $end = $dayTimes['end_time'] ?? '';
+                    if ($start !== '' && $end !== '') {
+                        $ranges[] = $start . ' - ' . $end;
+                    }
+                }
+
+                if (!empty($ranges)) {
+                    $dayTimeMap[$abbr] = implode(', ', $ranges);
+                }
+            }
+
+            // If all days share the same times, show once; otherwise show per-day
+            $uniqueTimes = array_unique(array_values($dayTimeMap));
+            if (count($uniqueTimes) === 1) {
+                $timesStr = $uniqueTimes[0];
+            } else {
+                $parts = [];
+                foreach ($dayTimeMap as $abbr => $timeRange) {
+                    $parts[] = $abbr . ': ' . $timeRange;
+                }
+                $timesStr = implode('; ', $parts);
+            }
+
+            return [
+                'days' => implode(', ', $days),
+                'times' => $timesStr,
+            ];
+        }
+
+        // v1 format: flat array of { day, start_time, end_time }
         foreach ($schedule as $entry) {
             if (!is_array($entry)) {
                 continue;
@@ -252,7 +309,7 @@ class ReportService
             $startTime = $entry['start_time'] ?? '';
             $endTime = $entry['end_time'] ?? '';
             if ($startTime !== '' && $endTime !== '') {
-                $timeRange = $startTime . '-' . $endTime;
+                $timeRange = $startTime . ' - ' . $endTime;
                 if (!in_array($timeRange, $times, true)) {
                     $times[] = $timeRange;
                 }

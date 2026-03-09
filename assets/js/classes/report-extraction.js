@@ -93,7 +93,7 @@
         var month = parseInt(parts[1], 10);
 
         // Show loading, hide preview and download button
-        $('#report-loading').removeClass('d-none').addClass('d-flex');
+        $('#clr-loading').removeClass('d-none').addClass('d-flex');
         $('#report-preview').empty();
         $('#clr-alert').empty();
         $('#btn-download-csv').hide().prop('disabled', true);
@@ -111,7 +111,7 @@
                 month: month
             },
             success: function (response) {
-                $('#report-loading').removeClass('d-flex').addClass('d-none');
+                $('#clr-loading').removeClass('d-flex').addClass('d-none');
                 $('#btn-generate-report').prop('disabled', false);
 
                 if (response.success && response.data) {
@@ -128,7 +128,7 @@
                 }
             },
             error: function () {
-                $('#report-loading').removeClass('d-flex').addClass('d-none');
+                $('#clr-loading').removeClass('d-flex').addClass('d-none');
                 $('#btn-generate-report').prop('disabled', false);
                 showAlert('An error occurred while generating the report.', 'danger');
             }
@@ -229,10 +229,12 @@
             'Race', 'Gender', 'Month Trained', 'Month Present',
             'Total Trained', 'Total Present', 'Hours %', 'Page %'
         ];
+        var centeredCols = { 6: true, 7: true, 8: true, 9: true, 10: true, 11: true };
         var $thead = $('<thead class="border-bottom">');
         var $headerRow = $('<tr>');
         $.each(columns, function (i, col) {
-            $headerRow.append($('<th class="border-0 text-nowrap">').text(col));
+            var cls = 'border-0 text-nowrap' + (centeredCols[i] ? ' text-center' : '');
+            $headerRow.append($('<th class="' + cls + '">').text(col));
         });
         $thead.append($headerRow);
         $table.append($thead);
@@ -247,12 +249,12 @@
             $row.append($('<td class="text-nowrap">').text(formatDate(learner.start_date)));
             $row.append($('<td>').text(learner.race || '-'));
             $row.append($('<td>').text(learner.gender || '-'));
-            $row.append($('<td class="text-end">').text(formatNumber(learner.month_hours_trained)));
-            $row.append($('<td class="text-end">').text(formatNumber(learner.month_hours_present)));
-            $row.append($('<td class="text-end">').text(formatNumber(learner.hours_trained)));
-            $row.append($('<td class="text-end">').text(formatNumber(learner.hours_present)));
-            $row.append($('<td class="text-end">').text(formatPercentage(learner.hours_progress_pct)));
-            $row.append($('<td class="text-end">').text(formatPercentage(learner.page_progress_pct)));
+            $row.append($('<td class="text-center">').text(formatNumber(learner.month_hours_trained)));
+            $row.append($('<td class="text-center">').text(formatNumber(learner.month_hours_present)));
+            $row.append($('<td class="text-center">').text(formatNumber(learner.hours_trained)));
+            $row.append($('<td class="text-center">').text(formatNumber(learner.hours_present)));
+            $row.append($('<td class="text-center">').text(formatPercentage(learner.hours_progress_pct)));
+            $row.append($('<td class="text-center">').text(formatPercentage(learner.page_progress_pct)));
 
             $tbody.append($row);
         });
