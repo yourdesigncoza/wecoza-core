@@ -2,7 +2,7 @@
 
 ## What This Is
 
-WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend, MVC architecture, service layer pattern, unified model hierarchy, and full return type coverage.
+WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, attendance capture with page-number tracking, per-class report extraction, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend, MVC architecture, service layer pattern, unified model hierarchy, and full return type coverage.
 
 ## Core Value
 
@@ -79,24 +79,25 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ AJAX capability guards on attendance write handlers — v7.0
 - ✓ Agent attendance page with JSONB class lookup + Phoenix card view — v7.0
 - ✓ Three-hook redirect cage (login, admin, template) locking agents to attendance only — v7.0
+- ✓ Page number capture in attendance modal (required field, JSONB persistence, blank each session) — v8.0
+- ✓ Page progression display on admin panel (green bar, JSONB lateral subquery, total_pages seeded) — v8.0
+- ✓ ReportRepository with CTE-based SQL joining 6 tables for per-class reports — v8.0
+- ✓ ReportService with schedule parsing, percentage calculations, 12-column CSV formatting — v8.0
+- ✓ `[wecoza_class_learner_report]` shortcode with class/month selector, AJAX preview, CSV download — v8.0
+- ✓ Race and gender columns in learner report extraction — v8.0
 
 ### Active
 
-#### v8.0 — Page Tracking & Report Extraction
-
-**Goal:** Add workbook page-number tracking to attendance capture for page-based progression measurement, and build per-class report extraction (CSV/Excel) with all fields Mario specified.
-
-**Target features:**
-- Page number capture during attendance (agent records current workbook page per learner per session)
-- Page-based progression metrics (target page vs actual page alongside hours-based progression)
-- Per-class report extraction (CSV/Excel) with: client, site, class type/subject, month, days, times, facilitator, learner details, hours breakdown, and progression metrics
-- Regulatory export inclusion of race & gender (deferred from v5.0)
+(No active requirements — use `/gsd:new-milestone` to define next milestone)
 
 ### Out of Scope
 
 - Packages feature (learners on different subjects) — deferred per WEC-168 discussion
 - Regulatory reporting for Umalusi/DHET (monthly progressions, CSV export) — deferred from v5.0 Phase 47
-- New reporting features — separate milestone
+- Target page progression (target vs actual pages — requires Mario to define targets per module)
+- Report templates (summary, attendance register, progress, individual learner — separate milestone after Mario designs layouts)
+- Automated monthly report emails (Mario wants to finalize layout in Google Sheets first)
+- Excel export format (CSV sufficient for now)
 - Mobile app — not planned
 - OAuth/social login — not required
 - Client billing/invoicing — separate domain
@@ -107,20 +108,20 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v7.0 Shipped)
+### Current State (v8.0 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~83,500 lines of PHP across 5 modules + LookupTables
+- **Total:** ~87,000 lines of PHP across 5 modules + LookupTables
 - **Agents module:** 16+ PHP files in `src/Agents/` (includes AgentService, AgentDisplayService)
 - **Events module:** 40+ PHP files in `src/Events/`
 - **Clients module:** 17+ PHP files in `src/Clients/` (includes ClientService)
-- **Learners module:** `src/Learners/` (includes LearnerService, ProgressionService)
-- **Classes module:** `src/Classes/` (includes AttendanceService, AttendanceRepository, ClassStatusAjaxHandler)
+- **Learners module:** `src/Learners/` (includes LearnerService, ProgressionService, LearnerProgressionRepository)
+- **Classes module:** `src/Classes/` (includes AttendanceService, AttendanceRepository, ReportRepository, ReportService, ReportAjaxHandlers, ReportExtractionShortcode)
 - **LookupTables module:** `src/LookupTables/` (3 files — config-driven CRUD for any lookup table)
 - **Core:** `core/Abstract/AppConstants.php` — shared constants
-- **View templates:** 25+ templates in `views/` (includes attendance.php, lookup-tables/manage.view.php)
-- **Shortcodes:** `[wecoza_manage_qualifications]`, `[wecoza_manage_placement_levels]`
-- **JavaScript:** 22+ JS files across `assets/js/` (includes attendance-capture.js)
+- **View templates:** 26+ templates in `views/` (includes attendance.php, report-extraction.php, lookup-tables/manage.view.php)
+- **Shortcodes:** `[wecoza_manage_qualifications]`, `[wecoza_manage_placement_levels]`, `[wecoza_class_learner_report]`
+- **JavaScript:** 23+ JS files across `assets/js/` (includes attendance-capture.js, report-extraction.js)
 - **Test coverage:** 4 test files in `tests/Events/`, 1 integration test, 1 architecture verification script
 - **Form field audits:** `docs/formfieldanalysis/*.md` (5 modules audited)
 
@@ -226,6 +227,15 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | App CPT for agent attendance page | Consistent with other WeCoza /app/ pages | ✓ v7.0 |
 | login_redirect priority 9 | Fires before theme's priority-10 catch-all redirect | ✓ v7.0 |
 | wp_doing_ajax() guard in admin_init | Prevents blocking attendance AJAX calls | ✓ v7.0 |
+| Page number per learner (not per session) | Mario confirmed: "last completed page" meaning | ✓ v8.0 |
+| Page number stored in existing JSONB | No schema changes; learner_data already exists | ✓ v8.0 |
+| No pre-fill from previous session | Mario: agent enters blank each session | ✓ v8.0 |
+| Page number required field | Mario: all classes use workbooks | ✓ v8.0 |
+| MAX(page_number) JSONB lateral subquery | Accurate page tracking scoped to learner+class | ✓ v8.0 |
+| Green bar for page vs blue for hours | Visual distinction between progression types | ✓ v8.0 |
+| CTEs for report queries | Performance: monthly hours + page numbers aggregation | ✓ v8.0 |
+| 12-column padded CSV | Excel compatibility — prevents inconsistent row length warnings | ✓ v8.0 |
+| Null percentages as dash not zero | Distinguishes missing data from actual 0% progress | ✓ v8.0 |
 
 ---
-*Last updated: 2026-03-06 after v8.0 milestone start*
+*Last updated: 2026-03-09 after v8.0 milestone completion*

@@ -1,5 +1,29 @@
 # Project Milestones: WeCoza Core
 
+## v8.0 Page Tracking & Report Extraction (Shipped: 2026-03-09)
+
+**Delivered:** Added workbook page-number tracking to attendance capture, page-based progression metrics on admin panel, and per-class CSV report extraction with header metadata, learner details, hours breakdown, and progression percentages.
+
+**Phases completed:** 56-58 (3 phases, 5 plans)
+
+**Key accomplishments:**
+
+- Page number capture in attendance modal — required field, blank each session, persisted in learner_data JSONB alongside hours
+- Page progression display on admin panel — green progress bar using MAX(page_number) JSONB lateral subquery vs total_pages
+- ReportRepository with CTE-based SQL joining 6 tables (classes, clients, sites, class_types, class_type_subjects, agents)
+- ReportService with schedule parsing, percentage calculations, and 12-column padded CSV formatting
+- `[wecoza_class_learner_report]` shortcode with Phoenix-themed class/month selector, AJAX preview, and streaming CSV download
+
+**Stats:**
+
+- 31 files changed, 3,447 insertions, 68 deletions
+- 30 commits
+- Timeline: 1 day (2026-03-09)
+
+**Git range:** `997eb35` → `1b21228`
+
+---
+
 ## v7.0 Agent Attendance Access (Shipped: 2026-03-05)
 
 **Delivered:** Completed WEC-182 attendance feedback — exception button UX, stopped-class capture gate, wp_agent WordPress role with capability guards, agent-to-WP-user linkage, dedicated attendance page with JSONB class lookup, and three-hook redirect cage locking agents to attendance only.
