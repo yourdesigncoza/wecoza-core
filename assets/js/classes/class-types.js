@@ -277,15 +277,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Generate a simple 9-character class code from client name and timestamp
+     * Generate a class code from client name, timestamp, and random suffix
      *
-     * Format: [ABC][MMDDHR] where ABC = first 3 letters of client name, MMDDHR = month-day-hour
-     * Example: AGR102214 = AGR (from "AGR Limited") + 10 (Oct) + 22 (22nd) + 14 (2pm)
+     * Format: [ABC][MMDDHR]-[N] where ABC = first 3 letters of client name, MMDDHR = month-day-hour, N = random digit 1-9
+     * Example: AGR102214-6 = AGR (from "AGR Limited") + 10 (Oct) + 22 (22nd) + 14 (2pm) + random 6
      *
-     * @return {string} The generated class code (9 characters)
+     * @return {string} The generated class code (11 characters)
      */
     function generateClassCode() {
-        // Get client name from dropdown
         const clientSelect = document.getElementById('client_id');
         if (!clientSelect || !clientSelect.value) {
             return '';
@@ -294,21 +293,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedOption = clientSelect.options[clientSelect.selectedIndex];
         const clientName = selectedOption.text;
 
-        // Extract first 3 uppercase letters from client name
         const prefix = clientName
-            .replace(/[^a-zA-Z]/g, '') // Remove non-letter characters
+            .replace(/[^a-zA-Z]/g, '')
             .substring(0, 3)
             .toUpperCase()
-            .padEnd(3, 'X'); // Pad with X if less than 3 letters
+            .padEnd(3, 'X');
 
-        // Get current date/time components
         const now = new Date();
         const month = (now.getMonth() + 1).toString().padStart(2, '0');
         const day = now.getDate().toString().padStart(2, '0');
         const hour = now.getHours().toString().padStart(2, '0');
+        const suffix = Math.floor(Math.random() * 9) + 1; // 1-9
 
-        // Format: [ABC][MMDDHR]
-        return `${prefix}${month}${day}${hour}`;
+        return `${prefix}${month}${day}${hour}-${suffix}`;
     }
 
 

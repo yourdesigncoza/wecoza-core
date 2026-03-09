@@ -110,7 +110,7 @@
          <div class="col-md-3">
             <label for="class_code" class="form-label">Class Code</label>
             <input type="text" id="class_code" name="class_code" class="form-control form-control-sm" placeholder="Class Code" readonly>
-            <small class="text-muted">[Abbreviation][month][day][hour] eg. EDU012216</small>
+            <small class="text-muted">[Abbreviation][month][day][hour]-[digit] eg. EDU012216-6</small>
          </div>
          <!-- Class Original Start Date -->
          <div class="col-md-3">
