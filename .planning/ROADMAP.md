@@ -155,7 +155,7 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 **Milestone Goal:** Add workbook page-number tracking to attendance capture, surface page-based progression metrics, and build per-class CSV report extraction.
 
 - [x] **Phase 56: Page Number Capture** - Add page number field to attendance modal and persist per learner per session
-- [ ] **Phase 57: Page Progression Display** - Calculate and display page-based progression alongside hours-based progression
+- [x] **Phase 57: Page Progression Display** - Calculate and display page-based progression alongside hours-based progression (completed 2026-03-09)
 - [ ] **Phase 58: Report Extraction** - Per-class CSV report with header, learner details, hours, progression, and demographics
 
 ### Phase 56: Page Number Capture
@@ -184,7 +184,7 @@ Plans:
   3. Page progression column appears on the progression admin panel next to hours-based progression
   4. Learners without page data show a dash or "N/A" instead of broken display
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 57-01: Add total_pages column to class_type_subjects + seed defaults + progression calculation + admin panel integration
 
@@ -222,7 +222,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md` for confirmed decisions and addition
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56 | v8.0 | Complete    | 2026-03-09 | 2026-03-09 |
-| 57 | v8.0 | 0/1 | Not started | - |
+| 57 | 1/1 | Complete   | 2026-03-09 | - |
 | 58 | v8.0 | 0/2 | Not started | - |
 
 **Total: 58 phases, 120 plans executed across 12 milestones + v8.0 in progress (5 plans planned)**
