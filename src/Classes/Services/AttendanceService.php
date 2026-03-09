@@ -398,6 +398,7 @@ class AttendanceService
             $learnerData[] = [
                 'learner_id'    => (int) $lh['learner_id'],
                 'hours_present' => (float) $lh['hours_present'],
+                'page_number'   => (int) ($lh['page_number'] ?? 0),
             ];
         }
 
@@ -496,6 +497,23 @@ class AttendanceService
         // Try learner_hours_log first, fall back to learner_data JSONB on session
         $learners = $this->repository->getSessionsWithLearnerHours($sessionId);
 
+        // Supplement learner_hours_log entries with page_number from learner_data JSONB
+        if (!empty($learners) && !empty($session['learner_data'])) {
+            $learnerDataRaw = is_string($session['learner_data'])
+                ? json_decode($session['learner_data'], true)
+                : $session['learner_data'];
+            $pageMap = [];
+            if (is_array($learnerDataRaw)) {
+                foreach ($learnerDataRaw as $ld) {
+                    $pageMap[(int) ($ld['learner_id'] ?? 0)] = (int) ($ld['page_number'] ?? 0);
+                }
+            }
+            foreach ($learners as &$l) {
+                $l['page_number'] = $pageMap[(int) $l['learner_id']] ?? 0;
+            }
+            unset($l);
+        }
+
         if (empty($learners) && !empty($session['learner_data'])) {
             $learnerData = is_string($session['learner_data'])
                 ? json_decode($session['learner_data'], true)
@@ -517,6 +535,7 @@ class AttendanceService
                         'hours_trained' => number_format($scheduledHours, 2, '.', ''),
                         'hours_present' => number_format($hoursPresent, 2, '.', ''),
                         'hours_absent'  => number_format(max(0, $scheduledHours - $hoursPresent), 2, '.', ''),
+                        'page_number'   => (int) ($ld['page_number'] ?? 0),
                     ];
                 }
             }
