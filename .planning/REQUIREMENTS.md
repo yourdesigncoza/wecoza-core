@@ -9,9 +9,9 @@ Requirements for Page Tracking & Report Extraction milestone. Each maps to roadm
 
 ### Page Tracking
 
-- [ ] **PAGE-01**: Agent can capture current workbook page number per learner during attendance session
-- [ ] **PAGE-02**: Page number is stored per learner per session alongside hours data
-- [ ] **PAGE-03**: Actual page progression percentage is calculated and displayed (current page / total pages in module)
+- [x] **PAGE-01**: Agent must capture last completed workbook page number per learner during attendance session (required field)
+- [x] **PAGE-02**: Page number is stored per learner per session alongside hours data
+- [ ] **PAGE-03**: Actual page progression percentage is calculated and displayed (last completed page / total pages in module via `class_type_subjects.total_pages`)
 - [ ] **PAGE-04**: Page progression is visible on the progression admin panel alongside hours-based progression
 
 ### Report Extraction
@@ -60,8 +60,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PAGE-01 | Phase 56 | Pending |
-| PAGE-02 | Phase 56 | Pending |
+| PAGE-01 | Phase 56 | Complete |
+| PAGE-02 | Phase 56 | Complete |
 | PAGE-03 | Phase 57 | Pending |
 | PAGE-04 | Phase 57 | Pending |
 | RPT-01 | Phase 58 | Pending |
@@ -79,4 +79,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 — traceability updated with phase mappings*
+*Last updated: 2026-03-09 — updated PAGE-01/PAGE-03 wording per Mario's WEC-184 feedback*
