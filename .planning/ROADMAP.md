@@ -154,7 +154,7 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 
 **Milestone Goal:** Add workbook page-number tracking to attendance capture, surface page-based progression metrics, and build per-class CSV report extraction.
 
-- [ ] **Phase 56: Page Number Capture** - Add page number field to attendance modal and persist per learner per session
+- [x] **Phase 56: Page Number Capture** - Add page number field to attendance modal and persist per learner per session
 - [ ] **Phase 57: Page Progression Display** - Calculate and display page-based progression alongside hours-based progression
 - [ ] **Phase 58: Report Extraction** - Per-class CSV report with header, learner details, hours, progression, and demographics
 
@@ -162,7 +162,7 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 **Goal**: Agents can record the last completed workbook page for each learner during attendance capture
 **Depends on**: Nothing (first phase of v8.0; builds on v6.0/v7.0 attendance infrastructure)
 **Requirements**: PAGE-01, PAGE-02
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 **Success Criteria** (what must be TRUE):
   1. Agent sees a "Last Completed Page" input field per learner row in the attendance capture modal
   2. Page number is **required** — attendance cannot be submitted without a page number for every learner
@@ -171,8 +171,8 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
   5. Previously captured sessions show the recorded page number in the view modal
 
 Plans:
-- [ ] 56-01-PLAN.md — Backend: AJAX handler + AttendanceService page_number validation, persistence in learner_data JSONB, detail response
-- [ ] 56-02-PLAN.md — Frontend: "Last Completed Page" input in capture modal, validation, display in view detail modal
+- [x] 56-01-PLAN.md — Backend: AJAX handler + AttendanceService page_number validation, persistence in learner_data JSONB, detail response
+- [x] 56-02-PLAN.md — Frontend: "Last Completed Page" input in capture modal, validation, display in view detail modal
 
 ### Phase 57: Page Progression Display
 **Goal**: Admins can see page-based progression metrics alongside hours-based progression for each learner
@@ -220,7 +220,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md` for confirmed decisions and addition
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
-| 56 | 1/2 | In Progress|  | - |
+| 56 | v8.0 | 2/2 | Complete | 2026-03-09 |
 | 57 | v8.0 | 0/1 | Not started | - |
 | 58 | v8.0 | 0/2 | Not started | - |
 
