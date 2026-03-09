@@ -189,6 +189,7 @@ if ($classStatus === 'stopped') {
                                     </button>
                                 </th>
                                 <th class="border-top border-translucent text-center">Hours Absent</th>
+                                <th class="border-top border-translucent text-center">Last Completed Page</th>
                             </tr>
                         </thead>
                         <tbody id="capture-learners-tbody"></tbody>

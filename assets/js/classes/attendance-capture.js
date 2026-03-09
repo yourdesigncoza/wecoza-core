@@ -683,7 +683,7 @@
         let html = '';
 
         if (learnerIds.length === 0) {
-            html = '<tr><td colspan="4" class="text-center text-muted py-2">No enrolled learners found.</td></tr>';
+            html = '<tr><td colspan="5" class="text-center text-muted py-2">No enrolled learners found.</td></tr>';
             $('#btn-submit-capture').prop('disabled', true);
         } else {
             learnerIds.forEach(function(learner) {
@@ -703,6 +703,14 @@
                     + ' style="width: 80px; display: inline-block;">'
                     + '</td>'
                     + '<td class="align-middle text-center"><span class="hours-absent-val">' + scheduledHours.toFixed(1) + '</span></td>'
+                    + '<td class="align-middle text-center">'
+                    + '<input type="number" class="form-control form-control-sm page-number-input"'
+                    + ' value=""'
+                    + ' min="1" step="1"'
+                    + ' placeholder="Page #"'
+                    + ' required'
+                    + ' style="width: 80px; display: inline-block;">'
+                    + '</td>'
                     + '</tr>';
             });
         }
@@ -731,10 +739,12 @@
                 var learners = response.data.learners || [];
                 if (learners.length === 0) return;
 
-                // Build a map of learner_id -> hours_present
+                // Build maps of learner_id -> hours_present and learner_id -> page_number
                 var hoursMap = {};
+                var pageMap = {};
                 learners.forEach(function(l) {
                     hoursMap[l.learner_id] = parseFloat(l.hours_present) || 0;
+                    pageMap[l.learner_id] = parseInt(l.page_number) || 0;
                 });
 
                 // Pre-fill each input
@@ -747,6 +757,10 @@
                         // Update hours absent
                         var trained = parseFloat($(this).find('.hours-trained-val').text()) || 0;
                         $(this).find('.hours-absent-val').text(Math.max(0, trained - present).toFixed(1));
+                    }
+                    // Pre-fill page number if saved value exists
+                    if (learnerId && pageMap[learnerId] > 0) {
+                        $(this).find('.page-number-input').val(pageMap[learnerId]);
                     }
                 });
 
@@ -777,22 +791,38 @@
             if (learnerId <= 0) return;
 
             const $input = $(this).find('.hours-present-input');
+            const $pageInput = $(this).find('.page-number-input');
             const hoursPresent = parseFloat($input.val());
+            const pageNumber = parseInt($pageInput.val()) || 0;
+            let rowValid = true;
 
             if (isNaN(hoursPresent) || hoursPresent < 0) {
-                isValid = false;
+                rowValid = false;
                 $input.addClass('is-invalid');
             } else {
                 $input.removeClass('is-invalid');
+            }
+
+            if (pageNumber < 1) {
+                rowValid = false;
+                $pageInput.addClass('is-invalid');
+            } else {
+                $pageInput.removeClass('is-invalid');
+            }
+
+            if (!rowValid) {
+                isValid = false;
+            } else {
                 learnerHours.push({
                     learner_id:    learnerId,
                     hours_present: hoursPresent,
+                    page_number:   pageNumber,
                 });
             }
         });
 
         if (!isValid) {
-            showAlert('#capture-alert', 'Please ensure all hours are valid (0 or above).', 'danger');
+            showAlert('#capture-alert', 'Please ensure all hours are valid and every learner has a page number.', 'danger');
             $btn.prop('disabled', false).html(
                 '<i class="bi bi-check-lg me-1"></i>' + btnLabel
             );
