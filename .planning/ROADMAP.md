@@ -162,7 +162,7 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 **Goal**: Agents can record the last completed workbook page for each learner during attendance capture
 **Depends on**: Nothing (first phase of v8.0; builds on v6.0/v7.0 attendance infrastructure)
 **Requirements**: PAGE-01, PAGE-02
-**Plans:** 2/2 plans executed
+**Plans:** 2/2 plans complete
 **Success Criteria** (what must be TRUE):
   1. Agent sees a "Last Completed Page" input field per learner row in the attendance capture modal
   2. Page number is **required** — attendance cannot be submitted without a page number for every learner
@@ -220,7 +220,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md` for confirmed decisions and addition
 | 44-46 | v5.0 | 9/9 | Complete | 2026-02-23 |
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
-| 56 | v8.0 | 2/2 | Complete | 2026-03-09 |
+| 56 | v8.0 | Complete    | 2026-03-09 | 2026-03-09 |
 | 57 | v8.0 | 0/1 | Not started | - |
 | 58 | v8.0 | 0/2 | Not started | - |
 
