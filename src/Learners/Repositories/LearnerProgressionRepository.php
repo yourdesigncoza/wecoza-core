@@ -42,18 +42,27 @@ class LearnerProgressionRepository extends BaseRepository
     private function baseQuery(): string
     {
         // Complex query: 6-table JOIN for full progression context with class_type for LP description
+        // Includes page progression: total_pages from class_type_subjects + last_page_number from attendance JSONB
         return "
             SELECT
                 lpt.*,
                 cts.subject_name,
                 cts.subject_code,
                 cts.subject_duration,
+                cts.total_pages,
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
                 c.class_code,
                 c.class_subject,
                 ct.class_type_name,
                 cl.client_id,
-                cl.client_name
+                cl.client_name,
+                (SELECT MAX((elem->>'page_number')::int)
+                 FROM class_attendance_sessions cas,
+                      jsonb_array_elements(cas.learner_data) AS elem
+                 WHERE (elem->>'learner_id')::int = lpt.learner_id
+                   AND cas.class_id = lpt.class_id
+                   AND elem->>'page_number' IS NOT NULL
+                ) AS last_page_number
             FROM learner_lp_tracking lpt
             LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
@@ -535,16 +544,25 @@ class LearnerProgressionRepository extends BaseRepository
     public function findForReport(array $filters = []): array
     {
         // Complex query: 5-table JOIN (lpt + class_type_subjects + learners + classes + employers) with dynamic filters
+        // Includes page progression: total_pages + last_page_number for report extraction
         $sql = "
             SELECT
                 lpt.*,
                 cts.subject_name,
                 cts.subject_duration,
+                cts.total_pages,
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
                 l.id AS learner_id,
                 c.class_code,
                 emp.employer_name,
-                emp.employer_id
+                emp.employer_id,
+                (SELECT MAX((elem->>'page_number')::int)
+                 FROM class_attendance_sessions cas,
+                      jsonb_array_elements(cas.learner_data) AS elem
+                 WHERE (elem->>'learner_id')::int = lpt.learner_id
+                   AND cas.class_id = lpt.class_id
+                   AND elem->>'page_number' IS NOT NULL
+                ) AS last_page_number
             FROM learner_lp_tracking lpt
             LEFT JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
             LEFT JOIN learners l ON lpt.learner_id = l.id
