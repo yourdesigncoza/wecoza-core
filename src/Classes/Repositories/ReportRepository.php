@@ -60,7 +60,7 @@ class ReportRepository extends BaseRepository
             LEFT JOIN clients cl ON c.client_id = cl.client_id
             LEFT JOIN sites s ON c.site_id = s.site_id
             LEFT JOIN class_types ct ON c.class_type = ct.class_type_code
-            LEFT JOIN class_type_subjects cts ON c.class_subject = cts.class_type_subject_id
+            LEFT JOIN class_type_subjects cts ON c.class_subject::int = cts.class_type_subject_id
             LEFT JOIN agents a ON c.class_agent = a.agent_id
             WHERE c.class_id = :class_id
         ";
