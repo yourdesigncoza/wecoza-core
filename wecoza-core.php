@@ -700,6 +700,22 @@ add_action(
         require_once WECOZA_CORE_PATH .
             "src/Classes/Ajax/ClassStatusAjaxHandler.php";
 
+        /*
+        |--------------------------------------------------------------------------
+        | Load Report Extraction Shortcode & AJAX Handlers
+        |--------------------------------------------------------------------------
+        |
+        | Shortcode [wecoza_report_extraction] for class report preview and CSV
+        | download. AJAX handlers for report generation and CSV streaming.
+        |
+        */
+
+        require_once WECOZA_CORE_PATH .
+            "src/Classes/Shortcodes/ReportExtractionShortcode.php";
+
+        require_once WECOZA_CORE_PATH .
+            "src/Classes/Ajax/ReportAjaxHandlers.php";
+
         // Auto-detect shortcode context for the feedback widget
         add_filter('do_shortcode_tag', function (string $output, string $tag): string {
             if (str_starts_with($tag, 'wecoza_') && !str_contains($output, 'data-wecoza-shortcode')) {
