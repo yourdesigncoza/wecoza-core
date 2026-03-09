@@ -184,6 +184,7 @@ Plans:
   3. Page progression column appears on the progression admin panel next to hours-based progression
   4. Learners without page data show a dash or "N/A" instead of broken display
 
+**Plans:** 1 plan
 Plans:
 - [ ] 57-01: Add total_pages column to class_type_subjects + seed defaults + progression calculation + admin panel integration
 
