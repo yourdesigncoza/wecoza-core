@@ -112,7 +112,7 @@
 
         if (!rows || rows.length === 0) {
             const $empty = $('<tr>').append(
-                $('<td>').attr('colspan', 8)
+                $('<td>').attr('colspan', 9)
                     .addClass('text-center text-muted py-4')
                     .text('No progressions found.')
             );
@@ -155,7 +155,7 @@
             $statusTd.append($badge);
             $tr.append($statusTd);
 
-            // Col 6: Progress bar
+            // Col 6: Hours Progress bar
             const duration   = parseFloat(row.subject_duration) || 0;
             const trained    = parseFloat(row.hours_trained) || 0;
             const pct        = duration > 0 ? Math.min(100, Math.round((trained / duration) * 100)) : 0;
@@ -171,10 +171,33 @@
             $progressTd.append($('<span>').addClass('ms-2 fs-9 text-muted').text(pct + '%'));
             $tr.append($progressTd);
 
-            // Col 7: Start date
+            // Col 7: Page Progress bar
+            const totalPages  = parseInt(row.total_pages) || 0;
+            const lastPage    = parseInt(row.last_page_number) || 0;
+            const $pageTd     = $('<td>').css('min-width', '120px');
+
+            if (totalPages > 0 && lastPage > 0) {
+                const pagePct    = Math.min(100, Math.round((lastPage / totalPages) * 100));
+                const $pageOuter = $('<div>').addClass('progress progress-sm').css({ height: '8px', width: '80px', display: 'inline-block' });
+                const $pageBar   = $('<div>').addClass('progress-bar bg-success').css('width', pagePct + '%')
+                    .attr('role', 'progressbar')
+                    .attr('aria-valuenow', pagePct)
+                    .attr('aria-valuemin', 0)
+                    .attr('aria-valuemax', 100);
+                $pageOuter.append($pageBar);
+                $pageTd.append($pageOuter);
+                $pageTd.append($('<span>').addClass('ms-2 fs-9 text-muted').text(pagePct + '%'));
+                $pageTd.append($('<br>'));
+                $pageTd.append($('<small>').addClass('text-muted').text(lastPage + '/' + totalPages + ' pages'));
+            } else {
+                $pageTd.append($('<span>').addClass('text-muted').html('&mdash;'));
+            }
+            $tr.append($pageTd);
+
+            // Col 8: Start date
             $tr.append($('<td>').text(row.start_date || ''));
 
-            // Col 8: Actions dropdown
+            // Col 9: Actions dropdown
             const $actionsTd = $('<td>').addClass('text-end pe-3');
             const $group     = $('<div>').addClass('btn-group');
 

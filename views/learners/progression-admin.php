@@ -96,7 +96,8 @@ if (!defined('ABSPATH')) {
                                 <th class="border-0">Learning Programme</th>
                                 <th class="border-0">Class</th>
                                 <th class="border-0">Status</th>
-                                <th class="border-0">Progress</th>
+                                <th class="border-0">Hours Progress</th>
+                                <th class="border-0">Page Progress</th>
                                 <th class="border-0">Start Date</th>
                                 <th class="border-0 text-end pe-3">Actions</th>
                             </tr>
