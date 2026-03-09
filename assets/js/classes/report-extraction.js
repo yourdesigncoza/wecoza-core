@@ -1,8 +1,8 @@
 /**
- * Report Extraction JS
+ * Class Learner Report JS
  *
  * Handles class selection, AJAX report generation preview,
- * and CSV download trigger for the report extraction shortcode.
+ * and CSV download trigger for the [wecoza_class_learner_report] shortcode.
  *
  * @package WeCoza
  */
@@ -50,21 +50,31 @@
      * Bind UI events
      */
     function bindEvents() {
-        // Enable/disable generate button based on class selection
         $('#report-class-select').on('change', function () {
             var hasClass = $(this).val() !== '';
             $('#btn-generate-report').prop('disabled', !hasClass);
         });
 
-        // Generate report
         $('#btn-generate-report').on('click', function () {
             generateReport();
         });
 
-        // Download CSV
         $('#btn-download-csv').on('click', function () {
             downloadCsv();
         });
+    }
+
+    /**
+     * Show alert message in the alert container
+     */
+    function showAlert(message, type) {
+        var $container = $('#clr-alert');
+        $container.html(
+            '<div class="alert alert-' + type + ' alert-dismissible fade show m-3" role="alert">' +
+                $('<span>').text(message).html() +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+            '</div>'
+        );
     }
 
     /**
@@ -72,7 +82,7 @@
      */
     function generateReport() {
         var classId = $('#report-class-select').val();
-        var monthVal = $('#report-month').val(); // YYYY-MM
+        var monthVal = $('#report-month').val();
 
         if (!classId || !monthVal) {
             return;
@@ -83,9 +93,11 @@
         var month = parseInt(parts[1], 10);
 
         // Show loading, hide preview and download button
-        $('#report-loading').show();
+        $('#report-loading').css('display', 'flex');
         $('#report-preview').empty();
+        $('#clr-alert').empty();
         $('#btn-download-csv').hide().prop('disabled', true);
+        $('#clr-learner-count').text('');
         $('#btn-generate-report').prop('disabled', true);
 
         $.ajax({
@@ -112,17 +124,13 @@
                     $('#btn-download-csv').show().prop('disabled', false);
                 } else {
                     var msg = (response.data && response.data.message) ? response.data.message : 'Failed to generate report.';
-                    $('#report-preview').html(
-                        '<div class="alert alert-warning">' + $('<span>').text(msg).html() + '</div>'
-                    );
+                    showAlert(msg, 'warning');
                 }
             },
             error: function () {
                 $('#report-loading').hide();
                 $('#btn-generate-report').prop('disabled', false);
-                $('#report-preview').html(
-                    '<div class="alert alert-danger">An error occurred while generating the report.</div>'
-                );
+                showAlert('An error occurred while generating the report.', 'danger');
             }
         });
     }
@@ -140,15 +148,13 @@
 
         // Error state
         if (!header) {
-            $preview.html(
-                '<div class="alert alert-warning">Class not found or no data available.</div>'
-            );
+            showAlert('Class not found or no data available.', 'warning');
             return;
         }
 
         // Header info section
-        var $headerSection = $('<div class="mb-4">');
-        var $dl = $('<dl class="row mb-0">');
+        var $headerSection = $('<div class="p-3 border-bottom bg-body-tertiary">');
+        var $dl = $('<dl class="row mb-0 fs-9">');
 
         var headerFields = [
             { label: 'Client', value: header.client_name },
@@ -162,40 +168,40 @@
 
         $.each(headerFields, function (i, field) {
             $dl.append(
-                $('<dt class="col-sm-3">').text(field.label),
-                $('<dd class="col-sm-9">').text(field.value || '-')
+                $('<dt class="col-sm-3 text-body-secondary">').text(field.label),
+                $('<dd class="col-sm-9 mb-1">').text(field.value || '-')
             );
         });
 
         $headerSection.append($dl);
         $preview.append($headerSection);
 
-        // Learner table
+        // No learners
         if (learners.length === 0) {
-            $preview.append(
-                '<div class="alert alert-info">No learner data found for this class and month.</div>'
-            );
+            showAlert('No learner data found for this class and month.', 'info');
             return;
         }
 
-        var $tableWrapper = $('<div class="table-responsive">');
-        var $table = $('<table class="table table-sm table-hover">');
+        // Update learner count in header
+        $('#clr-learner-count').text(learners.length + ' learner(s)');
 
-        // Table header
+        // Learner table
+        var $tableWrapper = $('<div class="table-responsive scrollbar">');
+        var $table = $('<table class="table table-sm table-striped table-hover fs-9 mb-0">');
+
         var columns = [
             'Surname', 'Initials', 'Level/Module', 'Start Date',
             'Race', 'Gender', 'Month Trained', 'Month Present',
             'Total Trained', 'Total Present', 'Hours %', 'Page %'
         ];
-        var $thead = $('<thead class="table-light">');
+        var $thead = $('<thead>');
         var $headerRow = $('<tr>');
         $.each(columns, function (i, col) {
-            $headerRow.append($('<th>').text(col));
+            $headerRow.append($('<th class="text-nowrap">').text(col));
         });
         $thead.append($headerRow);
         $table.append($thead);
 
-        // Table body
         var $tbody = $('<tbody>');
         $.each(learners, function (i, learner) {
             var $row = $('<tr>');
@@ -203,26 +209,21 @@
             $row.append($('<td>').text(learner.surname || '-'));
             $row.append($('<td>').text(learner.initials || '-'));
             $row.append($('<td>').text(learner.subject_name || '-'));
-            $row.append($('<td>').text(formatDate(learner.start_date)));
+            $row.append($('<td class="text-nowrap">').text(formatDate(learner.start_date)));
             $row.append($('<td>').text(learner.race || '-'));
             $row.append($('<td>').text(learner.gender || '-'));
-            $row.append($('<td>').text(formatNumber(learner.month_hours_trained)));
-            $row.append($('<td>').text(formatNumber(learner.month_hours_present)));
-            $row.append($('<td>').text(formatNumber(learner.hours_trained)));
-            $row.append($('<td>').text(formatNumber(learner.hours_present)));
-            $row.append($('<td>').text(formatPercentage(learner.hours_progress_pct)));
-            $row.append($('<td>').text(formatPercentage(learner.page_progress_pct)));
+            $row.append($('<td class="text-end">').text(formatNumber(learner.month_hours_trained)));
+            $row.append($('<td class="text-end">').text(formatNumber(learner.month_hours_present)));
+            $row.append($('<td class="text-end">').text(formatNumber(learner.hours_trained)));
+            $row.append($('<td class="text-end">').text(formatNumber(learner.hours_present)));
+            $row.append($('<td class="text-end">').text(formatPercentage(learner.hours_progress_pct)));
+            $row.append($('<td class="text-end">').text(formatPercentage(learner.page_progress_pct)));
 
             $tbody.append($row);
         });
         $table.append($tbody);
         $tableWrapper.append($table);
         $preview.append($tableWrapper);
-
-        // Summary count
-        $preview.append(
-            $('<p class="text-body-secondary mt-2">').text(learners.length + ' learner(s) found')
-        );
     }
 
     /**
