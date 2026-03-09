@@ -183,9 +183,13 @@ function handle_attendance_capture(): void
                 continue; // skip invalid entries
             }
 
+            $pageNumber   = isset($entry['page_number'])   ? (int)   $entry['page_number']
+                          : (isset($entry['pageNumber'])   ? (int)   $entry['pageNumber']   : 0);
+
             $normalizedHours[] = [
                 'learner_id'    => $learnerId,
                 'hours_present' => $hoursPresent,
+                'page_number'   => $pageNumber,
             ];
         }
 
@@ -205,6 +209,15 @@ function handle_attendance_capture(): void
             if ($entry['hours_present'] < 0 || $entry['hours_present'] > $scheduledHours) {
                 throw new Exception(
                     "hours_present must be between 0 and {$scheduledHours} for learner {$entry['learner_id']}"
+                );
+            }
+        }
+
+        // Validate page_number: required positive integer for every learner
+        foreach ($normalizedHours as $entry) {
+            if ($entry['page_number'] < 1) {
+                throw new Exception(
+                    "Last completed page is required for learner {$entry['learner_id']} (must be a positive integer)"
                 );
             }
         }
