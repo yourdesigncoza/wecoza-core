@@ -93,7 +93,7 @@
         var month = parseInt(parts[1], 10);
 
         // Show loading, hide preview and download button
-        $('#report-loading').css('display', 'flex');
+        $('#report-loading').removeClass('d-none').addClass('d-flex');
         $('#report-preview').empty();
         $('#clr-alert').empty();
         $('#btn-download-csv').hide().prop('disabled', true);
@@ -111,7 +111,7 @@
                 month: month
             },
             success: function (response) {
-                $('#report-loading').hide();
+                $('#report-loading').removeClass('d-flex').addClass('d-none');
                 $('#btn-generate-report').prop('disabled', false);
 
                 if (response.success && response.data) {
@@ -128,7 +128,7 @@
                 }
             },
             error: function () {
-                $('#report-loading').hide();
+                $('#report-loading').removeClass('d-flex').addClass('d-none');
                 $('#btn-generate-report').prop('disabled', false);
                 showAlert('An error occurred while generating the report.', 'danger');
             }

@@ -56,7 +56,7 @@ if (!defined('ABSPATH')) {
 
         <div class="card-body p-0">
             <!-- Loading Spinner -->
-            <div id="report-loading" class="d-flex justify-content-center align-items-center py-4" style="display:none;">
+            <div id="report-loading" class="justify-content-center align-items-center py-4 d-none">
                 <div class="spinner-border text-primary me-3" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
