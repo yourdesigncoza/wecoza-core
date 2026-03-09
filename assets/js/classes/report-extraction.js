@@ -136,6 +136,42 @@
     }
 
     /**
+     * Build a details column (table with icon rows) matching single class view pattern
+     */
+    function buildDetailsColumn(fields, extraClasses) {
+        var $col = $('<div class="col-sm-12 col-xxl-6 py-3 ' + (extraClasses || '') + '">');
+        var $table = $('<table class="w-100 table-stats table table-hover table-sm fs-9 mb-0">');
+        var $tbody = $('<tbody>');
+
+        $.each(fields, function (i, field) {
+            var $tr = $('<tr>');
+
+            // Label cell with icon
+            var $labelTd = $('<td class="py-2 ydcoza-w-150">');
+            var $labelWrap = $('<div class="d-inline-flex align-items-center">');
+            var $iconCircle = $('<div class="d-flex rounded-circle flex-center me-3" style="width:24px; height:24px">')
+                .addClass('bg-' + field.color + '-subtle');
+            var $icon = $('<i style="font-size: 12px;">')
+                .addClass('bi ' + field.icon + ' text-' + field.color);
+            $iconCircle.append($icon);
+            $labelWrap.append($iconCircle);
+            $labelWrap.append($('<p class="fw-bold mb-0">').text(field.label + ' :'));
+            $labelTd.append($labelWrap);
+
+            // Value cell
+            var $valueTd = $('<td class="py-2">');
+            $valueTd.append($('<p class="fw-semibold mb-0">').text(field.value || '-'));
+
+            $tr.append($labelTd, $valueTd);
+            $tbody.append($tr);
+        });
+
+        $table.append($tbody);
+        $col.append($table);
+        return $col;
+    }
+
+    /**
      * Render report preview into the preview area
      */
     function renderPreview(data) {
@@ -152,28 +188,26 @@
             return;
         }
 
-        // Header info section
-        var $headerSection = $('<div class="p-3 border-bottom bg-body-tertiary">');
-        var $dl = $('<dl class="row mb-0 fs-9">');
-
-        var headerFields = [
-            { label: 'Client', value: header.client_name },
-            { label: 'Site', value: header.site_name },
-            { label: 'Class Type & Subject', value: (header.class_type_name || '') + ' - ' + (header.subject_name || '') },
-            { label: 'Month', value: meta.month_label },
-            { label: 'Class Days', value: header.class_days },
-            { label: 'Class Times', value: header.class_times },
-            { label: 'Facilitator', value: header.facilitator }
+        // Header info section - 2-column table layout matching single class details
+        var leftFields = [
+            { icon: 'bi-building',       color: 'primary', label: 'Client',             value: header.client_name },
+            { icon: 'bi-geo-alt',        color: 'success', label: 'Site',               value: header.site_name },
+            { icon: 'bi-layers',         color: 'primary', label: 'Class Type & Subject', value: (header.class_type_name || '') + ' - ' + (header.subject_name || '') },
+            { icon: 'bi-calendar-event', color: 'info',    label: 'Month',              value: meta.month_label }
+        ];
+        var rightFields = [
+            { icon: 'bi-calendar-week', color: 'info',    label: 'Class Days',   value: header.class_days },
+            { icon: 'bi-clock',         color: 'warning', label: 'Class Times',  value: header.class_times },
+            { icon: 'bi-person-badge',  color: 'success', label: 'Facilitator',  value: header.facilitator }
         ];
 
-        $.each(headerFields, function (i, field) {
-            $dl.append(
-                $('<dt class="col-sm-3 text-body-secondary">').text(field.label),
-                $('<dd class="col-sm-9 mb-1">').text(field.value || '-')
-            );
-        });
+        var $headerSection = $('<div class="px-xl-4 border-bottom">');
+        var $row = $('<div class="row mx-0">');
 
-        $headerSection.append($dl);
+        $row.append(buildDetailsColumn(leftFields, 'border-bottom border-end-xxl'));
+        $row.append(buildDetailsColumn(rightFields, 'border-bottom'));
+
+        $headerSection.append($row);
         $preview.append($headerSection);
 
         // No learners
@@ -185,19 +219,20 @@
         // Update learner count in header
         $('#clr-learner-count').text(learners.length + ' learner(s)');
 
-        // Learner table
+        // Learner table wrapped in card-body
+        var $cardBody = $('<div class="card-body p-4 py-2">');
         var $tableWrapper = $('<div class="table-responsive scrollbar">');
-        var $table = $('<table class="table table-sm table-striped table-hover fs-9 mb-0">');
+        var $table = $('<table class="table table-sm table-hover fs-9 mb-0">');
 
         var columns = [
             'Surname', 'Initials', 'Level/Module', 'Start Date',
             'Race', 'Gender', 'Month Trained', 'Month Present',
             'Total Trained', 'Total Present', 'Hours %', 'Page %'
         ];
-        var $thead = $('<thead>');
+        var $thead = $('<thead class="border-bottom">');
         var $headerRow = $('<tr>');
         $.each(columns, function (i, col) {
-            $headerRow.append($('<th class="text-nowrap">').text(col));
+            $headerRow.append($('<th class="border-0 text-nowrap">').text(col));
         });
         $thead.append($headerRow);
         $table.append($thead);
@@ -223,7 +258,8 @@
         });
         $table.append($tbody);
         $tableWrapper.append($table);
-        $preview.append($tableWrapper);
+        $cardBody.append($tableWrapper);
+        $preview.append($cardBody);
     }
 
     /**
