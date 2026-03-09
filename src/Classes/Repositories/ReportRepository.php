@@ -94,25 +94,39 @@ class ReportRepository extends BaseRepository
         $monthEnd = date('Y-m-t', strtotime($monthStart));
 
         $sql = "
-            WITH monthly_hours AS (
-                SELECT learner_id, tracking_id,
-                       COALESCE(SUM(hours_trained), 0) AS month_hours_trained,
-                       COALESCE(SUM(hours_present), 0) AS month_hours_present
-                FROM learner_hours_log
-                WHERE class_id = :class_id_mh
-                  AND log_date BETWEEN :month_start AND :month_end
-                GROUP BY learner_id, tracking_id
-            ),
-            page_numbers AS (
-                SELECT (elem->>'learner_id')::int AS learner_id,
-                       cas.class_id,
-                       MAX((elem->>'page_number')::int) AS last_page_number
+            WITH attendance_flat AS (
+                SELECT cas.class_id,
+                       cas.session_date,
+                       cas.scheduled_hours,
+                       (elem->>'learner_id')::int AS learner_id,
+                       COALESCE((elem->>'hours_present')::numeric, 0) AS hours_present,
+                       CASE WHEN elem->>'page_number' ~ '^[0-9]+$'
+                            THEN (elem->>'page_number')::int ELSE NULL END AS page_number
                 FROM class_attendance_sessions cas,
                      jsonb_array_elements(cas.learner_data) AS elem
-                WHERE cas.class_id = :class_id_pn
-                  AND elem->>'page_number' IS NOT NULL
-                  AND elem->>'page_number' ~ '^[0-9]+$'
-                GROUP BY (elem->>'learner_id')::int, cas.class_id
+                WHERE cas.class_id = :class_id_af
+            ),
+            monthly_hours AS (
+                SELECT learner_id,
+                       COALESCE(SUM(scheduled_hours), 0) AS month_hours_trained,
+                       COALESCE(SUM(hours_present), 0) AS month_hours_present
+                FROM attendance_flat
+                WHERE session_date BETWEEN :month_start AND :month_end
+                GROUP BY learner_id
+            ),
+            total_hours AS (
+                SELECT learner_id,
+                       COALESCE(SUM(scheduled_hours), 0) AS total_hours_trained,
+                       COALESCE(SUM(hours_present), 0) AS total_hours_present
+                FROM attendance_flat
+                GROUP BY learner_id
+            ),
+            page_numbers AS (
+                SELECT learner_id,
+                       MAX(page_number) AS last_page_number
+                FROM attendance_flat
+                WHERE page_number IS NOT NULL
+                GROUP BY learner_id
             )
             SELECT
                 l.surname,
@@ -121,8 +135,8 @@ class ReportRepository extends BaseRepository
                 COALESCE(l.gender, '') AS gender,
                 cts.subject_name,
                 lpt.start_date,
-                lpt.hours_trained,
-                lpt.hours_present,
+                COALESCE(th.total_hours_trained, 0) AS hours_trained,
+                COALESCE(th.total_hours_present, 0) AS hours_present,
                 cts.subject_duration,
                 cts.total_pages,
                 COALESCE(pn.last_page_number, 0) AS last_page_number,
@@ -131,8 +145,9 @@ class ReportRepository extends BaseRepository
             FROM learner_lp_tracking lpt
             JOIN learners l ON lpt.learner_id = l.id
             JOIN class_type_subjects cts ON lpt.class_type_subject_id = cts.class_type_subject_id
-            LEFT JOIN monthly_hours mh ON mh.learner_id = lpt.learner_id AND mh.tracking_id = lpt.tracking_id
-            LEFT JOIN page_numbers pn ON pn.learner_id = lpt.learner_id AND pn.class_id = lpt.class_id
+            LEFT JOIN monthly_hours mh ON mh.learner_id = lpt.learner_id
+            LEFT JOIN total_hours th ON th.learner_id = lpt.learner_id
+            LEFT JOIN page_numbers pn ON pn.learner_id = lpt.learner_id
             WHERE lpt.class_id = :class_id
             ORDER BY l.surname, l.first_name
         ";
@@ -140,10 +155,9 @@ class ReportRepository extends BaseRepository
         try {
             $pdo = $this->db->getPdo();
             $stmt = $pdo->prepare($sql);
-            $stmt->bindValue(':class_id_mh', $classId, PDO::PARAM_INT);
+            $stmt->bindValue(':class_id_af', $classId, PDO::PARAM_INT);
             $stmt->bindValue(':month_start', $monthStart, PDO::PARAM_STR);
             $stmt->bindValue(':month_end', $monthEnd, PDO::PARAM_STR);
-            $stmt->bindValue(':class_id_pn', $classId, PDO::PARAM_INT);
             $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

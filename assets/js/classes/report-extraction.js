@@ -204,8 +204,8 @@
         var $headerSection = $('<div class="px-xl-4 border-bottom">');
         var $row = $('<div class="row mx-0">');
 
-        $row.append(buildDetailsColumn(leftFields, 'border-bottom border-end-xxl'));
-        $row.append(buildDetailsColumn(rightFields, 'border-bottom'));
+        $row.append(buildDetailsColumn(leftFields, 'border-end-xxl'));
+        $row.append(buildDetailsColumn(rightFields, ''));
 
         $headerSection.append($row);
         $preview.append($headerSection);
