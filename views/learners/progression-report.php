@@ -39,7 +39,7 @@ if (!defined('ABSPATH')) {
                 <div class="row g-3 justify-content-between align-items-center mb-3">
                     <div class="col-12 col-md">
                         <h4 class="text-body mb-0">
-                            <i class="bi bi-graph-up me-2"></i>Learner Progression Report
+                            Client Learner Progression Report <i class="bi bi-graph-up ms-2"></i>
                         </h4>
                     </div>
                     <div class="col-auto">
