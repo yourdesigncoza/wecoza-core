@@ -16,13 +16,13 @@ Requirements for Page Tracking & Report Extraction milestone. Each maps to roadm
 
 ### Report Extraction
 
-- [ ] **RPT-01**: Admin can generate a per-class report extraction
-- [ ] **RPT-02**: Report includes class header: Client Name, Site Name, Class Type & Subject, Month, Class Days, Class Times, Facilitator
-- [ ] **RPT-03**: Report includes per-learner rows: Surname & Initials, Current Level/Module, Start Date
-- [ ] **RPT-04**: Report includes hours columns: Current Month Trained, Current Month Present, Total Trained, Total Present
-- [ ] **RPT-05**: Report includes progression columns: Hours-based %, Actual page progression %
+- [x] **RPT-01**: Admin can generate a per-class report extraction
+- [x] **RPT-02**: Report includes class header: Client Name, Site Name, Class Type & Subject, Month, Class Days, Class Times, Facilitator
+- [x] **RPT-03**: Report includes per-learner rows: Surname & Initials, Current Level/Module, Start Date
+- [x] **RPT-04**: Report includes hours columns: Current Month Trained, Current Month Present, Total Trained, Total Present
+- [x] **RPT-05**: Report includes progression columns: Hours-based %, Actual page progression %
 - [ ] **RPT-06**: Report is downloadable as CSV
-- [ ] **RPT-07**: Report includes learner Race and Gender columns
+- [x] **RPT-07**: Report includes learner Race and Gender columns
 
 ## Future Requirements
 
@@ -64,13 +64,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAGE-02 | Phase 56 | Complete |
 | PAGE-03 | Phase 57 | Complete |
 | PAGE-04 | Phase 57 | Complete |
-| RPT-01 | Phase 58 | Pending |
-| RPT-02 | Phase 58 | Pending |
-| RPT-03 | Phase 58 | Pending |
-| RPT-04 | Phase 58 | Pending |
-| RPT-05 | Phase 58 | Pending |
+| RPT-01 | Phase 58 | Complete |
+| RPT-02 | Phase 58 | Complete |
+| RPT-03 | Phase 58 | Complete |
+| RPT-04 | Phase 58 | Complete |
+| RPT-05 | Phase 58 | Complete |
 | RPT-06 | Phase 58 | Pending |
-| RPT-07 | Phase 58 | Pending |
+| RPT-07 | Phase 58 | Complete |
 
 **Coverage:**
 - v8.0 requirements: 11 total

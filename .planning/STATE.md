@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: Page Tracking & Report Extraction
-status: completed
-stopped_at: Completed 57-01-PLAN.md
-last_updated: "2026-03-09T12:23:56.940Z"
-last_activity: 2026-03-09 — Completed 57-01 (page progression display)
+status: in-progress
+stopped_at: Completed 58-01-PLAN.md
+last_updated: "2026-03-09T12:47:00.000Z"
+last_activity: 2026-03-09 — Completed 58-01 (report data layer)
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 5
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -25,17 +25,17 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 
 ## Current Position
 
-Phase: 57 of 58 (Page Progression Display) — 2 of 3 in milestone
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase 57 Complete
-Last activity: 2026-03-09 — Completed 57-01 (page progression display)
+Phase: 58 of 58 (Report Extraction) — 3 of 3 in milestone
+Plan: 1 of 2 in current phase (COMPLETE)
+Status: Phase 58 In Progress
+Last activity: 2026-03-09 — Completed 58-01 (report data layer)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3 (v8.0) / 123 (lifetime)
+- Total plans completed: 4 (v8.0) / 124 (lifetime)
 - Average duration: —
 - Total execution time: —
 
@@ -53,6 +53,7 @@ See: .planning/MILESTONES.md for full details
 | Phase 56 P01 | 1min | 2 tasks | 2 files |
 | Phase 56 P02 | 5min | 3 tasks | 2 files |
 | Phase 57 P01 | 5min | 3 tasks | 4 files |
+| Phase 58 P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,7 @@ See: .planning/MILESTONES.md for full details
 6. Report format: we design layout, Mario iterates after seeing output
 - [Phase 56]: page_number stored in existing learner_data JSONB column -- no schema changes needed
 - [Phase 57]: Page progression uses MAX(page_number) from JSONB scoped to learner+class; green bar distinguishes from blue hours bar
+- [Phase 58]: CTEs for report queries (monthly hours + page numbers); 12-column padded CSV; null percentages as dash not zero
 
 ### Pending Todos
 
@@ -80,8 +82,8 @@ See: .planning/MILESTONES.md for full details
 
 ## Session Continuity
 
-Last session: 2026-03-09T12:21:02.865Z
-Stopped at: Completed 57-01-PLAN.md
+Last session: 2026-03-09T12:47:00.000Z
+Stopped at: Completed 58-01-PLAN.md
 Resume file: None
 
-**Next action:** `/gsd:execute-phase 58` (plan 01)
+**Next action:** `/gsd:execute-phase 58` (plan 02)
