@@ -236,6 +236,7 @@ if ($classStatus === 'stopped') {
                                 <th class="border-top border-translucent text-center">Hours Trained</th>
                                 <th class="border-top border-translucent text-center">Hours Present</th>
                                 <th class="border-top border-translucent text-center">Hours Absent</th>
+                                <th class="border-top border-translucent text-center">Last Completed Page</th>
                             </tr>
                         </thead>
                         <tbody id="detail-learners-tbody"></tbody>

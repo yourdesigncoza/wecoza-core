@@ -955,7 +955,7 @@
         $('#detail-session-info').text('Loading...');
         $('#detail-status-badge').html('');
         $('#detail-learners-tbody').html(
-            '<tr><td colspan="4" class="text-center text-muted py-2">'
+            '<tr><td colspan="5" class="text-center text-muted py-2">'
             + '<span class="spinner-border spinner-border-sm me-2"></span>Loading detail...'
             + '</td></tr>'
         );
@@ -981,13 +981,13 @@
                 } else {
                     const msg = (response.data && response.data.message) || 'Failed to load session detail.';
                     $('#detail-learners-tbody').html(
-                        '<tr><td colspan="4" class="text-center text-danger py-2">' + escHtml(msg) + '</td></tr>'
+                        '<tr><td colspan="5" class="text-center text-danger py-2">' + escHtml(msg) + '</td></tr>'
                     );
                 }
             },
             error: function() {
                 $('#detail-learners-tbody').html(
-                    '<tr><td colspan="4" class="text-center text-danger py-2">Server error loading detail.</td></tr>'
+                    '<tr><td colspan="5" class="text-center text-danger py-2">Server error loading detail.</td></tr>'
                 );
             }
         });
@@ -1013,7 +1013,7 @@
         // Learner rows (read-only)
         if (learners.length === 0) {
             $('#detail-learners-tbody').html(
-                '<tr><td colspan="4" class="text-center text-muted py-2">No learner data available.</td></tr>'
+                '<tr><td colspan="5" class="text-center text-muted py-2">No learner data available.</td></tr>'
             );
             return;
         }
@@ -1024,12 +1024,15 @@
             const hoursTrained  = parseFloat(l.hours_trained  || 0).toFixed(1);
             const hoursPresent  = parseFloat(l.hours_present  || 0).toFixed(1);
             const hoursAbsent   = parseFloat(l.hours_absent   || 0).toFixed(1);
+            const pageNumber    = parseInt(l.page_number || 0);
+            const pageDisplay   = pageNumber > 0 ? pageNumber.toString() : '-';
 
             html += '<tr>'
                 + '<td class="align-middle ps-3">' + name + '</td>'
                 + '<td class="align-middle text-center">' + escHtml(hoursTrained) + '</td>'
                 + '<td class="align-middle text-center">' + escHtml(hoursPresent) + '</td>'
                 + '<td class="align-middle text-center">' + escHtml(hoursAbsent) + '</td>'
+                + '<td class="align-middle text-center">' + escHtml(pageDisplay) + '</td>'
                 + '</tr>';
         });
 
