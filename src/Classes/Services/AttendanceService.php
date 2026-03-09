@@ -498,20 +498,47 @@ class AttendanceService
         $learners = $this->repository->getSessionsWithLearnerHours($sessionId);
 
         // Supplement learner_hours_log entries with page_number from learner_data JSONB
+        // and merge in any missing learners (e.g. absent learners with 0 hours aren't in learner_hours_log)
         if (!empty($learners) && !empty($session['learner_data'])) {
             $learnerDataRaw = is_string($session['learner_data'])
                 ? json_decode($session['learner_data'], true)
                 : $session['learner_data'];
             $pageMap = [];
+            $jsonbMap = [];
             if (is_array($learnerDataRaw)) {
                 foreach ($learnerDataRaw as $ld) {
-                    $pageMap[(int) ($ld['learner_id'] ?? 0)] = (int) ($ld['page_number'] ?? 0);
+                    $lid = (int) ($ld['learner_id'] ?? 0);
+                    $pageMap[$lid] = (int) ($ld['page_number'] ?? 0);
+                    $jsonbMap[$lid] = $ld;
                 }
             }
+            // Add page_number to existing learner_hours_log entries
+            $existingIds = [];
             foreach ($learners as &$l) {
-                $l['page_number'] = $pageMap[(int) $l['learner_id']] ?? 0;
+                $lid = (int) $l['learner_id'];
+                $l['page_number'] = $pageMap[$lid] ?? 0;
+                $existingIds[$lid] = true;
             }
             unset($l);
+
+            // Merge in learners from JSONB that are missing from learner_hours_log (absent learners)
+            $scheduledHours = (float) ($session['scheduled_hours'] ?? 0);
+            $missingIds = array_diff(array_keys($jsonbMap), array_keys($existingIds));
+            if (!empty($missingIds)) {
+                $nameMap = $this->getLearnerNames($missingIds);
+                foreach ($missingIds as $mid) {
+                    $ld = $jsonbMap[$mid];
+                    $hoursPresent = (float) ($ld['hours_present'] ?? 0);
+                    $learners[] = [
+                        'learner_id'    => $mid,
+                        'learner_name'  => $nameMap[$mid] ?? 'Unknown',
+                        'hours_trained' => number_format($scheduledHours, 2, '.', ''),
+                        'hours_present' => number_format($hoursPresent, 2, '.', ''),
+                        'hours_absent'  => number_format(max(0, $scheduledHours - $hoursPresent), 2, '.', ''),
+                        'page_number'   => (int) ($ld['page_number'] ?? 0),
+                    ];
+                }
+            }
         }
 
         if (empty($learners) && !empty($session['learner_data'])) {
