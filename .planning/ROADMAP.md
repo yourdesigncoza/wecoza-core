@@ -222,7 +222,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md` for confirmed decisions and addition
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56 | v8.0 | Complete    | 2026-03-09 | 2026-03-09 |
-| 57 | 1/1 | Complete   | 2026-03-09 | - |
+| 57 | 1/1 | Complete    | 2026-03-09 | - |
 | 58 | v8.0 | 0/2 | Not started | - |
 
 **Total: 58 phases, 120 plans executed across 12 milestones + v8.0 in progress (5 plans planned)**
