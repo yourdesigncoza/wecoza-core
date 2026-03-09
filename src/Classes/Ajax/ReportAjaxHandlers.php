@@ -34,7 +34,7 @@ function handle_generate_class_report(): void
         }
 
         // Verify nonce
-        check_ajax_referer('report_extraction_nonce', 'nonce');
+        check_ajax_referer('class_learner_report_nonce', 'nonce');
 
         // Get and validate parameters
         $classId = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
@@ -74,7 +74,7 @@ function handle_download_class_report_csv(): void
     }
 
     // Verify nonce (GET params for download links)
-    check_ajax_referer('report_extraction_nonce', 'nonce');
+    check_ajax_referer('class_learner_report_nonce', 'nonce');
 
     $classId = isset($_GET['class_id']) ? absint($_GET['class_id']) : 0;
     $year    = isset($_GET['year']) ? absint($_GET['year']) : (int) date('Y');

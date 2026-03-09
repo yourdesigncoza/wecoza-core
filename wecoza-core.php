@@ -705,7 +705,7 @@ add_action(
         | Load Report Extraction Shortcode & AJAX Handlers
         |--------------------------------------------------------------------------
         |
-        | Shortcode [wecoza_report_extraction] for class report preview and CSV
+        | Shortcode [wecoza_class_learner_report] for class report preview and CSV
         | download. AJAX handlers for report generation and CSV streaming.
         |
         */

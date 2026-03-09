@@ -7,7 +7,7 @@ declare(strict_types=1);
  * Displays report extraction UI with class selector, month picker,
  * report preview, and CSV download functionality.
  *
- * Shortcode: [wecoza_report_extraction]
+ * Shortcode: [wecoza_class_learner_report]
  *
  * @package WeCoza\Classes\Shortcodes
  * @since 1.0.0
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function wecoza_report_extraction_shortcode(): string {
+function wecoza_class_learner_report_shortcode(): string {
     // Enqueue report extraction script
     wp_enqueue_script(
         'report-extraction-script',
@@ -47,7 +47,7 @@ function wecoza_report_extraction_shortcode(): string {
     // Localize script with AJAX URL, nonce, and class list
     wp_localize_script('report-extraction-script', 'reportExtractionAjax', [
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce'   => wp_create_nonce('report_extraction_nonce'),
+        'nonce'   => wp_create_nonce('class_learner_report_nonce'),
         'classes' => $classList,
     ]);
 
@@ -55,4 +55,4 @@ function wecoza_report_extraction_shortcode(): string {
 }
 
 // Register shortcode
-add_shortcode('wecoza_report_extraction', __NAMESPACE__ . '\wecoza_report_extraction_shortcode');
+add_shortcode('wecoza_class_learner_report', __NAMESPACE__ . '\wecoza_class_learner_report_shortcode');
