@@ -199,6 +199,7 @@ Plans:
   4. Report CSV hours columns contain: Current Month Trained, Current Month Present, Total Trained, Total Present
   5. Report CSV progression columns contain: Hours-based %, Actual page progression %
 
+**Plans:** 2 plans
 Plans:
 - [ ] 58-01: Report service + data aggregation (ReportService, SQL queries joining class/learner/attendance/progression data)
 - [ ] 58-02: Shortcode + controller + CSV download (shortcode UI, class selector, CSV generation endpoint)
