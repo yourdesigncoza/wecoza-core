@@ -158,7 +158,51 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 - [ ] **Phase 57: Page Progression Display** - Calculate and display page-based progression alongside hours-based progression
 - [ ] **Phase 58: Report Extraction** - Per-class CSV report with header, learner details, hours, progression, and demographics
 
-See: `.planning/milestones/v8.0-ROADMAP.md` for full phase details.
+### Phase 56: Page Number Capture
+**Goal**: Agents can record the last completed workbook page for each learner during attendance capture
+**Depends on**: Nothing (first phase of v8.0; builds on v6.0/v7.0 attendance infrastructure)
+**Requirements**: PAGE-01, PAGE-02
+**Plans:** 2 plans
+**Success Criteria** (what must be TRUE):
+  1. Agent sees a "Last Completed Page" input field per learner row in the attendance capture modal
+  2. Page number is **required** — attendance cannot be submitted without a page number for every learner
+  3. Field starts **blank** each session (no pre-fill from previous session)
+  4. Page number is saved when agent submits attendance and persists in the database per learner per session
+  5. Previously captured sessions show the recorded page number in the view modal
+
+Plans:
+- [ ] 56-01-PLAN.md — Backend: AJAX handler + AttendanceService page_number validation, persistence in learner_data JSONB, detail response
+- [ ] 56-02-PLAN.md — Frontend: "Last Completed Page" input in capture modal, validation, display in view detail modal
+
+### Phase 57: Page Progression Display
+**Goal**: Admins can see page-based progression metrics alongside hours-based progression for each learner
+**Depends on**: Phase 56
+**Requirements**: PAGE-03, PAGE-04
+**Success Criteria** (what must be TRUE):
+  1. `class_type_subjects.total_pages` column exists with seeded defaults (Mario can override later)
+  2. Page progression percentage (last completed page / total pages) is calculated and displayed per learner
+  3. Page progression column appears on the progression admin panel next to hours-based progression
+  4. Learners without page data show a dash or "N/A" instead of broken display
+
+Plans:
+- [ ] 57-01: Add total_pages column to class_type_subjects + seed defaults + progression calculation + admin panel integration
+
+### Phase 58: Report Extraction
+**Goal**: Admins can generate and download a per-class CSV report with complete learner details, hours, progression, and demographics
+**Depends on**: Phase 57 (needs page progression data for RPT-05)
+**Requirements**: RPT-01, RPT-02, RPT-03, RPT-04, RPT-05, RPT-06, RPT-07
+**Success Criteria** (what must be TRUE):
+  1. Admin can select a class and generate a report from a dedicated report extraction page/shortcode
+  2. Report CSV header section contains: Client Name, Site Name, Class Type & Subject, Month, Class Days, Class Times, Facilitator
+  3. Report CSV per-learner rows contain: Surname & Initials, Current Level/Module, Start Date, Race, Gender
+  4. Report CSV hours columns contain: Current Month Trained, Current Month Present, Total Trained, Total Present
+  5. Report CSV progression columns contain: Hours-based %, Actual page progression %
+
+Plans:
+- [ ] 58-01: Report service + data aggregation (ReportService, SQL queries joining class/learner/attendance/progression data)
+- [ ] 58-02: Shortcode + controller + CSV download (shortcode UI, class selector, CSV generation endpoint)
+
+See: `.planning/milestones/v8.0-ROADMAP.md` for confirmed decisions and additional context.
 
 ## Progress
 
@@ -183,4 +227,4 @@ See: `.planning/milestones/v8.0-ROADMAP.md` for full phase details.
 **Total: 58 phases, 120 plans executed across 12 milestones + v8.0 in progress (5 plans planned)**
 
 ---
-*Last updated: 2026-03-06 — v8.0 Page Tracking & Report Extraction roadmap created*
+*Last updated: 2026-03-09 — Phase 56 plans created*
