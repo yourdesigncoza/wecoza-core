@@ -156,7 +156,7 @@ See: `.planning/milestones/v7.0-ROADMAP.md`
 
 - [x] **Phase 56: Page Number Capture** - Add page number field to attendance modal and persist per learner per session
 - [x] **Phase 57: Page Progression Display** - Calculate and display page-based progression alongside hours-based progression (completed 2026-03-09)
-- [ ] **Phase 58: Report Extraction** - Per-class CSV report with header, learner details, hours, progression, and demographics
+- [x] **Phase 58: Report Extraction** - Per-class CSV report with header, learner details, hours, progression, and demographics (completed 2026-03-09)
 
 ### Phase 56: Page Number Capture
 **Goal**: Agents can record the last completed workbook page for each learner during attendance capture
@@ -199,7 +199,7 @@ Plans:
   4. Report CSV hours columns contain: Current Month Trained, Current Month Present, Total Trained, Total Present
   5. Report CSV progression columns contain: Hours-based %, Actual page progression %
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 58-01: Report service + data aggregation (ReportService, SQL queries joining class/learner/attendance/progression data)
 - [ ] 58-02: Shortcode + controller + CSV download (shortcode UI, class selector, CSV generation endpoint)
@@ -224,7 +224,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md` for confirmed decisions and addition
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56 | v8.0 | Complete    | 2026-03-09 | 2026-03-09 |
 | 57 | 1/1 | Complete    | 2026-03-09 | - |
-| 58 | 1/2 | In Progress|  | - |
+| 58 | 2/2 | Complete    | 2026-03-09 | - |
 
 **Total: 58 phases, 120 plans executed across 12 milestones + v8.0 in progress (5 plans planned)**
 
