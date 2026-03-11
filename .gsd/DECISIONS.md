@@ -66,8 +66,26 @@ Append-only register of architectural and pattern decisions.
 **Rationale:** jQuery DOM methods (`$('<div>')`, `.text()`, `.attr()`) prevent XSS by design — user-supplied values are never interpolated into HTML strings. Enriching the AJAX response avoids extra round-trips to resolve usernames and file URLs client-side. Full section rebuild is simpler and less error-prone than surgical DOM patching of individual step cards.
 **Alternatives rejected:** innerHTML-based templating (XSS risk), server-side HTML fragment return (harder to test, mixes concerns), partial DOM updates per card (complex state tracking).
 
+## D013: LP auto-completion failure isolated from exam result save (2026-03-11)
+
+**Context:** After recording an exam result, the AJAX handler checks `isExamComplete()` and may call `markComplete()`. If `markComplete()` throws (e.g., DB error), the exam result itself was already saved successfully.
+**Decision:** Wrap `markComplete()` in try/catch. On failure, log the exception and set `lp_completed: false` + `lp_error: <message>` in the AJAX response. The exam result save is never rolled back.
+**Rationale:** Exam result recording is the primary action; LP completion is a side effect. Losing a successfully recorded exam result because of an LP subsystem failure would be worse than logging the completion failure and letting the user retry. The `lp_error` field gives the frontend diagnostic visibility.
+
+## D014: Conditional lp_error in AJAX response — only on failure (2026-03-11)
+
+**Context:** The `lp_error` field in the record_exam_result response is only relevant when LP completion fails.
+**Decision:** Only include `lp_error` key in the AJAX response when non-null. Clean success responses omit it entirely.
+**Rationale:** Keeps the normal success response clean. Frontend can check `response.data.lp_error` to surface LP completion problems without false positives.
+
 ## D006: Consistent service return format across all ExamService methods (2026-03-11)
 
 **Context:** Need a predictable return format for all ExamService methods so downstream consumers (AJAX handlers, controllers) can handle results uniformly.
 **Decision:** All ExamService methods return `['success' => bool, 'data' => array, 'error' => string]` with all three keys always present. Empty string for error on success, empty array for data on failure.
 **Rationale:** Consistent structure simplifies AJAX response handling in S03. Avoids the need for callers to check key existence. ExamUploadService follows the same pattern with `['success', 'file_path', 'file_name', 'error']`.
+
+## D012: PostgreSQL boolean columns need CASE WHEN for string conversion (2026-03-11)
+
+**Context:** `LearnerProgressionModel::$examClass` is typed as `?string` expecting 'Yes'/'No'. The `classes.exam_class` column is PostgreSQL boolean. Using `COALESCE(c.exam_class, 'No')` still returns a PG boolean, causing PHP `Cannot assign bool to property` fatal error.
+**Decision:** Use `CASE WHEN c.exam_class = true THEN 'Yes' ELSE 'No' END AS exam_class` in SQL queries instead of COALESCE with string fallback on boolean columns.
+**Rationale:** PostgreSQL preserves the column type through COALESCE when the first non-null value is boolean. CASE WHEN explicitly returns text type. This pattern should be used anywhere a PG boolean needs to become a PHP string.

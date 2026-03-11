@@ -51,7 +51,7 @@ This milestone is complete only when all are true:
 - [x] **S03: Exam Progress UI & AJAX** `risk:medium` `depends:[S01]`
   > After this: office staff can record mock exam percentages, SBA marks + scans, and final exam marks + certificates through the learner progression UI. The UI conditionally shows exam flow vs POE flow.
 
-- [ ] **S04: Integration Testing & Polish** `risk:low` `depends:[S02,S03]`
+- [x] **S04: Integration Testing & Polish** `risk:low` `depends:[S02,S03]`
   > After this: full end-to-end exam workflow verified in browser. Edge cases handled (partial progress, re-recording marks, exam class with mixed learners). LP completion via exam path confirmed working.
 
 ## Boundary Map

@@ -153,6 +153,17 @@
                 success: function(response) {
                     self.showProgressBar($progressBar, 100);
                     if (response.success) {
+                        // Check if LP was auto-completed
+                        if (response.data && response.data.lp_completed === true) {
+                            self.showSectionAlert('success',
+                                '🎓 Learning Programme completed! All exam steps have been recorded.');
+                            // Refresh overall progression card if available
+                            if (typeof window.refreshProgressionData === 'function') {
+                                try { window.refreshProgressionData(); } catch(err) {
+                                    console.warn('Could not refresh progression data:', err);
+                                }
+                            }
+                        }
                         self.refreshExamProgress(trackingId);
                     } else {
                         var msg = (response.data && response.data.message)

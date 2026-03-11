@@ -53,7 +53,7 @@ class LearnerProgressionRepository extends BaseRepository
                 CONCAT(l.first_name, ' ', l.surname) AS learner_name,
                 c.class_code,
                 c.class_subject,
-                COALESCE(c.exam_class, 'No') AS exam_class,
+                CASE WHEN c.exam_class = true THEN 'Yes' ELSE 'No' END AS exam_class,
                 ct.class_type_name,
                 cl.client_id,
                 cl.client_name,

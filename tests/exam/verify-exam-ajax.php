@@ -116,8 +116,8 @@ $repoFile = __DIR__ . '/../../src/Learners/Repositories/LearnerProgressionReposi
 $repoContent = file_exists($repoFile) ? file_get_contents($repoFile) : '';
 
 check(
-    'baseQuery() includes COALESCE(c.exam_class, \'No\') AS exam_class',
-    str_contains($repoContent, "COALESCE(c.exam_class, 'No') AS exam_class"),
+    'baseQuery() includes CASE WHEN c.exam_class = true for exam_class string conversion',
+    str_contains($repoContent, "CASE WHEN c.exam_class = true THEN 'Yes' ELSE 'No' END AS exam_class"),
     'exam_class not found in baseQuery SELECT'
 );
 

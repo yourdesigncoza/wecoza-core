@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WeCoza\Learners\Ajax;
 
 use WeCoza\Learners\Enums\ExamStep;
+use WeCoza\Learners\Models\LearnerProgressionModel;
 use WeCoza\Learners\Services\ExamService;
 use Exception;
 
@@ -73,10 +74,35 @@ function handle_record_exam_result(): void
             throw new Exception($result['error']);
         }
 
-        wp_send_json_success([
-            'message' => 'Exam result recorded successfully.',
-            'data'    => $result['data'],
-        ]);
+        // --- LP auto-completion check ---
+        $lpCompleted = false;
+        $lpError     = null;
+        if ($service->isExamComplete($trackingId)) {
+            $progressionModel = LearnerProgressionModel::getById($trackingId);
+            if ($progressionModel && $progressionModel->isCompleted()) {
+                error_log("WeCoza ExamAjax: LP already completed for tracking_id={$trackingId}, skipping");
+            } elseif ($progressionModel) {
+                try {
+                    if ($progressionModel->markComplete(get_current_user_id())) {
+                        $lpCompleted = true;
+                        error_log("WeCoza ExamAjax: LP auto-completed for tracking_id={$trackingId}");
+                    }
+                } catch (Exception $markEx) {
+                    $lpError = $markEx->getMessage();
+                    error_log("WeCoza ExamAjax: markComplete failed for tracking_id={$trackingId} - " . $lpError);
+                }
+            }
+        }
+
+        $responseData = [
+            'message'      => 'Exam result recorded successfully.',
+            'data'         => $result['data'],
+            'lp_completed' => $lpCompleted,
+        ];
+        if ($lpError !== null) {
+            $responseData['lp_error'] = $lpError;
+        }
+        wp_send_json_success($responseData);
 
     } catch (Exception $e) {
         error_log("WeCoza ExamAjax: handle_record_exam_result - " . $e->getMessage());
