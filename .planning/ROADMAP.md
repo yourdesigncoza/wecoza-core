@@ -254,7 +254,7 @@ Plans:
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56-58 | v8.0 | 5/5 | Complete | 2026-03-09 |
 | 59 | 1/1 | Complete    | 2026-03-11 | - |
-| 60 | 2/2 | Complete   | 2026-03-11 | - |
+| 60 | 2/2 | Complete    | 2026-03-11 | - |
 | 61 | v9.0 | 0/TBD | Not started | - |
 | 62 | v9.0 | 0/TBD | Not started | - |
 | 63 | v9.0 | 0/TBD | Not started | - |
