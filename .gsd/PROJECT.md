@@ -13,11 +13,8 @@ Accurate learner progression tracking through learning programmes — from enrol
 - Full CRUD for learners, agents, clients, classes, and locations
 - LP progression tracking (WEC-168): hours_trained/present/absent, progress calculation, portfolio upload for completion
 - Event/task system: generates tasks from class events, reminders, task completion by office staff
-- Classes already support `exam_class` (boolean), `exam_type` (varchar), and `exam_learners` (JSONB) fields
-- **Exam data layer complete (M001/S01):** `learner_exam_results` schema, ExamStep enum, ExamRepository, ExamUploadService, ExamService — all verified with 66 automated checks
-- **Exam task integration complete (M001/S02):** ExamTaskProvider generates virtual exam tasks from DB state, TaskManager routes exam complete/reopen through ExamService, ClassTaskPresenter formats exam tasks with no-note UI — 83 automated checks passing
-- **Exam progress UI & AJAX complete (M001/S03):** 3 AJAX endpoints for exam result CRUD, conditional exam/POE rendering in progression view, jQuery module for recording exam results with file upload — 22 automated checks passing. Non-exam flows unchanged.
-- **Exam workflow complete (M001/S04):** LP auto-completion wired into AJAX handler, edge cases hardened (partial progress, certificate requirement, double-completion guard), browser-verified end-to-end — 223 total automated checks across 5 test suites. M001 milestone complete.
+- Classes support `exam_class` (boolean), `exam_type` (varchar), and `exam_learners` (JSONB) fields
+- **Exam & Assessment Workflow (M001) — COMPLETE:** Full exam tracking pipeline for exam-track learners (AET, GETC AET, REALLL). 3 mock exams → SBA (marks + scan upload) → final exam (mark + certificate upload). ExamTaskProvider generates virtual tasks on dashboard. LP auto-completes when all 5 steps recorded with certificate. Conditional UI renders exam flow for exam-class learners, POE flow for others. 223 automated checks across 5 test suites. 14 architectural decisions documented.
 
 ## Architecture / Key Patterns
 
@@ -27,8 +24,10 @@ Accurate learner progression tracking through learning programmes — from enrol
 - **AJAX handlers** with nonce verification via `AjaxSecurity`
 - **Event system** dispatches class events, generates tasks, sends notifications
 - **Services** encapsulate business logic (ProgressionService, PortfolioUploadService, TaskManager, ExamService, ExamTaskProvider)
+- **Virtual task generation** — ExamTaskProvider creates Task objects from DB state without JSONB storage (D007)
+- **Constructor injection** with null-coalescing defaults for testability without DI container (D005)
 - CSS goes in child theme's `ydcoza-styles.css`, JS in `assets/js/`
 
 ## Milestone Sequence
 
-- [x] M001: Exam & Assessment Workflow — Build mock exam, SBA, and final exam tracking with event/task integration (WEC-186) — all 4 slices complete, 223 automated checks passing, browser-verified
+- [x] M001: Exam & Assessment Workflow — Mock exam, SBA, and final exam tracking with event/task integration and LP auto-completion (WEC-186). 4 slices, 223 automated checks, browser-verified. Completed 2026-03-11.
