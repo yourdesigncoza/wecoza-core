@@ -163,7 +163,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
 
 </details>
 
-### 🚧 v9.0 Agent Orders & Payment Tracking (In Progress)
+### v9.0 Agent Orders & Payment Tracking (In Progress)
 
 **Milestone Goal:** Replace manual Google Sheets reconciliation with system-derived monthly summaries, agent invoice capture, and discrepancy detection — per class, per agent, per month.
 
@@ -186,7 +186,9 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
   2. `agent_monthly_invoices` table exists with all calculated fields and status workflow (draft/submitted/approved/disputed)
   3. `agent_orders` rows exist for all existing active classes that have a class_agent assigned
   4. A second row can be inserted for the same class+agent with a different start_date (rate change supported)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 59-01-PLAN.md — Write SQL migrations for agent_orders + agent_monthly_invoices tables and seed data
 
 ### Phase 60: Backend Layer
 **Goal**: Business logic for order management, monthly calculations, and AJAX endpoints are wired and callable
@@ -248,7 +250,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56-58 | v8.0 | 5/5 | Complete | 2026-03-09 |
-| 59 | v9.0 | 0/TBD | Not started | - |
+| 59 | v9.0 | 0/1 | Planning | - |
 | 60 | v9.0 | 0/TBD | Not started | - |
 | 61 | v9.0 | 0/TBD | Not started | - |
 | 62 | v9.0 | 0/TBD | Not started | - |
@@ -257,4 +259,4 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
 **Total: 63 phases, 125 plans completed + v9.0 in progress**
 
 ---
-*Last updated: 2026-03-11 — v9.0 roadmap created*
+*Last updated: 2026-03-11 — Phase 59 planned (1 plan)*
