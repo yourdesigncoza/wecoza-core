@@ -273,6 +273,9 @@ $component_data = [
       <!-- Agent Monthly Invoice -->
       <?php echo wecoza_view('classes/components/single-class/agent-invoice', $component_data); ?>
 
+      <!-- Agent Invoice Reconciliation (admin only) -->
+      <?php echo wecoza_view('classes/components/single-class/agent-reconciliation', $component_data); ?>
+
       <!-- Monthly Schedule Summary Section -->
       <?php
       // Process monthly schedule data for single class
