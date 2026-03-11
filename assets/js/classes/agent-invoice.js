@@ -17,6 +17,7 @@
  *   - wecoza_invoice_calculate POST monthly summary (class hours, absent, payable)
  *   - wecoza_invoice_submit   POST submit claimed hours
  *   - wecoza_invoice_list     POST list invoices (admin only, manage_options)
+ *   - wecoza_invoice_review   POST approve or dispute an invoice (admin only)
  *
  * @package WeCoza_Classes
  * @since 1.0.0
@@ -47,6 +48,7 @@
 
         if (config.isAdmin) {
             loadOrder();
+            loadReconciliationTable();
         }
 
         calculateInvoice();
@@ -61,6 +63,18 @@
         $(document).on('click', '#btn-submit-invoice', submitInvoice);
         $(document).on('change', '#invoice-month-picker', function () {
             calculateInvoice();
+        });
+        $(document).on('click', '.btn-approve', function () {
+            const invoiceId = parseInt($(this).data('invoice-id'), 10);
+            if (invoiceId > 0) {
+                handleReviewAction(invoiceId, 'approved');
+            }
+        });
+        $(document).on('click', '.btn-dispute', function () {
+            const invoiceId = parseInt($(this).data('invoice-id'), 10);
+            if (invoiceId > 0) {
+                handleReviewAction(invoiceId, 'disputed');
+            }
         });
     }
 
@@ -355,6 +369,9 @@
                     const invoice = response.data;
                     $('#invoice-claim-form').addClass('d-none');
                     showSubmittedState(invoice);
+                    if (config.isAdmin) {
+                        loadReconciliationTable();
+                    }
                 } else {
                     const msg = (response.data && response.data.message) || 'Failed to submit invoice.';
                     showInvoiceAlert(msg, 'danger');
@@ -433,6 +450,204 @@
         $('#invoice-claim-form').addClass('d-none');
         $('#invoice-submitted').addClass('d-none');
         $('#invoice-summary').addClass('d-none');
+    }
+
+    // =========================================================
+    // RECONCILIATION TABLE (admin only)
+    // =========================================================
+
+    /**
+     * Load all invoices for the class/agent pair and populate the
+     * reconciliation table. Called on page load and after submitInvoice().
+     */
+    function loadReconciliationTable() {
+        $('#reconciliation-loading').removeClass('d-none');
+        $('#reconciliation-table-wrapper').addClass('d-none');
+        $('#reconciliation-empty').addClass('d-none');
+        $('#reconciliation-alert').html('');
+
+        $.ajax({
+            url: config.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'wecoza_invoice_list',
+                _ajax_nonce: config.ordersNonce,
+                class_id: config.classId,
+                agent_id: config.classAgent
+            },
+            success: function (response) {
+                $('#reconciliation-loading').addClass('d-none');
+
+                if (response.success && response.data && Array.isArray(response.data.invoices)) {
+                    const invoices = response.data.invoices;
+                    if (invoices.length === 0) {
+                        $('#reconciliation-empty').removeClass('d-none');
+                    } else {
+                        renderReconciliationRows(invoices);
+                        $('#reconciliation-table-wrapper').removeClass('d-none');
+                    }
+                } else {
+                    const msg = (response.data && response.data.message) || 'Failed to load reconciliation data.';
+                    $('#reconciliation-alert').html(
+                        '<div class="alert alert-subtle-warning alert-dismissible fade show" role="alert">'
+                        + escapeHtml(msg)
+                        + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                        + '</div>'
+                    );
+                }
+            },
+            error: function () {
+                $('#reconciliation-loading').addClass('d-none');
+                $('#reconciliation-alert').html(
+                    '<div class="alert alert-subtle-danger alert-dismissible fade show" role="alert">'
+                    + 'Request failed. Please try again.'
+                    + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                    + '</div>'
+                );
+            }
+        });
+    }
+
+    /**
+     * Render table rows into #reconciliation-tbody from the invoices array.
+     *
+     * Row highlighting:
+     *   - discrepancy > 0 (overclaim): table-danger (red)
+     *   - discrepancy === 0 and status !== 'draft': table-success (green)
+     *
+     * @param {Array} invoices  Array of invoice objects from wecoza_invoice_list.
+     */
+    function renderReconciliationRows(invoices) {
+        let html = '';
+
+        invoices.forEach(function (inv) {
+            const month = (inv.invoice_month || '').substring(0, 7);
+            const monthDisplay = month
+                ? new Date(month + '-15').toLocaleDateString('en-ZA', { year: 'numeric', month: 'long' })
+                : '—';
+
+            const classHours  = formatHours(inv.class_hours_total);
+            const claimed     = formatHours(inv.agent_claimed_hours);
+            const payable     = formatHours(inv.calculated_payable_hours);
+            const discrepancy = parseFloat(inv.discrepancy_hours) || 0;
+            const status      = inv.status || 'draft';
+
+            // Row highlight class
+            let rowClass = '';
+            if (discrepancy > 0) {
+                rowClass = 'table-danger';
+            } else if (discrepancy === 0 && status !== 'draft') {
+                rowClass = 'table-success';
+            }
+
+            // Discrepancy cell content
+            let discrepancyCell;
+            if (status === 'draft' || inv.agent_claimed_hours === null || inv.agent_claimed_hours === undefined) {
+                discrepancyCell = '—';
+            } else if (discrepancy > 0) {
+                discrepancyCell = '<span class="text-danger fw-bold">+' + discrepancy + ' hrs</span>';
+            } else if (discrepancy < 0) {
+                discrepancyCell = '<span class="text-success">' + discrepancy + ' hrs</span>';
+            } else {
+                discrepancyCell = '<span class="text-success"><i class="bi bi-check-circle"></i> 0</span>';
+            }
+
+            // Status badge
+            const statusBadge = '<span class="badge badge-phoenix ' + statusBadgeClass(status) + '">'
+                + escapeHtml(capitalise(status)) + '</span>';
+
+            // Actions cell
+            let actionsCell;
+            if (status === 'submitted') {
+                actionsCell = '<button class="btn btn-phoenix-success btn-sm me-1 btn-approve" data-invoice-id="' + inv.invoice_id + '">'
+                    + '<i class="bi bi-check-lg"></i> Approve'
+                    + '</button>'
+                    + '<button class="btn btn-phoenix-danger btn-sm btn-dispute" data-invoice-id="' + inv.invoice_id + '">'
+                    + '<i class="bi bi-x-lg"></i> Dispute'
+                    + '</button>';
+            } else if (status === 'approved') {
+                actionsCell = '<span class="text-success small"><i class="bi bi-check-circle-fill"></i> Approved</span>';
+            } else if (status === 'disputed') {
+                actionsCell = '<span class="text-danger small"><i class="bi bi-exclamation-triangle-fill"></i> Disputed</span>';
+            } else {
+                actionsCell = '<span class="text-muted small">Pending submission</span>';
+            }
+
+            html += '<tr class="' + rowClass + '" data-invoice-id="' + inv.invoice_id + '">'
+                + '<td>' + escapeHtml(monthDisplay) + '</td>'
+                + '<td class="text-end">' + escapeHtml(classHours) + '</td>'
+                + '<td class="text-end">' + escapeHtml(claimed) + '</td>'
+                + '<td class="text-end">' + escapeHtml(payable) + '</td>'
+                + '<td class="text-end">' + discrepancyCell + '</td>'
+                + '<td>' + statusBadge + '</td>'
+                + '<td>' + actionsCell + '</td>'
+                + '</tr>';
+        });
+
+        $('#reconciliation-tbody').html(html);
+    }
+
+    /**
+     * Send an approve or dispute action for a specific invoice.
+     * Updates the affected table row in-place without reloading the table.
+     *
+     * @param {number} invoiceId  The invoice primary key.
+     * @param {string} newStatus  'approved' or 'disputed'.
+     */
+    function handleReviewAction(invoiceId, newStatus) {
+        const $row = $('tr[data-invoice-id="' + invoiceId + '"]');
+        const $actionsCell = $row.find('td:last-child');
+
+        // Show spinner while request is in flight
+        const originalContent = $actionsCell.html();
+        $actionsCell.html('<span class="spinner-border spinner-border-sm" role="status"></span>');
+
+        $.ajax({
+            url: config.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'wecoza_invoice_review',
+                _ajax_nonce: config.ordersNonce,
+                invoice_id: invoiceId,
+                status: newStatus
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Update status badge cell (second-to-last td)
+                    const $statusCell = $row.find('td').eq(5);
+                    $statusCell.html(
+                        '<span class="badge badge-phoenix ' + statusBadgeClass(newStatus) + '">'
+                        + escapeHtml(capitalise(newStatus)) + '</span>'
+                    );
+
+                    // Update actions cell
+                    if (newStatus === 'approved') {
+                        $actionsCell.html('<span class="text-success small"><i class="bi bi-check-circle-fill"></i> Approved</span>');
+                        $row.removeClass('table-danger').addClass('table-success');
+                    } else {
+                        $actionsCell.html('<span class="text-danger small"><i class="bi bi-exclamation-triangle-fill"></i> Disputed</span>');
+                    }
+                } else {
+                    const msg = (response.data && response.data.message) || 'Failed to update invoice status.';
+                    $actionsCell.html(originalContent);
+                    $('#reconciliation-alert').html(
+                        '<div class="alert alert-subtle-danger alert-dismissible fade show" role="alert">'
+                        + escapeHtml(msg)
+                        + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                        + '</div>'
+                    );
+                }
+            },
+            error: function () {
+                $actionsCell.html(originalContent);
+                $('#reconciliation-alert').html(
+                    '<div class="alert alert-subtle-danger alert-dismissible fade show" role="alert">'
+                    + 'Request failed. Please try again.'
+                    + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                    + '</div>'
+                );
+            }
+        });
     }
 
     // =========================================================
