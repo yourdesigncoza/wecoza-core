@@ -829,6 +829,23 @@
             return;
         }
 
+        // [ATT-01] Detect all-absent session
+        const allAbsent = learnerHours.length > 0 &&
+            learnerHours.every(function(l) { return l.hours_present === 0; });
+
+        // [ATT-02] Prompt agent to confirm before submission
+        if (allAbsent) {
+            if (!window.confirm(
+                'All learners have 0 hours present for this session.\n\n' +
+                'Do you want to record this as an all-absent session?'
+            )) {
+                $btn.prop('disabled', false).html(
+                    '<i class="bi bi-check-lg me-1"></i>' + btnLabel
+                );
+                return;
+            }
+        }
+
         $.ajax({
             url:  config.ajaxUrl,
             type: 'POST',
