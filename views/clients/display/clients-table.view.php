@@ -57,10 +57,10 @@ $editUrl = site_url($atts['edit_url'] ?? '/app/all-clients', is_ssl() ? 'https' 
     <div class="card-header p-3 border-bottom">
         <div class="row g-3 justify-content-between align-items-center mb-3">
             <div class="col-12 col-md">
-                <h4 class="text-body mb-0" data-anchor="data-anchor" id="clients-table-header">
+                <h5 class="text-body mb-0" data-anchor="data-anchor" id="clients-table-header">
                     Clients Management
                     <i class="bi bi-people ms-2"></i>
-                </h4>
+                </h5>
             </div>
             
             <?php if (!empty($atts['show_search'])): ?>

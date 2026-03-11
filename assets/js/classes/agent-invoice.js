@@ -536,8 +536,6 @@
             let rowClass = '';
             if (discrepancy > 0) {
                 rowClass = 'table-danger';
-            } else if (discrepancy === 0 && status !== 'draft') {
-                rowClass = 'table-success';
             }
 
             // Discrepancy cell content
@@ -623,7 +621,7 @@
                     // Update actions cell
                     if (newStatus === 'approved') {
                         $actionsCell.html('<span class="text-success small"><i class="bi bi-check-circle-fill"></i> Approved</span>');
-                        $row.removeClass('table-danger').addClass('table-success');
+                        $row.removeClass('table-danger');
                     } else {
                         $actionsCell.html('<span class="text-danger small"><i class="bi bi-exclamation-triangle-fill"></i> Disputed</span>');
                     }

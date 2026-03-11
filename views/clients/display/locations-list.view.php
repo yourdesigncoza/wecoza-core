@@ -33,10 +33,10 @@ if (!empty($search)) {
         <div class="card-header p-3 border-bottom">
             <div class="row g-3 justify-content-between align-items-center mb-3">
                 <div class="col-12 col-md">
-                    <h4 class="text-body mb-0">
+                    <h5 class="text-body mb-0">
                         <?php esc_html_e('All Locations', 'wecoza-clients'); ?>
                         <i class="bi bi-geo-alt ms-2"></i>
-                    </h4>
+                    </h5>
                 </div>
                 <?php if ($showSearch) : ?>
                 <div class="search-box col-auto">

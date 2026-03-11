@@ -1,6 +1,6 @@
 <!-- Classes Capture Form -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-   <h4 class="mb-0">Create New Class</h4>
+   <h5 class="mb-0">Create New Class</h5>
    <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'createClassHelp']); ?>
 </div>
 <p class="text-muted small mb-5">   <span class="badge badge-phoenix fs-10 badge-phoenix-warning"><i class="bi bi-file-earmark-text me-1"></i><span class="badge-label">INIT. Status Draft</span></span> New classes are created as drafts. They will become active when an order number is assigned.</p>
@@ -557,10 +557,10 @@
       <!-- Schedule Statistics Section (hidden by default) -->
       <div class="card shadow-none border  d-none" id="schedule-statistics-section" data-component-card="data-component-card">
          <div class="card-header p-3 border-bottom bg-body">
-            <h4 class="text-body " data-anchor="schedule-statistics" id="schedule-statistics">
+            <h5 class="text-body " data-anchor="schedule-statistics" id="schedule-statistics">
                Schedule Statistics
                <a class="anchorjs-link" aria-label="Anchor" data-anchorjs-icon="#" href="#schedule-statistics" style="margin-left:0.1875em; padding:0 0.1875em;"></a>
-            </h4>
+            </h5>
          </div>
          <div class="card-body p-4">
             <div class="table-responsive scrollbar ">

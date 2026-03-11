@@ -235,9 +235,10 @@ final class NLQAjaxHandler
 
         if ($result['success']) {
             wp_send_json_success([
-                'sql'         => $result['sql'],
-                'explanation' => $result['explanation'],
-                'module'      => $result['module'],
+                'sql'                => $result['sql'],
+                'reformulated_query' => $result['reformulated_query'] ?? '',
+                'explanation'        => $result['explanation'],
+                'module'             => $result['module'],
             ]);
         } else {
             wp_send_json_error(['message' => $result['error']]);
@@ -264,8 +265,9 @@ final class NLQAjaxHandler
 
         if ($result['success']) {
             wp_send_json_success([
-                'sql'         => $result['sql'],
-                'explanation' => $result['explanation'],
+                'sql'                => $result['sql'],
+                'reformulated_query' => $result['reformulated_query'] ?? '',
+                'explanation'        => $result['explanation'],
             ]);
         } else {
             wp_send_json_error(['message' => $result['error']]);

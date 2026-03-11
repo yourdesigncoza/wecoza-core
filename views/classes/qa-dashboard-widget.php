@@ -50,14 +50,14 @@ $limit = intval($atts['limit']);
     <?php if ($show_charts): ?>
     <!-- Mini Chart -->
     <div class="widget-chart">
-        <h4>Recent Activity</h4>
+        <h5>Recent Activity</h5>
         <canvas id="widget-mini-chart"></canvas>
     </div>
     <?php endif; ?>
 
     <!-- Recent Visits -->
     <div class="widget-recent-visits">
-        <h4>Recent QA Visits</h4>
+        <h5>Recent QA Visits</h5>
         <div id="widget-visits-list">
             Loading recent visits...
         </div>
@@ -65,7 +65,7 @@ $limit = intval($atts['limit']);
 
     <!-- Alerts -->
     <div class="widget-alerts">
-        <h4>Alerts & Notifications</h4>
+        <h5>Alerts & Notifications</h5>
         <div id="widget-alerts-list">
             Loading alerts...
         </div>

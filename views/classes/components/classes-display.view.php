@@ -67,10 +67,10 @@ $controller = $controller ?? null;
                 <div class="card-header p-3 border-bottom">
                     <div class="row g-3 justify-content-between align-items-center mb-3">
                         <div class="col-12 col-md">
-                            <h4 class="text-body mb-0" data-anchor="data-anchor" id="classes-table-header">
+                            <h5 class="text-body mb-0" data-anchor="data-anchor" id="classes-table-header">
                                 All Classes
                                 <i class="bi bi-calendar-event ms-2"></i>
-                            </h4>
+                            </h5>
                         </div>
                         <div class="search-box col-auto">
                           <form class="position-relative"><input class="form-control search-input search form-control-sm" type="search" placeholder="Search" aria-label="Search">

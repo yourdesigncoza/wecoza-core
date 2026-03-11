@@ -34,7 +34,7 @@ if (!defined('ABSPATH')) {
             <div class="card-header p-3 border-bottom">
                 <div class="row align-items-center mb-2">
                     <div class="col">
-                        <h4 class="mb-0">Progression Management <i class="bi bi-mortarboard ms-1"></i></h4>
+                        <h5 class="mb-0">Progression Management <i class="bi bi-mortarboard ms-1"></i></h5>
                     </div>
                     <div class="col-auto">
                         <?php echo wecoza_component('form-help-button', ['offcanvas_id' => 'progressionAdminHelp']); ?>

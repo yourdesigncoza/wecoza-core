@@ -84,12 +84,10 @@ if ($classStatus === 'stopped') {
 
 <!-- Attendance Section -->
 <div class="card mb-4">
-    <div class="card-header">
-        <h4 class="mb-0">
-            <i class="bi bi-clipboard-check me-2"></i>Attendance
-        </h4>
-    </div>
     <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-clipboard-check me-2"></i>Attendance
+        </h5>
 
         <!-- Summary Stats Bar -->
         <div class="scrollbar mb-4" id="attendance-summary-cards">

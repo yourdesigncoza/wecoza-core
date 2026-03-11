@@ -21,7 +21,7 @@ echo $assets;
         <div class="card-header p-3 border-bottom">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <h4 class="text-body mb-0">
+                    <h5 class="text-body mb-0">
                         <?php echo esc_html__('Notifications', 'wecoza-events'); ?>
                         <?php if ($unreadCount > 0): ?>
                         <span class="badge badge-phoenix badge-phoenix-danger ms-2 fs-10" data-role="unread-count">
@@ -32,7 +32,7 @@ echo $assets;
                             0 <?php echo esc_html__('unread', 'wecoza-events'); ?>
                         </span>
                         <?php endif; ?>
-                    </h4>
+                    </h5>
                 </div>
                 <span class="badge badge-phoenix fs-10 badge-phoenix-primary" data-role="notification-count">
                     <?php echo esc_html($totalCount); ?> <?php echo esc_html(_n('Notification', 'Notifications', $totalCount, 'wecoza-events')); ?><?php if ($acknowledgedCount > 0): ?>, <?php echo esc_html($acknowledgedCount); ?> Read<?php endif; ?>

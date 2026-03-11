@@ -267,10 +267,7 @@ $component_data = [
       <!-- Attendance Section -->
       <?php echo wecoza_view('classes/components/single-class/attendance', $component_data); ?>
 
-      <!-- Agent Rate Card (admin only) -->
-      <?php echo wecoza_view('classes/components/single-class/agent-rate-card', $component_data); ?>
-
-      <!-- Agent Monthly Invoice -->
+      <!-- Agent Rate & Monthly Invoice -->
       <?php echo wecoza_view('classes/components/single-class/agent-invoice', $component_data); ?>
 
       <!-- Agent Invoice Reconciliation (admin only) -->
@@ -478,12 +475,10 @@ $component_data = [
 
       <?php if (!empty($monthly_data)): ?>
       <div class="card mb-4">
-         <div class="card-header">
-            <h4 class="mb-0">
-               <i class="bi bi-calendar-month me-2"></i>Schedule Statistics
-            </h4>
-         </div>
          <div class="card-body">
+            <h5 class="card-title mb-3">
+               <i class="bi bi-calendar-month me-2"></i>Schedule Statistics
+            </h5>
             <?php
             // Group by year
             $by_year = [];
@@ -495,85 +490,93 @@ $component_data = [
                 $by_year[$year][$month_key] = $data;
             }
             ?>
+            <div class="accordion" id="scheduleStatsAccordion">
+            <?php $year_index = 0; ?>
             <?php foreach ($by_year as $year => $months): ?>
-            <h5 class="mb-3"><?php echo esc_html($year); ?></h5>
-            <div class="row g-3 mb-4">
-               <?php foreach ($months as $month_key => $data): ?>
-               <div class="col-md-3">
-                  <div class="card h-100">
-                     <div class="card-body p-3">
-                        <h6 class="card-title mb-2"><?php echo esc_html($data['name']); ?></h6>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                           <span class="text-muted small">Sessions:</span>
-                           <span class="fw-bold"><?php echo esc_html($data['sessions']); ?></span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                           <span class="text-muted small">Hours:</span>
-                           <span class="fw-bold"><?php echo number_format($data['hours'], 1); ?></span>
-                        </div>
-                        <?php if ($data['exceptions'] > 0): ?>
-                        <span class="badge badge-phoenix badge-phoenix-warning me-1" title="Exception dates">
-                           <i class="bi bi-x-circle"></i> <?php echo $data['exceptions']; ?> exc
-                        </span>
-                        <?php endif; ?>
-                        <?php if ($data['holidays'] > 0): ?>
-                        <span class="badge badge-phoenix badge-phoenix-info me-1" title="Public holidays">
-                           <i class="bi bi-calendar-heart"></i> <?php echo $data['holidays']; ?> hol
-                        </span>
-                        <?php endif; ?>
-                        <?php if ($data['stop_periods'] > 0): ?>
-                        <span class="badge badge-phoenix badge-phoenix-secondary me-1" title="Stop period days">
-                           <i class="bi bi-pause-circle"></i> <?php echo $data['stop_periods']; ?> stop
-                        </span>
-                        <?php endif; ?>
-                        <?php if ($data['additions'] > 0): ?>
-                        <span class="badge badge-phoenix badge-phoenix-success me-1" title="Holiday override additions">
-                           <i class="bi bi-plus-circle"></i> <?php echo $data['additions']; ?> add
-                        </span>
-                        <?php endif; ?>
+            <div class="accordion-item">
+               <h2 class="accordion-header" id="schedHead<?php echo $year; ?>">
+                  <button class="accordion-button collapsed"
+                          type="button" data-bs-toggle="collapse"
+                          data-bs-target="#schedCollapse<?php echo $year; ?>"
+                          aria-expanded="false"
+                          aria-controls="schedCollapse<?php echo $year; ?>">
+                     <?php echo esc_html($year); ?>
+                  </button>
+               </h2>
+               <div class="accordion-collapse collapse"
+                    id="schedCollapse<?php echo $year; ?>"
+                    aria-labelledby="schedHead<?php echo $year; ?>"
+                    data-bs-parent="#scheduleStatsAccordion">
+                  <div class="accordion-body pt-0">
+            <div class="table-responsive mb-3">
+               <table class="table table-hover table-sm fs-9 mb-0">
+                  <thead>
+                     <tr>
+                        <th>Month</th>
+                        <th class="text-end">Sessions</th>
+                        <th class="text-end">Hours</th>
+                        <th>Flags</th>
+                        <th>Breakdown</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <?php foreach ($months as $month_key => $data):
+                        // Extract just the month name (without year)
+                        $month_only = explode(' ', $data['name'])[0];
 
-                        <!-- Calculation Breakdown Toggle -->
-                        <?php if (!empty($data['breakdown'])): ?>
-                        <div class="mt-2">
-                           <button class="btn btn-sm btn-link p-0 text-decoration-none" type="button"
-                                   data-bs-toggle="collapse"
-                                   data-bs-target="#breakdown-<?php echo esc_attr($month_key); ?>"
-                                   aria-expanded="false">
-                              <i class="bi bi-calculator me-1"></i>View Breakdown
-                           </button>
-                           <div class="collapse mt-2" id="breakdown-<?php echo esc_attr($month_key); ?>">
-                              <div class="card card-body p-2 bg-light small">
-                                 <?php
-                                 $potential = count(array_filter($data['breakdown'], fn($d) => $d['potential']));
-                                 $removed_exc = count(array_filter($data['breakdown'], fn($d) => $d['exception']));
-                                 $removed_hol = count(array_filter($data['breakdown'], fn($d) => $d['holiday'] && !$d['holiday_override']));
-                                 $removed_stop = count(array_filter($data['breakdown'], fn($d) => $d['stop_period']));
-                                 $added_override = count(array_filter($data['breakdown'], fn($d) => $d['holiday_override']));
-                                 ?>
-                                 <div>Potential: <?php echo $potential; ?></div>
-                                 <?php if ($removed_exc > 0): ?>
-                                 <div class="text-warning">- Exceptions: <?php echo $removed_exc; ?></div>
-                                 <?php endif; ?>
-                                 <?php if ($removed_hol > 0): ?>
-                                 <div class="text-info">- Holidays: <?php echo $removed_hol; ?></div>
-                                 <?php endif; ?>
-                                 <?php if ($removed_stop > 0): ?>
-                                 <div class="text-secondary">- Stop Days: <?php echo $removed_stop; ?></div>
-                                 <?php endif; ?>
-                                 <?php if ($added_override > 0): ?>
-                                 <div class="text-success">+ Overrides: <?php echo $added_override; ?></div>
-                                 <?php endif; ?>
-                                 <div class="fw-bold border-top mt-1 pt-1">= <?php echo $data['sessions']; ?> sessions</div>
-                              </div>
-                           </div>
-                        </div>
-                        <?php endif; ?>
-                     </div>
+                        // Build breakdown formula
+                        $breakdown_str = '';
+                        if (!empty($data['breakdown'])) {
+                           $potential = count(array_filter($data['breakdown'], fn($d) => $d['potential']));
+                           $removed_exc = count(array_filter($data['breakdown'], fn($d) => $d['exception']));
+                           $removed_hol = count(array_filter($data['breakdown'], fn($d) => $d['holiday'] && !$d['holiday_override']));
+                           $removed_stop = count(array_filter($data['breakdown'], fn($d) => $d['stop_period']));
+                           $added_override = count(array_filter($data['breakdown'], fn($d) => $d['holiday_override']));
+
+                           $has_adjustments = ($removed_exc + $removed_hol + $removed_stop + $added_override) > 0;
+                           if ($has_adjustments) {
+                              $parts = [(string)$potential];
+                              if ($removed_exc > 0) $parts[] = '<span class="text-warning">&minus; ' . $removed_exc . ' exc</span>';
+                              if ($removed_hol > 0) $parts[] = '<span class="text-info">&minus; ' . $removed_hol . ' hol</span>';
+                              if ($removed_stop > 0) $parts[] = '<span class="text-secondary">&minus; ' . $removed_stop . ' stop</span>';
+                              if ($added_override > 0) $parts[] = '<span class="text-success">+ ' . $added_override . ' ovr</span>';
+                              $parts[] = '= ' . $data['sessions'];
+                              $breakdown_str = implode(' ', $parts);
+                           } else {
+                              $breakdown_str = (string)$potential;
+                           }
+                        }
+                     ?>
+                     <tr>
+                        <td><?php echo esc_html($month_only); ?></td>
+                        <td class="text-end fw-semibold"><?php echo esc_html($data['sessions']); ?></td>
+                        <td class="text-end fw-semibold"><?php echo number_format($data['hours'], 1); ?></td>
+                        <td>
+                           <?php if ($data['exceptions'] > 0): ?>
+                           <span class="badge badge-phoenix badge-phoenix-warning me-1" title="Exception dates"><i class="bi bi-x-circle"></i> <?php echo $data['exceptions']; ?> exc</span>
+                           <?php endif; ?>
+                           <?php if ($data['holidays'] > 0): ?>
+                           <span class="badge badge-phoenix badge-phoenix-info me-1" title="Public holidays"><i class="bi bi-calendar-heart"></i> <?php echo $data['holidays']; ?> hol</span>
+                           <?php endif; ?>
+                           <?php if ($data['stop_periods'] > 0): ?>
+                           <span class="badge badge-phoenix badge-phoenix-secondary me-1" title="Stop period days"><i class="bi bi-pause-circle"></i> <?php echo $data['stop_periods']; ?> stop</span>
+                           <?php endif; ?>
+                           <?php if ($data['additions'] > 0): ?>
+                           <span class="badge badge-phoenix badge-phoenix-success me-1" title="Holiday override additions"><i class="bi bi-plus-circle"></i> <?php echo $data['additions']; ?> add</span>
+                           <?php endif; ?>
+                        </td>
+                        <td class="text-body-tertiary"><?php echo $breakdown_str; ?></td>
+                     </tr>
+                     <?php endforeach; ?>
+                  </tbody>
+               </table>
+            </div>
                   </div>
                </div>
-               <?php endforeach; ?>
             </div>
+            <?php $year_index++; ?>
             <?php endforeach; ?>
+            </div>
          </div>
       </div>
       <?php endif; ?>

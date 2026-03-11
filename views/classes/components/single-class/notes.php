@@ -100,7 +100,7 @@ if (!empty($class_notes_data)) {
       </h5>
 
    <!-- Class Notes Container for dynamic display -->
-   <div id="class-notes-container" class="mt-3">
+   <div id="class-notes-container" class="mt-3<?= empty($class_notes_data) ? ' d-none' : '' ?>">
       <!-- Notes Search and Filter Controls -->
       <div class="notes-controls mb-4">
          <div class="row g-2 mb-2">

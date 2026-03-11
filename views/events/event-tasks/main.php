@@ -30,7 +30,7 @@ echo $assets;
         <div class="card-header p-3 border-bottom">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <h4 class="text-body mb-0">
+                    <h5 class="text-body mb-0">
                         <?php
                         echo esc_html(
                             $classSpecific
@@ -38,7 +38,7 @@ echo $assets;
                                 : __('Classes Open Tasks', 'wecoza-events')
                         );
                         ?>
-                    </h4>
+                    </h5>
                     <?php if ($classSpecific && $viewAllUrl !== ''): ?>
                         <a class="btn btn-link btn-sm px-0" href="<?php echo esc_url($viewAllUrl); ?>">
                             <?php echo esc_html__('View all classes', 'wecoza-events'); ?>

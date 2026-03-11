@@ -23,10 +23,10 @@ $nonce      = $nonce ?? '';
     <!-- ─── Step 1: Ask a Question ─────────────────────────── -->
     <div class="card shadow-none border mb-4" data-component-card="data-component-card" id="nlq-step-ask">
         <div class="card-header p-3 border-bottom">
-            <h4 class="text-body mb-0">
+            <h5 class="text-body mb-0">
                 Ask Your Data
                 <i class="bi bi-chat-dots ms-2"></i>
-            </h4>
+            </h5>
         </div>
         <div class="card-body p-4">
             <p class="text-body-tertiary mb-3">
@@ -71,13 +71,20 @@ $nonce      = $nonce ?? '';
         <!-- AI Response Card -->
         <div class="card shadow-none border mb-4" data-component-card="data-component-card">
             <div class="card-header p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h4 class="text-body mb-0">
+                <h5 class="text-body mb-0">
                     Generated Query
                     <i class="bi bi-robot ms-2"></i>
-                </h4>
+                </h5>
                 <span class="badge badge-phoenix badge-phoenix-info" id="nlq-detected-module"></span>
             </div>
             <div class="card-body p-4">
+
+                <!-- Reformulated Query -->
+                <div id="nlq-reformulated" class="alert alert-subtle-secondary mb-3" style="display: none;">
+                    <i class="bi bi-arrow-repeat me-2"></i>
+                    <strong class="me-1">Interpreted as:</strong>
+                    <span id="nlq-reformulated-text"></span>
+                </div>
 
                 <!-- Explanation -->
                 <div id="nlq-explanation" class="alert alert-subtle-info mb-3" style="display: none;">
@@ -126,10 +133,10 @@ $nonce      = $nonce ?? '';
         <div id="nlq-preview-card" class="card shadow-none border mb-4" style="display: none;">
             <div class="card-header p-3 border-bottom">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                    <h4 class="text-body mb-0 text-nowrap">
+                    <h5 class="text-body mb-0 text-nowrap">
                         Preview Results
                         <i class="bi bi-table ms-2"></i>
-                    </h4>
+                    </h5>
                     <span id="nlq-preview-count" class="badge badge-phoenix badge-phoenix-success fs-10"></span>
                 </div>
             </div>
@@ -146,10 +153,10 @@ $nonce      = $nonce ?? '';
         <!-- Save Card -->
         <div id="nlq-save-card" class="card shadow-none border mb-4" style="display: none;">
             <div class="card-header p-3 border-bottom">
-                <h4 class="text-body mb-0">
+                <h5 class="text-body mb-0">
                     Save Query
                     <i class="bi bi-save ms-2"></i>
-                </h4>
+                </h5>
             </div>
             <div class="card-body p-4">
                 <div class="row g-3 mb-3">

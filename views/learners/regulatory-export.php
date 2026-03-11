@@ -36,7 +36,7 @@ if (!defined('ABSPATH')) {
                 <!-- Row 1: Title + Export action -->
                 <div class="row align-items-center mb-2">
                     <div class="col">
-                        <h4 class="mb-0">Regulatory Progressions Export <i class="bi bi-file-earmark-spreadsheet ms-1"></i></h4>
+                        <h5 class="mb-0">Regulatory Progressions Export <i class="bi bi-file-earmark-spreadsheet ms-1"></i></h5>
                     </div>
                     <div class="col-auto d-flex align-items-center gap-2">
                         <span id="reg-record-count" class="text-muted fs-9">0 records</span>

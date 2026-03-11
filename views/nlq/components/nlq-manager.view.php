@@ -63,10 +63,10 @@ $unique_categories = count(array_unique(array_filter(array_column($queries, 'cat
                 <!-- Card Header -->
                 <div class="card-header p-3 border-bottom">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-                        <h4 class="text-body mb-0 text-nowrap" data-anchor="data-anchor">
+                        <h5 class="text-body mb-0 text-nowrap" data-anchor="data-anchor">
                             Saved Queries
                             <i class="bi bi-database ms-2"></i>
-                        </h4>
+                        </h5>
                         <div class="d-flex flex-wrap align-items-center gap-2 ms-auto">
                             <div class="search-box">
                                 <form class="position-relative">
@@ -241,10 +241,10 @@ $unique_categories = count(array_unique(array_filter(array_column($queries, 'cat
 
             <div class="card shadow-none border" data-component-card="data-component-card">
                 <div class="card-header p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h4 class="text-body mb-0" id="nlq-form-title">
+                    <h5 class="text-body mb-0" id="nlq-form-title">
                         Create New Query
                         <i class="bi bi-plus-circle ms-2"></i>
-                    </h4>
+                    </h5>
                     <button class="btn btn-sm btn-outline-secondary" id="nlq-form-reset" style="display:none;">
                         Cancel Edit <i class="bi bi-x-circle ms-1"></i>
                     </button>

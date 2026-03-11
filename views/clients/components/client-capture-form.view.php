@@ -110,7 +110,7 @@ $is_edit = !empty($client['id']);
     <?php endif; ?>
     
     <?php if (!$is_edit) : ?>
-            <h4 class="mb-1 mt-4">Create a new Client</h4>
+            <h5 class="mb-1 mt-4">Create a new Client</h5>
             <p class="mb-5 text-muted">Before you start the upload process ensure you have all info. ready.</p>
     <?php endif; ?>
     

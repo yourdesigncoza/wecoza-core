@@ -65,7 +65,8 @@
             data.forEach(function (row) {
                 var rowData = [];
                 for (var i = 0; i < row.length; i++) {
-                    var cell = String(row[i] || '').replace(/"/g, '""');
+                    // Strip HTML tags and trim whitespace to get clean text
+                    var cell = $('<div>').html(row[i] || '').text().trim().replace(/"/g, '""');
                     rowData.push('"' + cell + '"');
                 }
                 csv += rowData.join(',') + '\n';

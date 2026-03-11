@@ -24,7 +24,7 @@ if (!defined('ABSPATH')) {
             <!-- Row 1: Title + Download action -->
             <div class="row align-items-center mb-2">
                 <div class="col">
-                    <h4 class="mb-0">Class Learner Report <i class="bi bi-file-earmark-spreadsheet ms-1"></i></h4>
+                    <h5 class="mb-0">Class Learner Report <i class="bi bi-file-earmark-spreadsheet ms-1"></i></h5>
                 </div>
                 <div class="col-auto d-flex align-items-center gap-2">
                     <span id="clr-learner-count" class="text-muted fs-9"></span>

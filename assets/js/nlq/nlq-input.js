@@ -85,6 +85,14 @@
                     currentSql = response.data.sql;
                     $('#nlq-generated-sql').val(response.data.sql);
 
+                    // Show reformulated query
+                    if (response.data.reformulated_query) {
+                        $('#nlq-reformulated-text').text(response.data.reformulated_query);
+                        $('#nlq-reformulated').show();
+                    } else {
+                        $('#nlq-reformulated').hide();
+                    }
+
                     // Show explanation
                     if (response.data.explanation) {
                         $('#nlq-explanation-text').text(response.data.explanation);
@@ -249,6 +257,11 @@
                     currentSql = response.data.sql;
                     $('#nlq-generated-sql').val(response.data.sql);
 
+                    if (response.data.reformulated_query) {
+                        $('#nlq-reformulated-text').text(response.data.reformulated_query);
+                        $('#nlq-reformulated').show();
+                    }
+
                     if (response.data.explanation) {
                         $('#nlq-explanation-text').text(response.data.explanation);
                         $('#nlq-explanation').show();
@@ -330,6 +343,7 @@
         $('#nlq-question').val('').focus();
         $('#nlq-step-result').slideUp(function () {
             $('#nlq-generated-sql').val('');
+            $('#nlq-reformulated').hide();
             $('#nlq-explanation').hide();
             $('#nlq-preview-card').hide();
             $('#nlq-save-card').hide();

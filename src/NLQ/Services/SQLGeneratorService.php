@@ -86,10 +86,11 @@ final class SQLGeneratorService
         }
 
         return [
-            'success'     => true,
-            'sql'         => $validation['sanitized'],
-            'explanation' => $parsed['explanation'] ?? '',
-            'module'      => $module,
+            'success'             => true,
+            'sql'                 => $validation['sanitized'],
+            'reformulated_query'  => $parsed['reformulated_query'] ?? '',
+            'explanation'         => $parsed['explanation'] ?? '',
+            'module'              => $module,
         ];
     }
 
@@ -138,9 +139,10 @@ final class SQLGeneratorService
         }
 
         return [
-            'success'     => true,
-            'sql'         => $validation['sanitized'],
-            'explanation' => $parsed['explanation'] ?? '',
+            'success'             => true,
+            'sql'                 => $validation['sanitized'],
+            'reformulated_query'  => $parsed['reformulated_query'] ?? '',
+            'explanation'         => $parsed['explanation'] ?? '',
         ];
     }
 
@@ -148,32 +150,66 @@ final class SQLGeneratorService
 
     private function buildSystemPrompt(string $schemaContext): string
     {
+        $examples = $this->buildExamplesContext();
+
         return <<<PROMPT
 You are a PostgreSQL SQL query generator for WeCoza, an internal training management system.
 
-Your task: Convert natural language questions into safe, read-only PostgreSQL SELECT queries.
+Your task is to:
+1. Reformulate the user's natural language query to align precisely with the database schema, indicating which tables to use.
+2. Generate the corresponding safe, read-only PostgreSQL SELECT query.
 
 DATABASE SCHEMA (verified against live PostgreSQL database — these are the ONLY tables that exist):
 {$schemaContext}
 
 RULES:
 1. Generate ONLY SELECT queries. Never generate INSERT, UPDATE, DELETE, DROP, ALTER, or any write operation.
-2. CRITICAL: Use ONLY the tables and columns listed above. If a table or column is not listed, it does NOT exist. Never guess or invent tables/columns.
+2. CRITICAL: Use ONLY the exact table and column names from the schema above. Column names must match EXACTLY as listed — do NOT shorten, abbreviate, or rename them (e.g., use "class_subject" not "subject", use "class_code" not "code", use "client_name" not "name"). If a column is not listed, it does NOT exist.
 3. Use proper PostgreSQL syntax (e.g., ILIKE for case-insensitive matching, ::date for date casting).
 4. For "today" use CURRENT_DATE, for "now" use NOW().
 5. For "active" status checks, use status = 'active' unless the column has different values.
 6. Use reasonable LIMIT clauses (default 100) unless the user asks for all records.
-7. Use meaningful column aliases with AS for calculated fields.
+7. Use meaningful column aliases with AS for calculated or prefixed fields (e.g., c.class_subject AS subject).
 8. For JSONB columns (learner_ids, schedule_data, etc.), use appropriate JSONB operators.
 9. Always qualify ambiguous column names with table aliases.
+10. When using aggregate functions (COUNT, SUM, AVG, MIN, MAX), you MUST include a GROUP BY clause listing ALL non-aggregated columns in the SELECT.
+11. For enum/status columns, match values exactly as documented (lowercase: 'active' not 'Active'). Use ILIKE only for free-text searches.
+12. For division or ratio calculations, always wrap the divisor in NULLIF(col, 0) to prevent division-by-zero errors.
+13. Double-check that every column reference in your SQL exists in the schema before responding.
+
+EXAMPLES (follow these patterns for correct column names, JOINs, and table aliases):
+{$examples}
 
 RESPONSE FORMAT:
 Return ONLY valid JSON (no markdown, no code blocks, no extra text):
 {
+  "reformulated_query": "Precise, schema-aligned version of the user's question, indicating which tables to use",
   "sql": "SELECT ... FROM ...",
   "explanation": "Brief explanation of what this query does"
 }
 PROMPT;
+    }
+
+    /* ─── Few-Shot Examples Builder ───────────────────────── */
+
+    /**
+     * Load curated NL→SQL examples from config/nlq-examples.php
+     * These teach the AI exact column names, JOIN patterns, and conventions.
+     */
+    private function buildExamplesContext(): string
+    {
+        $examples = wecoza_config('nlq-examples');
+        if (!$examples || !is_array($examples)) {
+            return '';
+        }
+
+        $parts = [];
+        foreach ($examples as $idx => $ex) {
+            $num = $idx + 1;
+            $parts[] = "Example {$num}:\n  Input: {$ex['input']}\n  Reformulated: {$ex['reformulated']}\n  SQL: {$ex['sql']}";
+        }
+
+        return implode("\n\n", $parts);
     }
 
     /* ─── Schema Context Builder ──────────────────────────── */

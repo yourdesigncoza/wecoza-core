@@ -17,10 +17,10 @@ if (!defined("ABSPATH")) {
         <div class="card-header p-3 border-bottom">
             <div class="row g-3 justify-content-between align-items-center mb-3">
                 <div class="col-12 col-md">
-                    <h4 class="text-body-emphasis mb-0">
+                    <h5 class="text-body-emphasis mb-0">
                         Material Delivery Tracking
                         <i class="bi bi-box-seam ms-2"></i>
-                    </h4>
+                    </h5>
                 </div>
                 <div class="search-box col-auto">
                     <form class="position-relative">

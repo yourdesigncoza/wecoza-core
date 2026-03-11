@@ -18,7 +18,7 @@ $totalCount = count($records);
         <div class="card-header p-3 border-bottom">
             <div class="row align-items-center">
                 <div class="col">
-                    <h4 class="mb-0">LP Collision Audit Trail <i class="bi bi-shield-exclamation ms-1"></i></h4>
+                    <h5 class="mb-0">LP Collision Audit Trail <i class="bi bi-shield-exclamation ms-1"></i></h5>
                     <p class="text-body-tertiary fs-9 mb-0 mt-1">
                         Record of LP collisions acknowledged during learner assignment
                     </p>

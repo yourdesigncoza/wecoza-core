@@ -133,7 +133,7 @@ $resolved_contact_position = $client["contact_person_position"] ?? "";
         <?php endif; ?>
     <?php endif; ?>
 
-    <h4 class="mb-1 mt-4">Update Client</h4>
+    <h5 class="mb-1 mt-4">Update Client</h5>
 
     <form id="clients-form" class="needs-validation ydcoza-compact-form" novalidate method="POST" enctype="multipart/form-data">
         <?php wp_nonce_field("clients_nonce_action", "nonce"); ?>

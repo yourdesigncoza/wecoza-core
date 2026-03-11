@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 <div class="agent-attendance-page">
 
     <div class="mb-4">
-        <h4 class="mb-1">My Classes</h4>
+        <h5 class="mb-1">My Classes</h5>
         <p class="text-muted fs-9 mb-0">Classes assigned to you for attendance capture</p>
     </div>
 

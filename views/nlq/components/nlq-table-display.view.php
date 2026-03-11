@@ -59,10 +59,10 @@ $category    = $category ?? '';
             <div class="card-header p-3 border-bottom">
                 <div class="row g-3 justify-content-between align-items-center mb-3">
                     <div class="col-12 col-md">
-                        <h4 class="text-body mb-0" data-anchor="data-anchor">
+                        <h5 class="text-body mb-0" data-anchor="data-anchor">
                             <?php echo esc_html($title); ?>
                             <i class="bi bi-table ms-2 text-body-quaternary"></i>
-                        </h4>
+                        </h5>
                         <?php if ($subtitle): ?>
                         <p class="text-body-tertiary fs-9 mb-0 mt-1">
                             <?php echo esc_html($subtitle); ?>

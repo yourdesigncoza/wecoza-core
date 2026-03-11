@@ -1,8 +1,10 @@
 <?php
 /**
- * Single Class Display - Agent Monthly Invoice Component
+ * Single Class Display - Agent Rate & Monthly Invoice Component
  *
- * Displays the monthly invoice section for both admin and wp_agent roles.
+ * Combined card showing agent rate settings (admin only) and monthly invoice
+ * section for both admin and wp_agent roles.
+ *
  * Allows agents to view monthly summaries (class hours, absent days/hours,
  * payable hours) and submit claimed hours for payment reconciliation.
  *
@@ -46,14 +48,54 @@ if ($classStatus === 'draft') {
 $currentMonth = wp_date('Y-m');
 ?>
 
-<!-- Agent Monthly Invoice Section -->
-<div class="card mb-4" id="agent-invoice-card">
-    <div class="card-header">
-        <h4 class="mb-0">
-            <i class="bi bi-receipt me-2"></i><?= esc_html__('Monthly Invoice', 'wecoza-core'); ?>
-        </h4>
-    </div>
+<!-- Agent Rate & Monthly Invoice Section -->
+<div class="card mb-3" id="agent-invoice-card">
     <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-receipt me-2"></i><?= esc_html__('Agent Rate & Monthly Invoice', 'wecoza-core'); ?>
+        </h5>
+
+        <?php if (current_user_can('manage_options')): ?>
+        <!-- Agent Rate (admin only) -->
+        <input type="hidden" id="agent-order-id" value="">
+
+        <div class="row g-3 align-items-end mb-3">
+            <div class="col-md-4">
+                <label for="agent-rate-type" class="form-label form-label-sm">
+                    <?= esc_html__('Rate Type', 'wecoza-core'); ?>
+                </label>
+                <select class="form-select form-select-sm" id="agent-rate-type" disabled>
+                    <option value=""><?= esc_html__('Select...', 'wecoza-core'); ?></option>
+                    <option value="hourly"><?= esc_html__('Hourly', 'wecoza-core'); ?></option>
+                    <option value="daily"><?= esc_html__('Daily', 'wecoza-core'); ?></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="agent-rate-amount" class="form-label form-label-sm">
+                    <?= esc_html__('Rate Amount', 'wecoza-core'); ?> (R)
+                </label>
+                <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    id="agent-rate-amount"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    disabled
+                >
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end gap-2">
+                <button type="button" class="btn btn-phoenix-primary btn-sm" id="btn-save-agent-rate" disabled>
+                    <i class="bi bi-floppy me-1"></i><?= esc_html__('Save Rate', 'wecoza-core'); ?>
+                </button>
+                <span id="agent-rate-status" class="small"></span>
+            </div>
+        </div>
+
+        <hr class="my-3">
+        <?php endif; ?>
 
         <!-- Month Picker -->
         <div class="row mb-4">
@@ -79,38 +121,58 @@ $currentMonth = wp_date('Y-m');
         <!-- Alert Container -->
         <div id="invoice-alert"></div>
 
-        <!-- Invoice Summary (shown after calculate) -->
+        <!-- Invoice Summary (shown after calculate) — horizontal summary bar -->
         <div id="invoice-summary" class="d-none mb-4">
-            <div class="row g-3">
-                <div class="col-6 col-md-3">
-                    <div class="card h-100 border-0 bg-body-highlight">
-                        <div class="card-body p-3 text-center">
-                            <h6 class="text-body-tertiary small mb-1"><?= esc_html__('Class Hours', 'wecoza-core'); ?></h6>
-                            <span class="fs-5 fw-bold" id="inv-class-hours">—</span>
+            <div class="card mb-2">
+                <div class="card-body ydcoza-mini-card-header">
+                    <div class="row g-4 justify-content-between">
+                        <!-- Class Hours -->
+                        <div class="col-sm-auto">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex bg-primary-subtle rounded flex-center me-3" style="width:32px;height:32px">
+                                    <i class="bi bi-clock text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="fw-bold mb-1"><?= esc_html__('Class Hours', 'wecoza-core'); ?></p>
+                                    <h5 class="fw-bolder text-nowrap" id="inv-class-hours">—</h5>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card h-100 border-0 bg-body-highlight">
-                        <div class="card-body p-3 text-center">
-                            <h6 class="text-body-tertiary small mb-1"><?= esc_html__('Absent Days', 'wecoza-core'); ?></h6>
-                            <span class="fs-5 fw-bold" id="inv-absent-days">—</span>
+                        <!-- Absent Days -->
+                        <div class="col-sm-auto">
+                            <div class="d-flex align-items-center border-start-sm ps-sm-5">
+                                <div class="d-flex bg-warning-subtle rounded flex-center me-3" style="width:32px;height:32px">
+                                    <i class="bi bi-calendar-x text-warning"></i>
+                                </div>
+                                <div>
+                                    <p class="fw-bold mb-1"><?= esc_html__('Absent Days', 'wecoza-core'); ?></p>
+                                    <h5 class="fw-bolder text-nowrap" id="inv-absent-days">—</h5>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card h-100 border-0 bg-body-highlight">
-                        <div class="card-body p-3 text-center">
-                            <h6 class="text-body-tertiary small mb-1"><?= esc_html__('Absent Hours', 'wecoza-core'); ?></h6>
-                            <span class="fs-5 fw-bold" id="inv-absent-hours">—</span>
+                        <!-- Absent Hours -->
+                        <div class="col-sm-auto">
+                            <div class="d-flex align-items-center border-start-sm ps-sm-5">
+                                <div class="d-flex bg-danger-subtle rounded flex-center me-3" style="width:32px;height:32px">
+                                    <i class="bi bi-hourglass text-danger"></i>
+                                </div>
+                                <div>
+                                    <p class="fw-bold mb-1"><?= esc_html__('Absent Hours', 'wecoza-core'); ?></p>
+                                    <h5 class="fw-bolder text-nowrap" id="inv-absent-hours">—</h5>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card h-100 border-0 bg-body-highlight">
-                        <div class="card-body p-3 text-center">
-                            <h6 class="text-body-tertiary small mb-1"><?= esc_html__('Payable Hours', 'wecoza-core'); ?></h6>
-                            <span class="fs-5 fw-bold text-success" id="inv-payable-hours">—</span>
+                        <!-- Payable Hours -->
+                        <div class="col-sm-auto">
+                            <div class="d-flex align-items-center border-start-sm ps-sm-5">
+                                <div class="d-flex bg-success-subtle rounded flex-center me-3" style="width:32px;height:32px">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                </div>
+                                <div>
+                                    <p class="fw-bold mb-1"><?= esc_html__('Payable Hours', 'wecoza-core'); ?></p>
+                                    <h5 class="fw-bolder text-nowrap text-success" id="inv-payable-hours">—</h5>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

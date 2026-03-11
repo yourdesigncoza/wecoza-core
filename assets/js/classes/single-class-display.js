@@ -64,8 +64,6 @@
             // Initialize view toggle functionality
             this.initializeViewToggle();
 
-            // Initialize month breakdown toggle functionality
-            this.initializeMonthBreakdowns();
 
             // Initialize notes filtering when models are ready
             this.initializeNotesWhenReady();
@@ -547,47 +545,6 @@
                     subject: config.classSubject
                 });
             }
-        },
-
-        /**
-         * Initialize Month Breakdown Toggle Functionality
-         */
-        initializeMonthBreakdowns: function() {
-            console.log('Initializing month breakdown functionality...');
-
-            const breakdownToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
-
-            if (breakdownToggles.length === 0) {
-                console.log('No month breakdown toggles found');
-                return;
-            }
-
-            breakdownToggles.forEach(toggle => {
-                const targetId = toggle.getAttribute('data-bs-target');
-                const targetElement = document.querySelector(targetId);
-
-                if (targetElement) {
-                    targetElement.addEventListener('show.bs.collapse', function() {
-                        console.log('Expanding breakdown for:', targetId);
-                        toggle.setAttribute('aria-expanded', 'true');
-                    });
-
-                    targetElement.addEventListener('hide.bs.collapse', function() {
-                        console.log('Collapsing breakdown for:', targetId);
-                        toggle.setAttribute('aria-expanded', 'false');
-                    });
-                }
-
-                toggle.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = 'rgba(0,0,0,0.05)';
-                });
-
-                toggle.addEventListener('mouseleave', function() {
-                    this.style.backgroundColor = '';
-                });
-            });
-
-            console.log(`Initialized ${breakdownToggles.length} month breakdown toggles`);
         },
 
         /**

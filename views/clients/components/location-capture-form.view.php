@@ -16,7 +16,7 @@ foreach ($provinces as $province) {
 ?>
 
 <div class="wecoza-clients-form-container">
-    <h4 class="mb-3">Capture a Location</h4>
+    <h5 class="mb-3">Capture a Location</h5>
     <p class="mb-4 text-muted">Use the form below to add new locations for suburbs and towns across South Africa.</p>
 
     <?php if ($success) : ?>

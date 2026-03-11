@@ -38,13 +38,11 @@ if (empty($class) || empty($class['class_agent'])) {
 ?>
 
 <!-- Agent Invoice Reconciliation (admin only) -->
-<div class="card mb-4" id="agent-reconciliation-card">
-    <div class="card-header">
-        <h4 class="mb-0">
-            <i class="bi bi-clipboard-check me-2"></i><?= esc_html__('Invoice Reconciliation', 'wecoza-core'); ?>
-        </h4>
-    </div>
+<div class="card mb-3" id="agent-reconciliation-card">
     <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-clipboard-check me-2"></i><?= esc_html__('Invoice Reconciliation', 'wecoza-core'); ?>
+        </h5>
 
         <!-- Loading Spinner -->
         <div id="reconciliation-loading" class="text-center py-3">
@@ -62,7 +60,7 @@ if (empty($class) || empty($class['class_agent'])) {
 
         <!-- Reconciliation Table -->
         <div class="table-responsive d-none" id="reconciliation-table-wrapper">
-            <table class="table table-sm table-hover" id="reconciliation-table">
+            <table class="table table-sm table-hover fs-9 mb-0" id="reconciliation-table">
                 <thead>
                     <tr>
                         <th><?= esc_html__('Month', 'wecoza-core'); ?></th>

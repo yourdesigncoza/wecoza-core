@@ -27,12 +27,10 @@ $class = $class ?? [];
 ?>
 <!-- Class Calendar Section -->
 <div class="card mb-4">
-   <div class="card-header">
-      <h4 class="mb-0">
-         <i class="bi bi-calendar3 me-2"></i>Class Schedule Calendar
-      </h4>
-   </div>
    <div class="card-body">
+      <h5 class="card-title mb-3">
+         <i class="bi bi-calendar3 me-2"></i>Class Schedule Calendar
+      </h5>
       <!-- View Toggle Navigation -->
       <div class="mb-3">
          <ul class="nav nav-tabs" id="scheduleViewTabs" role="tablist">
