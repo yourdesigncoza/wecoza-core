@@ -45,7 +45,7 @@ This milestone is complete only when all are true:
 - [x] **S01: Exam Data Layer & Service** `risk:high` `depends:[]`
   > After this: exam results can be created, read, and updated via ExamService and ExamRepository against real database tables. Schema SQL is ready for deployment. No UI yet.
 
-- [ ] **S02: Event/Task Integration** `risk:high` `depends:[S01]`
+- [x] **S02: Event/Task Integration** `risk:high` `depends:[S01]`
   > After this: when exam results are recorded, corresponding tasks appear on the event/task dashboard. Office staff can complete exam tasks. Reminders work for pending exam steps.
 
 - [ ] **S03: Exam Progress UI & AJAX** `risk:medium` `depends:[S01]`

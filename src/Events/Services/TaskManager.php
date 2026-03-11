@@ -12,6 +12,8 @@ use RuntimeException;
 use WeCoza\Core\Database\PostgresConnection;
 use WeCoza\Events\Models\Task;
 use WeCoza\Events\Models\TaskCollection;
+use WeCoza\Learners\Enums\ExamStep;
+use WeCoza\Learners\Services\ExamService;
 
 use JsonException;
 use function __;
@@ -23,16 +25,33 @@ use function mb_strlen;
 use function mb_substr;
 use function preg_match;
 use function preg_replace;
+use function str_starts_with;
 use function trim;
 use const JSON_THROW_ON_ERROR;
 
 final class TaskManager
 {
     private PostgresConnection $db;
+    private ?ExamTaskProvider $examTaskProvider;
+    private ?ExamService $examService;
 
-    public function __construct()
-    {
+    public function __construct(
+        ?ExamTaskProvider $examTaskProvider = null,
+        ?ExamService $examService = null
+    ) {
         $this->db = PostgresConnection::getInstance();
+        $this->examTaskProvider = $examTaskProvider;
+        $this->examService = $examService;
+    }
+
+    /**
+     * Get the ExamTaskProvider instance.
+     *
+     * @return ExamTaskProvider|null
+     */
+    public function getExamTaskProvider(): ?ExamTaskProvider
+    {
+        return $this->examTaskProvider;
     }
 
     /**
@@ -57,6 +76,11 @@ final class TaskManager
         ?string $note = null
     ): TaskCollection {
         $cleanNote = $note !== null ? trim($note) : null;
+
+        // Route exam tasks to ExamService
+        if ($this->isExamTask($taskId)) {
+            return $this->completeExamTask($classId, $taskId, $userId);
+        }
 
         // Handle agent-order task specially
         if ($taskId === 'agent-order') {
@@ -120,6 +144,11 @@ final class TaskManager
      */
     public function reopenTask(int $classId, string $taskId): TaskCollection
     {
+        // Route exam tasks to ExamTaskProvider for result deletion
+        if ($this->isExamTask($taskId)) {
+            return $this->reopenExamTask($classId, $taskId);
+        }
+
         // Handle agent-order task specially - set order_nr to empty string
         if ($taskId === 'agent-order') {
             return $this->reopenAgentOrderTask($classId);
@@ -164,6 +193,96 @@ final class TaskManager
         return $this->buildTasksFromEvents($class);
     }
 
+    /**
+     * Check if a task ID is an exam task.
+     *
+     * @param string $taskId
+     * @return bool
+     */
+    private function isExamTask(string $taskId): bool
+    {
+        return str_starts_with($taskId, 'exam-');
+    }
+
+    /**
+     * Parse an exam task ID via ExamTaskProvider.
+     *
+     * @param string $taskId
+     * @return array{tracking_id: int, step: ExamStep}
+     * @throws RuntimeException If task ID format is invalid
+     */
+    private function parseExamTaskIdOrFail(string $taskId): array
+    {
+        $parsed = ExamTaskProvider::parseExamTaskId($taskId);
+        if ($parsed === null) {
+            error_log("WeCoza Exam: TaskManager - Invalid exam task ID format: {$taskId}");
+            throw new RuntimeException("Invalid exam task ID format: {$taskId}");
+        }
+        return $parsed;
+    }
+
+    /**
+     * Complete an exam task by recording a result via ExamService.
+     *
+     * Records 100% as the dashboard completion score. The actual percentage
+     * is recorded via the S03 UI (exam result form).
+     *
+     * @param int $classId Class ID
+     * @param string $taskId Exam task ID (e.g. "exam-42-mock_1")
+     * @param int $userId User ID who completed
+     * @return TaskCollection Fresh task collection after update
+     * @throws RuntimeException If ExamService not available or task ID invalid
+     */
+    private function completeExamTask(int $classId, string $taskId, int $userId): TaskCollection
+    {
+        error_log("WeCoza Exam: TaskManager::markTaskCompleted - routing exam task {$taskId}");
+
+        if ($this->examService === null) {
+            throw new RuntimeException('ExamService not available for exam task completion.');
+        }
+
+        $parsed = $this->parseExamTaskIdOrFail($taskId);
+
+        $this->examService->recordExamResult(
+            $parsed['tracking_id'],
+            $parsed['step'],
+            100.0,
+            null,
+            $userId
+        );
+
+        // Refresh cache for this class and return fresh tasks
+        $this->examTaskProvider?->preloadForClasses([$classId]);
+        $class = $this->fetchClassById($classId);
+        return $this->buildTasksFromEvents($class);
+    }
+
+    /**
+     * Reopen an exam task by deleting its result.
+     *
+     * @param int $classId Class ID
+     * @param string $taskId Exam task ID (e.g. "exam-42-mock_1")
+     * @return TaskCollection Fresh task collection after update
+     * @throws RuntimeException If ExamTaskProvider not available or task ID invalid
+     */
+    private function reopenExamTask(int $classId, string $taskId): TaskCollection
+    {
+        error_log("WeCoza Exam: TaskManager::reopenTask - routing exam task {$taskId}");
+
+        if ($this->examTaskProvider === null) {
+            throw new RuntimeException('ExamTaskProvider not available for exam task reopening.');
+        }
+
+        $parsed = $this->parseExamTaskIdOrFail($taskId);
+
+        $this->examTaskProvider->deleteExamResult($parsed['tracking_id'], $parsed['step']);
+
+        // Refresh cache for this class and return fresh tasks
+        $this->examTaskProvider->preloadForClasses([$classId]);
+        $class = $this->fetchClassById($classId);
+        return $this->buildTasksFromEvents($class);
+    }
+
     private function decodeJson(string $payload): mixed
     {
         if ($payload === '') {
@@ -191,12 +310,12 @@ final class TaskManager
      * Fetch a class by ID with fields needed for task building.
      *
      * @param int $classId Class ID
-     * @return array<string, mixed> Class data with class_id, order_nr, order_nr_metadata, event_dates, class_status
+     * @return array<string, mixed> Class data with class_id, order_nr, order_nr_metadata, event_dates, class_status, exam_class
      * @throws RuntimeException If class not found
      */
     private function fetchClassById(int $classId): array
     {
-        $sql = "SELECT class_id, order_nr, order_nr_metadata, event_dates, class_status FROM classes WHERE class_id = :class_id LIMIT 1";
+        $sql = "SELECT class_id, order_nr, order_nr_metadata, event_dates, class_status, exam_class FROM classes WHERE class_id = :class_id LIMIT 1";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         if ($stmt === false) {
@@ -426,6 +545,17 @@ SQL;
         foreach ($events as $index => $event) {
             if (is_array($event)) {
                 $collection->add($this->buildEventTask((int) $index, $event));
+            }
+        }
+
+        // Merge exam tasks for exam classes
+        if ($this->examTaskProvider !== null && !empty($class['exam_class'])) {
+            $classId = (int) ($class['class_id'] ?? 0);
+            if ($classId > 0) {
+                $examCollection = $this->examTaskProvider->getExamTasksForClass($classId);
+                foreach ($examCollection->all() as $examTask) {
+                    $collection->add($examTask);
+                }
             }
         }
 

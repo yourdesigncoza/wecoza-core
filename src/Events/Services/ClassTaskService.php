@@ -31,9 +31,23 @@ final class ClassTaskService
     {
         $rows = $this->repository->fetchClasses($limit, $sortDirection, $classIdFilter);
 
+        // Batch-preload exam tasks for all exam classes (avoids N+1)
+        $examTaskProvider = $this->taskManager->getExamTaskProvider();
+        if ($examTaskProvider !== null) {
+            $examClassIds = [];
+            foreach ($rows as $row) {
+                if (!empty($row['exam_class'])) {
+                    $examClassIds[] = (int) $row['class_id'];
+                }
+            }
+            if (!empty($examClassIds)) {
+                $examTaskProvider->preloadForClasses($examClassIds);
+            }
+        }
+
         $items = [];
         foreach ($rows as $row) {
-            // Build tasks from event_dates (no log_id needed)
+            // Build tasks from event_dates + exam tasks (exam data already cached)
             $tasks = $this->taskManager->buildTasksFromEvents($row);
 
             $items[] = [

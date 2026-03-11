@@ -33,6 +33,32 @@ Append-only register of architectural and pattern decisions.
 **Decision:** Constructor accepts optional parameters with null-coalescing defaults: `$this->repository = $repository ?? new ExamRepository()`. Callers can pass mocks; production code passes nothing.
 **Rationale:** Enables unit testing without modifying production wiring. Unlike ProgressionService which hardcodes `new` inside methods, this allows substitution at construction time. Lightweight alternative to a full DI container.
 
+## D007: ExamTaskProvider generates virtual tasks instead of storing in event_dates JSONB (2026-03-11)
+
+**Context:** D004 initially suggested extending `event_dates` JSONB for exam tasks. S02 research revealed exam tasks are per-learner (not per-class), making JSONB storage problematic — a class with 30 learners would need 150 exam entries in JSONB. Also, exam task state lives in `learner_exam_results`, so duplicating it in JSONB creates stale-data risk.
+**Decision:** Create `ExamTaskProvider` service that generates virtual `Task` objects on-the-fly from `learner_exam_results` + `learner_lp_tracking` data. Tasks are never stored in `event_dates` JSONB. `TaskManager` merges them into `TaskCollection` alongside event_dates tasks. Completion routes through `ExamService`, not JSONB updates.
+**Rationale:** Zero changes to existing event_dates structure. No stale-data risk (always reads current DB state). Exam tasks naturally per-learner. Batch-loaded for performance (one query for all displayed class IDs). Supersedes D004.
+**Alternatives rejected:** D004's event_dates JSONB approach (per-class, not per-learner; stale data; unbounded JSONB growth).
+
+## D008: Dashboard exam task completion records 100% — actual percentages via S03 UI (2026-03-11)
+
+**Context:** Exam tasks on the task dashboard support "Complete" and "Reopen" actions. The dedicated exam UI (S03) supports recording specific percentages. Need to clarify what happens when an exam task is completed from the dashboard.
+**Decision:** Dashboard "Complete" calls `ExamService::recordExamResult()` with percentage=100. Actual percentages are recorded through the S03 exam progress UI. Dashboard completion is a "mark done" action for task tracking purposes.
+**Rationale:** The task dashboard has no UI for entering percentages — it's a simple complete/reopen toggle. Office staff will use the dedicated exam UI to enter real scores. Recording 100% ensures the exam result row exists in the DB so task status reflects correctly. The percentage can be corrected via S03.
+
+## D009: Exam task reopen deletes result row rather than soft-clearing (2026-03-11)
+
+**Context:** When office staff reopen an exam task from the dashboard, the corresponding `learner_exam_results` row needs to be invalidated.
+**Decision:** `ExamRepository::deleteByTrackingAndStep()` performs a hard DELETE of the result row. `ExamTaskProvider::deleteExamResult()` delegates to this and refreshes the cache.
+**Rationale:** Exam results have no intermediate states — either a result exists (task complete) or it doesn't (task open). Soft-clearing (nulling percentage) would leave orphan rows that complicate queries and the virtual task generation logic. Hard delete is clean and idempotent.
+**Alternatives rejected:** Soft-clear with null percentage (complicates EXISTS-based task status queries), status column (unnecessary state machine for binary complete/incomplete).
+
+## D010: hide_note flag on exam task presenter output for template conditionals (2026-03-11)
+
+**Context:** Exam tasks don't require note input (unlike event tasks with agent-order notes). The presenter needs to signal this to the PHP template.
+**Decision:** Exam open tasks include `hide_note: true` and `note_required: false` in their presenter output. The template wraps the note input column in `<?php if (empty($task['hide_note'])): ?>`.
+**Rationale:** Keeps the task row layout intact while hiding the note column. Avoids undefined index warnings from template code that directly accesses `$task['note_label']`. Non-exam tasks are completely unaffected since they never have `hide_note` set.
+
 ## D006: Consistent service return format across all ExamService methods (2026-03-11)
 
 **Context:** Need a predictable return format for all ExamService methods so downstream consumers (AJAX handlers, controllers) can handle results uniformly.

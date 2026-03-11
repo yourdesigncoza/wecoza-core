@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use WeCoza\Events\Models\TaskCollection;
+use WeCoza\Events\Services\ExamTaskProvider;
 
 use function __;
 use function array_filter;
@@ -429,6 +430,8 @@ final class ClassTaskPresenter
                 'label' => $task->getLabel(),
             ];
 
+            $isExamTask = ExamTaskProvider::isExamTaskId($task->getId());
+
             if ($task->isCompleted()) {
                 $payload['completed_by'] = $this->resolveUserName($task->getCompletedBy());
                 $payload['completed_at'] = $this->formatCompletedAt($task->getCompletedAt());
@@ -436,8 +439,11 @@ final class ClassTaskPresenter
                 $payload['reopen_label'] = __('Reopen', 'wecoza-events');
                 $completed[] = $payload;
             } else {
-                $isAgentOrderTask = $task->getId() === 'agent-order';
-                if ($isAgentOrderTask) {
+                if ($isExamTask) {
+                    // Exam tasks have no note input — learner name is already in the label
+                    $payload['note_required'] = false;
+                    $payload['hide_note'] = true;
+                } elseif ($task->getId() === 'agent-order') {
                     $payload['note_label'] = __('Order number', 'wecoza-events');
                     $payload['note_placeholder'] = __('Order Number Required', 'wecoza-events');
                     $payload['note_required'] = true;

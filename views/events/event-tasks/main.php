@@ -241,6 +241,7 @@ echo $assets;
                                                                                 <div class="text-body-tertiary small"><?php echo esc_html($task['event_date']); ?></div>
                                                                             <?php endif; ?>
                                                                         </div>
+                                                                        <?php if (empty($task['hide_note'])): ?>
                                                                         <div class="col">
                                                                             <label class="visually-hidden" for="wecoza-note-<?php echo esc_attr($class['id'] . '-' . $task['id']); ?>"><?php echo esc_html($task['note_label']); ?></label>
                                                                             <input
@@ -259,6 +260,7 @@ echo $assets;
                                                                                 </div>
                                                                             <?php endif; ?>
                                                                         </div>
+                                                                        <?php endif; ?>
                                                                         <div class="col-auto">
                                                                             <button
                                                                                 type="button"

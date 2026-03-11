@@ -252,4 +252,30 @@ class ExamRepository extends BaseRepository
 
         return $progress;
     }
+
+    /**
+     * Delete a specific exam result by tracking ID and step.
+     *
+     * Used for "reopening" an exam task on the task dashboard.
+     *
+     * @param int $trackingId LP tracking ID
+     * @param ExamStep $step Exam step enum
+     * @return bool True if a row was deleted, false if no matching row
+     */
+    public function deleteByTrackingAndStep(int $trackingId, ExamStep $step): bool
+    {
+        $sql = "DELETE FROM learner_exam_results
+                WHERE tracking_id = :tracking_id AND exam_step = :exam_step";
+
+        try {
+            $stmt = $this->db->query($sql, [
+                'tracking_id' => $trackingId,
+                'exam_step'   => $step->value,
+            ]);
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            error_log("WeCoza Exam: ExamRepository::deleteByTrackingAndStep - Error for tracking_id={$trackingId}, step={$step->value}: " . $e->getMessage());
+            throw $e;
+        }
+    }
 }
