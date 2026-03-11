@@ -229,6 +229,14 @@ class ClassController extends BaseController
             true
         );
 
+        wp_register_script(
+            'wecoza-agent-invoice-js',
+            WECOZA_CORE_URL . 'assets/js/classes/agent-invoice.js',
+            ['jquery', 'wecoza-single-class-display-js'],
+            WECOZA_CORE_VERSION,
+            true
+        );
+
         wp_localize_script('wecoza-class-js', 'wecozaClass', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wecoza_class_nonce'),
@@ -469,6 +477,12 @@ class ClassController extends BaseController
         wp_enqueue_script('wecoza-single-class-display-js');
         wp_enqueue_script('wecoza-attendance-capture-js');
 
+        // Enqueue agent invoice JS only when an agent is assigned
+        $classAgent = (int)($class['class_agent'] ?? 0);
+        if ($classAgent > 0) {
+            wp_enqueue_script('wecoza-agent-invoice-js');
+        }
+
         $newClassPage = get_page_by_path('app/new-class');
         $editUrl = $newClassPage
             ? add_query_arg(['mode' => 'update', 'class_id' => $class['class_id']], get_permalink($newClassPage->ID))
@@ -511,6 +525,8 @@ class ClassController extends BaseController
             'showLoading' => $showLoading,
             'notesData' => $notesData,
             'learnerIds' => $learnerIds,
+            'ordersNonce' => wp_create_nonce('wecoza_orders_nonce'),
+            'classAgent' => (int)($class['class_agent'] ?? 0),
             'debug' => defined('WP_DEBUG') && WP_DEBUG
         ]);
     }

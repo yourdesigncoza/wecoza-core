@@ -267,6 +267,12 @@ $component_data = [
       <!-- Attendance Section -->
       <?php echo wecoza_view('classes/components/single-class/attendance', $component_data); ?>
 
+      <!-- Agent Rate Card (admin only) -->
+      <?php echo wecoza_view('classes/components/single-class/agent-rate-card', $component_data); ?>
+
+      <!-- Agent Monthly Invoice -->
+      <?php echo wecoza_view('classes/components/single-class/agent-invoice', $component_data); ?>
+
       <!-- Monthly Schedule Summary Section -->
       <?php
       // Process monthly schedule data for single class
