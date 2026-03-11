@@ -199,7 +199,10 @@ Plans:
   2. `AgentInvoiceService::calculateMonthSummary()` returns correct class_hours_total, all_absent_days, all_absent_hours, and calculated_payable_hours for any class+agent+month
   3. Discrepancy between agent claimed hours and calculated payable hours is stored on invoice submission
   4. All six AJAX endpoints respond correctly (order save/get, invoice calculate/submit/review/list) with nonce + capability enforcement
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 60-01-PLAN.md — Repositories + Services (AgentOrderRepository, AgentInvoiceRepository, AgentOrderService, AgentInvoiceService)
+- [ ] 60-02-PLAN.md — AJAX handlers + class-save hook + bootstrap wiring
 
 ### Phase 61: All-Absent Confirmation
 **Goal**: Agents are warned before submitting a session where every learner recorded zero hours present
@@ -251,7 +254,7 @@ Plans:
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56-58 | v8.0 | 5/5 | Complete | 2026-03-09 |
 | 59 | 1/1 | Complete    | 2026-03-11 | - |
-| 60 | v9.0 | 0/TBD | Not started | - |
+| 60 | v9.0 | 0/2 | Planned | - |
 | 61 | v9.0 | 0/TBD | Not started | - |
 | 62 | v9.0 | 0/TBD | Not started | - |
 | 63 | v9.0 | 0/TBD | Not started | - |
@@ -259,4 +262,4 @@ Plans:
 **Total: 63 phases, 125 plans completed + v9.0 in progress**
 
 ---
-*Last updated: 2026-03-11 — Phase 59 planned (1 plan)*
+*Last updated: 2026-03-11 — Phase 60 planned (2 plans)*
