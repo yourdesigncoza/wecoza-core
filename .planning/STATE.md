@@ -5,9 +5,9 @@ milestone_name: Agent Orders & Payment Tracking
 status: active
 stopped_at: null
 last_updated: "2026-03-11T00:00:00.000Z"
-last_activity: 2026-03-11 — Milestone v9.0 started
+last_activity: 2026-03-11 — Roadmap created, Phase 59 ready to plan
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Single source of truth for all WeCoza functionality — unified plugin infrastructure
-**Current focus:** v9.0 Agent Orders & Payment Tracking
+**Current focus:** v9.0 — Phase 59: Database Schema
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-11 — Milestone v9.0 started
+Phase: 59 of 63 (Database Schema)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-03-11 — Roadmap created for v9.0
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -54,24 +56,25 @@ See: .planning/MILESTONES.md for full details
 
 ### Decisions
 
-- [v8.0]: Page number per learner (not per session), stored in existing JSONB, no pre-fill, required field
-- [v8.0]: CTEs for report queries, 12-column padded CSV, null percentages as dash not zero
-- [v8.0]: Green bar for page progression, blue for hours progression
+- [v9.0]: Rate changes supported via new agent_orders row (UNIQUE on class_id+agent_id+start_date)
+- [v9.0]: all_absent detection is pure JS (UX guard); calculation enforced server-side in AgentInvoiceService
+- [v9.0]: class_id+agent_id denormalized on agent_monthly_invoices for simpler reconciliation queries
+- [v9.0]: ON DELETE RESTRICT on agent_monthly_invoices.order_id — can't delete orders with invoices
 
 ### Pending Todos
 
-- Agent edit form `wp_user_id` field (AGT-09, AGT-10) — deferred to future milestone.
+- Agent edit form wp_user_id field (AGT-09, AGT-10) — deferred to future milestone
 - Target page progression (TPAG-01..03) — requires Mario to define target pages per module
 
 ### Blockers/Concerns
 
-- Target page progression deferred to future requirements (TPAG-01..03). v8.0 captures actual pages only.
-- Total pages per module: seeded with defaults in `class_type_subjects.total_pages`, Mario can override later.
+- Phase 59 requires user to run SQL manually (no DDL via MCP)
+- Rate amounts for existing migrated orders will be 0.00 — admin must set rates after migration
 
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: null
+Stopped at: Roadmap written, requirements mapped, ready to plan Phase 59
 Resume file: None
 
-**Next action:** Define requirements → create roadmap
+**Next action:** `/gsd:plan-phase 59`

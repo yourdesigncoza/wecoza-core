@@ -15,6 +15,7 @@
 - ✅ **v6.0 Agent Attendance Capture** — Phases 48-52 (shipped 2026-02-24)
 - ✅ **v7.0 Agent Attendance Access** — Phases 53-55 (shipped 2026-03-05)
 - ✅ **v8.0 Page Tracking & Report Extraction** — Phases 56-58 (shipped 2026-03-09)
+- 🚧 **v9.0 Agent Orders & Payment Tracking** — Phases 59-63 (in progress)
 
 ## Phases
 
@@ -162,6 +163,74 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
 
 </details>
 
+### 🚧 v9.0 Agent Orders & Payment Tracking (In Progress)
+
+**Milestone Goal:** Replace manual Google Sheets reconciliation with system-derived monthly summaries, agent invoice capture, and discrepancy detection — per class, per agent, per month.
+
+#### Phase Summary
+
+- [ ] **Phase 59: Database Schema** — Create agent_orders and agent_monthly_invoices tables; migrate existing active classes
+- [ ] **Phase 60: Backend Layer** — AgentOrderRepository, AgentInvoiceRepository, AgentInvoiceService, AJAX handlers
+- [ ] **Phase 61: All-Absent Confirmation** — Detect all-zero capture and prompt agent confirmation before submission
+- [ ] **Phase 62: Agent Invoice UI** — Agent rate card (admin) + monthly invoice section inline on single class view
+- [ ] **Phase 63: Reconciliation & Admin Workflow** — Admin reconciliation view with approve/dispute actions and discrepancy flags
+
+## Phase Details
+
+### Phase 59: Database Schema
+**Goal**: The database supports agent rate tracking and monthly invoice storage with referential integrity
+**Depends on**: Nothing (first phase of v9.0)
+**Requirements**: ORD-03, ORD-04
+**Success Criteria** (what must be TRUE):
+  1. `agent_orders` table exists with rate_type, rate_amount, start_date columns and UNIQUE(class_id, agent_id, start_date) constraint
+  2. `agent_monthly_invoices` table exists with all calculated fields and status workflow (draft/submitted/approved/disputed)
+  3. `agent_orders` rows exist for all existing active classes that have a class_agent assigned
+  4. A second row can be inserted for the same class+agent with a different start_date (rate change supported)
+**Plans**: TBD
+
+### Phase 60: Backend Layer
+**Goal**: Business logic for order management, monthly calculations, and AJAX endpoints are wired and callable
+**Depends on**: Phase 59
+**Requirements**: ORD-02, INV-03
+**Success Criteria** (what must be TRUE):
+  1. An agent_order row is created automatically when a class has order_nr set and a class_agent assigned
+  2. `AgentInvoiceService::calculateMonthSummary()` returns correct class_hours_total, all_absent_days, all_absent_hours, and calculated_payable_hours for any class+agent+month
+  3. Discrepancy between agent claimed hours and calculated payable hours is stored on invoice submission
+  4. All six AJAX endpoints respond correctly (order save/get, invoice calculate/submit/review/list) with nonce + capability enforcement
+**Plans**: TBD
+
+### Phase 61: All-Absent Confirmation
+**Goal**: Agents are warned before submitting a session where every learner recorded zero hours present
+**Depends on**: Phase 59
+**Requirements**: ATT-01, ATT-02
+**Success Criteria** (what must be TRUE):
+  1. When all learners in a capture have 0 hours present, a confirmation dialog appears before the AJAX call fires
+  2. If the agent cancels the dialog, the submit button is re-enabled and nothing is submitted
+  3. If the agent confirms, submission proceeds normally (all-absent session saved as usual)
+**Plans**: TBD
+
+### Phase 62: Agent Invoice UI
+**Goal**: Agents and admins can view the calculated monthly summary and agents can submit their claimed hours inline on the class view
+**Depends on**: Phase 60
+**Requirements**: ORD-01, INV-01, INV-02, INV-04
+**Success Criteria** (what must be TRUE):
+  1. An "Agent Rate" card (admin-only) appears on the single class view with rate_type dropdown and rate_amount input; saving persists to agent_orders
+  2. A "Monthly Invoice" section appears on the single class view showing class hours, absent days, absent hours, and calculated payable hours for the selected month
+  3. An agent can enter claimed hours with optional notes and submit; the form is replaced by a read-only submitted state
+  4. Invoice section renders correctly for both the wp_agent role (submit view) and admin role (rate card + review view)
+**Plans**: TBD
+
+### Phase 63: Reconciliation & Admin Workflow
+**Goal**: Admins can review all monthly invoices for a class, flag discrepancies visually, and approve or dispute each submission
+**Depends on**: Phase 62
+**Requirements**: REC-01, REC-02, REC-03, REC-04
+**Success Criteria** (what must be TRUE):
+  1. Admin can view a reconciliation table for a class showing all months with class hours, claimed hours, payable hours, discrepancy, and current status
+  2. Admin can click Approve on a submitted invoice; status changes to approved and the button disappears
+  3. Admin can click Dispute on a submitted invoice; status changes to disputed with visual warning indicator
+  4. Invoices where agent claimed hours exceed calculated payable hours are highlighted in red; zero-discrepancy invoices show a green indicator
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -179,8 +248,13 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
 | 48-52 | v6.0 | 13/13 | Complete | 2026-02-24 |
 | 53-55 | v7.0 | 7/7 | Complete | 2026-03-05 |
 | 56-58 | v8.0 | 5/5 | Complete | 2026-03-09 |
+| 59 | v9.0 | 0/TBD | Not started | - |
+| 60 | v9.0 | 0/TBD | Not started | - |
+| 61 | v9.0 | 0/TBD | Not started | - |
+| 62 | v9.0 | 0/TBD | Not started | - |
+| 63 | v9.0 | 0/TBD | Not started | - |
 
-**Total: 58 phases, 125 plans executed across 13 milestones**
+**Total: 63 phases, 125 plans completed + v9.0 in progress**
 
 ---
-*Last updated: 2026-03-09 — v8.0 milestone completed*
+*Last updated: 2026-03-11 — v9.0 roadmap created*

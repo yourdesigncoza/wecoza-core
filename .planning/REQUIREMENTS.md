@@ -59,26 +59,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ORD-01 | — | Pending |
-| ORD-02 | — | Pending |
-| ORD-03 | — | Pending |
-| ORD-04 | — | Pending |
-| ATT-01 | — | Pending |
-| ATT-02 | — | Pending |
-| INV-01 | — | Pending |
-| INV-02 | — | Pending |
-| INV-03 | — | Pending |
-| INV-04 | — | Pending |
-| REC-01 | — | Pending |
-| REC-02 | — | Pending |
-| REC-03 | — | Pending |
-| REC-04 | — | Pending |
+| ORD-01 | Phase 62 | Pending |
+| ORD-02 | Phase 60 | Pending |
+| ORD-03 | Phase 59 | Pending |
+| ORD-04 | Phase 59 | Pending |
+| ATT-01 | Phase 61 | Pending |
+| ATT-02 | Phase 61 | Pending |
+| INV-01 | Phase 62 | Pending |
+| INV-02 | Phase 62 | Pending |
+| INV-03 | Phase 60 | Pending |
+| INV-04 | Phase 62 | Pending |
+| REC-01 | Phase 63 | Pending |
+| REC-02 | Phase 63 | Pending |
+| REC-03 | Phase 63 | Pending |
+| REC-04 | Phase 63 | Pending |
 
 **Coverage:**
 - v9.0 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-11*
-*Last updated: 2026-03-11 after initial definition*
+*Last updated: 2026-03-11 — traceability mapped during roadmap creation*
