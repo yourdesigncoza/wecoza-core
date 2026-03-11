@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v9.0
 milestone_name: Agent Orders & Payment Tracking
 status: planning
-stopped_at: Completed 61-01-PLAN.md (all-absent confirmation guard)
-last_updated: "2026-03-11T11:31:22.551Z"
+stopped_at: Completed 62-01-PLAN.md (agent invoice UI)
+last_updated: "2026-03-11T12:08:45.339Z"
 last_activity: 2026-03-11 — Roadmap created for v9.0
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 4
-  completed_plans: 4
+  completed_phases: 4
+  total_plans: 5
+  completed_plans: 5
   percent: 0
 ---
 
@@ -56,6 +56,7 @@ See: .planning/MILESTONES.md for full details
 | Phase 60 P01 | 2 | 2 tasks | 4 files |
 | Phase 60 P02 | 4 | 2 tasks | 3 files |
 | Phase 61-all-absent-confirmation P01 | 1min | 2 tasks | 1 files |
+| Phase 62-agent-invoice-ui P01 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ See: .planning/MILESTONES.md for full details
 - [Phase 61-all-absent-confirmation]: All-absent detection is pure JS UX guard; server-side enforcement remains in AgentInvoiceService
 - [Phase 61-all-absent-confirmation]: Guard placed after isValid check so NaN/missing page numbers are caught before all-absent prompt
 - [Phase Phase 61-all-absent-confirmation]: Browser verification confirmed all four test scenarios: all-zero cancel, all-zero confirm, mixed hours (no dialog), single learner
+- [Phase 62-agent-invoice-ui]: Agent role always sees claim form; backend enforces submission uniqueness
+- [Phase 62-agent-invoice-ui]: agent-invoice.js conditionally enqueued only when classAgent > 0
 
 ### Pending Todos
 
@@ -90,8 +93,8 @@ See: .planning/MILESTONES.md for full details
 
 ## Session Continuity
 
-Last session: 2026-03-11T11:29:09.286Z
-Stopped at: Completed 61-01-PLAN.md (all-absent confirmation guard)
+Last session: 2026-03-11T12:08:45.336Z
+Stopped at: Completed 62-01-PLAN.md (agent invoice UI)
 Resume file: None
 
 **Next action:** `/gsd:plan-phase 59`

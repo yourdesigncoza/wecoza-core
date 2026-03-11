@@ -9,7 +9,7 @@ Requirements for Agent Orders & Payment Tracking milestone. Each maps to roadmap
 
 ### Agent Orders
 
-- [ ] **ORD-01**: Admin can set agent rate (hourly/daily) and amount for a class assignment
+- [x] **ORD-01**: Admin can set agent rate (hourly/daily) and amount for a class assignment
 - [x] **ORD-02**: Agent order created automatically when class has order_nr and assigned agent
 - [x] **ORD-03**: System supports rate changes mid-class (new order row with different start_date)
 - [x] **ORD-04**: Data migration populates agent_orders for existing active classes
@@ -21,10 +21,10 @@ Requirements for Agent Orders & Payment Tracking milestone. Each maps to roadmap
 
 ### Agent Invoicing
 
-- [ ] **INV-01**: Agent can view auto-calculated monthly summary (class hours, absent days, payable hours)
-- [ ] **INV-02**: Agent can submit claimed hours for a month with optional notes
+- [x] **INV-01**: Agent can view auto-calculated monthly summary (class hours, absent days, payable hours)
+- [x] **INV-02**: Agent can submit claimed hours for a month with optional notes
 - [x] **INV-03**: System calculates discrepancy between claimed and calculated payable hours
-- [ ] **INV-04**: Invoice section appears on single class view (inline with attendance)
+- [x] **INV-04**: Invoice section appears on single class view (inline with attendance)
 
 ### Reconciliation
 
@@ -59,16 +59,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ORD-01 | Phase 62 | Pending |
+| ORD-01 | Phase 62 | Complete |
 | ORD-02 | Phase 60 | Complete |
 | ORD-03 | Phase 59 | Complete |
 | ORD-04 | Phase 59 | Complete |
 | ATT-01 | Phase 61 | Complete |
 | ATT-02 | Phase 61 | Complete |
-| INV-01 | Phase 62 | Pending |
-| INV-02 | Phase 62 | Pending |
+| INV-01 | Phase 62 | Complete |
+| INV-02 | Phase 62 | Complete |
 | INV-03 | Phase 60 | Complete |
-| INV-04 | Phase 62 | Pending |
+| INV-04 | Phase 62 | Complete |
 | REC-01 | Phase 63 | Pending |
 | REC-02 | Phase 63 | Pending |
 | REC-03 | Phase 63 | Pending |
