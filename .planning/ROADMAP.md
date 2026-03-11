@@ -238,7 +238,9 @@ Plans:
   2. Admin can click Approve on a submitted invoice; status changes to approved and the button disappears
   3. Admin can click Dispute on a submitted invoice; status changes to disputed with visual warning indicator
   4. Invoices where agent claimed hours exceed calculated payable hours are highlighted in red; zero-discrepancy invoices show a green indicator
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 63-01-PLAN.md — Admin reconciliation table component + approve/dispute JS actions
 
 ## Progress
 
