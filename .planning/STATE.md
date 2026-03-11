@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v9.0
 milestone_name: Agent Orders & Payment Tracking
-status: active
-stopped_at: null
-last_updated: "2026-03-11T00:00:00.000Z"
-last_activity: 2026-03-11 — Roadmap created, Phase 59 ready to plan
+status: planning
+stopped_at: "Checkpoint: Awaiting user execution of SQL migrations (59-01 Task 2)"
+last_updated: "2026-03-11T10:07:57.490Z"
+last_activity: 2026-03-11 — Roadmap created for v9.0
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
   percent: 0
 ---
 
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | v4.0 | Technical Debt | 2026-02-16 | 36-41 | 14 |
 
 See: .planning/MILESTONES.md for full details
+| Phase 59-database-schema P01 | 2 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,9 @@ See: .planning/MILESTONES.md for full details
 - [v9.0]: all_absent detection is pure JS (UX guard); calculation enforced server-side in AgentInvoiceService
 - [v9.0]: class_id+agent_id denormalized on agent_monthly_invoices for simpler reconciliation queries
 - [v9.0]: ON DELETE RESTRICT on agent_monthly_invoices.order_id — can't delete orders with invoices
+- [Phase 59-database-schema]: Rate changes recorded as new agent_orders rows (different start_date), not UPDATE — preserves history
+- [Phase 59-database-schema]: class_id and agent_id denormalized onto agent_monthly_invoices for simpler reconciliation queries
+- [Phase 59-database-schema]: Seed sets rate_amount=0.00 for all migrated orders — admin must set real rates via UI after migration
 
 ### Pending Todos
 
@@ -73,8 +77,8 @@ See: .planning/MILESTONES.md for full details
 
 ## Session Continuity
 
-Last session: 2026-03-11
-Stopped at: Roadmap written, requirements mapped, ready to plan Phase 59
+Last session: 2026-03-11T10:07:57.487Z
+Stopped at: Checkpoint: Awaiting user execution of SQL migrations (59-01 Task 2)
 Resume file: None
 
 **Next action:** `/gsd:plan-phase 59`

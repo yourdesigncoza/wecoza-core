@@ -11,8 +11,8 @@ Requirements for Agent Orders & Payment Tracking milestone. Each maps to roadmap
 
 - [ ] **ORD-01**: Admin can set agent rate (hourly/daily) and amount for a class assignment
 - [ ] **ORD-02**: Agent order created automatically when class has order_nr and assigned agent
-- [ ] **ORD-03**: System supports rate changes mid-class (new order row with different start_date)
-- [ ] **ORD-04**: Data migration populates agent_orders for existing active classes
+- [x] **ORD-03**: System supports rate changes mid-class (new order row with different start_date)
+- [x] **ORD-04**: Data migration populates agent_orders for existing active classes
 
 ### Attendance Enhancement
 
@@ -61,8 +61,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | ORD-01 | Phase 62 | Pending |
 | ORD-02 | Phase 60 | Pending |
-| ORD-03 | Phase 59 | Pending |
-| ORD-04 | Phase 59 | Pending |
+| ORD-03 | Phase 59 | Complete |
+| ORD-04 | Phase 59 | Complete |
 | ATT-01 | Phase 61 | Pending |
 | ATT-02 | Phase 61 | Pending |
 | INV-01 | Phase 62 | Pending |
