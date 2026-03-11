@@ -28,10 +28,10 @@ Requirements for Agent Orders & Payment Tracking milestone. Each maps to roadmap
 
 ### Reconciliation
 
-- [ ] **REC-01**: Admin can view reconciliation summary per class per month
-- [ ] **REC-02**: Admin can approve an agent's monthly invoice
-- [ ] **REC-03**: Admin can dispute an agent's monthly invoice
-- [ ] **REC-04**: Discrepancies are visually flagged (overclaim highlighted)
+- [x] **REC-01**: Admin can view reconciliation summary per class per month
+- [x] **REC-02**: Admin can approve an agent's monthly invoice
+- [x] **REC-03**: Admin can dispute an agent's monthly invoice
+- [x] **REC-04**: Discrepancies are visually flagged (overclaim highlighted)
 
 ## Future Requirements
 
@@ -69,10 +69,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INV-02 | Phase 62 | Complete |
 | INV-03 | Phase 60 | Complete |
 | INV-04 | Phase 62 | Complete |
-| REC-01 | Phase 63 | Pending |
-| REC-02 | Phase 63 | Pending |
-| REC-03 | Phase 63 | Pending |
-| REC-04 | Phase 63 | Pending |
+| REC-01 | Phase 63 | Complete |
+| REC-02 | Phase 63 | Complete |
+| REC-03 | Phase 63 | Complete |
+| REC-04 | Phase 63 | Complete |
 
 **Coverage:**
 - v9.0 requirements: 14 total
