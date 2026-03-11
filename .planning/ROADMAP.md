@@ -225,7 +225,9 @@ Plans:
   2. A "Monthly Invoice" section appears on the single class view showing class hours, absent days, absent hours, and calculated payable hours for the selected month
   3. An agent can enter claimed hours with optional notes and submit; the form is replaced by a read-only submitted state
   4. Invoice section renders correctly for both the wp_agent role (submit view) and admin role (rate card + review view)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 62-01-PLAN.md — PHP view components (rate card + invoice section) + JS AJAX wiring + localization
 
 ### Phase 63: Reconciliation & Admin Workflow
 **Goal**: Admins can review all monthly invoices for a class, flag discrepancies visually, and approve or dispute each submission
@@ -258,10 +260,10 @@ Plans:
 | 59 | 1/1 | Complete    | 2026-03-11 | - |
 | 60 | 2/2 | Complete    | 2026-03-11 | - |
 | 61 | 1/1 | Complete    | 2026-03-11 | - |
-| 62 | v9.0 | 0/TBD | Not started | - |
+| 62 | v9.0 | 0/1 | Not started | - |
 | 63 | v9.0 | 0/TBD | Not started | - |
 
 **Total: 63 phases, 125 plans completed + v9.0 in progress**
 
 ---
-*Last updated: 2026-03-11 — Phase 61 planned (1 plan)*
+*Last updated: 2026-03-11 — Phase 62 planned (1 plan)*
