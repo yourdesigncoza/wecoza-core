@@ -214,11 +214,9 @@
                 });
             }
 
-            $('#nlq-ai-preview-table').css('width', '100%');
-            $('#nlq-ai-preview-table').DataTable({
+            var dt = $('#nlq-ai-preview-table').DataTable({
                 pageLength: 25,
-                scrollX: true,
-                autoWidth: true,
+                autoWidth: false,
                 destroy: true,
                 dom: 'rt<"d-flex justify-content-between align-items-center mt-2"<"text-body-tertiary fs-9"i>p>',
                 language: {
@@ -228,6 +226,8 @@
                     },
                 },
             });
+            // Ensure columns recalculate after the card is visible
+            setTimeout(function() { dt.columns.adjust(); }, 150);
         }
     }
 
