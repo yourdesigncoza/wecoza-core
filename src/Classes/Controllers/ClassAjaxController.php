@@ -131,6 +131,9 @@ class ClassAjaxController extends BaseController
                     // Auto-create LP records for newly assigned learners
                     $lpCreationResults = self::createLPsForNewLearners($class, $formData, $isUpdate);
 
+                    // Auto-create agent order if class has order_nr and class_agent assigned
+                    self::ensureAgentOrderExists($class);
+
                     $redirect_url = '';
                     $display_page = get_page_by_path('app/display-single-class');
                     if ($display_page) {
@@ -739,6 +742,37 @@ class ClassAjaxController extends BaseController
             } catch (\Throwable $e) {
                 wecoza_log("Learner remove event dispatch failed for learner {$learnerId}: " . $e->getMessage(), 'warning');
             }
+        }
+    }
+
+    /**
+     * Auto-create agent_orders row when class has both order_nr and class_agent.
+     *
+     * Non-blocking — failures are logged but do not affect the class save response.
+     *
+     * @param ClassModel $class The saved class model
+     * @return void
+     */
+    private static function ensureAgentOrderExists(ClassModel $class): void
+    {
+        $classData = $class->toArray();
+        $orderNr   = $classData['order_nr']    ?? null;
+        $agentId   = $classData['class_agent'] ?? null;
+
+        // Only create order when BOTH order_nr AND class_agent are set
+        if (empty($orderNr) || empty($agentId)) {
+            return;
+        }
+
+        try {
+            $service = new \WeCoza\Agents\Services\AgentOrderService();
+            $service->ensureOrderForClass(
+                (int) $class->getId(),
+                (int) $agentId,
+                $classData['original_start_date'] ?? null
+            );
+        } catch (\Throwable $e) {
+            wecoza_log('AgentOrderService::ensureOrderForClass failed: ' . $e->getMessage(), 'error');
         }
     }
 

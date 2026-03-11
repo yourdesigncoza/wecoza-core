@@ -58,6 +58,7 @@ spl_autoload_register(function (string $class) {
         "WeCoza\\Dev\\" => WECOZA_CORE_PATH . "src/Dev/",
         "WeCoza\\LookupTables\\" => WECOZA_CORE_PATH . "src/LookupTables/",
         "WeCoza\\Feedback\\" => WECOZA_CORE_PATH . "src/Feedback/",
+        "WeCoza\\NLQ\\" => WECOZA_CORE_PATH . "src/NLQ/",
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
@@ -279,6 +280,17 @@ add_action(
             \WeCoza\Feedback\Shortcodes\FeedbackDashboardShortcode::register();
         }
 
+        // Initialize NLQ (Natural Language Query) Module
+        if (class_exists(\WeCoza\NLQ\Shortcodes\NLQTableShortcode::class)) {
+            \WeCoza\NLQ\Shortcodes\NLQTableShortcode::register();
+        }
+        if (class_exists(\WeCoza\NLQ\Shortcodes\NLQManagerShortcode::class)) {
+            \WeCoza\NLQ\Shortcodes\NLQManagerShortcode::register();
+        }
+        if (class_exists(\WeCoza\NLQ\Ajax\NLQAjaxHandler::class)) {
+            \WeCoza\NLQ\Ajax\NLQAjaxHandler::register();
+        }
+
         // Initialize Shortcode Inspector (Tools > WeCoza Shortcodes)
         if (
             class_exists(\WeCoza\ShortcodeInspector\ShortcodeInspector::class)
@@ -307,6 +319,9 @@ add_action(
         }
         if (class_exists(\WeCoza\Agents\Ajax\AgentsAjaxHandlers::class)) {
             new \WeCoza\Agents\Ajax\AgentsAjaxHandlers();
+        }
+        if (class_exists(\WeCoza\Agents\Ajax\AgentOrdersAjaxHandlers::class)) {
+            new \WeCoza\Agents\Ajax\AgentOrdersAjaxHandlers();
         }
         if (class_exists(\WeCoza\Agents\Controllers\AgentAccessController::class)) {
             new \WeCoza\Agents\Controllers\AgentAccessController();
