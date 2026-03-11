@@ -260,7 +260,7 @@ Plans:
 | 59 | 1/1 | Complete    | 2026-03-11 | - |
 | 60 | 2/2 | Complete    | 2026-03-11 | - |
 | 61 | 1/1 | Complete    | 2026-03-11 | - |
-| 62 | 1/1 | Complete   | 2026-03-11 | - |
+| 62 | 1/1 | Complete    | 2026-03-11 | - |
 | 63 | v9.0 | 0/TBD | Not started | - |
 
 **Total: 63 phases, 125 plans completed + v9.0 in progress**

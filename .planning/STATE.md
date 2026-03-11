@@ -4,7 +4,7 @@ milestone: v9.0
 milestone_name: Agent Orders & Payment Tracking
 status: planning
 stopped_at: Completed 62-01-PLAN.md (agent invoice UI)
-last_updated: "2026-03-11T12:08:45.339Z"
+last_updated: "2026-03-11T12:17:56.290Z"
 last_activity: 2026-03-11 — Roadmap created for v9.0
 progress:
   total_phases: 5
