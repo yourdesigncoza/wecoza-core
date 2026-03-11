@@ -88,6 +88,7 @@ class LearnerProgressionModel extends BaseModel
 
     // Joined fields (from classes table)
     protected ?string $classCode = null;
+    protected ?string $examClass = null;
 
     /**
      * Repository instance (lazy loaded)
@@ -478,6 +479,8 @@ class LearnerProgressionModel extends BaseModel
     public function getSubjectDuration(): ?int { return $this->subjectDuration; }
     public function getLearnerName(): ?string { return $this->learnerName; }
     public function getClassCode(): ?string { return $this->classCode; }
+    public function getExamClass(): ?string { return $this->examClass; }
+    public function isExamClass(): bool { return $this->examClass === 'Yes'; }
 
     /*
     |--------------------------------------------------------------------------

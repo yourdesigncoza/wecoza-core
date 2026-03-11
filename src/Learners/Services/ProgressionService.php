@@ -16,6 +16,7 @@ namespace WeCoza\Learners\Services;
 use WeCoza\Core\Abstract\AppConstants;
 use WeCoza\Learners\Models\LearnerProgressionModel;
 use WeCoza\Learners\Repositories\LearnerProgressionRepository;
+use WeCoza\Learners\Services\ExamService;
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -323,7 +324,9 @@ class ProgressionService
             return null;
         }
 
-        return [
+        $isExamClass = $progression->isExamClass();
+
+        $details = [
             'tracking_id' => $progression->getTrackingId(),
             'subject_name' => $progression->getSubjectName(),
             'subject_duration' => $progression->getSubjectDuration(),
@@ -334,7 +337,15 @@ class ProgressionService
             'start_date' => $progression->getStartDate(),
             'class_code' => $progression->getClassCode(),
             'is_hours_complete' => $progression->isHoursComplete(),
+            'is_exam_class' => $isExamClass,
         ];
+
+        if ($isExamClass) {
+            $examService = new ExamService();
+            $details['exam_progress'] = $examService->getExamProgress($progression->getTrackingId());
+        }
+
+        return $details;
     }
 
     /**

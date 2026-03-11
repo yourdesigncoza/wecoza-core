@@ -58,6 +58,7 @@ function wecoza_single_learner_display_shortcode() {
     // Enqueue necessary scripts
     wp_enqueue_script('learner-single-display', WECOZA_CORE_URL . 'assets/js/learners/learner-single-display.js', array('jquery'), WECOZA_CORE_VERSION, true);
     wp_enqueue_script('learner-progressions', WECOZA_CORE_URL . 'assets/js/learners/learner-progressions.js', array('jquery'), WECOZA_CORE_VERSION, true);
+    wp_enqueue_script('learner-exam-progress', WECOZA_CORE_URL . 'assets/js/learners/learner-exam-progress.js', array('jquery'), WECOZA_CORE_VERSION, true);
     wp_localize_script('learner-single-display', 'learnerSingleAjax', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('learners_nonce'),

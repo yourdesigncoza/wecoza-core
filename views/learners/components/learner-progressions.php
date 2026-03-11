@@ -128,6 +128,11 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                             <?php if ($isAdmin): ?>
                                 <!-- Admin Actions -->
                                 <div class="admin-actions border-top pt-3">
+                                    <?php if (!empty($currentLP['is_exam_class'])): ?>
+                                        <!-- Exam Progress Flow (exam-class learners) -->
+                                        <?php include __DIR__ . '/learner-exam-progress.php'; ?>
+                                    <?php else: ?>
+                                    <!-- POE Flow (non-exam learners) -->
                                     <!-- Mark Complete button: data attributes feed confirmation modal -->
                                     <button type="button"
                                             class="btn btn-outline-success mark-complete-btn"
@@ -217,6 +222,7 @@ $progressBarClass = $progressPercentage >= 80 ? 'bg-success' : ($progressPercent
                                             </div>
                                         </form>
                                     </div>
+                                    <?php endif; ?><!-- end POE vs Exam conditional -->
                                 </div>
                             <?php endif; ?>
                         </div>

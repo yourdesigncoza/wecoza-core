@@ -59,6 +59,13 @@ Append-only register of architectural and pattern decisions.
 **Decision:** Exam open tasks include `hide_note: true` and `note_required: false` in their presenter output. The template wraps the note input column in `<?php if (empty($task['hide_note'])): ?>`.
 **Rationale:** Keeps the task row layout intact while hiding the note column. Avoids undefined index warnings from template code that directly accesses `$task['note_label']`. Non-exam tasks are completely unaffected since they never have `hide_note` set.
 
+## D011: Client-side exam card rendering from JSON for XSS safety (2026-03-11)
+
+**Context:** After recording/deleting exam results, the exam progress section needs to refresh in-place without a full page reload.
+**Decision:** The `get_exam_progress` AJAX endpoint returns enriched JSON (including `recorded_by_name` and `file_url`), and JavaScript rebuilds the entire exam section from JSON using jQuery DOM construction methods (no `innerHTML`). The JS renderer mirrors the PHP component's output exactly.
+**Rationale:** jQuery DOM methods (`$('<div>')`, `.text()`, `.attr()`) prevent XSS by design — user-supplied values are never interpolated into HTML strings. Enriching the AJAX response avoids extra round-trips to resolve usernames and file URLs client-side. Full section rebuild is simpler and less error-prone than surgical DOM patching of individual step cards.
+**Alternatives rejected:** innerHTML-based templating (XSS risk), server-side HTML fragment return (harder to test, mixes concerns), partial DOM updates per card (complex state tracking).
+
 ## D006: Consistent service return format across all ExamService methods (2026-03-11)
 
 **Context:** Need a predictable return format for all ExamService methods so downstream consumers (AJAX handlers, controllers) can handle results uniformly.

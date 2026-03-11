@@ -15,7 +15,8 @@ Accurate learner progression tracking through learning programmes — from enrol
 - Event/task system: generates tasks from class events, reminders, task completion by office staff
 - Classes already support `exam_class` (boolean), `exam_type` (varchar), and `exam_learners` (JSONB) fields
 - **Exam data layer complete (M001/S01):** `learner_exam_results` schema, ExamStep enum, ExamRepository, ExamUploadService, ExamService — all verified with 66 automated checks
-- **Exam task integration complete (M001/S02):** ExamTaskProvider generates virtual exam tasks from DB state, TaskManager routes exam complete/reopen through ExamService, ClassTaskPresenter formats exam tasks with no-note UI — 83 automated checks passing. Non-exam flows unchanged.
+- **Exam task integration complete (M001/S02):** ExamTaskProvider generates virtual exam tasks from DB state, TaskManager routes exam complete/reopen through ExamService, ClassTaskPresenter formats exam tasks with no-note UI — 83 automated checks passing
+- **Exam progress UI & AJAX complete (M001/S03):** 3 AJAX endpoints for exam result CRUD, conditional exam/POE rendering in progression view, jQuery module for recording exam results with file upload — 22 automated checks passing. Non-exam flows unchanged.
 
 ## Architecture / Key Patterns
 
@@ -29,4 +30,4 @@ Accurate learner progression tracking through learning programmes — from enrol
 
 ## Milestone Sequence
 
-- [ ] M001: Exam & Assessment Workflow — Build mock exam, SBA, and final exam tracking with event/task integration (WEC-186) — S01+S02 complete, S03 next
+- [ ] M001: Exam & Assessment Workflow — Build mock exam, SBA, and final exam tracking with event/task integration (WEC-186) — S01+S02+S03 complete, S04 (Integration Testing & Polish) next

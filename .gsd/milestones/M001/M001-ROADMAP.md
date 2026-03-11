@@ -48,7 +48,7 @@ This milestone is complete only when all are true:
 - [x] **S02: Event/Task Integration** `risk:high` `depends:[S01]`
   > After this: when exam results are recorded, corresponding tasks appear on the event/task dashboard. Office staff can complete exam tasks. Reminders work for pending exam steps.
 
-- [ ] **S03: Exam Progress UI & AJAX** `risk:medium` `depends:[S01]`
+- [x] **S03: Exam Progress UI & AJAX** `risk:medium` `depends:[S01]`
   > After this: office staff can record mock exam percentages, SBA marks + scans, and final exam marks + certificates through the learner progression UI. The UI conditionally shows exam flow vs POE flow.
 
 - [ ] **S04: Integration Testing & Polish** `risk:low` `depends:[S02,S03]`

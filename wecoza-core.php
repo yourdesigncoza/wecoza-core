@@ -694,6 +694,19 @@ add_action(
 
         /*
         |--------------------------------------------------------------------------
+        | Load Exam AJAX Handlers
+        |--------------------------------------------------------------------------
+        |
+        | AJAX handlers for learner exam result operations: record result,
+        | fetch progress, and delete result for the 5-step exam flow.
+        |
+        */
+
+        require_once WECOZA_CORE_PATH .
+            "src/Learners/Ajax/ExamAjaxHandlers.php";
+
+        /*
+        |--------------------------------------------------------------------------
         | Load Attendance AJAX Handlers
         |--------------------------------------------------------------------------
         |

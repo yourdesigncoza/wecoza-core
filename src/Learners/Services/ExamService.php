@@ -189,6 +189,40 @@ class ExamService
     }
 
     /**
+     * Delete an exam result for a tracking ID and step.
+     *
+     * Delegates to ExamRepository::deleteByTrackingAndStep().
+     *
+     * @param int      $trackingId LP tracking ID
+     * @param ExamStep $step       Exam step enum
+     * @return array{success: bool, error: string}
+     */
+    public function deleteExamResult(int $trackingId, ExamStep $step): array
+    {
+        try {
+            $deleted = $this->repository->deleteByTrackingAndStep($trackingId, $step);
+
+            if (!$deleted) {
+                return [
+                    'success' => false,
+                    'error'   => 'No exam result found for this step',
+                ];
+            }
+
+            return [
+                'success' => true,
+                'error'   => '',
+            ];
+        } catch (Exception $e) {
+            error_log("WeCoza Exam: ExamService::deleteExamResult - Exception for tracking_id={$trackingId}, step={$step->value}: " . $e->getMessage());
+            return [
+                'success' => false,
+                'error'   => 'Failed to delete exam result',
+            ];
+        }
+    }
+
+    /**
      * Get raw exam results for a tracking ID from the repository.
      *
      * @param int $trackingId LP tracking ID
