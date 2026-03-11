@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v9.0
 milestone_name: Agent Orders & Payment Tracking
 status: planning
-stopped_at: Completed 59-01-PLAN.md
-last_updated: "2026-03-11T10:25:27.864Z"
+stopped_at: Completed 60-01-PLAN.md
+last_updated: "2026-03-11T10:43:16.982Z"
 last_activity: 2026-03-11 — Roadmap created for v9.0
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 3
+  completed_plans: 2
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 See: .planning/MILESTONES.md for full details
 | Phase 59-database-schema P01 | 2 | 1 tasks | 3 files |
 | Phase 59-database-schema P01 | 2 | 2 tasks | 3 files |
+| Phase 60 P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ See: .planning/MILESTONES.md for full details
 - [Phase 59-database-schema]: Rate changes recorded as new agent_orders rows (different start_date), not UPDATE — preserves history
 - [Phase 59-database-schema]: class_id and agent_id denormalized onto agent_monthly_invoices for simpler reconciliation queries
 - [Phase 59-database-schema]: Seed sets rate_amount=0.00 for all migrated orders — admin must set real rates via UI after migration
+- [Phase 60]: ensureOrderForClass guards class_id/agent_id > 0 to prevent orphan orders
+- [Phase 60]: client_cancelled sessions do NOT count as agent-absent — only agent_absent and captured-with-all-zeros count
+- [Phase 60]: calculateMonthSummary normalises invoiceMonth to Y-m-01 so callers can pass any date in month
 
 ### Pending Todos
 
@@ -78,8 +82,8 @@ See: .planning/MILESTONES.md for full details
 
 ## Session Continuity
 
-Last session: 2026-03-11T10:19:52.893Z
-Stopped at: Completed 59-01-PLAN.md
+Last session: 2026-03-11T10:43:08.014Z
+Stopped at: Completed 60-01-PLAN.md
 Resume file: None
 
 **Next action:** `/gsd:plan-phase 59`
