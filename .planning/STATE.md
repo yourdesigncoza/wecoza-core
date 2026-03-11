@@ -4,7 +4,7 @@ milestone: v9.0
 milestone_name: Agent Orders & Payment Tracking
 status: planning
 stopped_at: Completed 61-01-PLAN.md (all-absent confirmation guard)
-last_updated: "2026-03-11T11:29:09.290Z"
+last_updated: "2026-03-11T11:31:22.551Z"
 last_activity: 2026-03-11 — Roadmap created for v9.0
 progress:
   total_phases: 5
