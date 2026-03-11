@@ -171,7 +171,7 @@ See: `.planning/milestones/v8.0-ROADMAP.md`
 
 - [x] **Phase 59: Database Schema** — Create agent_orders and agent_monthly_invoices tables; migrate existing active classes (completed 2026-03-11)
 - [x] **Phase 60: Backend Layer** — AgentOrderRepository, AgentInvoiceRepository, AgentInvoiceService, AJAX handlers (completed 2026-03-11)
-- [ ] **Phase 61: All-Absent Confirmation** — Detect all-zero capture and prompt agent confirmation before submission
+- [x] **Phase 61: All-Absent Confirmation** — Detect all-zero capture and prompt agent confirmation before submission (completed 2026-03-11)
 - [ ] **Phase 62: Agent Invoice UI** — Agent rate card (admin) + monthly invoice section inline on single class view
 - [ ] **Phase 63: Reconciliation & Admin Workflow** — Admin reconciliation view with approve/dispute actions and discrepancy flags
 
@@ -257,7 +257,7 @@ Plans:
 | 56-58 | v8.0 | 5/5 | Complete | 2026-03-09 |
 | 59 | 1/1 | Complete    | 2026-03-11 | - |
 | 60 | 2/2 | Complete    | 2026-03-11 | - |
-| 61 | v9.0 | 0/1 | Not started | - |
+| 61 | 1/1 | Complete   | 2026-03-11 | - |
 | 62 | v9.0 | 0/TBD | Not started | - |
 | 63 | v9.0 | 0/TBD | Not started | - |
 

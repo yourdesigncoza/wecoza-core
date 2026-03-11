@@ -16,8 +16,8 @@ Requirements for Agent Orders & Payment Tracking milestone. Each maps to roadmap
 
 ### Attendance Enhancement
 
-- [ ] **ATT-01**: System detects when all learners have 0 hours present in a capture
-- [ ] **ATT-02**: Agent confirms "all learners absent" via prompt before submission
+- [x] **ATT-01**: System detects when all learners have 0 hours present in a capture
+- [x] **ATT-02**: Agent confirms "all learners absent" via prompt before submission
 
 ### Agent Invoicing
 
@@ -63,8 +63,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORD-02 | Phase 60 | Complete |
 | ORD-03 | Phase 59 | Complete |
 | ORD-04 | Phase 59 | Complete |
-| ATT-01 | Phase 61 | Pending |
-| ATT-02 | Phase 61 | Pending |
+| ATT-01 | Phase 61 | Complete |
+| ATT-02 | Phase 61 | Complete |
 | INV-01 | Phase 62 | Pending |
 | INV-02 | Phase 62 | Pending |
 | INV-03 | Phase 60 | Complete |
