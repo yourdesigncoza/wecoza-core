@@ -2,7 +2,7 @@
 
 ## What This Is
 
-WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, attendance capture with page-number tracking, per-class report extraction, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend, MVC architecture, service layer pattern, unified model hierarchy, and full return type coverage.
+WordPress plugin providing unified infrastructure for WeCoza: learner management, class management, client & location management, LP progression tracking, attendance capture with page-number tracking, per-class report extraction, agent order & payment reconciliation, event/task management, and notification system. Consolidates previously separate plugins into a single maintainable codebase with PostgreSQL backend, MVC architecture, service layer pattern, unified model hierarchy, and full return type coverage.
 
 ## Core Value
 
@@ -85,19 +85,15 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 - ✓ ReportService with schedule parsing, percentage calculations, 12-column CSV formatting — v8.0
 - ✓ `[wecoza_class_learner_report]` shortcode with class/month selector, AJAX preview, CSV download — v8.0
 - ✓ Race and gender columns in learner report extraction — v8.0
+- ✓ Agent orders table with rate tracking per class assignment (rate change history) — v9.0
+- ✓ Auto-order creation on class save when order_nr + class_agent set — v9.0
+- ✓ All-learners-absent detection with agent confirmation guard — v9.0
+- ✓ Agent monthly invoice capture (inline on single class view) — v9.0
+- ✓ Monthly calculation engine (class hours, absent days, payable hours, discrepancy) — v9.0
+- ✓ Admin reconciliation table with approve/dispute workflow — v9.0
+- ✓ Discrepancy highlighting (overclaim red, match green) — v9.0
 
 ### Active
-
-## Current Milestone: v9.0 Agent Orders & Payment Tracking
-
-**Goal:** Automate agent payment reconciliation — replace manual Google Sheets with system-derived monthly summaries, agent invoice capture, and discrepancy detection.
-
-**Target features:**
-- Agent orders table with rate tracking per class assignment
-- All-learners-absent detection with agent confirmation
-- Agent monthly invoice capture (inline on attendance screen)
-- Monthly reconciliation summary (class hours vs agent claimed vs calculated payable)
-- Admin approve/dispute workflow for agent invoices
 
 ### Out of Scope
 
@@ -117,22 +113,23 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ## Context
 
-### Current State (v8.0 Shipped)
+### Current State (v9.0 Shipped)
 
 **Codebase:** `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core/`
-- **Total:** ~87,000 lines of PHP across 5 modules + LookupTables
-- **Agents module:** 16+ PHP files in `src/Agents/` (includes AgentService, AgentDisplayService)
+- **Total:** ~98,000 lines of PHP across 5 modules + LookupTables
+- **Agents module:** 20+ PHP files in `src/Agents/` (includes AgentService, AgentDisplayService, AgentOrderRepository, AgentInvoiceRepository, AgentInvoiceService, AgentOrderService, AgentOrdersAjaxHandlers)
 - **Events module:** 40+ PHP files in `src/Events/`
 - **Clients module:** 17+ PHP files in `src/Clients/` (includes ClientService)
 - **Learners module:** `src/Learners/` (includes LearnerService, ProgressionService, LearnerProgressionRepository)
 - **Classes module:** `src/Classes/` (includes AttendanceService, AttendanceRepository, ReportRepository, ReportService, ReportAjaxHandlers, ReportExtractionShortcode)
 - **LookupTables module:** `src/LookupTables/` (3 files — config-driven CRUD for any lookup table)
 - **Core:** `core/Abstract/AppConstants.php` — shared constants
-- **View templates:** 26+ templates in `views/` (includes attendance.php, report-extraction.php, lookup-tables/manage.view.php)
+- **View templates:** 30+ templates in `views/` (includes attendance.php, report-extraction.php, lookup-tables/manage.view.php, agent-rate-card.php, agent-invoice-section.php, agent-reconciliation.php)
 - **Shortcodes:** `[wecoza_manage_qualifications]`, `[wecoza_manage_placement_levels]`, `[wecoza_class_learner_report]`
-- **JavaScript:** 23+ JS files across `assets/js/` (includes attendance-capture.js, report-extraction.js)
+- **JavaScript:** 25+ JS files across `assets/js/` (includes attendance-capture.js, report-extraction.js, agent-invoice.js)
 - **Test coverage:** 4 test files in `tests/Events/`, 1 integration test, 1 architecture verification script
 - **Form field audits:** `docs/formfieldanalysis/*.md` (5 modules audited)
+- **Database tables:** agent_orders, agent_monthly_invoices (new in v9.0)
 
 **Architecture:**
 - `core/` — Framework abstractions (BaseController, BaseModel, BaseRepository, AppConstants, AjaxSecurity)
@@ -245,6 +242,14 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | CTEs for report queries | Performance: monthly hours + page numbers aggregation | ✓ v8.0 |
 | 12-column padded CSV | Excel compatibility — prevents inconsistent row length warnings | ✓ v8.0 |
 | Null percentages as dash not zero | Distinguishes missing data from actual 0% progress | ✓ v8.0 |
+| Rate changes as new order rows | UNIQUE(class_id, agent_id, start_date) preserves history | ✓ v9.0 |
+| Denormalized class_id/agent_id on invoices | Simpler reconciliation queries without order JOIN | ✓ v9.0 |
+| All-absent as JS UX guard only | Server-side calculation is source of truth in AgentInvoiceService | ✓ v9.0 |
+| Auto-order on class save | ensureAgentOrderExists non-blocking — class save never fails | ✓ v9.0 |
+| client_cancelled ≠ agent-absent | Only agent_absent and captured-all-zeros count for absent hours | ✓ v9.0 |
+| ON DELETE RESTRICT on order_id | Can't delete orders with invoices — referential integrity | ✓ v9.0 |
+| Inline invoice on class view | Agent submits claimed hours on same page as attendance | ✓ v9.0 |
+| In-place row update on approve/dispute | handleReviewAction() avoids full table reload | ✓ v9.0 |
 
 ---
-*Last updated: 2026-03-11 after v9.0 milestone start*
+*Last updated: 2026-03-11 after v9.0 milestone*

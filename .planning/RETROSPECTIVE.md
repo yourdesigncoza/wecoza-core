@@ -2,6 +2,49 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v9.0 — Agent Orders & Payment Tracking
+
+**Shipped:** 2026-03-11
+**Phases:** 5 | **Plans:** 6 | **Sessions:** ~1
+
+### What Was Built
+- agent_orders + agent_monthly_invoices PostgreSQL tables with rate change history and idempotent seed
+- AgentOrderRepository, AgentInvoiceRepository, AgentInvoiceService with monthly hour calculations
+- Six AJAX endpoints (order save/get, invoice calculate/submit/review/list) + auto-order on class save
+- All-absent confirmation guard in attendance capture JS
+- Agent Rate Card + Monthly Invoice UI inline on single class view
+- Admin reconciliation table with approve/dispute workflow and discrepancy highlighting
+
+### What Worked
+- Entire milestone shipped in a single day (5 phases, 6 plans, 32 commits)
+- Inline UI approach — agent invoice section on existing class view, no new pages needed
+- Denormalizing class_id/agent_id on invoices simplified reconciliation queries significantly
+- Non-blocking auto-order creation — class save never fails due to order errors
+- All-absent guard as pure JS UX — simple implementation, server-side calculation remains source of truth
+
+### What Was Inefficient
+- Summary one_liner fields not populated — gsd-tools summary-extract returned null for all summaries
+- STATE.md accumulated duplicate/overlapping decisions from both roadmap-level and phase-level entries
+- Phase 59 SQL still required manual execution (DDL restriction) — adds human-in-the-loop delay
+
+### Patterns Established
+- Agent orders as append-only rate history (new row per rate change, not UPDATE)
+- Invoice calculation engine pattern: service queries sessions → aggregates hours → computes discrepancy
+- In-place row update pattern for review actions (avoid full table reload)
+- Conditional JS enqueue pattern (only load agent-invoice.js when classAgent > 0)
+
+### Key Lessons
+1. Denormalization for reconciliation queries was the right call — joins through agent_orders would have been complex
+2. ON DELETE RESTRICT on FKs prevents orphaned invoices — defensive referential integrity pays off
+3. Browser-level all-absent guard is elegant — minimal code, maximum UX improvement
+
+### Cost Observations
+- Model mix: ~30% opus, ~70% sonnet
+- Sessions: ~1
+- Notable: Fastest 5-phase milestone — all executed in single session
+
+---
+
 ## Milestone: v8.0 — Page Tracking & Report Extraction
 
 **Shipped:** 2026-03-09
@@ -86,6 +129,7 @@
 
 | Milestone | Sessions | Phases | Key Change |
 |-----------|----------|--------|------------|
+| v9.0 | ~1 | 5 | Single-session 5-phase execution, append-only rate history, inline invoice UI |
 | v8.0 | ~2 | 3 | Single-day execution, CTE report pattern, JSONB lateral subqueries |
 | v7.0 | ~3 | 3 | Quick-task pre-shipping, retroactive summary creation |
 | v6.0 | ~4 | 5 | First attendance capture milestone, 13 plans |
@@ -97,3 +141,5 @@
 2. WP-native patterns (roles, capabilities, hooks) consistently simpler than custom auth (v6.0, v7.0)
 3. JSONB for flexible data storage continues to work well (v1.2, v6.0, v7.0, v8.0 — zero schema changes for page tracking)
 4. Schema assumptions in plans should be verified against actual DB before execution (v8.0 Phase 58-02)
+5. Denormalization for reporting/reconciliation queries is worth the trade-off — cleaner SQL, faster reads (v9.0)
+6. Non-blocking side-effect creation (auto-order on class save) prevents cascading failures (v9.0)

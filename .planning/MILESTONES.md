@@ -1,5 +1,30 @@
 # Project Milestones: WeCoza Core
 
+## v9.0 Agent Orders & Payment Tracking (Shipped: 2026-03-11)
+
+**Delivered:** Replaced manual Google Sheets reconciliation with system-derived monthly summaries, agent invoice capture, and discrepancy detection — per class, per agent, per month. Agents submit claimed hours inline on class view; admins approve/dispute with visual discrepancy flags.
+
+**Phases completed:** 59-63 (5 phases, 6 plans)
+
+**Key accomplishments:**
+
+- PostgreSQL agent_orders + agent_monthly_invoices tables with rate change history and idempotent seed from active classes
+- AgentOrderRepository, AgentInvoiceRepository, AgentInvoiceService with monthly hour calculations (class hours, absent days, payable hours)
+- Six AJAX endpoints (order save/get, invoice calculate/submit/review/list) + auto-order creation on class save
+- All-absent confirmation guard preventing accidental zero-hours attendance submissions
+- Agent Rate Card (admin-only) + Monthly Invoice section inline on single class view with jQuery AJAX module
+- Admin reconciliation table with approve/dispute workflow, discrepancy highlighting (overclaim red, match green)
+
+**Stats:**
+
+- 63 files changed, 10,758 insertions, 54 deletions
+- 32 commits
+- Timeline: 1 day (2026-03-11)
+
+**Git range:** `a6c1046` → `98bb03a`
+
+---
+
 ## v8.0 Page Tracking & Report Extraction (Shipped: 2026-03-09)
 
 **Delivered:** Added workbook page-number tracking to attendance capture, page-based progression metrics on admin panel, and per-class CSV report extraction with header metadata, learner details, hours breakdown, and progression percentages.
