@@ -212,7 +212,9 @@ Plans:
   1. When all learners in a capture have 0 hours present, a confirmation dialog appears before the AJAX call fires
   2. If the agent cancels the dialog, the submit button is re-enabled and nothing is submitted
   3. If the agent confirms, submission proceeds normally (all-absent session saved as usual)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 61-01-PLAN.md — Add all-absent detection and window.confirm() guard to submitCapture()
 
 ### Phase 62: Agent Invoice UI
 **Goal**: Agents and admins can view the calculated monthly summary and agents can submit their claimed hours inline on the class view
@@ -255,11 +257,11 @@ Plans:
 | 56-58 | v8.0 | 5/5 | Complete | 2026-03-09 |
 | 59 | 1/1 | Complete    | 2026-03-11 | - |
 | 60 | 2/2 | Complete    | 2026-03-11 | - |
-| 61 | v9.0 | 0/TBD | Not started | - |
+| 61 | v9.0 | 0/1 | Not started | - |
 | 62 | v9.0 | 0/TBD | Not started | - |
 | 63 | v9.0 | 0/TBD | Not started | - |
 
 **Total: 63 phases, 125 plans completed + v9.0 in progress**
 
 ---
-*Last updated: 2026-03-11 — Phase 60 planned (2 plans)*
+*Last updated: 2026-03-11 — Phase 61 planned (1 plan)*
