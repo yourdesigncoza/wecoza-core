@@ -88,7 +88,16 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 
 ### Active
 
-(No active requirements — use `/gsd:new-milestone` to define next milestone)
+## Current Milestone: v9.0 Agent Orders & Payment Tracking
+
+**Goal:** Automate agent payment reconciliation — replace manual Google Sheets with system-derived monthly summaries, agent invoice capture, and discrepancy detection.
+
+**Target features:**
+- Agent orders table with rate tracking per class assignment
+- All-learners-absent detection with agent confirmation
+- Agent monthly invoice capture (inline on attendance screen)
+- Monthly reconciliation summary (class hours vs agent claimed vs calculated payable)
+- Admin approve/dispute workflow for agent invoices
 
 ### Out of Scope
 
@@ -238,4 +247,4 @@ WordPress plugin providing unified infrastructure for WeCoza: learner management
 | Null percentages as dash not zero | Distinguishes missing data from actual 0% progress | ✓ v8.0 |
 
 ---
-*Last updated: 2026-03-09 after v8.0 milestone completion*
+*Last updated: 2026-03-11 after v9.0 milestone start*
