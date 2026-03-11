@@ -20,3 +20,26 @@ Thumbs.db
 
 .integrate/
 schema/
+
+# ── GSD baseline (auto-generated) ──
+.gsd/activity/
+.gsd/runtime/
+.gsd/auto.lock
+.gsd/metrics.json
+.gsd/STATE.md
+*~
+*.code-workspace
+.env
+.env.*
+!.env.example
+.next/
+dist/
+build/
+__pycache__/
+*.pyc
+.venv/
+venv/
+target/
+coverage/
+.cache/
+tmp/
