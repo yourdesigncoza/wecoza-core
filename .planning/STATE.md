@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v9.0
 milestone_name: Agent Orders & Payment Tracking
 status: planning
-stopped_at: Completed 60-01-PLAN.md
-last_updated: "2026-03-11T10:43:16.982Z"
+stopped_at: Completed 60-02-PLAN.md
+last_updated: "2026-03-11T10:47:04.022Z"
 last_activity: 2026-03-11 — Roadmap created for v9.0
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ See: .planning/MILESTONES.md for full details
 | Phase 59-database-schema P01 | 2 | 1 tasks | 3 files |
 | Phase 59-database-schema P01 | 2 | 2 tasks | 3 files |
 | Phase 60 P01 | 2 | 2 tasks | 4 files |
+| Phase 60 P02 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ See: .planning/MILESTONES.md for full details
 - [Phase 60]: ensureOrderForClass guards class_id/agent_id > 0 to prevent orphan orders
 - [Phase 60]: client_cancelled sessions do NOT count as agent-absent — only agent_absent and captured-with-all-zeros count
 - [Phase 60]: calculateMonthSummary normalises invoiceMonth to Y-m-01 so callers can pass any date in month
+- [Phase Phase 60]: handleCalculate is pure read — no DB write on calculate endpoint
+- [Phase Phase 60]: ensureAgentOrderExists is non-blocking — class save never fails due to order creation errors
+- [Phase Phase 60]: invoice_month YYYY-MM normalised to YYYY-MM-01 at AJAX boundary, not inside service
 
 ### Pending Todos
 
@@ -82,8 +86,8 @@ See: .planning/MILESTONES.md for full details
 
 ## Session Continuity
 
-Last session: 2026-03-11T10:43:08.014Z
-Stopped at: Completed 60-01-PLAN.md
+Last session: 2026-03-11T10:46:42.450Z
+Stopped at: Completed 60-02-PLAN.md
 Resume file: None
 
 **Next action:** `/gsd:plan-phase 59`
