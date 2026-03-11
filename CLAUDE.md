@@ -185,9 +185,16 @@ wp wecoza version    # Show plugin version
 
 
 ## Database Access Restrictions
-- postgres-do MCP tool has read-only access only
+- **READ-ONLY access at all times** — this applies to ALL methods of database interaction:
+  - postgres-do MCP tool
+  - PHP scripts executed via `php -r`, `php -f`, or any bash command
+  - WP-CLI commands (`wp eval`, `wp db query`, etc.)
+  - Any code that uses `wecoza_db()`, `PostgresConnection`, `PDO`, or `$wpdb`
 - Only the following SQL operations are allowed: SELECT, WITH, EXPLAIN, ANALYZE, SHOW
-- No INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, or other write operations permitted
+- **NEVER execute**: INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, TRUNCATE, or any other write/DDL operation
+- **NEVER create, modify, or drop database tables** — provide the SQL schema file and let the developer run it
+- **NEVER insert, update, or delete rows** — write the PHP code that does it, but do not execute it directly
+- If a database schema change is needed, write the migration SQL to `schema/` and instruct the developer to run it
 
 
 ## CSS Styles Location

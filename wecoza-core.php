@@ -287,6 +287,9 @@ add_action(
         if (class_exists(\WeCoza\NLQ\Shortcodes\NLQManagerShortcode::class)) {
             \WeCoza\NLQ\Shortcodes\NLQManagerShortcode::register();
         }
+        if (class_exists(\WeCoza\NLQ\Shortcodes\NLQInputShortcode::class)) {
+            \WeCoza\NLQ\Shortcodes\NLQInputShortcode::register();
+        }
         if (class_exists(\WeCoza\NLQ\Ajax\NLQAjaxHandler::class)) {
             \WeCoza\NLQ\Ajax\NLQAjaxHandler::register();
         }
