@@ -667,6 +667,12 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
 
+        <?php // Entity Relationship History (M002) ?>
+        <?php echo wecoza_component('entity-history-section', [
+            'entity_type' => 'agent',
+            'entity_id' => $agent_id ?? 0,
+        ]); ?>
+
         <?php // Documents Section ?>
         <div class="card mb-3">
             <div class="card-header bg-light">

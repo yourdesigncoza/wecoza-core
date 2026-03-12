@@ -294,6 +294,14 @@ add_action(
             \WeCoza\NLQ\Ajax\NLQAjaxHandler::register();
         }
 
+        // History & Audit module (M002)
+        if (file_exists(WECOZA_CORE_PATH . 'src/Classes/Ajax/HistoryAjaxHandlers.php')) {
+            require_once WECOZA_CORE_PATH . 'src/Classes/Ajax/HistoryAjaxHandlers.php';
+        }
+        if (class_exists(\WeCoza\Classes\Shortcodes\AuditLogShortcode::class)) {
+            \WeCoza\Classes\Shortcodes\AuditLogShortcode::register();
+        }
+
         // Initialize Shortcode Inspector (Tools > WeCoza Shortcodes)
         if (
             class_exists(\WeCoza\ShortcodeInspector\ShortcodeInspector::class)
@@ -941,6 +949,11 @@ register_activation_hook(__FILE__, function () {
         wp_schedule_event(time(), "hourly", "wecoza_process_notifications");
     }
 
+    // Schedule audit log purge cron (M002 — D017: 3-year retention)
+    if (!wp_next_scheduled('wecoza_audit_log_purge')) {
+        wp_schedule_event(time(), 'weekly', 'wecoza_audit_log_purge');
+    }
+
     /**
      * Fires when WeCoza Core is activated.
      *
@@ -949,9 +962,26 @@ register_activation_hook(__FILE__, function () {
     do_action("wecoza_core_activated");
 });
 
+// Audit log purge cron handler (M002)
+add_action('wecoza_audit_log_purge', function () {
+    if (class_exists(\WeCoza\Classes\Services\AuditService::class)) {
+        $audit = new \WeCoza\Classes\Services\AuditService();
+        $deleted = $audit->purgeOlderThan(\WeCoza\Classes\Services\AuditService::DEFAULT_RETENTION_MONTHS);
+        if ($deleted > 0) {
+            wecoza_log("Audit log purge: deleted {$deleted} entries older than 36 months", 'info');
+        }
+    }
+});
+
 register_deactivation_hook(__FILE__, function () {
     // Flush rewrite rules
     flush_rewrite_rules();
+
+    // Unschedule audit log purge cron
+    $timestamp = wp_next_scheduled('wecoza_audit_log_purge');
+    if ($timestamp) {
+        wp_unschedule_event($timestamp, 'wecoza_audit_log_purge');
+    }
 
     // Remove custom roles
     remove_role("wp_agent");

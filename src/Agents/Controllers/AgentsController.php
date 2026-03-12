@@ -241,6 +241,23 @@ class AgentsController extends BaseController
             }
         }
 
+        // Enqueue entity history JS (M002)
+        if ($agent && !$error) {
+            wp_enqueue_script(
+                'wecoza-entity-history-js',
+                WECOZA_CORE_URL . 'assets/js/classes/entity-history.js',
+                ['jquery'],
+                WECOZA_CORE_VERSION,
+                true
+            );
+            wp_localize_script('wecoza-entity-history-js', 'WeCozaEntityHistory', [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'historyNonce' => wp_create_nonce('wecoza_history_nonce'),
+                'entityType' => 'agent',
+                'entityId' => $agent_id,
+            ]);
+        }
+
         // Render view
         return $this->render('agents/display/agent-single-display', [
             'agent_id' => $agent_id,

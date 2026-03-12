@@ -43,6 +43,7 @@ target/
 coverage/
 .cache/
 tmp/
+.pg_password
 
 # ── GSD baseline (auto-generated) ──
 .gsd/worktrees/

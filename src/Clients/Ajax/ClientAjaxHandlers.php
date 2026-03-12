@@ -54,6 +54,14 @@ class ClientAjaxHandlers {
                 AjaxSecurity::sendError('Validation errors', 400, ['errors' => $result['errors']]);
             }
 
+            // Audit log (M002)
+            try {
+                $audit = new \WeCoza\Classes\Services\AuditService();
+                $savedClientId = $result['client']['client_id'] ?? $clientId;
+                $actionCode = ($clientId === 0) ? 'CLIENT_CREATED' : 'CLIENT_UPDATED';
+                $audit->log($actionCode, 'client', (int) $savedClientId, get_current_user_id());
+            } catch (\Exception $e) { /* audit never blocks */ }
+
             AjaxSecurity::sendSuccess([
                 'client' => $result['client'],
                 'message' => $result['message'],

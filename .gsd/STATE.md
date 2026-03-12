@@ -1,20 +1,22 @@
 # GSD State
 
-**Active Milestone:** M002 — Change History & Audit Trail
-**Phase:** Planning complete — ready for execution
-**Active Workspace:** /opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-core
-**Last Updated:** 2026-03-11
+**Active Milestone:** M002 — Entity History & Audit Trail ✅ COMPLETE
+**Phase:** Done — all 5 slices complete
 
-## Active Milestone: M002
+## Completed Slices
+- [x] S01: History Data Layer & Audit Service — 105 checks
+- [x] S02: History Service Facade, AJAX & Audit Wiring — 144 checks
+- [x] S03: Class & Agent History UI — browser-verified
+- [x] S04: Learner & Client History UI — browser-verified
+- [x] S05: Integration Verification — all 4 entity types verified with production data
 
-- [ ] S01: History Data Layer & Audit Log (5 tasks, risk:high)
-- [ ] S02: Entity History UI Tabs (4 tasks, risk:medium)
-- [ ] S03: Audit Trail Integration & Retention (4 tasks, risk:low)
+## Final Stats
+- **144 automated checks** across 2 test suites (HistoryServiceTest + AuditServiceTest)
+- **4 entity pages** with history sections (class, agent, learner, client)
+- **1 AJAX endpoint** (wecoza_get_entity_history)
+- **1 shortcode** ([wecoza_audit_log])
+- **1 cron event** (wecoza_audit_log_purge — weekly, 36-month retention)
+- **1 audit wiring** (ClassStatusAjaxHandler → CLASS_STATUS_CHANGED)
 
-## Completed Milestones
-
-- [x] M001: Exam & Assessment Workflow ✅ (223/223 checks, 4 slices, browser-verified)
-
-## Blockers
-
-- (none)
+## Branch
+`gsd/M002/S01` — ready for squash merge to main

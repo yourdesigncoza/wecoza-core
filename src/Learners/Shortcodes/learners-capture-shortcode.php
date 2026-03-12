@@ -99,6 +99,13 @@ function wecoza_learners_form_shortcode($atts) {
 
             if ($learner) {
                 $learner_id = $learner->getId();
+
+                // Audit log (M002)
+                try {
+                    $audit = new \WeCoza\Classes\Services\AuditService();
+                    $audit->log('LEARNER_CREATED', 'learner', $learner_id, get_current_user_id());
+                } catch (\Exception $e) { /* audit never blocks */ }
+
                 echo '<div class="alert alert-subtle-success" role="alert">Learner added successfully!</div>';
 
                 // Handle file uploads if files were submitted

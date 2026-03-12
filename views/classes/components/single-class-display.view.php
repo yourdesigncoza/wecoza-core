@@ -581,6 +581,12 @@ $component_data = [
       </div>
       <?php endif; ?>
 
+      <!-- Entity Relationship History (M002) -->
+      <?php echo wecoza_component('entity-history-section', [
+          'entity_type' => 'class',
+          'entity_id' => $class['class_id'] ?? 0,
+      ]); ?>
+
       <!-- QA Reports Section -->
       <?php echo wecoza_view('classes/components/single-class/qa-reports', $component_data); ?>
 

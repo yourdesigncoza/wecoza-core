@@ -59,6 +59,15 @@ function wecoza_single_learner_display_shortcode() {
     wp_enqueue_script('learner-single-display', WECOZA_CORE_URL . 'assets/js/learners/learner-single-display.js', array('jquery'), WECOZA_CORE_VERSION, true);
     wp_enqueue_script('learner-progressions', WECOZA_CORE_URL . 'assets/js/learners/learner-progressions.js', array('jquery'), WECOZA_CORE_VERSION, true);
     wp_enqueue_script('learner-exam-progress', WECOZA_CORE_URL . 'assets/js/learners/learner-exam-progress.js', array('jquery'), WECOZA_CORE_VERSION, true);
+
+    // Entity history (M002)
+    wp_enqueue_script('wecoza-entity-history-js', WECOZA_CORE_URL . 'assets/js/classes/entity-history.js', array('jquery'), WECOZA_CORE_VERSION, true);
+    wp_localize_script('wecoza-entity-history-js', 'WeCozaEntityHistory', [
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'historyNonce' => wp_create_nonce('wecoza_history_nonce'),
+        'entityType' => 'learner',
+        'entityId' => $learner_id,
+    ]);
     wp_localize_script('learner-single-display', 'learnerSingleAjax', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('learners_nonce'),
@@ -580,6 +589,12 @@ function wecoza_single_learner_display_shortcode() {
                 <?php include WECOZA_CORE_DIR . 'views/learners/components/learner-progressions.php'; ?>
             </div>
         </div>
+
+        <!-- Entity Relationship History (M002) -->
+        <?php echo wecoza_component('entity-history-section', [
+            'entity_type' => 'learner',
+            'entity_id' => $learner_id,
+        ]); ?>
 
         <!-- Documents & Compliance Section -->
         <div class="card mb-3">

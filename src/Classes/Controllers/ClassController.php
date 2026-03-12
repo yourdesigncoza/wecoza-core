@@ -230,6 +230,14 @@ class ClassController extends BaseController
         );
 
         wp_register_script(
+            'wecoza-entity-history-js',
+            WECOZA_CORE_URL . 'assets/js/classes/entity-history.js',
+            ['jquery'],
+            WECOZA_CORE_VERSION,
+            true
+        );
+
+        wp_register_script(
             'wecoza-agent-invoice-js',
             WECOZA_CORE_URL . 'assets/js/classes/agent-invoice.js',
             ['jquery', 'wecoza-single-class-display-js'],
@@ -476,6 +484,15 @@ class ClassController extends BaseController
     {
         wp_enqueue_script('wecoza-single-class-display-js');
         wp_enqueue_script('wecoza-attendance-capture-js');
+
+        // Entity history (M002)
+        wp_enqueue_script('wecoza-entity-history-js');
+        wp_localize_script('wecoza-entity-history-js', 'WeCozaEntityHistory', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'historyNonce' => wp_create_nonce('wecoza_history_nonce'),
+            'entityType' => 'class',
+            'entityId' => $class['class_id'] ?? 0,
+        ]);
 
         // Enqueue agent invoice JS only when an agent is assigned
         $classAgent = (int)($class['class_agent'] ?? 0);

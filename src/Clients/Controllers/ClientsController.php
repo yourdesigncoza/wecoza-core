@@ -72,6 +72,26 @@ class ClientsController extends BaseController {
         $has_display_table = has_shortcode($post->post_content, 'wecoza_display_clients');
         $nonce = wp_create_nonce('clients_nonce_action');
 
+        // Entity history JS for update form (M002)
+        if ($has_update_form) {
+            $client_id = isset($_GET['client_id']) ? intval($_GET['client_id']) : 0;
+            if ($client_id > 0) {
+                wp_enqueue_script(
+                    'wecoza-entity-history-js',
+                    WECOZA_CORE_URL . 'assets/js/classes/entity-history.js',
+                    array('jquery'),
+                    WECOZA_CORE_VERSION,
+                    true
+                );
+                wp_localize_script('wecoza-entity-history-js', 'WeCozaEntityHistory', [
+                    'ajaxUrl' => admin_url('admin-ajax.php'),
+                    'historyNonce' => wp_create_nonce('wecoza_history_nonce'),
+                    'entityType' => 'client',
+                    'entityId' => $client_id,
+                ]);
+            }
+        }
+
         // Enqueue scripts based on shortcode presence
         if ($has_capture_form || $has_update_form) {
             wp_enqueue_script(

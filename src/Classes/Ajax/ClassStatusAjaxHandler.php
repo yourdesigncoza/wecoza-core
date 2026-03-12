@@ -208,6 +208,15 @@ function handle_class_status_update(): void
         exit;
     }
 
+    // Audit log — fire-and-forget, never blocks the response (D017, D018)
+    try {
+        $auditService = new \WeCoza\Classes\Services\AuditService();
+        $auditService->log('CLASS_STATUS_CHANGED', 'class', $classId, $currentUserId);
+    } catch (\Exception $e) {
+        // Audit failures are suppressed — AuditService::log() already handles this,
+        // but belt-and-suspenders in case instantiation fails.
+    }
+
     wp_send_json_success([
         'status'  => $newStatus,
         'message' => __('Class status updated.', 'wecoza-core'),

@@ -493,4 +493,10 @@ $resolved_contact_position = $client["contact_person_position"] ?? "";
             </div>
         </div>
     </form>
+
+    <!-- Entity Relationship History (M002) -->
+    <?php echo wecoza_component('entity-history-section', [
+        'entity_type' => 'client',
+        'entity_id' => $client['client_id'] ?? 0,
+    ]); ?>
 </div>

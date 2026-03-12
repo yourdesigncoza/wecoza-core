@@ -1,80 +1,105 @@
-# M002: Change History & Audit Trail
+# M002: Entity History & Audit Trail
 
-**Vision:** Unified entity history views and a lightweight audit trail so staff can see the full relationship timeline of any learner, agent, client, or class — and know who changed class/learner records.
+**Vision:** Surface entity relationship history across all four core entities (class, learner, agent, client) on their single-entity display pages, so staff can quickly answer "what happened with this entity?" without digging through multiple screens. Backed by a lightweight, high-level-only audit log (admin-accessible shortcode, not user-facing) for basic change tracking. Per Mario (WEC-189): entity history visibility is the priority; audit trail is nice-to-have and must stay simple — no granular field-change tracking, no "playing policeman."
 
 ## Success Criteria
 
-- Learner detail page shows a History tab with class history, client history, levels completed, portfolios, and progression dates
-- Agent detail page shows a History tab with class history, client history, subjects facilitated, performance notes, and QA reports
-- Client detail page shows a History tab with all learners, classes, and agents associated
-- Class detail page shows a History tab with learner history, agent history, progression history, notes, and events
-- Class and learner changes are logged to `wecoza_events.audit_log` with user, entity, action, and timestamp
-- Audit log entries are high-level only (no field-level before/after values)
-- 3-year retention cleanup mechanism exists
+- On the single class page, a user can see: agent assignments (current + historical), enrolled learners, learner progression summary, status change history, class notes, and event history with dates
+- On the single agent page, a user can see: classes facilitated (with dates and duration), clients trained at, subjects/levels/modules facilitated, performance notes, and QA visit reports
+- On the single learner page, a user can see: class enrollment history with LP status, client history (which clients they trained at), levels/subjects completed with progression dates (start/completion), and portfolio records per level
+- On the single client page, a user can see: all classes run, agents who trained there, full learner list (not just counts), and class status summaries
+- High-level audit log entries are written when class or learner data changes — action codes only (e.g. `CLASS_STATUS_CHANGED`, `LEARNER_ADDED`), entity type + ID, no PII, no field-value diffs
+- Audit log is viewable via a `[wecoza_audit_log]` shortcode (to be gatekept to admin-only pages)
+- Audit log entries can be purged after 3-year retention via scheduled cleanup
+- `agent_class_history` table tracks agent-class assignment changes with timestamps
+
+## Explicit Scope Boundaries
+
+**In scope:**
+- All data points listed in WEC-189 per entity (see success criteria above)
+- Simple, read-only history sections added to existing single-entity pages
+- Audit log shortcode for admin pages
+- Automated 3-year purge via WP-Cron
+
+**Out of scope (deferred):**
+- Agent → learner history (Mario marked "optional/nice-to-have")
+- Client → monthly report history (separate reporting feature, not entity relationships)
+- Interactive/animated timeline UI — use clean tables and lists matching existing page style
+- Granular field-change audit diffs — Mario explicitly warned against this
+- User-facing audit log querying — admin shortcode only
+
+**Legacy data handling:**
+- Historical agent assignments before `agent_class_history` deployment will show as "current assignment" only, with no change dates. UI labels this clearly.
 
 ## Key Risks / Unknowns
 
-- **JSONB relationship storage** — `learner_ids` on classes is a JSONB array, not a junction table. Querying "which classes was learner X in?" requires scanning all class records. Risk: performance on large datasets. Mitigation: use PostgreSQL JSONB operators with proper indexing.
-- **Agent placement history gaps** — only current + initial agent stored. No timestamped history of agent replacements. Risk: incomplete agent-class history. Mitigation: create `agent_class_history` table for future tracking; for past data, derive from `class_events` where available.
+- **Performance with large datasets** — Clients/agents with years of history could produce slow queries. Mitigated with pagination per sub-section and lazy-loading via AJAX.
+- **Existing page layout integration** — History sections must fit existing single-entity pages without disrupting current functionality.
 
 ## Proof Strategy
 
-- **JSONB query performance** → retire in S01 by proving history queries return correct results from existing data with acceptable performance
-- **Agent placement history** → retire in S01 by building the `agent_class_history` schema and populating from `class_events` data
+- Performance → retire in S03 by showing paginated history loads without lag on real production data
+- Layout integration → retire in S03/S04 by browser-verifying history sections on actual entity pages
 
 ## Verification Classes
 
-- Contract verification: PHP integration tests verifying repository queries return correct history data
-- Integration verification: Browser verification of history tabs rendering on entity detail pages
-- Operational verification: Audit log entries created on real class/learner updates via AJAX
-- UAT / human verification: Visual review of history tab content and layout
+- Contract verification: PHP integration tests for HistoryRepository, AuditService, HistoryService (data shape, empty results, live data)
+- Integration verification: AJAX endpoints return correct history data; audit log writes fire on class/learner AJAX saves; shortcode renders
+- Operational verification: WP-Cron audit purge fires and deletes old entries; pagination handles large datasets
+- UAT / human verification: History sections display correctly on single entity pages with real data; audit shortcode works on admin page
 
 ## Milestone Definition of Done
 
 This milestone is complete only when all are true:
 
-- All 4 entity history tabs render correct data on their respective detail pages
-- Audit log captures class and learner changes at high level
-- History data is derived from existing relational tables — no unnecessary duplication
-- 3-year retention cleanup mechanism is in place
-- All slices are browser-verified on running WordPress instance
+- All 4 entity history sections are rendered on their single-entity display pages showing **all data points** from WEC-189 (enumerated in success criteria)
+- HistoryService returns correct timeline data for all 4 entity types (proven by integration tests with live DB)
+- AuditService writes action-code entries on class/learner saves, reads by entity, and purges by retention (proven by integration tests)
+- `agent_class_history` DDL deployed and recording assignment changes on class save
+- `[wecoza_audit_log]` shortcode renders audit entries with filtering by entity type
+- WP-Cron scheduled event purges audit entries older than 3 years
+- AJAX endpoints serve history data with proper nonce verification
+- History sections are browser-verified on real entity pages with production data
+- All test suites pass
+- Legacy/pre-feature data displays gracefully (no broken UI for missing timestamps)
 
 ## Requirement Coverage
 
-- Covers: WEC-189 (entity history + audit trail)
-- Partially covers: none
-- Leaves for later: Monthly report history (no module exists), detailed field-level audit
-- Orphan risks: none
+- No `REQUIREMENTS.md` found — operating in legacy compatibility mode.
+- Covers: WEC-189 (Entity History & Audit Trail) per `docs/mario/WEC-189-history-audit.md`
+- Explicitly deferred: Agent→learner history (optional per Mario), Client→monthly report history (separate feature)
+- Orphan risks: None — all WEC-189 items mapped or explicitly deferred
 
 ## Slices
 
-- [ ] **S01: History Data Layer & Audit Log** `risk:high` `depends:[]`
-  > After this: HistoryRepository queries return correct entity relationship data from existing tables; audit log entries are written on class/learner changes; `agent_class_history` table exists for future agent placement tracking. Verified by PHP integration tests.
+- [x] **S01: History Data Layer & Audit Service** `risk:medium` `depends:[]`
+  > After this: PHP integration tests prove HistoryRepository returns correct timeline data for all 4 entities from existing DB tables; AuditService writes and reads audit log entries; `agent_class_history` DDL is ready for deployment. ✅ 105 checks passing.
 
-- [ ] **S02: Entity History UI Tabs** `risk:medium` `depends:[S01]`
-  > After this: All 4 entity detail pages (learner, agent, client, class) display a History tab with timeline data. Browser-verified on running WordPress instance.
+- [x] **S02: History Service Facade, AJAX & Audit Wiring** `risk:medium` `depends:[S01]` ✅ 144 checks
+  > After this: HistoryService facade merges repository data into per-entity timeline arrays covering all WEC-189 data points. AJAX endpoint returns entity history JSON. AuditService::log() is called from class and learner save handlers with action codes. WP-Cron purge event registered. Audit log shortcode renders a filterable table. All proven by integration tests against live DB.
 
-- [ ] **S03: Audit Trail Integration & Retention** `risk:low` `depends:[S01]`
-  > After this: Audit log entries appear in a viewable log (admin or entity-level); 3-year retention cleanup runs via WP-Cron. Browser-verified end-to-end: update a class → see audit entry.
+- [x] **S03: Class & Agent History UI** `risk:medium` `depends:[S02]` ✅
+  > After this: Single class page shows a history section with agent assignments, enrolled learners with progression, status changes, class notes, and event dates — loaded via AJAX with pagination. Single agent page shows classes facilitated (with dates/duration), clients trained at, subjects/levels taught, performance notes, and QA visit summaries. Browser-verified on real pages.
+
+- [x] **S04: Learner & Client History UI** `risk:low` `depends:[S02]` ✅
+  > After this: Single learner page shows class enrollment history with LP status, client training history, levels completed with start/completion dates, and portfolio records per level — loaded via AJAX. Single client page shows all classes, all agents, and full learner list. Browser-verified on real pages.
+
+- [x] **S05: Integration Verification & Polish** `risk:low` `depends:[S03, S04]` ✅ browser-verified
+  > After this: All 4 history sections browser-verified on real entity pages with production data. Performance confirmed (pagination, lazy-load). WP-Cron audit purge verified. Audit shortcode tested on admin page. Legacy data handled gracefully. Regression checks on existing functionality pass.
 
 ## Boundary Map
 
 ### S01 → S02
 
 Produces:
-- `HistoryService` with methods: `getLearnerHistory()`, `getAgentHistory()`, `getClientHistory()`, `getClassHistory()` — each returns structured arrays of relationship timeline data
-- `AuditService` with `log()` method writing to `wecoza_events.audit_log`
-- Schema SQL for `agent_class_history` table
-
-Consumes:
-- nothing (first slice)
-
-### S01 → S03
-
-Produces:
-- `AuditService::log()` method for writing entries
-- `AuditService::getEntityLog()` method for reading entries
-- `AuditService::purgeOlderThan()` method for retention cleanup
+- `HistoryRepository::getClassHistory(classId)` → `{agent_assignments[], learner_assignments[], status_changes[], stop_restart_dates[]}`
+- `HistoryRepository::getLearnerHistory(learnerId)` → `{class_enrollments[], hours_logged[]}`
+- `HistoryRepository::getAgentHistory(agentId)` → `{primary_classes[], backup_classes[], notes[], absences[]}`
+- `HistoryRepository::getClientHistory(clientId)` → `{classes[], locations[]}`
+- `HistoryRepository::getAgentClassHistory(classId)` / `getAgentClassHistoryByAgent(agentId)` → assignment rows from `agent_class_history`
+- `schema/agent_class_history.sql` — DDL for agent-class assignment tracking
+- `tests/History/bootstrap.php` — standalone PG test bootstrap
+- `wecoza_events.audit_log` table (pre-existing)
 
 Consumes:
 - nothing (first slice)
@@ -82,7 +107,49 @@ Consumes:
 ### S02 → S03
 
 Produces:
-- History tab UI component structure (tab layout, AJAX loading pattern)
+- `HistoryService::getClassTimeline(classId)` → merged array: agent assignments, learner list with LP status, status changes, class notes (from JSONB), event dates (from event_dates JSONB + events_log)
+- `HistoryService::getAgentTimeline(agentId)` → merged array: classes facilitated (with type/subject/duration), clients derived from classes, agent notes, QA visits (from qa_visits table)
+- `AuditService::log(action, entityType, entityId, context)` → writes to `wecoza_events.audit_log` with action code
+- `AuditService::getEntityLog(entityType, entityId, limit, offset)` → paginated audit entries
+- `AuditService::purgeOlderThan(months)` → retention cleanup
+- `AuditService::registerCronPurge()` → WP-Cron scheduled event for 3-year cleanup
+- AJAX endpoint: `wp_ajax_wecoza_get_entity_history` → returns entity history JSON (nonce-verified)
+- Audit wiring: `AuditService::log()` called from class save and learner save AJAX handlers
+- `[wecoza_audit_log]` shortcode → renders filterable audit log table
 
-Consumes:
-- S01: HistoryService methods for data
+Consumes from S01:
+- `HistoryRepository` — all query methods
+- `wecoza_events.audit_log` table
+
+### S02 → S04
+
+Produces:
+- `HistoryService::getLearnerTimeline(learnerId)` → merged array: class enrollments with LP status + client info, levels/subjects completed with start/completion dates, portfolio records (from learner_progression_portfolios)
+- `HistoryService::getClientTimeline(clientId)` → merged array: all classes with status, agents derived from classes, learner list derived from classes.learner_ids
+- AJAX endpoint reusable for all 4 entity types
+
+Consumes from S01:
+- `HistoryRepository` — learner and client query methods
+
+### S03 → S05
+
+Produces:
+- `views/classes/components/single-class/history-section.php` — class history section (tables/lists, not interactive timeline)
+- `views/agents/components/history-section.php` — agent history section
+- CSS in `ydcoza-styles.css` for history section styling
+- JS in `assets/js/classes/` and `assets/js/agents/` for AJAX history loading + pagination
+
+Consumes from S02:
+- `HistoryService::getClassTimeline()`, `getAgentTimeline()`
+- AJAX endpoint for entity history
+
+### S04 → S05
+
+Produces:
+- `views/learners/components/history-section.php` — learner history section
+- `views/clients/components/history-section.php` — client history section
+- JS for AJAX learner/client history loading + pagination
+
+Consumes from S02:
+- `HistoryService::getLearnerTimeline()`, `getClientTimeline()`
+- AJAX endpoint for entity history

@@ -98,6 +98,12 @@ function handle_update_learner(): void {
         $result = get_learner_service()->updateLearner($learner_id, $data);
 
         if ($result) {
+            // Audit log (M002)
+            try {
+                $audit = new \WeCoza\Classes\Services\AuditService();
+                $audit->log('LEARNER_UPDATED', 'learner', $learner_id, get_current_user_id());
+            } catch (\Exception $e) { /* audit never blocks */ }
+
             wp_send_json_success(['message' => 'Learner updated successfully']);
         } else {
             throw new Exception('Failed to update learner');
@@ -125,6 +131,12 @@ function handle_delete_learner(): void {
         $result = get_learner_service()->deleteLearner($learner_id);
 
         if ($result) {
+            // Audit log (M002)
+            try {
+                $audit = new \WeCoza\Classes\Services\AuditService();
+                $audit->log('LEARNER_DELETED', 'learner', $learner_id, get_current_user_id());
+            } catch (\Exception $e) { /* audit never blocks */ }
+
             wp_send_json_success(['message' => 'Learner deleted successfully']);
         } else {
             throw new Exception('Failed to delete learner');

@@ -89,3 +89,60 @@ Append-only register of architectural and pattern decisions.
 **Context:** `LearnerProgressionModel::$examClass` is typed as `?string` expecting 'Yes'/'No'. The `classes.exam_class` column is PostgreSQL boolean. Using `COALESCE(c.exam_class, 'No')` still returns a PG boolean, causing PHP `Cannot assign bool to property` fatal error.
 **Decision:** Use `CASE WHEN c.exam_class = true THEN 'Yes' ELSE 'No' END AS exam_class` in SQL queries instead of COALESCE with string fallback on boolean columns.
 **Rationale:** PostgreSQL preserves the column type through COALESCE when the first non-null value is boolean. CASE WHEN explicitly returns text type. This pattern should be used anywhere a PG boolean needs to become a PHP string.
+
+## D015: Entity history derived from existing relations, not a separate history table per entity (2026-03-12)
+
+**Context:** M002 (WEC-189) needs entity relationship history for classes, learners, agents, and clients. Could either create dedicated history tables or query existing relational data.
+**Decision:** Derive history from existing tables (classes, learner_lp_tracking, learner_hours_log, class_status_history, agent_notes, agent_absences, sites, locations). Only create `agent_class_history` as a new table for tracking agent-class assignment changes over time (not derivable from current schema).
+**Rationale:** Most relationship data already exists in the DB — learner-class via learner_lp_tracking, agent-class via classes.class_agent, client-class via classes.client_id. Creating redundant history tables would mean double-writing and data staleness risk. The one exception is agent assignments, which only store current state (not when changes happened), hence the new `agent_class_history` table.
+
+## D016: JSONB columns contain object arrays, not flat IDs (2026-03-12)
+
+**Context:** `classes.learner_ids` and `classes.backup_agent_ids` are JSONB columns. Initial assumption was flat ID arrays.
+**Decision:** Parse `learner_ids` as `[{id, name, level, status}]` and `backup_agent_ids` as `[{agent_id, date}]`. HistoryRepository handles both object and flat-ID formats with fallback parsing.
+**Rationale:** Discovered during S01/T01 live data testing. The JSONB shapes include metadata beyond just IDs. Fallback support ensures backward compatibility if any rows use the older flat format.
+
+## D017: Audit log: high-level only, entity type + ID, no PII field values, 3-year retention (2026-03-12)
+
+**Context:** Mario (WEC-189) said audit trail is "nice to have" and explicitly warned against "everyone playing policeman." Detail level: high level only. Entities: class changes & learner changes. Retention: 3 years.
+**Decision:** Audit log entries record action, entity_type, entity_id, user_id, and timestamp. No field-level change tracking. No PII in message text. 3-year retention with purge mechanism. Writes to existing `wecoza_events.audit_log` table. Audit failures are logged but never block the parent operation.
+**Rationale:** Keeps audit trail lightweight and non-intrusive per Mario's guidance. Prevents staff from micro-auditing each other. Uses existing table infrastructure.
+
+## D018: Audit log uses action codes, not field diffs (2026-03-12)
+
+**Context:** Gemini audit flagged that "what changed" could be interpreted as JSON diffs of entity state, which would bloat the DB and risk leaking PII. Mario said "high level only."
+**Decision:** Audit log entries use predefined action codes (e.g. `CLASS_STATUS_CHANGED`, `LEARNER_ADDED`, `AGENT_ASSIGNED`) in the `action` column. No field names, no old/new values, no JSON diffs. The `context` JSONB column stores only entity_type and entity_id.
+**Rationale:** Matches Mario's "high level only" requirement. Prevents scope creep into granular change tracking. Keeps DB size minimal. No PII risk.
+
+## D019: Audit log shortcode gatekept to admin pages, not user-facing (2026-03-12)
+
+**Context:** Mario warned about "everyone playing policeman." Gemini flagged SC6's "can be queried" as potentially enabling user-facing audit browsing.
+**Decision:** Audit log is exposed via `[wecoza_audit_log]` shortcode only. The shortcode itself renders for any authenticated user, but it will be placed exclusively on admin-only WordPress pages via page-level access control (existing WP capability checks). No user-facing audit query interface.
+**Rationale:** Mario's intent: audit data exists for admin oversight, not for staff to monitor each other. Shortcode approach matches existing WeCoza pattern and allows gatekeeping via WP page permissions.
+
+## D020: History UI uses clean tables/lists, not interactive timelines (2026-03-12)
+
+**Context:** Original roadmap specified "Phoenix-style interactive timeline components." Gemini flagged this as over-engineering for a visibility requirement.
+**Decision:** History sections on entity pages use clean, paginated tables and definition lists matching the existing page design language. No animated timelines, no interactive drag/filter UI. AJAX-loaded with pagination for performance.
+**Rationale:** Mario asked for visibility ("what happened with this entity"), not an interactive timeline product. Tables are simpler to build, maintain, and match the existing Bootstrap-based admin UI.
+
+## D021: HistoryService facade lives in S02, not S01 (2026-03-12)
+
+**Context:** Gemini flagged AuditService boundary being split between S01 and S02. Original plan had HistoryService in S01.
+**Decision:** S01 provides raw data-access (HistoryRepository + AuditService primitives). S02 builds HistoryService facade that merges repository data, adds additional queries (QA visits, portfolios, events, class notes), and wires audit logging into save handlers. Clean separation: S01 = data access, S02 = business logic + wiring.
+**Rationale:** Cleaner slice boundaries. S01 is pure data layer. S02 is the integration layer that composes S01 primitives into user-facing data shapes.
+
+## D022: Phoenix Card + Table Pattern for All List/Table Views (2026-03-12)
+
+**Context:** Audit log shortcode initially used plain Bootstrap tables that looked inconsistent with the rest of the app. Mario's feedback — all tables must match the Phoenix card pattern used by `wecoza_display_classes`.
+**Decision:** All WeCoza list/table views MUST follow this exact Phoenix card pattern:
+1. Outer wrapper: `<div class="card shadow-none border my-3" data-component-card="data-component-card">`
+2. Card header (`card-header p-3 border-bottom`): title with icon + search/filter buttons + action buttons
+3. Summary strip: `scrollbar > row g-0 flex-nowrap` with `border-end` column dividers
+4. Card body (`card-body p-4 py-2`): wrapping `table-responsive`
+5. Table: `table table-hover table-sm fs-9 mb-0 overflow-hidden`
+6. Thead: `border-bottom` with `border-0` th cells, each with a trailing Bootstrap icon
+7. Status/action badges: `badge-phoenix badge-phoenix-{color}` with `badge-label` span + inline SVG icon
+8. Pagination in card footer with `border-top`
+**Reference:** `views/classes/components/classes-display.view.php`
+**Rationale:** Consistent UI across all shortcode table views. Non-negotiable — every new table view must follow this pattern.

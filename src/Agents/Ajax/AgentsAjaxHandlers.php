@@ -195,6 +195,13 @@ class AgentsAjaxHandlers
             );
 
             if ($result['success']) {
+                // Audit log (M002)
+                try {
+                    $audit = new \WeCoza\Classes\Services\AuditService();
+                    $actionCode = ($agent_id === 0) ? 'AGENT_CREATED' : 'AGENT_UPDATED';
+                    $audit->log($actionCode, 'agent', (int) $result['agent_id'], get_current_user_id());
+                } catch (\Exception $e) { /* audit never blocks */ }
+
                 AjaxSecurity::sendSuccess([
                     'message'  => __('Agent saved successfully.', 'wecoza-core'),
                     'agent_id' => $result['agent_id'],

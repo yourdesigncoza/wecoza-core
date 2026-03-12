@@ -31,3 +31,4 @@ Accurate learner progression tracking through learning programmes — from enrol
 ## Milestone Sequence
 
 - [x] M001: Exam & Assessment Workflow — Mock exam, SBA, and final exam tracking with event/task integration and LP auto-completion (WEC-186). 4 slices, 223 automated checks, browser-verified. Completed 2026-03-11.
+- [ ] M002: Entity History & Audit Trail — Surface entity relationship history across class/learner/agent/client as interactive timeline components on single-entity pages, with lightweight audit log for change tracking (WEC-189). 5 slices.
