@@ -59,6 +59,7 @@ spl_autoload_register(function (string $class) {
         "WeCoza\\LookupTables\\" => WECOZA_CORE_PATH . "src/LookupTables/",
         "WeCoza\\Feedback\\" => WECOZA_CORE_PATH . "src/Feedback/",
         "WeCoza\\NLQ\\" => WECOZA_CORE_PATH . "src/NLQ/",
+        "WeCoza\\Reports\\" => WECOZA_CORE_PATH . "src/Reports/",
     ];
 
     foreach ($namespaces as $prefix => $baseDir) {
@@ -754,6 +755,22 @@ add_action(
 
         require_once WECOZA_CORE_PATH .
             "src/Classes/Ajax/ReportAjaxHandlers.php";
+
+        /*
+        |--------------------------------------------------------------------------
+        | Load Excessive Hours Report AJAX Handlers
+        |--------------------------------------------------------------------------
+        |
+        | AJAX handlers for excessive training hours detection and resolution.
+        | Live query approach — no cron, data is always current. (WEC-187)
+        |
+        */
+
+        require_once WECOZA_CORE_PATH .
+            "src/Reports/ExcessiveHours/ExcessiveHoursAjaxHandlers.php";
+
+        require_once WECOZA_CORE_PATH .
+            "src/Reports/ExcessiveHours/ExcessiveHoursShortcode.php";
 
         // Auto-detect shortcode context for the feedback widget
         add_filter('do_shortcode_tag', function (string $output, string $tag): string {

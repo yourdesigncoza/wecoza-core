@@ -167,6 +167,20 @@ final class SystemPulseShortcode
             ];
         } catch (\Throwable) {}
 
+        // Excessive training hours (WEC-187)
+        try {
+            $ehRepo = new \WeCoza\Reports\ExcessiveHours\ExcessiveHoursRepository();
+            $n = $ehRepo->countOpen();
+            $items[] = [
+                'icon' => 'bi-exclamation-triangle',
+                'color' => $n > 0 ? 'warning' : 'success',
+                'value' => $n,
+                'label' => $n > 0
+                    ? ($n === 1 ? 'Learner' : 'Learners') . ' Over Hours'
+                    : 'No Excessive Hours',
+            ];
+        } catch (\Throwable) {}
+
         // Classes ending within 7 days
         try {
             $pdo = wecoza_db()->getPdo();

@@ -146,3 +146,22 @@ Append-only register of architectural and pattern decisions.
 8. Pagination in card footer with `border-top`
 **Reference:** `views/classes/components/classes-display.view.php`
 **Rationale:** Consistent UI across all shortcode table views. Non-negotiable — every new table view must follow this pattern.
+
+## D018: Excessive Hours — Live Query, No WP-Cron (M003, 2026-03-12)
+
+**Context:** WEC-187 requires flagging learners with excessive training hours. WP-Cron is unreliable.
+**Decision:** Use live SQL query on every page load instead of cron-generated flags. Only resolution records are persisted.
+**Rationale:** Always shows current data, no stale flags, no cron dependency, simpler architecture.
+**Trade-off:** Slightly higher query cost per page load (mitigated by optimized query + composite index).
+
+## D019: 30-Day Rolling Resolution Window (M003, 2026-03-12)
+
+**Context:** Resolved items should resurface if the underlying problem persists.
+**Decision:** Use 30-day rolling window instead of calendar month for resolution expiry.
+**Rationale:** Calendar month has edge case where resolving on March 31 immediately expires April 1. Per Gemini review.
+
+## D020: src/Reports/ Namespace (M003, 2026-03-12)
+
+**Context:** Excessive hours report is a cross-cutting admin aggregation, not learner-specific.
+**Decision:** Place under `src/Reports/ExcessiveHours/` with `WeCoza\Reports\` namespace.
+**Rationale:** Avoids polluting `src/Learners/`. Reports are a separate concern. Per Gemini review.
